@@ -1,0 +1,40 @@
+import { MantineColorsTuple } from '@mantine/core';
+
+export const light_yellow: MantineColorsTuple = [
+    '#fdfce5',
+    '#f8f6d3',
+    '#f0ecaa',
+    '#e7e17c',
+    '#e0d957',
+    '#dbd33e',
+    '#d9d02f',
+    '#c0b820',
+    '#aaa316',
+    '#938c03'
+]
+
+export const light_blue: MantineColorsTuple = [
+    "#eef3ff",
+    "#dce4f5",
+    "#b9c7e2",
+    "#94a8d0",
+    "#748dc1",
+    "#5f7cb8",
+    "#5474b4",
+    "#44639f",
+    "#39588f",
+    "#2d4b81"
+]
+
+export const shading: MantineColorsTuple = [
+    "#f5f5f5",
+    "#e7e7e7",
+    "#cdcdcd",
+    "#b2b2b2",
+    "#9a9a9a",
+    "#8b8b8b",
+    "#848484",
+    "#717171",
+    "#656565",
+    "#575757"
+]
