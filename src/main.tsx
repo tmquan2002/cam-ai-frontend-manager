@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import '@mantine/core/styles.css';
 import { MantineProvider, createTheme } from '@mantine/core';
-import { light_blue, light_yellow, shading } from './constants/Color.ts';
+import { light_blue, light_yellow, pale_red, shading } from './constants/Color.ts';
 
 //TODO: Setup main theme here with different colors
 const theme = createTheme({
@@ -11,6 +11,7 @@ const theme = createTheme({
   colors: {
     'light-blue': light_blue, 
     'light-yellow': light_yellow, 
+    'pale-red': pale_red,
     'shading': shading
   }
 });

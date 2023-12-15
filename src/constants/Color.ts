@@ -38,3 +38,16 @@ export const shading: MantineColorsTuple = [
     "#656565",
     "#575757"
 ]
+
+export const pale_red: MantineColorsTuple = [
+    '#ffeaf3',
+    '#fdd4e1',
+    '#f4a7bf',
+    '#ec779c',
+    '#e64f7e',
+    '#e3356b',
+    '#e22762',
+    '#c91a52',
+    '#b41149',
+    '#9f003e'
+];
