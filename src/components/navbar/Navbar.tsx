@@ -2,7 +2,7 @@ import styled from "../../styles/navbar/navbar.module.scss";
 import Logo from "../../assets/images/milease_icon.png"
 import { Button, Group } from "@mantine/core";
 
-export const MileaseNavbar = () => {
+export const Navbar = () => {
 
     return (
         <div className={styled["container-main"]}>
@@ -16,4 +16,4 @@ export const MileaseNavbar = () => {
     )
 };
 
-export default MileaseNavbar;
+export default Navbar;
