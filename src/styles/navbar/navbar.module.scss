@@ -1,0 +1,73 @@
+$primary-red: #ee5a5b;
+
+.container-main {
+    position: fixed;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: white;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px;
+    height: 70px;
+    z-index: 999;
+    box-shadow: 2px 2px 2px rgb(218, 218, 218);
+
+    .logo {
+        width: 70px;
+    }
+
+    .navlink-main-container {
+        display: flex;
+        flex-direction: row;
+
+        .navlink-container {
+            position: relative;
+
+            .navlink {
+                margin: 0 30px;
+                color: rgba(0, 0, 0, 0.486);
+                font-weight: bold;
+            }
+
+            .navlink:hover,
+            .navlinkActive {
+                color: black;
+            }
+
+            .navlinkActive::after {
+                content: "";
+                width: 30px;
+                height: 4px;
+                background: $primary-red;
+                position: absolute;
+                bottom: -4px;
+                left: 30px;
+                border-radius: 20px;
+            }
+        }
+    }
+
+    .loginLink {
+        margin: 0 40px;
+        color: black;
+        font-weight: bold;
+    }
+
+    .logoutLink {
+        margin: 0 40px;
+        color: black;
+        font-weight: bold;
+        background-color: transparent;
+        border: 1px solid white;
+    }
+
+    .downloadLink {
+        background-color: $primary-red;
+        padding: 10px 30px;
+        border-radius: 20px;
+        color: white;
+        font-weight: bold;
+    }
+}

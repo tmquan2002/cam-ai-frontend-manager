@@ -3,9 +3,23 @@
   src: local("DVN-Poppins"), url("./assets/fonts/DesignerVN-Poppins-Regular.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "DVN-Poppins";
+  src: local("DVN-Poppins"), url("./assets/fonts/Poppins-Bold.otf") format("truetype");
+  font-weight: bold;
+}
+
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+label {
+  margin-top: 20px;
+}
+
+button {
+  margin: 20px 0;
 }

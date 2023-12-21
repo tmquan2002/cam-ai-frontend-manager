@@ -1,11 +1,7 @@
 #root {
-  max-width: 1280px;
+  background-color: #dfdfdf;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-}
-
-.viet-class {
-  font-weight: 400;
-  font-size: 40px;
+  height: 100vh;
 }
