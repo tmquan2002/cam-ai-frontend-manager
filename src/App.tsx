@@ -1,12 +1,10 @@
-import { Button, Group } from '@mantine/core'
+import './App.css'
+import LoginPage from './pages/common/LoginPage'
 
 function App() {
 
   return (
-    <Group>
-      <Button>Primary button</Button>
-      <Button color="light-yellow.9">Yellow button</Button>
-    </Group>
+    <LoginPage />
   )
 }
 

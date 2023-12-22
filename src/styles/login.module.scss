@@ -1,0 +1,43 @@
+$primary-red: #ee5a5b;
+
+.container-main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    padding: 100px 0;
+
+    .image-container {
+        width: min-content;
+        text-align: left;
+        color: var(--mantine-color-shading-9);
+
+        .title {
+            font-weight: bold;
+            color: black;
+            font-size: 55px;
+        }
+
+        .description {
+            text-align: left;
+            padding: 0 0 30px 0;
+            font-size: 20px;
+        }
+    }
+
+    .container {
+        border-radius: 36px;
+        background-color: white;
+        width: 800px;
+        height: fit-content;
+        padding: 50px 100px;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 3px 1px rgba(0, 0, 0, 0.12), 0px 1px 5px rgba(0, 0, 0, 0.2);
+
+        .title {
+            text-align: left;
+            font-weight: bold;
+            font-size: 40px;
+        }
+    }
+}
