@@ -1,5 +1,5 @@
 import { useRoutes } from "react-router-dom";
-import LoginPage from "../pages/common/LoginPage";
+import LoginPage from "../pages/common/login/LoginPage";
 
 const CommonRoute = () => {
 

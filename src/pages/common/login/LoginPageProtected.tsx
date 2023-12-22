@@ -1,6 +1,5 @@
-import styled from "../../styles/login.module.scss";
-import AuthImage from "../../assets/images/login_signup_main.png"
-import { LoginForm } from "../../components/form/LoginForm";
+import styled from "./styles/login.module.scss";
+import AuthImage from "../../../assets/images/login_signup_main.png"
 
 const LoginPageProtected = () => {
 

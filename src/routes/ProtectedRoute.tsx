@@ -1,5 +1,5 @@
 import { useRoutes } from "react-router-dom";
-import LoginPageProtected from "../pages/common/LoginPageProtected";
+import LoginPageProtected from "../pages/common/login/LoginPageProtected";
 
 const ProtectedRoute = () => {
   let element = useRoutes([

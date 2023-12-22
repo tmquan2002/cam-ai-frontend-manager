@@ -1,4 +1,4 @@
-import styled from "../../styles/navbar/navbar.module.scss";
+import styled from "./navbar.module.scss";
 import Logo from "../../assets/images/milease_icon.png"
 import { Button, Group } from "@mantine/core";
 
