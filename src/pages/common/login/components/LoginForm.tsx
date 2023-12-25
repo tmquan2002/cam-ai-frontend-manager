@@ -1,7 +1,13 @@
 import { TextInput, Button, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { MdEmail, MdLockOutline } from "react-icons/md";
 
-export const LoginForm = () => {
+interface LoginFormProp {
+    modalOpen: boolean,
+    setModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const LoginForm = (props: LoginFormProp) => {
     const form = useForm({
         initialValues: {
             email: '',
@@ -17,13 +23,19 @@ export const LoginForm = () => {
         },
     });
 
+    const onSubmitForm = (values: { email: string; password: string; }) => {
+        console.log(values)
+        props.setModalOpen(true)
+    }
+
     return (
-        <form onSubmit={form.onSubmit((values) => console.log(values))}
+        <form onSubmit={form.onSubmit((values) => onSubmitForm(values))}
             style={{ marginTop: '20px', textAlign: 'left' }}>
             <TextInput
                 withAsterisk
                 label="Email"
                 placeholder="your@email.com"
+                leftSection={<MdEmail />}
                 size='md'
                 {...form.getInputProps('email')}
             />
@@ -32,6 +44,7 @@ export const LoginForm = () => {
                 withAsterisk
                 label="Password"
                 type='password'
+                leftSection={<MdLockOutline />}
                 size='md'
                 {...form.getInputProps('password')}
             />

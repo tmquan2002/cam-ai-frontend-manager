@@ -1,8 +1,13 @@
 import styled from "./styles/login.module.scss";
 import AuthImage from "../../../assets/images/login_signup_main.png"
 import { LoginForm } from "./components/LoginForm";
+import { Modal } from "@mantine/core";
+import { useState } from "react";
+import { ChangePasswordForm } from "./components/ChangePasswordForm";
 
 const LoginPage = () => {
+
+  const [modalOpen, setModalOpen] = useState(false)
 
   return (
     <>
@@ -16,7 +21,11 @@ const LoginPage = () => {
           <div className={styled["title"]}>
             LOGIN
           </div>
-          <LoginForm />
+          <LoginForm setModalOpen={setModalOpen} modalOpen={modalOpen} />
+          <Modal opened={modalOpen} onClose={() => setModalOpen(false)} title="New User" centered>
+            <div>Please change given password with your new password to continue</div>
+            <ChangePasswordForm />
+          </Modal>
         </div>
       </div>
     </>

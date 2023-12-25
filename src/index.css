@@ -23,3 +23,12 @@ label {
 button {
   margin: 20px 0;
 }
+
+.mantine-Modal-header, .mantine-Modal-content {
+  padding: 0 20px;
+}
+
+.mantine-Modal-title {
+  font-size: 25px;
+  margin-top: 10px;
+}
