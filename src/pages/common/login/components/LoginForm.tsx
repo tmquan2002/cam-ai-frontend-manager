@@ -30,7 +30,7 @@ export const LoginForm = (props: LoginFormProp) => {
 
     return (
         <form onSubmit={form.onSubmit((values) => onSubmitForm(values))}
-            style={{ marginTop: '20px', textAlign: 'left' }}>
+            style={{ textAlign: 'left' }}>
             <TextInput
                 withAsterisk
                 label="Email"

@@ -9,29 +9,34 @@ $primary-red: #ee5a5b;
     padding: 100px 0;
 
     .image-container {
-        width: min-content;
+        width: 400px;
         text-align: left;
         color: var(--mantine-color-shading-9);
+        margin: 0 30px 30px 0;
 
         .title {
             font-weight: bold;
             color: black;
-            font-size: 55px;
+            font-size: 40px;
         }
 
         .description {
             text-align: left;
             padding: 0 0 30px 0;
-            font-size: 20px;
+            font-size: 18px;
+        }
+
+        .auth-image {
+            width: 300px;
         }
     }
 
     .container {
-        border-radius: 36px;
+        border-radius: 15px;
         background-color: white;
-        width: 800px;
+        width: 600px;
         height: fit-content;
-        padding: 50px 100px;
+        padding: 30px 50px;
         box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 3px 1px rgba(0, 0, 0, 0.12), 0px 1px 5px rgba(0, 0, 0, 0.2);
 
         .title {

@@ -5,3 +5,9 @@
   text-align: center;
   height: 100vh;
 }
+
+@media screen and (max-width: 1200px) {
+  #root {
+    height: 2000px;
+  }
+}
