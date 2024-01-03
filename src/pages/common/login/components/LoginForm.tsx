@@ -1,6 +1,8 @@
 import { TextInput, Button, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { MdEmail, MdLockOutline } from "react-icons/md";
+import { useLogin } from '../../../../hooks/useLogin';
+import { LoginParams } from '../../../../apis/LoginAPI';
 
 interface LoginFormProp {
     modalOpen: boolean,
@@ -8,6 +10,13 @@ interface LoginFormProp {
 }
 
 export const LoginForm = (props: LoginFormProp) => {
+    const {
+        mutate: login,
+        isLoading: isCreatePlanLoading,
+        error: errorCreate,
+        data: dataCreate,
+    } = useLogin();
+
     const form = useForm({
         initialValues: {
             email: '',
@@ -23,9 +32,25 @@ export const LoginForm = (props: LoginFormProp) => {
         },
     });
 
-    const onSubmitForm = (values: { email: string; password: string; }) => {
+    const onSubmitForm = async (values: { email: string; password: string; }) => {
         console.log(values)
-        props.setModalOpen(true)
+        // props.setModalOpen(true)
+
+        var loginParams: LoginParams = {
+            username: values.email,
+            password: values.password
+        }
+
+        await login(loginParams, {
+            onSuccess(data, variables, context) {
+                //TODO: Need to handle if this manager is new or not
+                //TODO: Handle refresh token, access token
+                console.log(data)
+            },
+            onError(error, variables, context) {
+                console.log(error);
+            },
+        });
     }
 
     return (
