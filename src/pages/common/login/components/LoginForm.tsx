@@ -26,7 +26,8 @@ export const LoginForm = (props: LoginFormProp) => {
         validate: {
             email: (value) => (
                 value.trim().length === 0 ? "Email is required" :
-                    /^\S+@\S+$/.test(value) ? null : 'Invalid email'
+                    /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
+                        .test(value) ? null : 'Invalid email'
             ),
             password: (value) => (value.trim().length === 0 ? 'Password is required' : null),
         },
@@ -34,7 +35,7 @@ export const LoginForm = (props: LoginFormProp) => {
 
     const onSubmitForm = async (values: { email: string; password: string; }) => {
         console.log(values)
-        // props.setModalOpen(true)
+        props.setModalOpen(true)
 
         var loginParams: LoginParams = {
             username: values.email,

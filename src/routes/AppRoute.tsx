@@ -9,7 +9,7 @@ const AppRoute = () => {
   return (
     <>
       <CommonRoute />
-      {login && <ProtectedRoute />}
+      {/* {login && <ProtectedRoute />} */}
     </>
   );
 };
