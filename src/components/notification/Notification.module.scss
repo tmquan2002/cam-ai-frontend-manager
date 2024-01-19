@@ -1,0 +1,34 @@
+.header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tabnumber {
+  border-radius: 0.4rem;
+  color: #868e96;
+  border: 1px solid #a8afb6;
+  background-color: #f8f9fa;
+}
+
+.tabnumber-active {
+  border-radius: 0.4rem;
+  color: #fff;
+  background-color: #f03e3e;
+  border: none;
+}
+
+.detail-card:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.anchor:hover {
+  color: #339af0 !important;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.tabtext {
+}
+
+.tabtext-active {
+}
