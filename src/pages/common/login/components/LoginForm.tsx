@@ -35,7 +35,6 @@ export const LoginForm = (props: LoginFormProp) => {
 
     const onSubmitForm = async (values: { email: string; password: string; }) => {
         console.log(values)
-        props.setModalOpen(true)
 
         var loginParams: LoginParams = {
             username: values.email,
@@ -47,8 +46,12 @@ export const LoginForm = (props: LoginFormProp) => {
                 //TODO: Need to handle if this manager is new or not
                 //TODO: Handle refresh token, access token
                 console.log(data)
+                if (data) {
+                    console.log("OK")
+                }
             },
             onError(error, variables, context) {
+                props.setModalOpen(true)
                 console.log(error);
             },
         });

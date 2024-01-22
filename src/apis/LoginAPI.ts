@@ -7,7 +7,7 @@ export type LoginParams = {
 
 export const LoginAPI = {
     login: async (params: LoginParams) => {
-        const res = await http.post("/api/Auth", params);
+        const res = await http.post("/api/auth", params);
         return res.data;
     },
 }
