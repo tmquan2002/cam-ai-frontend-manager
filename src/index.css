@@ -1,11 +1,13 @@
 @font-face {
   font-family: "DVN-Poppins";
-  src: local("DVN-Poppins"), url("./assets/fonts/DesignerVN-Poppins-Regular.ttf") format("truetype");
+  src: local("DVN-Poppins"),
+    url("./assets/fonts/DesignerVN-Poppins-Regular.ttf") format("truetype");
 }
 
 @font-face {
   font-family: "DVN-Poppins";
-  src: local("DVN-Poppins"), url("./assets/fonts/Poppins-Bold.otf") format("truetype");
+  src: local("DVN-Poppins"),
+    url("./assets/fonts/Poppins-Bold.otf") format("truetype");
   font-weight: bold;
 }
 
@@ -16,19 +18,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-label {
-  margin-top: 20px;
-}
-
-button {
-  margin: 20px 0;
-}
-
-.mantine-Modal-header, .mantine-Modal-content {
-  padding: 0 20px;
-}
-
-.mantine-Modal-title {
-  font-size: 25px;
-  margin-top: 10px;
+p {
+  margin: 0;
+  padding: 0;
 }

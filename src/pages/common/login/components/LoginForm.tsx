@@ -1,89 +1,97 @@
-import { TextInput, Button, Group } from '@mantine/core';
-import { useForm } from '@mantine/form';
+import { TextInput, Button, Group } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { MdEmail, MdLockOutline } from "react-icons/md";
-import { useLogin } from '../../../../hooks/useLogin';
-import { LoginParams } from '../../../../apis/LoginAPI';
+import { useLogin } from "../../../../hooks/useLogin";
+import { LoginParams } from "../../../../apis/LoginAPI";
+import { useSession } from "../../../../context/AuthContext";
 
 interface LoginFormProp {
-    modalOpen: boolean,
-    setModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  modalOpen: boolean;
+  setModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const LoginForm = (props: LoginFormProp) => {
-    const {
-        mutate: login,
-        isLoading: isCreatePlanLoading,
-        error: errorCreate,
-        data: dataCreate,
-    } = useLogin();
+  const sessionHook = useSession();
+  const { mutate: login, isLoading } = useLogin();
 
-    const form = useForm({
-        initialValues: {
-            email: '',
-            password: '',
-        },
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
 
-        validate: {
-            email: (value) => (
-                value.trim().length === 0 ? "Email is required" :
-                    /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/
-                        .test(value) ? null : 'Invalid email'
-            ),
-            password: (value) => (value.trim().length === 0 ? 'Password is required' : null),
-        },
-    });
+    validate: {
+      email: (value) =>
+        value.trim().length === 0
+          ? "Email is required"
+          : /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(value)
+          ? null
+          : "Invalid email",
+      password: (value) =>
+        value.trim().length === 0 ? "Password is required" : null,
+    },
+  });
 
-    const onSubmitForm = async (values: { email: string; password: string; }) => {
-        console.log(values)
+  const onSubmitForm = async (values: { email: string; password: string }) => {
+    props.setModalOpen(true);
 
-        var loginParams: LoginParams = {
-            username: values.email,
-            password: values.password
-        }
+    const loginParams: LoginParams = {
+      username: values.email,
+      password: values.password,
+    };
 
-        await login(loginParams, {
-            onSuccess(data, variables, context) {
-                //TODO: Need to handle if this manager is new or not
-                //TODO: Handle refresh token, access token
-                console.log(data)
-                if (data) {
-                    console.log("OK")
-                }
-            },
-            onError(error, variables, context) {
-                props.setModalOpen(true)
-                console.log(error);
-            },
+    login(loginParams, {
+      onSuccess(data) {
+        // sessionHook?.signIn(data);
+        sessionHook?.signIn({
+          ...data,
+          accessToken:
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhhNmU5MjUyLWUzMDAtNDU0Ni05YmRiLWUwMTE0NDI2NmIwZiIsInJvbGVzIjoiW3tcIklkXCI6NCxcIk5hbWVcIjpcIlNob3AgbWFuYWdlclwifV0iLCJzdGF0dXMiOiJ7XCJJZFwiOjIsXCJOYW1lXCI6XCJBY3RpdmVcIn0iLCJleHAiOjE3MDAzOTQxMzksImlzcyI6IkpXVF9JU1NVRVIiLCJhdWQiOiJKV1RfQVVESUVOQ0UifQ.or9AbG2DVuo_8ROckCxJNgHuemnocUZJMigbWmQr2v0",
         });
-    }
+      },
+      onError(error) {
+        console.log(error);
+      },
+    });
+  };
 
-    return (
-        <form onSubmit={form.onSubmit((values) => onSubmitForm(values))}
-            style={{ textAlign: 'left' }}>
-            <TextInput
-                withAsterisk
-                label="Email"
-                placeholder="your@email.com"
-                leftSection={<MdEmail />}
-                size='md'
-                {...form.getInputProps('email')}
-            />
+  return (
+    <form
+      onSubmit={form.onSubmit((values) => onSubmitForm(values))}
+      style={{ textAlign: "left" }}
+    >
+      <TextInput
+        withAsterisk
+        label="Email"
+        placeholder="your@email.com"
+        leftSection={<MdEmail />}
+        size="md"
+        {...form.getInputProps("email")}
+      />
 
-            <TextInput
-                withAsterisk
-                label="Password"
-                type='password'
-                leftSection={<MdLockOutline />}
-                size='md'
-                {...form.getInputProps('password')}
-            />
+      <TextInput
+        withAsterisk
+        label="Password"
+        type="password"
+        leftSection={<MdLockOutline />}
+        size="md"
+        {...form.getInputProps("password")}
+      />
 
-            <Group justify="flex-start" mt="md">
-                <Button
-                    type="submit" variant="gradient" size='md'
-                    gradient={{ from: 'light-blue.5', to: 'light-blue.7', deg: 90 }}
-                >Login</Button>
-            </Group>
-        </form>
-    );
-}
+      <Group
+        justify="flex-start"
+        mt="md"
+      >
+        <Button
+          type="submit"
+          variant="gradient"
+          size="md"
+          loading={isLoading}
+          gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+        >
+          Login
+        </Button>
+      </Group>
+    </form>
+  );
+};
