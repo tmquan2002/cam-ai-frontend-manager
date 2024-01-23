@@ -7,7 +7,6 @@ import { Button, Group, Loader, Paper, Text, rem } from "@mantine/core";
 import { useGetGenderList } from "../../hooks/useGetGender";
 import {
   mapLookupStringValueToArray,
-  mapLookupToArray,
   mapNumberLookupToArray,
 } from "../../utils/helperFunction";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
@@ -174,6 +173,7 @@ const ShopManagerProfilePage = () => {
             gender: values.gender,
             name: values.name,
             phone: values.phone,
+            wardId: 1,
           };
           updateAccount(params, {
             onSuccess() {
