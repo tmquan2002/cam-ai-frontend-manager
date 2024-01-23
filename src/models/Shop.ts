@@ -1,3 +1,4 @@
+import { WardDetail } from "./Address";
 import { BrandDetail } from "./Brand";
 
 export type ShopDetail = {
@@ -7,14 +8,9 @@ export type ShopDetail = {
   timestamp: string;
   name: string;
   phone: string;
-  wardId: string;
+  wardId: number;
   addressLine: string;
-  ward: {
-    id: string;
-    createdDate: Date;
-    modifiedDate: Date;
-    timestamp: string;
-  };
+  ward: WardDetail;
   brand: BrandDetail;
   shopStatus: {
     timestamp: string;

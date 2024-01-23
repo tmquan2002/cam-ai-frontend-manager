@@ -1,9 +1,10 @@
-import { Box, Grid, Select, TextInput } from "@mantine/core";
+import { Grid, Loader, Select, TextInput } from "@mantine/core";
 
 const renderTextField = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required } = fieldProps;
+  const { form, name, placeholder, label, required, disabled } = fieldProps;
   return (
     <TextInput
+      disabled={disabled}
       withAsterisk={required}
       label={label}
       placeholder={placeholder}
@@ -13,10 +14,25 @@ const renderTextField = ({ fieldProps }: any) => {
 };
 
 const renderSelect = ({ fieldProps }: any) => {
-  const { label, placeholder, data, form, name } = fieldProps;
+  const {
+    label,
+    placeholder,
+    data,
+    form,
+    name,
+    disabled,
+    searchable,
+    loading,
+  } = fieldProps;
+  if (loading) return <Loader />;
+
+  // console.log(value, setValue);
+
   return (
     <Select
+      searchable={searchable}
       label={label}
+      disabled={disabled}
       placeholder={placeholder}
       data={data}
       {...form.getInputProps(name)}

@@ -9,12 +9,14 @@ export const useGetShopList = (params: GetShopListParams) => {
     isLoading,
     data,
     error,
+    refetch,
   }: UseQueryResult<CommonResponse<ShopDetail>, Error> = useQuery({
+    enabled: params.enabled,
     queryKey: ["shops", params],
     queryFn: async () => {
       return await ShopAPI._getShopList(params);
     },
   });
 
-  return { isError, isLoading, data, error };
+  return { isError, isLoading, data, error, refetch };
 };

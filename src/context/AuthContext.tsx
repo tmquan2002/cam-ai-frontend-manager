@@ -47,6 +47,7 @@ export function getUserRoles(): RoleDetail[] | null {
 
 export function getUserId(): string | null {
   const accessToken: string | null = getAccessToken();
+
   if (accessToken) {
     const id: string = jwt.getIdFromToken(accessToken);
     return id;
@@ -83,16 +84,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
   useEffect(() => {
     http.interceptors.response.use(
       (res) => {
-        if (res && res?.data) {
-          return res;
-        }
-
         return res;
       },
       async (err) => {
-        try {
-          if (err?.response?.status == 401) {
-            if (err?.response?.headers.auto == "True") {
+        if (err?.response?.status == 401) {
+          if (err?.response?.headers.auto == "True") {
+            try {
               const { config } = err;
 
               const isAlreadyFetchingAccessToken = localStorage.getItem(
@@ -124,23 +121,21 @@ export function SessionProvider(props: React.PropsWithChildren) {
               });
 
               return retryOriginalRequest;
-            } else {
-              throw err;
+            } catch (error) {
+              setAccessToken(null);
+              setRefreshToken(null);
+              navigate("/login");
+            } finally {
+              localStorage.removeItem(
+                CommonConstant.IS_ALREADY_FETCHING_ACCESS
+              );
             }
           }
-        } catch (error) {
-          setAccessToken(null);
-          setRefreshToken(null);
-          navigate("/login");
-        } finally {
-          localStorage.removeItem(CommonConstant.IS_ALREADY_FETCHING_ACCESS);
+
+          throw err;
         }
 
-        if (err.response) {
-          return err.response.data;
-        } else {
-          return Promise.reject(err);
-        }
+        throw err;
       }
     );
   }, []);

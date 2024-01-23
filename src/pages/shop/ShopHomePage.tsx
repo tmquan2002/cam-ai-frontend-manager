@@ -108,7 +108,7 @@ const ShopHomePage = () => {
     </Table.Tr>
   ));
   return (
-    <>
+    <Box m={rem(32)}>
       <Grid
         justify="space-between"
         columns={24}
@@ -260,7 +260,7 @@ const ShopHomePage = () => {
           <Table.Tbody bg={"white"}>{rows}</Table.Tbody>
         </Table>
       </Card>
-    </>
+    </Box>
   );
 };
 

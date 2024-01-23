@@ -42,12 +42,10 @@ export const LoginForm = (props: LoginFormProp) => {
 
     login(loginParams, {
       onSuccess(data) {
-        // sessionHook?.signIn(data);
-        sessionHook?.signIn({
-          ...data,
-          accessToken:
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhhNmU5MjUyLWUzMDAtNDU0Ni05YmRiLWUwMTE0NDI2NmIwZiIsInJvbGVzIjoiW3tcIklkXCI6NCxcIk5hbWVcIjpcIlNob3AgbWFuYWdlclwifV0iLCJzdGF0dXMiOiJ7XCJJZFwiOjIsXCJOYW1lXCI6XCJBY3RpdmVcIn0iLCJleHAiOjE3MDAzOTQxMzksImlzcyI6IkpXVF9JU1NVRVIiLCJhdWQiOiJKV1RfQVVESUVOQ0UifQ.or9AbG2DVuo_8ROckCxJNgHuemnocUZJMigbWmQr2v0",
-        });
+        sessionHook?.signIn(data);
+        // sessionHook?.signIn({
+        //   ...data,
+        // });
       },
       onError(error) {
         console.log(error);
@@ -84,10 +82,10 @@ export const LoginForm = (props: LoginFormProp) => {
       >
         <Button
           type="submit"
-          variant="gradient"
+          // variant="gradient"
           size="md"
           loading={isLoading}
-          gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+          // gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
         >
           Login
         </Button>

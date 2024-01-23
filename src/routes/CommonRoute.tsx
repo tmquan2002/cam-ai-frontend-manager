@@ -4,22 +4,38 @@ import { checkRole } from "../context/AuthContext";
 import { RoleEnum } from "../types/enum";
 
 const CommonRoute = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.Employee);
   useEffect(() => {
-    const isUserHavePermission: boolean | undefined = checkRole({
+    const isUserRoleBrandManager: boolean | undefined = checkRole({
+      Id: RoleEnum.BrandManager,
+      Name: "",
+    });
+
+    const isUserRoleShopManager: boolean | undefined = checkRole({
       Id: RoleEnum.ShopManager,
       Name: "",
     });
-    if (isUserHavePermission) {
-      setIsAuthenticated(true);
+
+    console.log(isUserRoleBrandManager, isUserRoleShopManager);
+
+    if (isUserRoleBrandManager) {
+      setUserRole(RoleEnum.BrandManager);
+      return;
+    }
+    if (isUserRoleShopManager) {
+      setUserRole(RoleEnum.ShopManager);
+      return;
     }
   }, []);
 
-  if (!isAuthenticated) {
-    return <Outlet />;
+  switch (userRole) {
+    case RoleEnum.BrandManager:
+      return <Navigate to={"/brand"} />;
+    case RoleEnum.ShopManager:
+      return <Navigate to={"/shop"} />;
+    default:
+      return <Outlet />;
   }
-
-  return <Navigate to={"/shop"} />;
 };
 
 export default CommonRoute;

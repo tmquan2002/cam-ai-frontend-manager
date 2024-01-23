@@ -12,9 +12,9 @@ import { ScrollArea } from "@mantine/core";
 import classes from "./ShopNavbar.module.scss";
 
 const mockdata = [
-  { label: "Dashboard", icon: IconGauge, path: "/shop" },
+  { label: "Dashboard", icon: IconGauge, path: "/brand" },
   {
-    label: "Tin mới Việt Nam",
+    label: "Tin mới Brand",
     icon: IconNotes,
     initiallyOpened: true,
     links: [
@@ -47,7 +47,7 @@ const mockdata = [
   },
 ];
 
-export function ShopNavbar() {
+export function BrandNavbar() {
   const links = mockdata.map((item) => (
     <NavbarLinksGroup
       {...item}

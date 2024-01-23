@@ -4,7 +4,11 @@ import LoginPage from "../pages/common/login/LoginPage";
 import ShopRoute from "./ShopRoute";
 import ShopHomePage from "../pages/shop/ShopHomePage";
 import ShopDetailPage from "../pages/shop/ShopDetailPage";
-import Notification from "../components/notification/Notification";
+import ShopReportPage from "../pages/shop/ShopReportPage";
+import BrandDetailPage from "../pages/brand/BrandDetailPage";
+import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
+import BrandRoute from "./BrandRoute";
+import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -32,8 +36,30 @@ const AppRoute = () => {
           element: <ShopDetailPage />,
         },
         {
-          path: "noti",
-          element: <Notification />,
+          path: "report",
+          element: <ShopReportPage />,
+        },
+        {
+          path: "brand/detail",
+          element: <BrandShopDetailPage />,
+        },
+        {
+          path: "profile",
+          element: <ShopManagerProfilePage />,
+        },
+      ],
+    },
+    {
+      path: "/brand",
+      element: <BrandRoute />,
+      children: [
+        {
+          path: "",
+          element: <BrandDetailPage />,
+        },
+        {
+          path: "profile",
+          element: <ShopManagerProfilePage />,
         },
       ],
     },

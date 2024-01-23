@@ -10,6 +10,7 @@ export type GetShopListParams = {
   shopManagerId?: string;
   size: number;
   pageIndex?: number;
+  enabled: boolean;
 };
 
 export type UpdateShopParams = {

@@ -4,7 +4,7 @@ import { useSession } from "../../context/AuthContext";
 import Notification from "../notification/Notification";
 import { useNavigate } from "react-router-dom";
 
-const ShopHeader = () => {
+const BrandHeader = () => {
   const session = useSession();
   const navigate = useNavigate();
   return (
@@ -42,7 +42,7 @@ const ShopHeader = () => {
           aria-label="Settings"
           color="blue"
           m={0}
-          onClick={() => navigate("/shop/profile")}
+          onClick={() => navigate("/brand/profile")}
         >
           <IconUser
             style={{ width: "70%", height: "70%" }}
@@ -69,4 +69,4 @@ const ShopHeader = () => {
   );
 };
 
-export default ShopHeader;
+export default BrandHeader;

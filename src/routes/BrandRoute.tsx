@@ -2,14 +2,15 @@ import { Navigate, Outlet } from "react-router-dom";
 import { checkRole } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { RoleEnum } from "../types/enum";
-import { ShopNavbar } from "../components/navbar/ShopNavbar";
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import ShopHeader from "../components/header/ShopHeader";
+import { BrandNavbar } from "../components/navbar/BrandNavbar";
+import BrandHeader from "../components/header/BrandHeader";
 
-const ShopRoute = () => {
+const BrandRoute = () => {
   const [opened] = useDisclosure();
-  const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.ShopManager);
+  const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.BrandManager);
   useEffect(() => {
     const isUserRoleBrandManager: boolean | undefined = checkRole({
       Id: RoleEnum.BrandManager,
@@ -21,15 +22,15 @@ const ShopRoute = () => {
       Name: "",
     });
 
-    if (isUserRoleBrandManager) {
-      setUserRole(RoleEnum.BrandManager);
-    } else if (!isUserRoleShopManager) {
+    if (isUserRoleShopManager) {
+      setUserRole(RoleEnum.ShopManager);
+    } else if (!isUserRoleBrandManager) {
       setUserRole(RoleEnum.Employee);
     }
   }, []);
 
   switch (userRole) {
-    case RoleEnum.ShopManager:
+    case RoleEnum.BrandManager:
       return (
         <AppShell
           header={{ height: 60 }}
@@ -40,11 +41,11 @@ const ShopRoute = () => {
           }}
         >
           <AppShell.Header>
-            <ShopHeader />
+            <BrandHeader />
           </AppShell.Header>
 
           <AppShell.Navbar>
-            <ShopNavbar />
+            <BrandNavbar />
           </AppShell.Navbar>
 
           <AppShell.Main
@@ -56,8 +57,8 @@ const ShopRoute = () => {
           </AppShell.Main>
         </AppShell>
       );
-    case RoleEnum.BrandManager:
-      return <Navigate to={"/brand"} />;
+    case RoleEnum.ShopManager:
+      return <Navigate to={"/shop"} />;
     default:
       return (
         <Navigate
@@ -68,4 +69,4 @@ const ShopRoute = () => {
   }
 };
 
-export default ShopRoute;
+export default BrandRoute;

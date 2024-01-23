@@ -53,8 +53,6 @@ export function NavbarLinksGroup({
       >
         <Group
           onClick={() => {
-            console.log(path);
-
             if (path) {
               navigate(path);
             }

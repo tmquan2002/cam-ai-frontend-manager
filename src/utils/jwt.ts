@@ -21,6 +21,6 @@ export const getRolesFromToken = (token: string): RoleDetail[] => {
 };
 
 export const getIdFromToken = (token: string): string => {
-  const id: string = JSON.parse(getPayloadFromToken(token).id);
+  const id: string = getPayloadFromToken(token).id;
   return id;
 };
