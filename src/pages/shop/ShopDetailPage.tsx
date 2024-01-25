@@ -1,5 +1,5 @@
 import {
-  ActionIcon,
+  // ActionIcon,
   Box,
   Button,
   Flex,
@@ -338,7 +338,8 @@ const ShopDetailPage = () => {
               };
 
               updateShop(updateShopParams, {
-                onSuccess(data) {
+                onSuccess() {
+                  // onSuccess(data) {
                   notifications.show({
                     title: "Update successfully",
                     message: "Shop detail updated!",

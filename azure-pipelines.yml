@@ -1,0 +1,56 @@
+trigger:
+- deploy/vps
+
+pool:
+  name: 'Camai-Agent'
+
+variables:
+- group: web-admin-group
+- group: docker
+
+steps:
+- task: Docker@2
+  displayName: 'Build image'
+  inputs:
+    containerRegistry: 'camai-hub'
+    repository: 'milease/camai-backend'
+    command: 'build'
+    tags: 'camai-web-manager'
+    arguments: '--build-arg REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)'
+
+- task: Docker@2
+  displayName: 'Push image'
+  inputs:
+    containerRegistry: 'camai-hub'
+    repository: 'milease/camai-backend'
+    command: 'push'
+    tags: 'camai-web-manager'
+
+- script: |
+    echo "REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)" > .env
+  displayName: 'Write .env'
+  
+- task: CopyFilesOverSSH@0
+  displayName: 'Copy files'
+  inputs:
+    sshEndpoint: 'ssh-server'
+    contents: |
+      .env
+      ./Deploy/docker-compose.yml
+    targetFolder: 'frontend/manager'
+    readyTimeout: '20000'
+
+- task: SSH@0
+  displayName: 'Pull and run image'
+  inputs:
+    sshEndpoint: 'ssh-server'
+    runOptions: 'inline'
+    inline: |
+      cd frontend/manager
+      mv Deploy/*yml .
+      rmdir Deploy
+      echo $(docker.password) | docker login -u $(docker.username) --password-stdin 2>&1
+      docker compose down web 2>&1
+      docker rmi milease/camai-backend:camai-web-manager 2>&1
+      docker compose up -d --quiet-pull 2>&1
+    readyTimeout: '20000'

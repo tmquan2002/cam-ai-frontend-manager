@@ -8,7 +8,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { SessionProvider } from "./context/AuthContext";
 import { Notifications } from "@mantine/notifications";
 import { MantineProvider, createTheme } from "@mantine/core";
-import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
+// import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
+import { light_yellow, pale_red, shading } from "./types/constant";
 
 const queryClient = new QueryClient({
   defaultOptions: {

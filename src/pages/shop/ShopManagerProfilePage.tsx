@@ -30,14 +30,25 @@ type ProfileFieldValue = {
 };
 
 const ShopManagerProfilePage = () => {
-  const { data: gender, isLoading: isGenderLoading } = useGetGenderList();
+  const {
+    data: gender,
+    // isLoading: isGenderLoading
+  } = useGetGenderList();
   const { data: account, isLoading: isAccountLoading } = useGetAccountById(
     getUserId() ?? "0"
   );
-  const { data: accountStatus, isLoading: isAccountStatusLoading } =
-    useGetAccountStatusList();
-  const { mutate: updateAccount, isLoading: updateAccountLoading } =
-    useUpdateAccount();
+  const
+    {
+      data: accountStatus,
+      // isLoading: isAccountStatusLoading 
+    } =
+      useGetAccountStatusList();
+  const
+    {
+      mutate: updateAccount,
+      // isLoading: updateAccountLoading 
+    } =
+      useUpdateAccount();
   const form = useForm<ProfileFieldValue>({});
 
   useEffect(() => {
