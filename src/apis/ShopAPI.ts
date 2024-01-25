@@ -5,12 +5,13 @@ import http, { toQueryParams } from "../utils/http";
 
 export type GetShopListParams = {
   name?: string;
+  phone?: string;
+  wardId?: number;
   statusId?: string;
   brandId?: string;
   shopManagerId?: string;
   size: number;
   pageIndex?: number;
-  enabled: boolean;
 };
 
 export type UpdateShopParams = {
@@ -21,6 +22,15 @@ export type UpdateShopParams = {
   brandId?: string;
   shopManagerId?: string;
   addressLine?: string;
+};
+
+export type CreateShopParams = {
+  name: string;
+  phone: string;
+  wardId: number;
+  brandId: string;
+  shopManagerId: string;
+  addressLine: string;
 };
 
 export const ShopAPI = {
@@ -54,15 +64,23 @@ export const ShopAPI = {
   _updateShopById: async ({ shopId, ...updateParams }: UpdateShopParams) => {
     const access_token = getAccessToken();
 
-    const res = await http.put<ShopDetail>(
-      `/api/shops/${shopId}`,
-      updateParams,
-      {
-        headers: {
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
-    );
+    const res = await http.put<any>(`/api/shops/${shopId}`, updateParams, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _createShop: async (params: CreateShopParams) => {
+    const access_token = getAccessToken();
+
+    const res = await http.post<any>(`/api/shops`, params, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
 
     return res?.data;
   },

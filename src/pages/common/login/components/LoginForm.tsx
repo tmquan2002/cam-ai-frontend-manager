@@ -4,6 +4,8 @@ import { MdEmail, MdLockOutline } from "react-icons/md";
 import { useLogin } from "../../../../hooks/useLogin";
 import { LoginParams } from "../../../../apis/LoginAPI";
 import { useSession } from "../../../../context/AuthContext";
+import { getStatusFromToken } from "../../../../utils/jwt";
+import { StatusEnum } from "../../../../types/enum";
 
 interface LoginFormProp {
   modalOpen: boolean;
@@ -33,8 +35,6 @@ export const LoginForm = (props: LoginFormProp) => {
   });
 
   const onSubmitForm = async (values: { email: string; password: string }) => {
-    props.setModalOpen(true);
-
     const loginParams: LoginParams = {
       username: values.email,
       password: values.password,
@@ -42,7 +42,14 @@ export const LoginForm = (props: LoginFormProp) => {
 
     login(loginParams, {
       onSuccess(data) {
-        sessionHook?.signIn(data);
+        const didUserChangePassword: boolean =
+          getStatusFromToken(data.accessToken).Id == StatusEnum.Disable;
+
+        if (!didUserChangePassword) {
+          props.setModalOpen(true);
+        }
+
+        // sessionHook?.signIn(data);
         // sessionHook?.signIn({
         //   ...data,
         // });

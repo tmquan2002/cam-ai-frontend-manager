@@ -1,5 +1,4 @@
 import {
-  // ActionIcon,
   Box,
   Button,
   Flex,
@@ -17,7 +16,6 @@ import { useEffect, useMemo, useState } from "react";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useGetShopList } from "../../hooks/useGetShopList";
 import { notifications } from "@mantine/notifications";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
@@ -28,7 +26,9 @@ import { IconPlus, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
-import classes from "./ShopDetailPage.module.scss";
+import classes from "./ShopDetailPageManager.module.scss";
+import { useParams } from "react-router-dom";
+import { useGetShopById } from "../../hooks/useGetShopById";
 
 const employee = [
   {
@@ -163,8 +163,9 @@ export type FormFieldValue = {
   brandName: string;
 };
 
-const ShopDetailPage = () => {
+const ShopDetailPageManager = () => {
   const [scrolled, setScrolled] = useState(false);
+  const { id } = useParams<{ id: string }>();
 
   const rows = employee?.map((row) => (
     <Table.Tr
@@ -190,7 +191,7 @@ const ShopDetailPage = () => {
       district: "0",
     },
   });
-  const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
+  const { data, isLoading } = useGetShopById(id ?? "0");
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -204,15 +205,14 @@ const ShopDetailPage = () => {
 
   useEffect(() => {
     if (data) {
-      const { values } = data;
       const initialData: FormFieldValue = {
-        name: values[0].name,
-        phone: values[0].phone,
-        wardId: `${values[0].wardId}`,
-        addressLine: values[0].addressLine,
-        brandName: values[0].brand.name,
-        province: `${values[0].ward.district.province.id}`,
-        district: `${values[0].ward.district.id}`,
+        name: data.name,
+        phone: data.phone,
+        wardId: `${data.wardId}`,
+        addressLine: data.addressLine,
+        brandName: data.brand.name,
+        province: `${data.ward.district.province.id}`,
+        district: `${data.ward.district.id}`,
       };
       form.setValues(initialData);
     }
@@ -330,7 +330,7 @@ const ShopDetailPage = () => {
           <form
             onSubmit={form.onSubmit((values) => {
               const updateShopParams: UpdateShopParams = {
-                shopId: data?.values[0].id ?? "0",
+                shopId: data?.id ?? "0",
                 addressLine: values.addressLine,
                 wardId: values.wardId,
                 name: values.name,
@@ -339,7 +339,6 @@ const ShopDetailPage = () => {
 
               updateShop(updateShopParams, {
                 onSuccess() {
-                  // onSuccess(data) {
                   notifications.show({
                     title: "Update successfully",
                     message: "Shop detail updated!",
@@ -362,7 +361,7 @@ const ShopDetailPage = () => {
               size="lg"
               pb={rem(28)}
             >
-              Shop detail
+              {data?.name}
             </Text>
             <EditAndUpdateForm fields={fields} />
 
@@ -447,4 +446,4 @@ const ShopDetailPage = () => {
   );
 };
 
-export default ShopDetailPage;
+export default ShopDetailPageManager;
