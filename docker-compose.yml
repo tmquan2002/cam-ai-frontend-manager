@@ -7,4 +7,4 @@ services:
       args:
         - REACT_APP_VITE_SERVER_LINK=${VITE_SERVER_LINK}
     ports:
-      - 3010:4173
+      - 3010:4174

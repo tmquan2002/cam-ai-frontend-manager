@@ -72,11 +72,13 @@ export function checkRole(acceptableRole: RoleDetail): boolean {
 }
 
 export function SessionProvider(props: React.PropsWithChildren) {
-  const [[isAccessTokenLoading, accessToken], setAccessToken] = useStorageState(
+  const [[isAccessTokenLoading], setAccessToken] = useStorageState(
+    // const [[isAccessTokenLoading, accessToken], setAccessToken] = useStorageState(
     CommonConstant.USER_ACCESS_TOKEN
   );
 
-  const [[isRefreshTokenLoading, refreshToken], setRefreshToken] =
+  const [[isRefreshTokenLoading], setRefreshToken] =
+    // const [[isRefreshTokenLoading, refreshToken], setRefreshToken] =
     useStorageState(CommonConstant.USER_REFRESH_TOKEN);
 
   const navigate = useNavigate();

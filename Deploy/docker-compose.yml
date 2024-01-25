@@ -3,4 +3,4 @@ services:
   web:
     image: milease/camai-backend:camai-web-admin
     ports:
-      - 3000:4173
+      - 3010:4174

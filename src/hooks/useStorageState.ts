@@ -7,7 +7,8 @@ function useAsyncState<T>(
 ): UseStateHook<T> {
   return React.useReducer(
     (
-      state: [boolean, T | null],
+      _state: [boolean, T | null],
+      // state: [boolean, T | null],
       action: T | null = null
     ): [boolean, T | null] => [false, action],
     initialValue

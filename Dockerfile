@@ -13,5 +13,5 @@ COPY --from=builder /app/dist /app/react-app/dist
 COPY package*.json .
 COPY vite.config.ts .
 RUN npm install typescript
-EXPOSE 4173
+EXPOSE 4174
 CMD npm run preview -- --host

@@ -1,5 +1,5 @@
 import {
-  ActionIcon,
+  // ActionIcon,
   Box,
   Button,
   Flex,
@@ -201,7 +201,7 @@ const ShopDetailPage = () => {
   );
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
-  const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
+  // const xIcon = <IconX style={{ width: rem(20), height: rem(20) }} />;
 
   useEffect(() => {
     if (data) {
@@ -339,7 +339,8 @@ const ShopDetailPage = () => {
               };
 
               updateShop(updateShopParams, {
-                onSuccess(data) {
+                onSuccess() {
+                  // onSuccess(data) {
                   notifications.show({
                     title: "Update successfully",
                     message: "Shop detail updated!",

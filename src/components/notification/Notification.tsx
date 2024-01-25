@@ -8,7 +8,7 @@ import {
   ScrollArea,
   Tabs,
   Text,
-  ThemeIcon,
+  // ThemeIcon,
   rem,
 } from "@mantine/core";
 import classes from "./Notification.module.scss";
