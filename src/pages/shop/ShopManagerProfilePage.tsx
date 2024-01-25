@@ -43,14 +43,14 @@ const ShopManagerProfilePage = () => {
   useEffect(() => {
     if (account) {
       const initialValue: ProfileFieldValue = {
-        name: account.name,
-        email: account.email,
-        phone: account.phone,
-        birthday: account.birthday,
-        address: account.addressLine,
-        status: account.accountStatus.id.toString(),
-        gender: account.gender,
-        shop: account.managingShop.name,
+        name: account?.name,
+        email: account?.email,
+        phone: account?.phone,
+        birthday: account?.birthday,
+        address: account?.addressLine,
+        status: account?.accountStatus.id.toString(),
+        gender: account?.gender,
+        shop: account?.managingShop?.name,
       };
       form.setValues(initialValue);
     }

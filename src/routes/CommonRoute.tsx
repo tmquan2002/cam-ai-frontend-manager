@@ -16,8 +16,6 @@ const CommonRoute = () => {
       Name: "",
     });
 
-    console.log(isUserRoleBrandManager, isUserRoleShopManager);
-
     if (isUserRoleBrandManager) {
       setUserRole(RoleEnum.BrandManager);
       return;
