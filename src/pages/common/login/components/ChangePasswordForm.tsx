@@ -7,12 +7,12 @@ import { ChangePasswordParams } from "../../../../apis/LoginAPI";
 import { useSession } from "../../../../context/AuthContext";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../../../models/Response";
-import { notifications, useNotifications } from "@mantine/notifications";
+import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 
 export const ChangePasswordForm = (data: AuthToken) => {
   const sessionHook = useSession();
-  const { mutate: changePassword, isLoading } = useChangePassword();
+  const { mutate: changePassword } = useChangePassword();
 
   const form = useForm({
     initialValues: {
