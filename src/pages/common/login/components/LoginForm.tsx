@@ -3,7 +3,6 @@ import { useForm } from "@mantine/form";
 import { MdEmail, MdLockOutline } from "react-icons/md";
 import { useLogin } from "../../../../hooks/useLogin";
 import { LoginParams } from "../../../../apis/LoginAPI";
-import { useSession } from "../../../../context/AuthContext";
 import { getStatusFromToken } from "../../../../utils/jwt";
 import { StatusEnum } from "../../../../types/enum";
 
@@ -13,7 +12,6 @@ interface LoginFormProp {
 }
 
 export const LoginForm = (props: LoginFormProp) => {
-  const sessionHook = useSession();
   const { mutate: login, isLoading } = useLogin();
 
   const form = useForm({
@@ -43,7 +41,7 @@ export const LoginForm = (props: LoginFormProp) => {
     login(loginParams, {
       onSuccess(data) {
         const didUserChangePassword: boolean =
-          getStatusFromToken(data.accessToken).Id == StatusEnum.Disable;
+          getStatusFromToken(data.accessToken).Id != StatusEnum.New;
 
         if (!didUserChangePassword) {
           props.setModalOpen(true);
