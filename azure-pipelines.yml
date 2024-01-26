@@ -53,4 +53,5 @@ steps:
       docker compose down web 2>&1
       docker rmi milease/camai-backend:camai-web-manager 2>&1
       docker compose up -d --quiet-pull 2>&1
+      docker logout
     readyTimeout: '20000'
