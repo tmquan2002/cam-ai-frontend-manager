@@ -25,10 +25,10 @@ const mockdata = [
     ],
   },
   {
-    label: "Your brand",
+    label: "Your Shop",
     icon: IconCalendarStats,
     links: [
-      { label: "Detail", link: "/shop/brand/detail" },
+      { label: "Add shop ", link: "/brand/create/shop" },
       { label: "Previous releases", link: "/" },
       { label: "Releases schedule", link: "/" },
     ],

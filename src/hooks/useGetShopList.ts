@@ -3,7 +3,11 @@ import { GetShopListParams, ShopAPI } from "../apis/ShopAPI";
 import { CommonResponse } from "../models/Common";
 import { ShopDetail } from "../models/Shop";
 
-export const useGetShopList = (params: GetShopListParams) => {
+export type GetShopListHookParams = GetShopListParams & {
+  enabled: boolean;
+};
+
+export const useGetShopList = (params: GetShopListHookParams) => {
   const {
     isError,
     isLoading,

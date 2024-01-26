@@ -4,9 +4,16 @@ export type RoleDetail = {
   Id: number;
   Name: string;
 };
+
+export type StatusDetail = {
+  Id: number;
+  Name: string;
+};
+
 export type UserDetail = {
   id: string;
   roles: string;
+  status: string;
   exp: number;
 };
 
@@ -23,4 +30,9 @@ export const getRolesFromToken = (token: string): RoleDetail[] => {
 export const getIdFromToken = (token: string): string => {
   const id: string = getPayloadFromToken(token).id;
   return id;
+};
+
+export const getStatusFromToken = (token: string): StatusDetail => {
+  const status: StatusDetail = JSON.parse(getPayloadFromToken(token).status);
+  return status;
 };
