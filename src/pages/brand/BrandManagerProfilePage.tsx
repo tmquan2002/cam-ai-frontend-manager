@@ -1,22 +1,21 @@
+import { Button, Group, Loader, Paper, Text, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
 import { useEffect, useMemo } from "react";
+import { UpdateAccountParams } from "../../apis/AccountAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { Button, Group, Loader, Paper, Text, rem } from "@mantine/core";
-import { useGetGenderList } from "../../hooks/useGetGender";
-import {
-  mapLookupStringValueToArray,
-  mapNumberLookupToArray,
-} from "../../utils/helperFunction";
-import { useGetAccountById } from "../../hooks/useGetAccountById";
 import { getUserId } from "../../context/AuthContext";
+import { useGetAccountById } from "../../hooks/useGetAccountById";
 import { useGetAccountStatusList } from "../../hooks/useGetAccountStatus";
-import { UpdateAccountParams } from "../../apis/AccountAPI";
+import { useGetGenderList } from "../../hooks/useGetGender";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
+import {
+  mapLookupStringValueToArray
+} from "../../utils/helperFunction";
 
 type ProfileFieldValue = {
   name: string;
