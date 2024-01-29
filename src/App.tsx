@@ -9,7 +9,7 @@ import { SessionProvider } from "./context/AuthContext";
 import { Notifications } from "@mantine/notifications";
 import { MantineProvider, createTheme } from "@mantine/core";
 // import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
-import { light_yellow, pale_red, shading } from "./types/constant";
+import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,8 +22,11 @@ const queryClient = new QueryClient({
 });
 
 const theme = createTheme({
+  fontFamily: "DVN-Poppins",
+  primaryColor: "light-blue",
   colors: {
     "light-yellow": light_yellow,
+    "light-blue": light_blue,
     "pale-red": pale_red,
     shading: shading,
   },
@@ -39,7 +42,6 @@ function App() {
         <BrowserRouter>
           <SessionProvider>
             <Notifications position="top-right" />
-
             <AppRoute />
           </SessionProvider>
         </BrowserRouter>

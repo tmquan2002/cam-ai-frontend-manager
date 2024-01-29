@@ -11,6 +11,7 @@ import { StatusEnum } from "../../../types/enum";
 import { MdEmail, MdLockOutline } from "react-icons/md";
 import { AuthToken } from "../../../models/Auth";
 import { useSession } from "../../../context/AuthContext";
+import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
 
 const LoginPage = () => {
   const { mutate: login, isLoading } = useLogin();
@@ -29,8 +30,8 @@ const LoginPage = () => {
         value.trim().length === 0
           ? "Email is required"
           : /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(value)
-          ? null
-          : "Invalid email",
+            ? null
+            : "Invalid email",
       password: (value) =>
         value.trim().length === 0 ? "Password is required" : null,
     },
@@ -65,9 +66,7 @@ const LoginPage = () => {
       <div className={styled["container-main"]}>
         <div className={styled["image-container"]}>
           <div className={styled["title"]}>CAMAI</div>
-          <div className={styled["description"]}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          <div className={styled["description"]}>Solution for coffee brands to detect customers and employee behaviors
           </div>
           <img
             src={AuthImage}
@@ -76,7 +75,10 @@ const LoginPage = () => {
           />
         </div>
         <div className={styled["container"]}>
-          <div className={styled["title"]}>LOGIN</div>
+          <div className={styled["title"]}>
+            <div>LOGIN</div>
+            <LightDarkSwitch size="lg" />
+          </div>
           <form
             onSubmit={form.onSubmit((values) => onSubmitForm(values))}
             style={{ textAlign: "left" }}
@@ -108,7 +110,8 @@ const LoginPage = () => {
                 variant="gradient"
                 size="md"
                 loading={isLoading}
-                gradient={{ from: "blue", to: "cyan", deg: 90 }}
+                mt={20}
+                gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
               >
                 Login
               </Button>
@@ -118,7 +121,7 @@ const LoginPage = () => {
           <Modal
             opened={modalOpen}
             onClose={() => setModalOpen(false)}
-            centered
+            centered title="New User"
           >
             <div>
               Please change given password with your new password to continue

@@ -1,8 +1,9 @@
-import { ActionIcon, Box, Flex, Popover, rem } from "@mantine/core";
-import { IconLogout, IconNotification, IconUser } from "@tabler/icons-react";
+import { ActionIcon, Flex, Group, Indicator, Popover, Tooltip, rem } from "@mantine/core";
+import { IconUser } from "@tabler/icons-react";
+import { MdLogout, MdNotifications } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/AuthContext";
 import Notification from "../notification/Notification";
-import { useNavigate } from "react-router-dom";
 
 const BrandHeader = () => {
   const session = useSession();
@@ -14,57 +15,53 @@ const BrandHeader = () => {
       align={"center"}
       h={"100%"}
     >
-      <p>Logo</p>
-      <Box>
+      <b>CAMAI</b>
+      <Group gap={5}>
         <Popover
           position="bottom-end"
           withArrow
           shadow="md"
         >
-          <Popover.Target>
-            <ActionIcon
-              variant="default"
-              aria-label="Settings"
-            >
-              <IconNotification
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
-          </Popover.Target>
+          <Tooltip label="Notification" withArrow>
+            <Popover.Target>
+              <Indicator size={5} color="pale-red.6">
+                <ActionIcon
+                  variant="default"
+                  aria-label="Notifications"
+                >
+                  <MdNotifications style={{ width: 18, height: 18 }} />
+                </ActionIcon>
+              </Indicator>
+            </Popover.Target>
+          </Tooltip>
+
           <Popover.Dropdown p={0}>
             <Notification />
           </Popover.Dropdown>
         </Popover>
 
-        <ActionIcon
-          variant="outline"
-          aria-label="Settings"
-          color="blue"
-          m={0}
-          onClick={() => navigate("/brand/profile")}
-        >
-          <IconUser
-            style={{ width: "70%", height: "70%" }}
-            stroke={1.5}
-          />
-        </ActionIcon>
+        <Tooltip label="Profile" withArrow>
+          <ActionIcon
+            variant="default" aria-label="Profile"
+            onClick={() => navigate("/brand/profile")}
+          >
+            <IconUser
+              style={{ width: "70%", height: "70%" }}
+              stroke={1.5}
+            />
+          </ActionIcon>
+        </Tooltip>
 
-        <ActionIcon
-          variant="outline"
-          aria-label="Settings"
-          color="red"
-          m={0}
-          onClick={() => {
-            session?.signOut();
-          }}
-        >
-          <IconLogout
-            style={{ width: "70%", height: "70%" }}
-            stroke={1.5}
-          />
-        </ActionIcon>
-      </Box>
+        <Tooltip label="Logout" withArrow>
+          <ActionIcon
+            variant="default" aria-label="Logout"
+            onClick={() => { session?.signOut(); }}
+          >
+            <MdLogout style={{ width: 18, height: 18 }} />
+          </ActionIcon>
+        </Tooltip>
+
+      </Group>
     </Flex>
   );
 };

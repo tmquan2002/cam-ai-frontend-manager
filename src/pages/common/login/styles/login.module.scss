@@ -1,5 +1,3 @@
-$primary-red: #ee5a5b;
-
 .container-main {
   display: flex;
   flex-direction: row;
@@ -11,12 +9,19 @@ $primary-red: #ee5a5b;
   .image-container {
     width: 400px;
     text-align: left;
-    color: var(--mantine-color-shading-9);
+
+    @include light {
+      color: var(--mantine-color-shading-9);
+    }
+
+    @include dark {
+      color: white;
+    }
+
     margin: 0 30px 30px 0;
 
     .title {
       font-weight: bold;
-      color: black;
       font-size: 40px;
     }
 
@@ -27,21 +32,32 @@ $primary-red: #ee5a5b;
     }
 
     .auth-image {
-      width: 300px;
+      width: 400px;
     }
   }
 
   .container {
     border-radius: 15px;
-    background-color: white;
+
+    @include light {
+      background-color: white;
+    }
+
+    @include dark {
+      background-color: #1f1f1f;
+    }
+
     width: 600px;
     height: fit-content;
     padding: 30px 50px;
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 3px 1px rgba(0, 0, 0, 0.12),
-      0px 1px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.14),
+    0px 3px 1px rgba(0, 0, 0, 0.12),
+    0px 1px 5px rgba(0, 0, 0, 0.2);
 
     .title {
-      text-align: left;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
       font-weight: bold;
       font-size: 40px;
     }

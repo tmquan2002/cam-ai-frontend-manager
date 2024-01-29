@@ -7,7 +7,7 @@
 @font-face {
   font-family: "DVN-Poppins";
   src: local("DVN-Poppins"),
-    url("./assets/fonts/Poppins-Bold.otf") format("truetype");
+    url("./assets/fonts/DesignerVN-Poppins-ExtraBold.ttf") format("truetype");
   font-weight: bold;
 }
 
@@ -21,4 +21,16 @@
 p {
   margin: 0;
   padding: 0;
+}
+
+label {
+  margin-top: 10px;
+}
+
+.mantine-Modal-content {
+  padding: 10px 20px;
+}
+
+.mantine-Modal-title {
+  font-weight: bold;
 }

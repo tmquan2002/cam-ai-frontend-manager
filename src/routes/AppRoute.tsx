@@ -12,6 +12,7 @@ import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
 import CreateShop from "../pages/brand/CreateShop";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
 import CommonLandingPage from "../pages/common/Landing/CommonLandingPage";
+import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -66,7 +67,7 @@ const AppRoute = () => {
         },
         {
           path: "profile",
-          element: <ShopManagerProfilePage />,
+          element: <BrandManagerProfilePage />,
         },
         {
           path: "create/shop",

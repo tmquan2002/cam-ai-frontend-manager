@@ -39,27 +39,6 @@ import { useDebouncedValue } from "@mantine/hooks";
 import * as _ from "lodash";
 import { useNavigate } from "react-router-dom";
 
-const SearchCategory = {
-  SHOE: (
-    <IconShoe
-      size={"1.3rem"}
-      stroke={1.5}
-    />
-  ),
-  SHOP: (
-    <IconUserCheck
-      size={"1.3rem"}
-      stroke={1.5}
-    />
-  ),
-  LOCATION: (
-    <IconLocation
-      size={"1.3rem"}
-      stroke={1.5}
-    />
-  ),
-};
-
 const BrandDetailPageManager = () => {
   const [search, setSearch] = useState<string>("");
   const [activePage, setPage] = useState(1);
@@ -79,10 +58,6 @@ const BrandDetailPageManager = () => {
     const { value } = event.currentTarget;
     setSearch(value);
   };
-
-  const [searchCategory, setSearchCategory] = useState<JSX.Element>(
-    SearchCategory.SHOE
-  );
 
   const rows = shopList?.values.map((row, index) => {
     if (isShopListLoading) return <Loader />;
@@ -117,65 +92,6 @@ const BrandDetailPageManager = () => {
       </Table.Tr>
     );
   });
-
-  const renderDropdownFilter = () => {
-    return (
-      <Menu transitionProps={{ transition: "pop-top-right" }}>
-        <Tooltip label="Search by">
-          <Menu.Target>
-            <ActionIcon
-              size={36}
-              radius="xl"
-              color={"blue"}
-              variant="filled"
-            >
-              {searchCategory}
-            </ActionIcon>
-          </Menu.Target>
-        </Tooltip>
-
-        <Menu.Dropdown>
-          <Menu.Label>Application</Menu.Label>
-          <Menu.Item
-            leftSection={
-              <IconShoe
-                size={"1.3rem"}
-                stroke={1.5}
-                color="#228be6"
-              />
-            }
-            onClick={() => setSearchCategory(SearchCategory.SHOE)}
-          >
-            Shoe
-          </Menu.Item>
-          <Menu.Item
-            leftSection={
-              <IconUserCheck
-                size={"1.3rem"}
-                stroke={1.5}
-                color={"#15aabf"}
-              />
-            }
-            onClick={() => setSearchCategory(SearchCategory.LOCATION)}
-          >
-            Location
-          </Menu.Item>
-          <Menu.Item
-            leftSection={
-              <IconLocation
-                size={"1.3rem"}
-                stroke={1.5}
-                color={"#7950f2"}
-              />
-            }
-            onClick={() => setSearchCategory(SearchCategory.SHOP)}
-          >
-            SHOP
-          </Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
-    );
-  };
 
   if (isLoading) {
     return <Loader />;
@@ -289,7 +205,6 @@ const BrandDetailPageManager = () => {
               stroke={1.5}
             />
           }
-          rightSection={renderDropdownFilter()}
           value={search}
           onChange={handleSearchChange}
         />
