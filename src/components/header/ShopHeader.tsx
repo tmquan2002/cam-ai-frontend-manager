@@ -1,10 +1,19 @@
-import { ActionIcon, Box, Flex, Popover, rem } from "@mantine/core";
-import { IconLogout, IconNotification, IconUser } from "@tabler/icons-react";
-import { useSession } from "../../context/AuthContext";
-import Notification from "../notification/Notification";
+import { ActionIcon, Burger, Flex, Group, Indicator, Popover, Tooltip, rem } from "@mantine/core";
+import { IconUser } from "@tabler/icons-react";
+import { MdLogout, MdNotifications } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useSession } from "../../context/AuthContext";
+import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
+import Notification from "../notification/Notification";
 
-const ShopHeader = () => {
+interface BurgerProps {
+  mobileOpened: boolean,
+  toggleMobile: () => void,
+  desktopOpened: boolean,
+  toggleDesktop: () => void,
+}
+
+const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }: BurgerProps) => {
   const session = useSession();
   const navigate = useNavigate();
   return (
@@ -14,57 +23,70 @@ const ShopHeader = () => {
       align={"center"}
       h={"100%"}
     >
-      <p>Logo</p>
-      <Box>
+      <Group>
+        <Burger
+          opened={mobileOpened}
+          onClick={toggleMobile}
+          hiddenFrom="sm"
+          size="sm"
+        />
+        <Burger
+          opened={desktopOpened}
+          onClick={toggleDesktop}
+          visibleFrom="sm"
+          size="sm"
+        />
+        <b>CAMAI</b>
+      </Group>
+      <Group gap={5}>
+
+        <LightDarkSwitch size="md" />
+
         <Popover
           position="bottom-end"
           withArrow
           shadow="md"
         >
-          <Popover.Target>
-            <ActionIcon
-              variant="default"
-              aria-label="Settings"
-            >
-              <IconNotification
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
-          </Popover.Target>
+          <Tooltip label="Notification" withArrow>
+            <Popover.Target>
+              <Indicator size={5} color="pale-red.6">
+                <ActionIcon
+                  variant="default"
+                  aria-label="Notifications"
+                >
+                  <MdNotifications style={{ width: 18, height: 18 }} />
+                </ActionIcon>
+              </Indicator>
+            </Popover.Target>
+          </Tooltip>
+
           <Popover.Dropdown p={0}>
             <Notification />
           </Popover.Dropdown>
         </Popover>
 
-        <ActionIcon
-          variant="outline"
-          aria-label="Settings"
-          color="blue"
-          m={0}
-          onClick={() => navigate("/shop/profile")}
-        >
-          <IconUser
-            style={{ width: "70%", height: "70%" }}
-            stroke={1.5}
-          />
-        </ActionIcon>
+        <Tooltip label="Profile" withArrow>
+          <ActionIcon
+            variant="default" aria-label="Profile"
+            onClick={() => navigate("/shop/profile")}
+          >
+            <IconUser
+              style={{ width: "70%", height: "70%" }}
+              stroke={1.5}
+            />
+          </ActionIcon>
+        </Tooltip>
 
-        <ActionIcon
-          variant="outline"
-          aria-label="Settings"
-          color="red"
-          m={0}
-          onClick={() => {
-            session?.signOut();
-          }}
-        >
-          <IconLogout
-            style={{ width: "70%", height: "70%" }}
-            stroke={1.5}
-          />
-        </ActionIcon>
-      </Box>
+        <Tooltip label="Logout" withArrow>
+          <ActionIcon
+            variant="default" aria-label="Logout"
+            onClick={() => { session?.signOut(); }}
+          >
+            <MdLogout style={{ width: 18, height: 18 }} />
+          </ActionIcon>
+        </Tooltip>
+
+      </Group>
     </Flex>
   );
 };

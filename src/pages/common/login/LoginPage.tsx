@@ -96,6 +96,7 @@ const LoginPage = () => {
               withAsterisk
               label="Password"
               type="password"
+              placeholder="Password"
               leftSection={<MdLockOutline />}
               size="md"
               {...form.getInputProps("password")}

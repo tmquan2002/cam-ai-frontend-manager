@@ -140,13 +140,7 @@ const CreateShop = () => {
       m={rem(32)}
       p={rem(32)}
     >
-      <Text
-        fw={500}
-        size="lg"
-        pb={rem(28)}
-      >
-        Add new shop
-      </Text>
+      <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ADD NEW SHOP</Text>
       <form action="">
         <EditAndUpdateForm fields={fields} />
         <Group

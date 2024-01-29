@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
-import classes from "./ShopNavbar.module.scss";
+import classes from "./Sidebar.module.scss";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },

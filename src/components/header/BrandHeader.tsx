@@ -1,4 +1,4 @@
-import { ActionIcon, Flex, Group, Indicator, Popover, Tooltip, rem } from "@mantine/core";
+import { ActionIcon, Burger, Flex, Group, Indicator, Popover, Tooltip, rem } from "@mantine/core";
 import { IconUser } from "@tabler/icons-react";
 import { MdLogout, MdNotifications } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,14 @@ import { useSession } from "../../context/AuthContext";
 import Notification from "../notification/Notification";
 import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
 
-const BrandHeader = () => {
+interface BurgerProps {
+  mobileOpened: boolean,
+  toggleMobile: () => void,
+  desktopOpened: boolean,
+  toggleDesktop: () => void,
+}
+
+const BrandHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }: BurgerProps) => {
   const session = useSession();
   const navigate = useNavigate();
   return (
@@ -16,7 +23,21 @@ const BrandHeader = () => {
       align={"center"}
       h={"100%"}
     >
-      <b>CAMAI</b>
+      <Group>
+        <Burger
+          opened={mobileOpened}
+          onClick={toggleMobile}
+          hiddenFrom="sm"
+          size="sm"
+        />
+        <Burger
+          opened={desktopOpened}
+          onClick={toggleDesktop}
+          visibleFrom="sm"
+          size="sm"
+        />
+        <b>CAMAI</b>
+      </Group>
       <Group gap={5}>
 
         <LightDarkSwitch size="md" />
