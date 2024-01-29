@@ -7,7 +7,7 @@ import {
   IconAdjustments,
   IconLock,
 } from "@tabler/icons-react";
-import { NavbarLinksGroup } from "../linkgroup/NavbarLinkGroup";
+import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
 import classes from "./ShopNavbar.module.scss";
 
@@ -49,7 +49,7 @@ const mockdata = [
 
 export function ShopNavbar() {
   const links = mockdata.map((item) => (
-    <NavbarLinksGroup
+    <SidebarLinksGroup
       {...item}
       key={item.label}
     />

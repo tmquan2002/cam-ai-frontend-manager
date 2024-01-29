@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Avatar,
   Badge,
   Box,
@@ -9,7 +8,6 @@ import {
   Group,
   Image,
   Loader,
-  Menu,
   Overlay,
   Pagination,
   Paper,
@@ -18,26 +16,23 @@ import {
   Text,
   TextInput,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
-import { useGetBrandList } from "../../hooks/useGetBrandList";
+import { useDebouncedValue } from "@mantine/hooks";
 import {
   IconFilter,
-  IconLocation,
   IconMail,
   IconPhone,
-  IconSearch,
-  IconShoe,
-  IconUserCheck,
+  IconSearch
 } from "@tabler/icons-react";
-import { useState } from "react";
 import cx from "clsx";
-import classes from "./BrandDetailPage.module.scss";
+import * as _ from "lodash";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useGetBrandList } from "../../hooks/useGetBrandList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { isEmpty } from "../../utils/helperFunction";
-import { useDebouncedValue } from "@mantine/hooks";
-import * as _ from "lodash";
-import { useNavigate } from "react-router-dom";
+import classes from "./BrandDetailPage.module.scss";
 
 const BrandDetailPageManager = () => {
   const [search, setSearch] = useState<string>("");
@@ -144,6 +139,18 @@ const BrandDetailPageManager = () => {
       p={rem(32)}
       style={{ flex: 1 }}
     >
+      {data?.values[0].bannerUri &&
+        <Tooltip label="Brand banner">
+          <Image
+            radius={"md"}
+            bg={"#000"}
+            height={200}
+            fit="contain"
+            src={data?.values[0].bannerUri}
+          />
+        </Tooltip>
+      }
+
       <Flex
         align={"center"}
         mb={rem(32)}
@@ -180,15 +187,6 @@ const BrandDetailPageManager = () => {
         </Box>
       </Flex>
 
-      <Tooltip label="Brand banner">
-        <Image
-          radius={"md"}
-          bg={"#000"}
-          height={400}
-          fit="contain"
-          src={data?.values[0].bannerUri}
-        />
-      </Tooltip>
       <Flex
         align={"center"}
         my={"md"}

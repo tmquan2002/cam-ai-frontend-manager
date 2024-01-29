@@ -4,6 +4,7 @@ import { MdLogout, MdNotifications } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/AuthContext";
 import Notification from "../notification/Notification";
+import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
 
 const BrandHeader = () => {
   const session = useSession();
@@ -17,6 +18,9 @@ const BrandHeader = () => {
     >
       <b>CAMAI</b>
       <Group gap={5}>
+
+        <LightDarkSwitch size="md" />
+
         <Popover
           position="bottom-end"
           withArrow

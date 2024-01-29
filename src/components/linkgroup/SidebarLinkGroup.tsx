@@ -9,8 +9,8 @@ import {
   rem,
 } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import classes from "./NavbarLinkGroup.module.scss";
-import { useNavigate } from "react-router-dom";
+import classes from "./SidebarLinkGroup.module.scss";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface LinksGroupProps {
   icon: React.FC<any>;
@@ -20,7 +20,7 @@ interface LinksGroupProps {
   links?: { label: string; link: string }[];
 }
 
-export function NavbarLinksGroup({
+export function SidebarLinksGroup({
   icon: Icon,
   label,
   initiallyOpened,
@@ -28,6 +28,7 @@ export function NavbarLinksGroup({
   links,
 }: LinksGroupProps) {
   const navigate = useNavigate();
+  const location = useLocation()
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const items = (hasLinks ? links : []).map((link) => (
@@ -49,7 +50,7 @@ export function NavbarLinksGroup({
     <Box>
       <UnstyledButton
         onClick={() => setOpened((o) => !o)}
-        className={classes["control"]}
+        className={(hasLinks && links.some(e => location.pathname === e.link)) || location.pathname === path! ? `${classes["activeControl"]}` : `${classes["control"]}`}
       >
         <Group
           onClick={() => {
@@ -62,7 +63,6 @@ export function NavbarLinksGroup({
         >
           <Box style={{ display: "flex", alignItems: "center" }}>
             <ThemeIcon
-              variant="light"
               size={30}
             >
               <Icon style={{ width: rem(18), height: rem(18) }} />

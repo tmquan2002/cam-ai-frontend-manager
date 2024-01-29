@@ -7,14 +7,14 @@ import {
   IconAdjustments,
   IconLock,
 } from "@tabler/icons-react";
-import { NavbarLinksGroup } from "../linkgroup/NavbarLinkGroup";
+import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
 import classes from "./ShopNavbar.module.scss";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/brand" },
   {
-    label: "Tin mới Brand",
+    label: "Brand News",
     icon: IconNotes,
     initiallyOpened: true,
     links: [
@@ -40,16 +40,16 @@ const mockdata = [
     label: "Security",
     icon: IconLock,
     links: [
-      { label: "Enable 2FA", link: "/" },
-      { label: "Change password", link: "/" },
-      { label: "Recovery codes", link: "/" },
+      { label: "Enable 2FA", link: "/security" },
+      { label: "Change password", link: "/security" },
+      { label: "Recovery codes", link: "/security" },
     ],
   },
 ];
 
 export function BrandNavbar() {
   const links = mockdata.map((item) => (
-    <NavbarLinksGroup
+    <SidebarLinksGroup
       {...item}
       key={item.label}
     />
