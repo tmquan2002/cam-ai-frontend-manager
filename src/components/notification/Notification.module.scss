@@ -6,13 +6,12 @@
   border-radius: 0.4rem;
   color: #868e96;
   border: 1px solid #a8afb6;
-  background-color: #f8f9fa;
 }
 
 .tabnumber-active {
   border-radius: 0.4rem;
   color: #fff;
-  background-color: #f03e3e;
+  background-color: var(--mantine-color-pale-red-5);
   border: none;
 }
 

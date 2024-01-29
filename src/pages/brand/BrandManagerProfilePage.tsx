@@ -1,4 +1,4 @@
-import { Button, Group, Loader, Paper, Text, rem } from "@mantine/core";
+import { Button, Group, LoadingOverlay, Paper, Text, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
@@ -133,20 +133,22 @@ const BrandManagerProfilePage = () => {
     ];
   }, [gender, form, accountStatus]);
 
-  if (isAccountLoading) return <Loader />;
+  if (isAccountLoading) return (
+    <Paper
+      style={{ flex: 1, height: '100vh' }}
+      pos={"relative"}
+    >
+      <LoadingOverlay visible={isAccountLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
+    </Paper>
+  );
 
   return (
     <Paper
+      m={rem(32)}
       p={rem(32)}
       style={{ flex: 1 }}
     >
-      <Text
-        fw={500}
-        size="xl"
-        mb={rem(32)}
-      >
-        Account profile
-      </Text>
+      <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ACCOUNT PROFILE</Text>
       <form
         onSubmit={form.onSubmit((values) => {
           const params: UpdateAccountParams = {
@@ -180,10 +182,10 @@ const BrandManagerProfilePage = () => {
       >
         <EditAndUpdateForm fields={fields} />
         <Group
-          justify="flex-end"
+          justify="flex-start"
           mt="md"
         >
-          <Button type="submit">Submit</Button>
+          <Button type="submit" mt={10}>Submit</Button>
         </Group>
       </form>
     </Paper>

@@ -1,22 +1,22 @@
+import { Button, Group, LoadingOverlay, Paper, Text, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
 import { useEffect, useMemo } from "react";
+import { UpdateAccountParams } from "../../apis/AccountAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { Button, Group, Loader, Paper, Text, rem } from "@mantine/core";
+import { getUserId } from "../../context/AuthContext";
+import { useGetAccountById } from "../../hooks/useGetAccountById";
+import { useGetAccountStatusList } from "../../hooks/useGetAccountStatus";
 import { useGetGenderList } from "../../hooks/useGetGender";
+import { useUpdateAccount } from "../../hooks/useUpdateAccount";
+import { ResponseErrorDetail } from "../../models/Response";
 import {
   mapLookupStringValueToArray,
   mapNumberLookupToArray,
 } from "../../utils/helperFunction";
-import { useGetAccountById } from "../../hooks/useGetAccountById";
-import { getUserId } from "../../context/AuthContext";
-import { useGetAccountStatusList } from "../../hooks/useGetAccountStatus";
-import { UpdateAccountParams } from "../../apis/AccountAPI";
-import { useUpdateAccount } from "../../hooks/useUpdateAccount";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
 
 type ProfileFieldValue = {
   name: string;
@@ -161,20 +161,21 @@ const ShopManagerProfilePage = () => {
     ];
   }, [gender, form, accountStatus]);
 
-  if (isAccountLoading) return <Loader />;
+  if (isAccountLoading) return (
+    <Paper
+      style={{ flex: 1, height: '100vh' }}
+      pos={"relative"}
+    >
+      <LoadingOverlay visible={isAccountLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
+    </Paper>
+  );
 
   return (
     <Paper
       p={rem(32)}
       style={{ flex: 1 }}
     >
-      <Text
-        fw={500}
-        size="xl"
-        mb={rem(32)}
-      >
-        Account profile
-      </Text>
+      <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ACCOUNT PROFILE</Text>
       <form
         onSubmit={form.onSubmit((values) => {
           const params: UpdateAccountParams = {

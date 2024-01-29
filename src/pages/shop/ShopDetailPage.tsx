@@ -357,13 +357,7 @@ const ShopDetailPage = () => {
               });
             })}
           >
-            <Text
-              fw={500}
-              size="lg"
-              pb={rem(28)}
-            >
-              Shop detail
-            </Text>
+            <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>SHOP DETAIL</Text>
             <EditAndUpdateForm fields={fields} />
 
             <Group

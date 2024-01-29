@@ -7,7 +7,7 @@ import {
   Flex,
   Group,
   Image,
-  Loader,
+  LoadingOverlay,
   Overlay,
   Pagination,
   Paper,
@@ -55,7 +55,15 @@ const BrandDetailPageManager = () => {
   };
 
   const rows = shopList?.values.map((row, index) => {
-    if (isShopListLoading) return <Loader />;
+
+    if (isShopListLoading) return (
+      <Paper
+        style={{ flex: 1, height: '100vh' }}
+        pos={"relative"}
+      >
+        <LoadingOverlay visible={isShopListLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
+      </Paper>
+    );
 
     return (
       <Table.Tr
@@ -88,9 +96,14 @@ const BrandDetailPageManager = () => {
     );
   });
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return (
+    <Paper
+      style={{ flex: 1, height: '100vh' }}
+      pos={"relative"}
+    >
+      <LoadingOverlay visible={isLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
+    </Paper>
+  );
 
   if (isError)
     return (

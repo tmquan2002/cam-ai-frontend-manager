@@ -3,12 +3,7 @@ import { Text } from "@mantine/core";
 const ShopReportPage = () => {
   return (
     <div>
-      <Text
-        fw={500}
-        size="lg"
-      >
-        Reports
-      </Text>
+      <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>REPORTS</Text>
     </div>
   );
 };
