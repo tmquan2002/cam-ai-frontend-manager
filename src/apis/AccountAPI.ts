@@ -27,4 +27,13 @@ export const AccountAPI = {
     });
     return res.data;
   },
+  _getAccounts: async () => {
+    const access_token = getAccessToken();
+    const res = await http.get(`/api/accounts`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    return res.data;
+  },
 };

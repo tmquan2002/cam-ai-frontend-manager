@@ -13,8 +13,7 @@ import {
 } from "@mantine/core";
 import classes from "./Notification.module.scss";
 import { useEffect, useState } from "react";
-import { onMessageListener, requestForToken } from "../../utils/firebase";
-import { notifications } from "@mantine/notifications";
+import { getMessagingToken, onMessageListener } from "../../utils/firebase";
 
 export const TabsHeader = ({
   active,
@@ -102,18 +101,12 @@ const DetailCard = () => {
 
 const Notification = () => {
   useEffect(() => {
-    requestForToken();
+    getMessagingToken();
   }, []);
-
   useEffect(() => {
-    onMessageListener()
-      .then(() => {
-        notifications.show({
-          title: "noti",
-          message: "noti",
-        });
-      })
-      .catch((err) => console.log("failed: ", err));
+    onMessageListener().then((data) => {
+      console.log("Receive foreground: ", data);
+    });
   });
 
   const [activeTab, setActiveTab] = useState<string | null>("gallery");

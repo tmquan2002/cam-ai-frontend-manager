@@ -9,13 +9,10 @@ import EditAndUpdateForm, {
 } from "../../components/form/EditAndUpdateForm";
 import { getUserId } from "../../context/AuthContext";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
-import { useGetAccountStatusList } from "../../hooks/useGetAccountStatus";
 import { useGetGenderList } from "../../hooks/useGetGender";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { ResponseErrorDetail } from "../../models/Response";
-import {
-  mapLookupStringValueToArray
-} from "../../utils/helperFunction";
+import { mapLookupStringValueToArray } from "../../utils/helperFunction";
 
 type ProfileFieldValue = {
   name: string;
@@ -34,18 +31,14 @@ const BrandManagerProfilePage = () => {
   const { data: account, isLoading: isAccountLoading } = useGetAccountById(
     getUserId() ?? "0"
   );
-  const
-    {
-      data: accountStatus,
-      // isLoading: isAccountStatusLoading 
-    } =
-      useGetAccountStatusList();
-  const
-    {
-      mutate: updateAccount,
-      // isLoading: updateAccountLoading 
-    } =
-      useUpdateAccount();
+  // const {
+  //   data: accountStatus,
+  //   // isLoading: isAccountStatusLoading
+  // } = useGetAccountStatusList();
+  const {
+    mutate: updateAccount,
+    // isLoading: updateAccountLoading
+  } = useUpdateAccount();
   const form = useForm<ProfileFieldValue>({});
 
   useEffect(() => {
@@ -131,13 +124,14 @@ const BrandManagerProfilePage = () => {
         spans: 6,
       },
     ];
-  }, [gender, form, accountStatus]);
+  }, [gender, form]);
 
   if (isAccountLoading) return <Loader />;
 
   return (
     <Paper
       p={rem(32)}
+      m={rem(32)}
       style={{ flex: 1 }}
     >
       <Text

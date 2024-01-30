@@ -269,9 +269,10 @@ const BrandDetailPageManager = () => {
       {data?.values[0].bannerUri && (
         <Tooltip label="Brand banner">
           <Image
+            mb={rem(16)}
             radius={"md"}
             bg={"#000"}
-            height={200}
+            height={280}
             fit="contain"
             src={data?.values[0].bannerUri}
           />

@@ -42,15 +42,23 @@ const BrandRoute = () => {
           }}
         >
           <AppShell.Header>
-            <BrandHeader mobileOpened={mobileOpened} desktopOpened={desktopOpened}
-              toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
+            <BrandHeader
+              mobileOpened={mobileOpened}
+              desktopOpened={desktopOpened}
+              toggleDesktop={toggleDesktop}
+              toggleMobile={toggleMobile}
+            />
           </AppShell.Header>
 
           <AppShell.Navbar>
             <BrandNavbar />
           </AppShell.Navbar>
 
-          <AppShell.Main>
+          <AppShell.Main
+            style={{
+              backgroundColor: "#f2f4f7",
+            }}
+          >
             <Outlet />
           </AppShell.Main>
         </AppShell>

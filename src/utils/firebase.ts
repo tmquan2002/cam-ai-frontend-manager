@@ -1,53 +1,46 @@
-import { initializeApp } from "firebase/app";
-import { getMessaging } from "firebase/messaging/sw";
-import { getToken, onMessage } from "firebase/messaging";
-const firebaseConfig = {
-  apiKey: "AIzaSyCPpQUUMRkvFrZdOtBNwTvbxVeKA6N-l5Y",
-  authDomain: "camera-with-ai.firebaseapp.com",
-  projectId: "camera-with-ai",
-  storageBucket: "camera-with-ai.appspot.com",
-  messagingSenderId: "261831702951",
-  appId: "1:261831702951:web:388077fecbf7e0472cde82",
-  measurementId: "G-BXL7FSX0HH",
-};
+import firebase from "firebase/app";
+import "firebase/messaging";
 
-const app = initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey: "AIzaSyCPpQUUMRkvFrZdOtBNwTvbxVeKA6N-l5Y",
+    authDomain: "camera-with-ai.firebaseapp.com",
+    projectId: "camera-with-ai",
+    storageBucket: "camera-with-ai.appspot.com",
+    messagingSenderId: "261831702951",
+    appId: "1:261831702951:web:388077fecbf7e0472cde82",
+    measurementId: "G-BXL7FSX0HH",
+  });
+} else {
+  firebase.app(); // if already initialized, use that one
+}
 
-export const messaging = getMessaging(app);
+let messaging: firebase.messaging.Messaging;
 
-export const requestForToken = async () => {
-  requestPermission();
+if (typeof window !== "undefined") {
+  if (firebase.messaging.isSupported()) {
+    messaging = firebase.messaging();
+  }
+}
+
+export const getMessagingToken = async () => {
+  let currentToken = "";
+  if (!messaging) return;
   try {
-    const currentToken = await getToken(messaging, {
+    currentToken = await messaging.getToken({
       vapidKey:
         "BBh_WhzBpHQ9KYycEmPO794ZGjRkSFFwHEk-p3P8Ee9W8sSnrRDxXa23ncVyQTSLgbi5tNW1H9J3Wn_YOn_Docw",
     });
-    if (currentToken) {
-      console.log("current token for client: ", currentToken);
-    } else {
-      // Show permission request UI
-      console.log(
-        "No registration token available. Request permission to generate one."
-      );
-    }
-  } catch (err) {
-    console.log("An error occurred while retrieving token. ", err);
+    console.log("FCM registration token", currentToken);
+  } catch (error) {
+    console.log("An error occurred while retrieving token. ", error);
   }
+  return currentToken;
 };
 
 export const onMessageListener = () =>
   new Promise((resolve) => {
-    onMessage(messaging, (payload) => {
-      console.log("payload", payload);
+    messaging.onMessage((payload) => {
       resolve(payload);
     });
   });
-
-export const requestPermission = () => {
-  console.log("request permission");
-  Notification.requestPermission().then((permission) => {
-    if (permission == "granted") {
-      console.log("Granted");
-    }
-  });
-};

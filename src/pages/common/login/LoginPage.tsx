@@ -30,8 +30,8 @@ const LoginPage = () => {
         value.trim().length === 0
           ? "Email is required"
           : /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(value)
-            ? null
-            : "Invalid email",
+          ? null
+          : "Invalid email",
       password: (value) =>
         value.trim().length === 0 ? "Password is required" : null,
     },
@@ -66,7 +66,9 @@ const LoginPage = () => {
       <div className={styled["container-main"]}>
         <div className={styled["image-container"]}>
           <div className={styled["title"]}>CAMAI</div>
-          <div className={styled["description"]}>Solution for coffee brands to detect customers and employee behaviors
+          <div className={styled["description"]}>
+            Solution for coffee brands to detect customers and employee
+            behaviors
           </div>
           <img
             src={AuthImage}
@@ -122,7 +124,8 @@ const LoginPage = () => {
           <Modal
             opened={modalOpen}
             onClose={() => setModalOpen(false)}
-            centered title="New User"
+            centered
+            title="New User"
           >
             <div>
               Please change given password with your new password to continue

@@ -7,6 +7,13 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
+import { useGetAccountList } from "../../hooks/useGetAccounts";
+import { useCreateShop } from "../../hooks/useCreateShop";
+import { CreateShopParams } from "../../apis/ShopAPI";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
+import { useNavigate } from "react-router-dom";
 
 export type CreateShopField = {
   name: string;
@@ -33,11 +40,18 @@ const CreateShop = () => {
     },
     validate: {
       name: isNotEmpty("Name is required"),
-      phone: isNotEmpty("Phone is required"),
+      phone: (value) =>
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          ? null
+          : "Invalid phone number",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
     },
   });
+
+  const navigate = useNavigate();
+  const { data: accountList, isLoading: isAccountListLoading } =
+    useGetAccountList();
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -46,6 +60,9 @@ const CreateShop = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
     +form.values.district
   );
+
+  const { mutate: createShop, isLoading: isCreateShopLoading } =
+    useCreateShop();
 
   const fields = useMemo(() => {
     return [
@@ -64,8 +81,10 @@ const CreateShop = () => {
         fieldProps: {
           form,
           name: "phone",
+          type: "number",
           placeholder: "Shop phone",
           label: "Shop phone",
+          required: true,
         },
       },
       {
@@ -78,7 +97,25 @@ const CreateShop = () => {
           required: true,
         },
       },
-
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          form,
+          name: "shopManagerId",
+          placeholder: "Shop manager",
+          label: "Shop manager",
+          data: accountList?.values?.map((item) => {
+            return {
+              value: item.id,
+              label: item.name,
+              disabled: item.managingShop != null,
+            };
+          }),
+          loading: isAccountListLoading,
+          searchable: true,
+          // required: true,
+        },
+      },
       {
         type: FIELD_TYPES.SELECT,
         fieldProps: {
@@ -119,6 +156,7 @@ const CreateShop = () => {
           form,
           name: "wardId",
           loading: isWardsLoading,
+          required: true,
         },
         spans: 4,
       },
@@ -146,9 +184,35 @@ const CreateShop = () => {
         Add new shop
       </Text>
       <form
-        onSubmit={form.onSubmit((values) => {
-          console.log(values);
-        })}
+        onSubmit={form.onSubmit(
+          ({ addressLine, brandId, name, phone, wardId, shopManagerId }) => {
+            const updateParams: CreateShopParams = {
+              addressLine,
+              brandId,
+              name,
+              phone,
+              wardId: +wardId,
+              shopManagerId,
+            };
+            createShop(updateParams, {
+              onSuccess(data) {
+                notifications.show({
+                  title: "Successfully",
+                  message: "Update account success!",
+                });
+                navigate(`/brand/shop/${data.id}`);
+              },
+              onError(data) {
+                const error = data as AxiosError<ResponseErrorDetail>;
+                notifications.show({
+                  color: "red",
+                  title: "Failed",
+                  message: error.response?.data?.message,
+                });
+              },
+            });
+          }
+        )}
       >
         <EditAndUpdateForm fields={fields} />
         <Group
