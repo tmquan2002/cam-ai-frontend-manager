@@ -1,14 +1,14 @@
-import { TextInput, Button, Group, rem } from "@mantine/core";
+import { Button, Group, TextInput, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { MdLockOutline } from "react-icons/md";
-import { AuthToken } from "../../../../models/Auth";
-import { useChangePassword } from "../../../../hooks/useChangePassword";
-import { ChangePasswordParams } from "../../../../apis/LoginAPI";
-import { useSession } from "../../../../context/AuthContext";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
+import { AxiosError } from "axios";
+import { MdLockOutline } from "react-icons/md";
+import { ChangePasswordParams } from "../../../../apis/LoginAPI";
+import { useSession } from "../../../../context/AuthContext";
+import { useChangePassword } from "../../../../hooks/useChangePassword";
+import { AuthToken } from "../../../../models/Auth";
+import { ResponseErrorDetail } from "../../../../models/Response";
 
 export const ChangePasswordForm = (data: AuthToken) => {
   const sessionHook = useSession();
@@ -102,7 +102,8 @@ export const ChangePasswordForm = (data: AuthToken) => {
           type="submit"
           variant="gradient"
           size="md"
-          gradient={{ from: "blue", to: "cyan", deg: 90 }}
+          mt={20}
+          gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
         >
           Change Password
         </Button>

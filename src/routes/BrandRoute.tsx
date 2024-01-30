@@ -1,15 +1,16 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { checkRole } from "../context/AuthContext";
-import { useEffect, useState } from "react";
-import { RoleEnum } from "../types/enum";
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useEffect, useState } from "react";
+import { Navigate, Outlet } from "react-router-dom";
+import { checkRole } from "../context/AuthContext";
+import { RoleEnum } from "../types/enum";
 // import ShopHeader from "../components/header/ShopHeader";
-import { BrandNavbar } from "../components/navbar/BrandNavbar";
 import BrandHeader from "../components/header/BrandHeader";
+import { BrandNavbar } from "../components/navbar/BrandNavbar";
 
 const BrandRoute = () => {
-  const [opened] = useDisclosure();
+  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.BrandManager);
   useEffect(() => {
     const isUserRoleBrandManager: boolean | undefined = checkRole({
@@ -35,24 +36,21 @@ const BrandRoute = () => {
         <AppShell
           header={{ height: 60 }}
           navbar={{
-            width: 300,
+            width: 250,
             breakpoint: "sm",
-            collapsed: { mobile: !opened },
+            collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
           }}
         >
           <AppShell.Header>
-            <BrandHeader />
+            <BrandHeader mobileOpened={mobileOpened} desktopOpened={desktopOpened}
+              toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
           </AppShell.Header>
 
           <AppShell.Navbar>
             <BrandNavbar />
           </AppShell.Navbar>
 
-          <AppShell.Main
-            style={{
-              backgroundColor: "#f2f4f7",
-            }}
-          >
+          <AppShell.Main>
             <Outlet />
           </AppShell.Main>
         </AppShell>

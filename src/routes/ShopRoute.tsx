@@ -8,7 +8,8 @@ import { useDisclosure } from "@mantine/hooks";
 import ShopHeader from "../components/header/ShopHeader";
 
 const ShopRoute = () => {
-  const [opened] = useDisclosure();
+  const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.ShopManager);
   useEffect(() => {
     const isUserRoleBrandManager: boolean | undefined = checkRole({
@@ -36,11 +37,12 @@ const ShopRoute = () => {
           navbar={{
             width: 300,
             breakpoint: "sm",
-            collapsed: { mobile: !opened },
+            collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
           }}
         >
           <AppShell.Header>
-            <ShopHeader />
+            <ShopHeader mobileOpened={mobileOpened} desktopOpened={desktopOpened}
+              toggleDesktop={toggleDesktop} toggleMobile={toggleMobile}/>
           </AppShell.Header>
 
           <AppShell.Navbar>

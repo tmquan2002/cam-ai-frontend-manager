@@ -1,0 +1,79 @@
+.control,
+.activeControl {
+  font-weight: 500;
+  display: block;
+  width: 100%;
+  padding: 0.625rem 1rem;
+
+  .label {
+    @include light {
+      color: black;
+    }
+
+    @include dark {
+      color: white;
+    }
+
+    padding-left: 15px;
+  }
+
+  font-size: 1rem;
+}
+
+.control:hover,
+.activeControl {
+  background-color: var(--mantine-color-light-blue-2);
+
+  @include light {
+    color: black;
+  }
+
+  @include dark {
+    color: black;
+  }
+}
+
+.link {
+  font-weight: 500;
+  display: block;
+  text-decoration: none;
+  padding: 0.625rem 1rem;
+  padding-left: 1rem;
+  margin-left: 1rem;
+  font-size: 0.9rem;
+
+  @include light {
+    color: #495057;
+  }
+
+  @include dark {
+    color: #a5a9ad;
+  }
+
+  border-left: 1px solid #dee2e6;
+
+  //   @mixin hover {
+  //     background-color: light-dark(
+  //       var(--mantine-color-gray-0),
+  //       var(--mantine-color-dark-7)
+  //     );
+  //     color: light-dark(var(--mantine-color-black), var(--mantine-color-dark-0));
+  //   }
+}
+
+.link:hover {
+
+  @include light {
+    background-color: #f8f9fa;
+    color: black;
+  }
+
+  @include dark {
+    background-color: #353535;
+    color: white;
+  }
+}
+
+.chevron {
+  transition: transform 200ms ease;
+}

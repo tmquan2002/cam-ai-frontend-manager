@@ -22,7 +22,6 @@ import {
   Tooltip,
   rem,
 } from "@mantine/core";
-import { useGetBrandList } from "../../hooks/useGetBrandList";
 import {
   IconAlignBoxCenterStretch,
   IconFilter,
@@ -48,6 +47,7 @@ import EditAndUpdateForm, {
 } from "../../components/form/EditAndUpdateForm";
 import { useForm } from "@mantine/form";
 import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
+import { useGetBrandList } from "../../hooks/useGetBrandList";
 
 type SearchShopField = {
   status: string | null;
@@ -266,6 +266,18 @@ const BrandDetailPageManager = () => {
       p={rem(32)}
       style={{ flex: 1 }}
     >
+      {data?.values[0].bannerUri && (
+        <Tooltip label="Brand banner">
+          <Image
+            radius={"md"}
+            bg={"#000"}
+            height={200}
+            fit="contain"
+            src={data?.values[0].bannerUri}
+          />
+        </Tooltip>
+      )}
+
       <Flex
         align={"center"}
         mb={rem(32)}
@@ -302,15 +314,6 @@ const BrandDetailPageManager = () => {
         </Box>
       </Flex>
 
-      <Tooltip label="Brand banner">
-        <Image
-          radius={"md"}
-          bg={"#000"}
-          height={400}
-          fit="contain"
-          src={data?.values[0].bannerUri}
-        />
-      </Tooltip>
       <Flex
         align={"center"}
         my={"md"}
