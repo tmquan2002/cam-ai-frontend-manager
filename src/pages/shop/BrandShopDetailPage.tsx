@@ -3,24 +3,31 @@ import {
   Box,
   Flex,
   Image,
-  Loader,
+  LoadingOverlay,
   Paper,
   Text,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
-import { useGetBrandList } from "../../hooks/useGetBrandList";
 import { IconMail, IconPhone } from "@tabler/icons-react";
+import { useGetBrandList } from "../../hooks/useGetBrandList";
 
 const BrandShopDetailPage = () => {
   const { data, isLoading } = useGetBrandList({ size: 1 });
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return (
+    <Paper
+      style={{ flex: 1, height: '100vh' }}
+      pos={"relative"}
+    >
+      <LoadingOverlay visible={isLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
+    </Paper>
+  );
+
   return (
     <Paper
       p={rem(32)}
+      m={rem(32)}
       style={{ flex: 1 }}
     >
       <Flex
