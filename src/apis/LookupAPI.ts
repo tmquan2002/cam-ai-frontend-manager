@@ -23,4 +23,8 @@ export const LookupAPI = {
     const res = await http.get(`/api/locations/districts/${districtId}/wards`);
     return res.data;
   },
+  _getShopStatus: async () => {
+    const res = await http.get("/api/lookup/shop-status");
+    return res.data;
+  },
 };

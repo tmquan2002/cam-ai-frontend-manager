@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
@@ -24,12 +24,18 @@ const CreateShop = () => {
     initialValues: {
       name: "",
       phone: "",
-      wardId: "0",
+      wardId: "",
       brandId: "",
       shopManagerId: "",
       addressLine: "",
-      province: "0",
-      district: "0",
+      province: "",
+      district: "",
+    },
+    validate: {
+      name: isNotEmpty("Name is required"),
+      phone: isNotEmpty("Phone is required"),
+      addressLine: isNotEmpty("Address line is required"),
+      wardId: isNotEmpty("Ward is required"),
     },
   });
   const { data: provinces, isLoading: isProvicesLoading } =
@@ -72,16 +78,7 @@ const CreateShop = () => {
           required: true,
         },
       },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form,
-          name: "brandName",
-          placeholder: "Brand",
-          label: "Shop",
-          disabled: true,
-        },
-      },
+
       {
         type: FIELD_TYPES.SELECT,
         fieldProps: {
@@ -135,6 +132,7 @@ const CreateShop = () => {
     provinces,
     wards,
   ]);
+
   return (
     <Paper
       m={rem(32)}
@@ -147,7 +145,11 @@ const CreateShop = () => {
       >
         Add new shop
       </Text>
-      <form action="">
+      <form
+        onSubmit={form.onSubmit((values) => {
+          console.log(values);
+        })}
+      >
         <EditAndUpdateForm fields={fields} />
         <Group
           justify="flex-end"

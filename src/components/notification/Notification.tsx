@@ -12,7 +12,9 @@ import {
   rem,
 } from "@mantine/core";
 import classes from "./Notification.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { onMessageListener, requestForToken } from "../../utils/firebase";
+import { notifications } from "@mantine/notifications";
 
 export const TabsHeader = ({
   active,
@@ -99,6 +101,21 @@ const DetailCard = () => {
 };
 
 const Notification = () => {
+  useEffect(() => {
+    requestForToken();
+  }, []);
+
+  useEffect(() => {
+    onMessageListener()
+      .then(() => {
+        notifications.show({
+          title: "noti",
+          message: "noti",
+        });
+      })
+      .catch((err) => console.log("failed: ", err));
+  });
+
   const [activeTab, setActiveTab] = useState<string | null>("gallery");
   return (
     <ScrollArea
@@ -163,10 +180,10 @@ const Notification = () => {
 
         <Tabs.Panel value="gallery">
           {[1, 2, 3, 4, 5].map((item) => (
-            <>
-              <DetailCard key={item} />
+            <Box key={item}>
+              <DetailCard />
               <Divider />
-            </>
+            </Box>
           ))}
           <DetailCard />
         </Tabs.Panel>

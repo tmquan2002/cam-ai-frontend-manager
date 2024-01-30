@@ -1,4 +1,4 @@
-import { Grid, Loader, Select, TextInput } from "@mantine/core";
+import { Grid, Group, Loader, Radio, Select, TextInput } from "@mantine/core";
 
 const renderTextField = ({ fieldProps }: any) => {
   const { form, name, placeholder, label, required, disabled } = fieldProps;
@@ -40,9 +40,33 @@ const renderSelect = ({ fieldProps }: any) => {
   );
 };
 
+const renderRadio = ({ fieldProps }: any) => {
+  const { name, label, description, form, data } = fieldProps;
+
+  return (
+    <Radio.Group
+      name={name}
+      label={label}
+      description={description}
+      {...form.getInputProps(name)}
+    >
+      <Group mt={"xs"}>
+        {data.map(({ value, label }: { value: string; label: string }) => (
+          <Radio
+            key={value}
+            value={value}
+            label={label}
+          />
+        ))}
+      </Group>
+    </Radio.Group>
+  );
+};
+
 export const FIELD_TYPES = {
   TEXT: "text",
   SELECT: "select",
+  RADIO: "radio",
   AUTOCOMPLETE: "autocomplete",
   UPLOAD: "upload",
   MULTILINE: "multiline",
@@ -56,6 +80,7 @@ const FORM_MAPPING = {
   [FIELD_TYPES.TEXT]: renderTextField,
   // [FIELD_TYPES.MULTILINE]: renderMultiline,
   [FIELD_TYPES.SELECT]: renderSelect,
+  [FIELD_TYPES.RADIO]: renderRadio,
   //   [FIELD_TYPES.MULTI_SELECT]: renderMultiSelect,
   // [FIELD_TYPES.AUTOCOMPLETE]: renderAutoComplete,
   // [FIELD_TYPES.UPLOAD]: renderUpload,
