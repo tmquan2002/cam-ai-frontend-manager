@@ -1,13 +1,18 @@
 import {
+  ActionIcon,
   Avatar,
   Badge,
   Box,
   Button,
   Card,
+  Collapse,
   Flex,
   Group,
   Image,
+  Loader,
   LoadingOverlay,
+  Menu,
+  NumberInput,
   Overlay,
   Pagination,
   Paper,
@@ -16,38 +21,108 @@ import {
   Text,
   TextInput,
   Tooltip,
-  rem
+  rem,
 } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
 import {
+  IconAlignBoxCenterStretch,
   IconFilter,
   IconMail,
   IconPhone,
-  IconSearch
+  IconPhoneCall,
+  IconPlus,
+  IconSearch,
 } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
 import cx from "clsx";
-import * as _ from "lodash";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useGetBrandList } from "../../hooks/useGetBrandList";
-import { useGetShopList } from "../../hooks/useGetShopList";
-import { isEmpty } from "../../utils/helperFunction";
 import classes from "./BrandDetailPage.module.scss";
+import {
+  GetShopListHookParams,
+  useGetShopList,
+} from "../../hooks/useGetShopList";
+import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import * as _ from "lodash";
+import { useNavigate } from "react-router-dom";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import { useForm } from "@mantine/form";
+import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
+import { useGetBrandList } from "../../hooks/useGetBrandList";
+
+type SearchShopField = {
+  status: string | null;
+};
+
+const SearchCategory = {
+  NAME: (
+    <IconAlignBoxCenterStretch
+      size={"1.2rem"}
+      stroke={1.5}
+    />
+  ),
+  PHONE: (
+    <IconPhoneCall
+      size={"1.2rem"}
+      stroke={1.5}
+    />
+  ),
+};
 
 const BrandDetailPageManager = () => {
-  const [search, setSearch] = useState<string>("");
+  const form = useForm<SearchShopField>({
+    initialValues: {
+      status: null,
+    },
+  });
+
+  const { data: shopStatusList } = useGetShopStatusList();
+  const [search, setSearch] = useState<string | number>("");
+  const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
   const [scrolled, setScrolled] = useState(false);
+  const [searchCategory, setSearchCategory] = useState<JSX.Element>(
+    SearchCategory.NAME
+  );
   const { data, isLoading, isError } = useGetBrandList({ size: 1 });
-  const { data: shopList, isLoading: isShopListLoading } = useGetShopList({
-    size: 12,
-    name: debounced,
-    enabled: !isEmpty(data?.values[0].id),
-    brandId: data?.values[0].id,
-    pageIndex: activePage - 1,
-  });
+
+  const searchParams: GetShopListHookParams = useMemo(() => {
+    let sb: GetShopListHookParams = {
+      size: 12,
+      enabled: !isEmpty(data?.values[0].id),
+      brandId: data?.values[0].id,
+      pageIndex: activePage - 1,
+      statusId: form.values.status ? +form.values.status : null,
+    };
+    if (searchCategory == SearchCategory.NAME) {
+      sb.name = debounced.toString();
+    } else {
+      sb.phone = debounced.toString();
+    }
+    sb = _.omitBy(sb, _.isNil) as GetShopListHookParams;
+    sb = _.omitBy(sb, _.isNaN) as GetShopListHookParams;
+    return sb;
+  }, [activePage, data?.values, debounced, form.values.status, searchCategory]);
+
+  const { data: shopList, isLoading: isShopListLoading } =
+    useGetShopList(searchParams);
+
+  const fields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.RADIO,
+        fieldProps: {
+          form,
+          name: "status",
+          placeholder: "Shop status",
+          label: "Shop status",
+          data: mapLookupToArray(shopStatusList ?? {}),
+        },
+      },
+    ];
+  }, [shopStatusList, form]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -55,15 +130,19 @@ const BrandDetailPageManager = () => {
   };
 
   const rows = shopList?.values.map((row, index) => {
-
-    if (isShopListLoading) return (
-      <Paper
-        style={{ flex: 1, height: '100vh' }}
-        pos={"relative"}
-      >
-        <LoadingOverlay visible={isShopListLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
-      </Paper>
-    );
+    if (isShopListLoading)
+      return (
+        <Paper
+          style={{ flex: 1, height: "100vh" }}
+          pos={"relative"}
+        >
+          <LoadingOverlay
+            visible={isShopListLoading}
+            zIndex={1000}
+            overlayProps={{ radius: "sm", blur: 1 }}
+          />
+        </Paper>
+      );
 
     return (
       <Table.Tr
@@ -96,14 +175,62 @@ const BrandDetailPageManager = () => {
     );
   });
 
-  if (isLoading) return (
-    <Paper
-      style={{ flex: 1, height: '100vh' }}
-      pos={"relative"}
-    >
-      <LoadingOverlay visible={isLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
-    </Paper>
-  );
+  const renderDropdownFilter = () => {
+    return (
+      <Menu transitionProps={{ transition: "pop-top-right" }}>
+        <Tooltip label="Search by">
+          <Menu.Target>
+            <ActionIcon
+              size={36}
+              radius="xl"
+              color={"blue"}
+              variant="filled"
+            >
+              {searchCategory}
+            </ActionIcon>
+          </Menu.Target>
+        </Tooltip>
+
+        <Menu.Dropdown>
+          <Menu.Label>Search by</Menu.Label>
+          <Menu.Item
+            leftSection={
+              <IconAlignBoxCenterStretch
+                size={"1.3rem"}
+                stroke={1.5}
+                color="#228be6"
+              />
+            }
+            onClick={() => {
+              setSearch("");
+              setSearchCategory(SearchCategory.NAME);
+            }}
+          >
+            Name
+          </Menu.Item>
+          <Menu.Item
+            leftSection={
+              <IconPhoneCall
+                size={"1.3rem"}
+                stroke={1.5}
+                color={"#15aabf"}
+              />
+            }
+            onClick={() => {
+              setSearch("");
+              setSearchCategory(SearchCategory.PHONE);
+            }}
+          >
+            Phone
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    );
+  };
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   if (isError)
     return (
@@ -152,17 +279,18 @@ const BrandDetailPageManager = () => {
       p={rem(32)}
       style={{ flex: 1 }}
     >
-      {data?.values[0].bannerUri &&
+      {data?.values[0].bannerUri && (
         <Tooltip label="Brand banner">
           <Image
+            mb={rem(16)}
             radius={"md"}
             bg={"#000"}
-            height={200}
+            height={280}
             fit="contain"
             src={data?.values[0].bannerUri}
           />
         </Tooltip>
-      }
+      )}
 
       <Flex
         align={"center"}
@@ -204,33 +332,79 @@ const BrandDetailPageManager = () => {
         align={"center"}
         my={"md"}
       >
-        <TextInput
-          style={{ flex: 1 }}
-          placeholder="Search by any field"
-          classNames={{ input: classes.search_input }}
-          rightSectionWidth={52}
-          leftSectionWidth={52}
-          leftSection={
-            <IconSearch
-              style={{ width: rem(16), height: rem(16) }}
-              stroke={1.5}
-            />
-          }
-          value={search}
-          onChange={handleSearchChange}
-        />
+        {searchCategory == SearchCategory.NAME ? (
+          <TextInput
+            style={{ flex: 1 }}
+            placeholder="Search by any field"
+            classNames={{ input: classes.search_input }}
+            rightSectionWidth={52}
+            leftSectionWidth={52}
+            leftSection={
+              <IconSearch
+                style={{ width: rem(16), height: rem(16) }}
+                stroke={1.5}
+              />
+            }
+            rightSection={renderDropdownFilter()}
+            value={search}
+            onChange={handleSearchChange}
+          />
+        ) : (
+          <NumberInput
+            style={{ flex: 1 }}
+            placeholder="Search by any field"
+            classNames={{ input: classes.search_input }}
+            rightSectionWidth={52}
+            leftSectionWidth={52}
+            leftSection={
+              <IconSearch
+                style={{ width: rem(16), height: rem(16) }}
+                stroke={1.5}
+              />
+            }
+            rightSection={renderDropdownFilter()}
+            value={search}
+            onChange={setSearch}
+          />
+        )}
         <Button
           leftSection={<IconFilter size={14} />}
           variant="default"
           className={classes.filter_button}
+          onClick={toggle}
         >
           Filter
         </Button>
+        <Button
+          leftSection={<IconPlus size={14} />}
+          variant="outline"
+          h={rem(48)}
+          onClick={() => {
+            navigate("/brand/create/shop");
+          }}
+          ml={rem(12)}
+          radius={"20%/50%"}
+        >
+          Add shop
+        </Button>
       </Flex>
+      <Collapse in={opened}>
+        <Group>
+          <EditAndUpdateForm fields={fields} />
+          <Button
+            variant="transparent"
+            ml={"auto"}
+            onClick={form.reset}
+          >
+            Clear all filter
+          </Button>
+        </Group>
+      </Collapse>
 
       <ScrollArea
         h={600}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+        mt={"md"}
       >
         <Table
           striped

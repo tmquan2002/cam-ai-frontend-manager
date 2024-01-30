@@ -1,9 +1,19 @@
-import { Grid, Loader, Select, TextInput } from "@mantine/core";
+import {
+  Grid,
+  Group,
+  Loader,
+  NumberInput,
+  Radio,
+  Select,
+  TextInput,
+} from "@mantine/core";
 
 const renderTextField = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled } = fieldProps;
+  const { form, name, placeholder, label, required, disabled, type } =
+    fieldProps;
   return (
     <TextInput
+      type={type}
       disabled={disabled}
       withAsterisk={required}
       label={label}
@@ -23,6 +33,7 @@ const renderSelect = ({ fieldProps }: any) => {
     disabled,
     searchable,
     loading,
+    required,
   } = fieldProps;
   if (loading) return <Loader />;
 
@@ -35,6 +46,46 @@ const renderSelect = ({ fieldProps }: any) => {
       disabled={disabled}
       placeholder={placeholder}
       data={data}
+      required={required}
+      {...form.getInputProps(name)}
+    />
+  );
+};
+
+const renderRadio = ({ fieldProps }: any) => {
+  const { name, label, description, form, data, required } = fieldProps;
+
+  return (
+    <Radio.Group
+      name={name}
+      label={label}
+      required={required}
+      description={description}
+      {...form.getInputProps(name)}
+    >
+      <Group mt={"xs"}>
+        {data.map(({ value, label }: { value: string; label: string }) => (
+          <Radio
+            key={value}
+            value={value}
+            label={label}
+          />
+        ))}
+      </Group>
+    </Radio.Group>
+  );
+};
+
+const renderNumber = ({ fieldProps }: any) => {
+  const { form, name, placeholder, label, required, disabled } = fieldProps;
+  return (
+    <NumberInput
+      required={required}
+      disabled={disabled}
+      withAsterisk={required}
+      rightSection={<></>}
+      label={label}
+      placeholder={placeholder}
       {...form.getInputProps(name)}
     />
   );
@@ -43,6 +94,7 @@ const renderSelect = ({ fieldProps }: any) => {
 export const FIELD_TYPES = {
   TEXT: "text",
   SELECT: "select",
+  RADIO: "radio",
   AUTOCOMPLETE: "autocomplete",
   UPLOAD: "upload",
   MULTILINE: "multiline",
@@ -56,11 +108,12 @@ const FORM_MAPPING = {
   [FIELD_TYPES.TEXT]: renderTextField,
   // [FIELD_TYPES.MULTILINE]: renderMultiline,
   [FIELD_TYPES.SELECT]: renderSelect,
+  [FIELD_TYPES.RADIO]: renderRadio,
   //   [FIELD_TYPES.MULTI_SELECT]: renderMultiSelect,
   // [FIELD_TYPES.AUTOCOMPLETE]: renderAutoComplete,
   // [FIELD_TYPES.UPLOAD]: renderUpload,
   // [FIELD_TYPES.LARGE_MULTILINE]: renderLargeMultiline,
-  // [FIELD_TYPES.NUMBER]: renderNumber,
+  [FIELD_TYPES.NUMBER]: renderNumber,
   //   [FIELD_TYPES.IMAGE_PICKER]: renderImagePicker,
 };
 

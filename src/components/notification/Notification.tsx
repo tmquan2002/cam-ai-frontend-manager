@@ -12,7 +12,8 @@ import {
   rem,
 } from "@mantine/core";
 import classes from "./Notification.module.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getMessagingToken, onMessageListener } from "../../utils/firebase";
 
 export const TabsHeader = ({
   active,
@@ -99,6 +100,15 @@ const DetailCard = () => {
 };
 
 const Notification = () => {
+  useEffect(() => {
+    getMessagingToken();
+  }, []);
+  useEffect(() => {
+    onMessageListener().then((data) => {
+      console.log("Receive foreground: ", data);
+    });
+  });
+
   const [activeTab, setActiveTab] = useState<string | null>("gallery");
   return (
     <ScrollArea
@@ -163,10 +173,10 @@ const Notification = () => {
 
         <Tabs.Panel value="gallery">
           {[1, 2, 3, 4, 5].map((item) => (
-            <>
-              <DetailCard key={item} />
+            <Box key={item}>
+              <DetailCard />
               <Divider />
-            </>
+            </Box>
           ))}
           <DetailCard />
         </Tabs.Panel>

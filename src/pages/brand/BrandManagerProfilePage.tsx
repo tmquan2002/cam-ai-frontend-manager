@@ -9,13 +9,10 @@ import EditAndUpdateForm, {
 } from "../../components/form/EditAndUpdateForm";
 import { getUserId } from "../../context/AuthContext";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
-import { useGetAccountStatusList } from "../../hooks/useGetAccountStatus";
 import { useGetGenderList } from "../../hooks/useGetGender";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { ResponseErrorDetail } from "../../models/Response";
-import {
-  mapLookupStringValueToArray
-} from "../../utils/helperFunction";
+import { mapLookupStringValueToArray } from "../../utils/helperFunction";
 
 type ProfileFieldValue = {
   name: string;
@@ -34,18 +31,14 @@ const BrandManagerProfilePage = () => {
   const { data: account, isLoading: isAccountLoading } = useGetAccountById(
     getUserId() ?? "0"
   );
-  const
-    {
-      data: accountStatus,
-      // isLoading: isAccountStatusLoading 
-    } =
-      useGetAccountStatusList();
-  const
-    {
-      mutate: updateAccount,
-      // isLoading: updateAccountLoading 
-    } =
-      useUpdateAccount();
+  // const {
+  //   data: accountStatus,
+  //   // isLoading: isAccountStatusLoading
+  // } = useGetAccountStatusList();
+  const {
+    mutate: updateAccount,
+    // isLoading: updateAccountLoading
+  } = useUpdateAccount();
   const form = useForm<ProfileFieldValue>({});
 
   useEffect(() => {
@@ -131,16 +124,21 @@ const BrandManagerProfilePage = () => {
         spans: 6,
       },
     ];
-  }, [gender, form, accountStatus]);
+  }, [gender, form]);
 
-  if (isAccountLoading) return (
-    <Paper
-      style={{ flex: 1, height: '100vh' }}
-      pos={"relative"}
-    >
-      <LoadingOverlay visible={isAccountLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
-    </Paper>
-  );
+  if (isAccountLoading)
+    return (
+      <Paper
+        style={{ flex: 1, height: "100vh" }}
+        pos={"relative"}
+      >
+        <LoadingOverlay
+          visible={isAccountLoading}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 1 }}
+        />
+      </Paper>
+    );
 
   return (
     <Paper
@@ -148,7 +146,14 @@ const BrandManagerProfilePage = () => {
       p={rem(32)}
       style={{ flex: 1 }}
     >
-      <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ACCOUNT PROFILE</Text>
+      <Text
+        size="lg"
+        fw={"bold"}
+        fz={25}
+        c={"light-blue.4"}
+      >
+        ACCOUNT PROFILE
+      </Text>
       <form
         onSubmit={form.onSubmit((values) => {
           const params: UpdateAccountParams = {
@@ -185,7 +190,12 @@ const BrandManagerProfilePage = () => {
           justify="flex-start"
           mt="md"
         >
-          <Button type="submit" mt={10}>Submit</Button>
+          <Button
+            type="submit"
+            mt={10}
+          >
+            Submit
+          </Button>
         </Group>
       </form>
     </Paper>

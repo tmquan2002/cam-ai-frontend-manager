@@ -22,15 +22,3 @@ p {
   margin: 0;
   padding: 0;
 }
-
-label {
-  margin-top: 10px;
-}
-
-.mantine-Modal-content {
-  padding: 10px 20px;
-}
-
-.mantine-Modal-title {
-  font-weight: bold;
-}
