@@ -169,6 +169,8 @@ const CreateShop = () => {
     isWardsLoading,
     provinces,
     wards,
+    accountList,
+    isAccountListLoading,
   ]);
 
   return (
@@ -219,7 +221,12 @@ const CreateShop = () => {
           justify="flex-end"
           mt="md"
         >
-          <Button type="submit">Submit</Button>
+          <Button
+            type="submit"
+            loading={isCreateShopLoading}
+          >
+            Submit
+          </Button>
         </Group>
       </form>
     </Paper>
