@@ -2,6 +2,7 @@ import { BrowserRouter } from "react-router-dom";
 import "@mantine/core/styles.css";
 import "@mantine/charts/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
 import "./App.css";
 import AppRoute from "./routes/AppRoute";
 import { QueryClient, QueryClientProvider } from "react-query";

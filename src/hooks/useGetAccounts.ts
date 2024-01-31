@@ -9,6 +9,7 @@ export const useGetAccountList = () => {
     data,
     isError,
     error,
+    refetch,
   }: UseQueryResult<CommonResponse<AccountDetail>, Error> = useQuery({
     queryKey: ["accounts"],
     queryFn: async () => {
@@ -16,5 +17,5 @@ export const useGetAccountList = () => {
     },
   });
 
-  return { isError, isLoading, data, error };
+  return { isError, isLoading, data, error, refetch };
 };

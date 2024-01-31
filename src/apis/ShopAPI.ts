@@ -28,7 +28,6 @@ export type CreateShopParams = {
   name: string;
   phone: string;
   wardId: number;
-  brandId: string;
   shopManagerId: string;
   addressLine: string;
 };

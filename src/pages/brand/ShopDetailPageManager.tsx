@@ -11,7 +11,7 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useEffect, useMemo, useState } from "react";
 import EditAndUpdateForm, {
   FIELD_TYPES,
@@ -190,8 +190,14 @@ const ShopDetailPageManager = () => {
       province: "0",
       district: "0",
     },
+    validate: {
+      name: isNotEmpty("Name should not be empty"),
+      phone: isNotEmpty("Please input valid phone number. ex -0379999999"),
+      addressLine: isNotEmpty("Address should not be empty"),
+      wardId: isNotEmpty("Please select ward"),
+    },
   });
-  const { data, isLoading } = useGetShopById(id ?? "0");
+  const { data, isLoading, refetch } = useGetShopById(id ?? "0");
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -237,6 +243,7 @@ const ShopDetailPageManager = () => {
           name: "phone",
           placeholder: "Shop phone",
           label: "Shop phone",
+          required: true,
         },
       },
       {
@@ -255,7 +262,7 @@ const ShopDetailPageManager = () => {
           form,
           name: "brandName",
           placeholder: "Brand",
-          label: "Shop",
+          label: "Brand",
           disabled: true,
         },
       },
@@ -299,6 +306,7 @@ const ShopDetailPageManager = () => {
           form,
           name: "wardId",
           loading: isWardsLoading,
+          required: true,
         },
         spans: 4,
       },
@@ -343,6 +351,7 @@ const ShopDetailPageManager = () => {
                     title: "Update successfully",
                     message: "Shop detail updated!",
                   });
+                  refetch();
                 },
                 onError(data) {
                   const error = data as AxiosError<ResponseErrorDetail>;
