@@ -1,4 +1,13 @@
-import { ActionIcon, Burger, Flex, Group, Indicator, Popover, Tooltip, rem } from "@mantine/core";
+import {
+  ActionIcon,
+  Burger,
+  Flex,
+  Group,
+  Indicator,
+  Popover,
+  Tooltip,
+  rem,
+} from "@mantine/core";
 import { IconUser } from "@tabler/icons-react";
 import { MdLogout, MdNotifications } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -7,13 +16,13 @@ import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
 import Notification from "../notification/Notification";
 
 interface BurgerProps {
-  mobileOpened: boolean,
-  toggleMobile: () => void,
-  desktopOpened: boolean,
-  toggleDesktop: () => void,
+  mobileOpened: boolean;
+  toggleMobile: () => void;
+  desktopOpened: boolean;
+  toggleDesktop: () => void;
 }
 
-const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }: BurgerProps) => {
+const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
   const session = useSession();
   const navigate = useNavigate();
   return (
@@ -25,13 +34,11 @@ const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }
     >
       <Group>
         <Burger
-          opened={mobileOpened}
           onClick={toggleMobile}
           hiddenFrom="sm"
           size="sm"
         />
         <Burger
-          opened={desktopOpened}
           onClick={toggleDesktop}
           visibleFrom="sm"
           size="sm"
@@ -39,7 +46,6 @@ const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }
         <b>CAMAI</b>
       </Group>
       <Group gap={5}>
-
         <LightDarkSwitch size="md" />
 
         <Popover
@@ -47,9 +53,15 @@ const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }
           withArrow
           shadow="md"
         >
-          <Tooltip label="Notification" withArrow>
+          <Tooltip
+            label="Notification"
+            withArrow
+          >
             <Popover.Target>
-              <Indicator size={5} color="pale-red.6">
+              <Indicator
+                size={5}
+                color="pale-red.6"
+              >
                 <ActionIcon
                   variant="default"
                   aria-label="Notifications"
@@ -65,9 +77,13 @@ const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }
           </Popover.Dropdown>
         </Popover>
 
-        <Tooltip label="Profile" withArrow>
+        <Tooltip
+          label="Profile"
+          withArrow
+        >
           <ActionIcon
-            variant="default" aria-label="Profile"
+            variant="default"
+            aria-label="Profile"
             onClick={() => navigate("/shop/profile")}
           >
             <IconUser
@@ -77,15 +93,20 @@ const ShopHeader = ({ mobileOpened, toggleMobile, desktopOpened, toggleDesktop }
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip label="Logout" withArrow>
+        <Tooltip
+          label="Logout"
+          withArrow
+        >
           <ActionIcon
-            variant="default" aria-label="Logout"
-            onClick={() => { session?.signOut(); }}
+            variant="default"
+            aria-label="Logout"
+            onClick={() => {
+              session?.signOut();
+            }}
           >
             <MdLogout style={{ width: 18, height: 18 }} />
           </ActionIcon>
         </Tooltip>
-
       </Group>
     </Flex>
   );

@@ -1,6 +1,7 @@
 import { UseQueryResult, useQuery } from "react-query";
 import { LookupAPI } from "../apis/LookupAPI";
 import { DistrictDetail } from "../models/Address";
+import _ from "lodash";
 
 export const useGetDistrictList = (provinceId: number) => {
   const {
@@ -10,7 +11,7 @@ export const useGetDistrictList = (provinceId: number) => {
     error,
   }: UseQueryResult<DistrictDetail[], Error> = useQuery({
     queryKey: ["Districts", provinceId],
-    enabled: provinceId != 0,
+    enabled: !_.isNaN(provinceId) && provinceId != 0,
     queryFn: async () => {
       return await LookupAPI._getDistrictList(provinceId);
     },

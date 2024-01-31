@@ -8,6 +8,8 @@ import {
   TextInput,
 } from "@mantine/core";
 
+import { DateInput } from "@mantine/dates";
+
 const renderTextField = ({ fieldProps }: any) => {
   const { form, name, placeholder, label, required, disabled, type } =
     fieldProps;
@@ -34,18 +36,21 @@ const renderSelect = ({ fieldProps }: any) => {
     searchable,
     loading,
     required,
+    rightSection,
+    rightSectionWidth,
   } = fieldProps;
   if (loading) return <Loader />;
-
-  // console.log(value, setValue);
 
   return (
     <Select
       searchable={searchable}
       label={label}
       disabled={disabled}
+      rightSectionWidth={rightSectionWidth}
+      rightSectionPointerEvents="all"
       placeholder={placeholder}
       data={data}
+      rightSection={rightSection}
       required={required}
       {...form.getInputProps(name)}
     />
@@ -91,6 +96,20 @@ const renderNumber = ({ fieldProps }: any) => {
   );
 };
 
+const renderDate = ({ fieldProps }: any) => {
+  const { form, name, placeholder, label, required, disabled } = fieldProps;
+  return (
+    <DateInput
+      required={required}
+      disabled={disabled}
+      withAsterisk={required}
+      label={label}
+      placeholder={placeholder}
+      {...form.getInputProps(name)}
+    />
+  );
+};
+
 export const FIELD_TYPES = {
   TEXT: "text",
   SELECT: "select",
@@ -102,6 +121,7 @@ export const FIELD_TYPES = {
   NUMBER: "number",
   IMAGE_PICKER: "image_picker",
   MULTI_SELECT: "multi_select",
+  DATE: "date",
 };
 
 const FORM_MAPPING = {
@@ -109,6 +129,7 @@ const FORM_MAPPING = {
   // [FIELD_TYPES.MULTILINE]: renderMultiline,
   [FIELD_TYPES.SELECT]: renderSelect,
   [FIELD_TYPES.RADIO]: renderRadio,
+  [FIELD_TYPES.DATE]: renderDate,
   //   [FIELD_TYPES.MULTI_SELECT]: renderMultiSelect,
   // [FIELD_TYPES.AUTOCOMPLETE]: renderAutoComplete,
   // [FIELD_TYPES.UPLOAD]: renderUpload,

@@ -275,168 +275,170 @@ const BrandDetailPageManager = () => {
     );
 
   return (
-    <Paper
-      p={rem(32)}
-      style={{ flex: 1 }}
-    >
-      {data?.values[0].bannerUri && (
-        <Tooltip label="Brand banner">
-          <Image
-            mb={rem(16)}
-            radius={"md"}
-            bg={"#000"}
-            height={280}
-            fit="contain"
-            src={data?.values[0].bannerUri}
-          />
-        </Tooltip>
-      )}
-
-      <Flex
-        align={"center"}
-        mb={rem(32)}
+    <>
+      <Paper
+        p={rem(32)}
+        style={{ flex: 1 }}
       >
-        <Tooltip label="Brand logo">
-          <Avatar
-            mr={rem(32)}
-            h={100}
-            w={100}
-            src={data?.values[0].logoUri}
-          />
-        </Tooltip>
-        <Box>
-          <Text
-            size="xl"
-            fw={500}
-            mb={rem(8)}
-          >
-            {data?.values[0].name}
-          </Text>
-
-          <Flex>
-            <Box mr={rem(8)}>
-              <IconMail width={20} />
-            </Box>
-            {data?.values[0].email}
-          </Flex>
-          <Flex>
-            <Box mr={rem(8)}>
-              <IconPhone width={20} />
-            </Box>
-            {data?.values[0].phone}
-          </Flex>
-        </Box>
-      </Flex>
-
-      <Flex
-        align={"center"}
-        my={"md"}
-      >
-        {searchCategory == SearchCategory.NAME ? (
-          <TextInput
-            style={{ flex: 1 }}
-            placeholder="Search by any field"
-            classNames={{ input: classes.search_input }}
-            rightSectionWidth={52}
-            leftSectionWidth={52}
-            leftSection={
-              <IconSearch
-                style={{ width: rem(16), height: rem(16) }}
-                stroke={1.5}
-              />
-            }
-            rightSection={renderDropdownFilter()}
-            value={search}
-            onChange={handleSearchChange}
-          />
-        ) : (
-          <NumberInput
-            style={{ flex: 1 }}
-            placeholder="Search by any field"
-            classNames={{ input: classes.search_input }}
-            rightSectionWidth={52}
-            leftSectionWidth={52}
-            leftSection={
-              <IconSearch
-                style={{ width: rem(16), height: rem(16) }}
-                stroke={1.5}
-              />
-            }
-            rightSection={renderDropdownFilter()}
-            value={search}
-            onChange={setSearch}
-          />
+        {data?.values[0].bannerUri && (
+          <Tooltip label="Brand banner">
+            <Image
+              mb={rem(16)}
+              radius={"md"}
+              bg={"#000"}
+              height={280}
+              fit="contain"
+              src={data?.values[0].bannerUri}
+            />
+          </Tooltip>
         )}
-        <Button
-          leftSection={<IconFilter size={14} />}
-          variant="default"
-          className={classes.filter_button}
-          onClick={toggle}
-        >
-          Filter
-        </Button>
-        <Button
-          leftSection={<IconPlus size={14} />}
-          variant="outline"
-          h={rem(48)}
-          onClick={() => {
-            navigate("/brand/create/shop");
-          }}
-          ml={rem(12)}
-          radius={"20%/50%"}
-        >
-          Add shop
-        </Button>
-      </Flex>
-      <Collapse in={opened}>
-        <Group>
-          <EditAndUpdateForm fields={fields} />
-          <Button
-            variant="transparent"
-            ml={"auto"}
-            onClick={form.reset}
-          >
-            Clear all filter
-          </Button>
-        </Group>
-      </Collapse>
 
-      <ScrollArea
-        h={600}
-        onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-        mt={"md"}
-      >
-        <Table
-          striped
-          highlightOnHover
-          withTableBorder
-          withColumnBorders
-          verticalSpacing={"md"}
+        <Flex
+          align={"center"}
+          mb={rem(32)}
         >
-          <Table.Thead
-            className={cx(classes.header, { [classes.scrolled]: scrolled })}
+          <Tooltip label="Brand logo">
+            <Avatar
+              mr={rem(32)}
+              h={100}
+              w={100}
+              src={data?.values[0].logoUri}
+            />
+          </Tooltip>
+          <Box>
+            <Text
+              size="xl"
+              fw={500}
+              mb={rem(8)}
+            >
+              {data?.values[0].name}
+            </Text>
+
+            <Flex>
+              <Box mr={rem(8)}>
+                <IconMail width={20} />
+              </Box>
+              {data?.values[0].email}
+            </Flex>
+            <Flex>
+              <Box mr={rem(8)}>
+                <IconPhone width={20} />
+              </Box>
+              {data?.values[0].phone}
+            </Flex>
+          </Box>
+        </Flex>
+
+        <Flex
+          align={"center"}
+          my={"md"}
+        >
+          {searchCategory == SearchCategory.NAME ? (
+            <TextInput
+              style={{ flex: 1 }}
+              placeholder="Search by any field"
+              classNames={{ input: classes.search_input }}
+              rightSectionWidth={52}
+              leftSectionWidth={52}
+              leftSection={
+                <IconSearch
+                  style={{ width: rem(16), height: rem(16) }}
+                  stroke={1.5}
+                />
+              }
+              rightSection={renderDropdownFilter()}
+              value={search}
+              onChange={handleSearchChange}
+            />
+          ) : (
+            <NumberInput
+              style={{ flex: 1 }}
+              placeholder="Search by any field"
+              classNames={{ input: classes.search_input }}
+              rightSectionWidth={52}
+              leftSectionWidth={52}
+              leftSection={
+                <IconSearch
+                  style={{ width: rem(16), height: rem(16) }}
+                  stroke={1.5}
+                />
+              }
+              rightSection={renderDropdownFilter()}
+              value={search}
+              onChange={setSearch}
+            />
+          )}
+          <Button
+            leftSection={<IconFilter size={14} />}
+            variant="default"
+            className={classes.filter_button}
+            onClick={toggle}
           >
-            <Table.Tr>
-              <Table.Th>Shop name</Table.Th>
-              <Table.Th>Address</Table.Th>
-              <Table.Th>Phone</Table.Th>
-              <Table.Th>Status</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
-      </ScrollArea>
-      <Group
-        justify="flex-end"
-        mt="lg"
-      >
-        <Pagination
-          value={activePage}
-          onChange={setPage}
-          total={Math.ceil((shopList?.totalCount ?? 0) / 12)}
-        />
-      </Group>
-    </Paper>
+            Filter
+          </Button>
+          <Button
+            leftSection={<IconPlus size={14} />}
+            variant="outline"
+            h={rem(48)}
+            onClick={() => {
+              navigate("/brand/create/shop");
+            }}
+            ml={rem(12)}
+            radius={"20%/50%"}
+          >
+            Add shop
+          </Button>
+        </Flex>
+        <Collapse in={opened}>
+          <Group>
+            <EditAndUpdateForm fields={fields} />
+            <Button
+              variant="transparent"
+              ml={"auto"}
+              onClick={form.reset}
+            >
+              Clear all filter
+            </Button>
+          </Group>
+        </Collapse>
+
+        <ScrollArea
+          h={600}
+          onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+          mt={"md"}
+        >
+          <Table
+            striped
+            highlightOnHover
+            withTableBorder
+            withColumnBorders
+            verticalSpacing={"md"}
+          >
+            <Table.Thead
+              className={cx(classes.header, { [classes.scrolled]: scrolled })}
+            >
+              <Table.Tr>
+                <Table.Th>Shop name</Table.Th>
+                <Table.Th>Address</Table.Th>
+                <Table.Th>Phone</Table.Th>
+                <Table.Th>Status</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{rows}</Table.Tbody>
+          </Table>
+        </ScrollArea>
+        <Group
+          justify="flex-end"
+          mt="lg"
+        >
+          <Pagination
+            value={activePage}
+            onChange={setPage}
+            total={Math.ceil((shopList?.totalCount ?? 0) / 12)}
+          />
+        </Group>
+      </Paper>
+    </>
   );
 };
 
