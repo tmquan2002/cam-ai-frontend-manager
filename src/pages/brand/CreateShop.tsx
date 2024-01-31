@@ -65,7 +65,6 @@ const CreateShop = () => {
           : "Invalid phone number - ex: 0379999999",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
-      shopManagerId: isNotEmpty("Please select shop manager"),
       province: isNotEmpty("Provice is required"),
       district: isNotEmpty("District is required"),
     },
@@ -170,7 +169,6 @@ const CreateShop = () => {
           }),
           loading: isAccountListLoading,
           rightSectionWidth: 70,
-          required: true,
           rightSection: (
             <Button
               variant="subtle"
