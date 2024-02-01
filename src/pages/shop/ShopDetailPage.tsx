@@ -211,8 +211,8 @@ const ShopDetailPage = () => {
         wardId: `${values[0].wardId}`,
         addressLine: values[0].addressLine,
         brandName: values[0].brand.name,
-        province: `${values[0].ward.district.province.id}`,
-        district: `${values[0].ward.district.id}`,
+        province: `${values[0].ward?.district?.province?.id}`,
+        district: `${values[0].ward?.district?.id}`,
       };
       form.setValues(initialData);
     }
@@ -378,12 +378,8 @@ const ShopDetailPage = () => {
           pb={rem(28)}
           justify={"space-between "}
         >
-          <Text
-            fw={500}
-            size="lg"
-          >
-            Employee
-          </Text>
+          <Text size='lg' fw={'bold'} fz={20} c={"light-blue.4"} mb={10}>Employee</Text>
+
           <Button leftSection={<IconPlus size={14} />}>Add Employee</Button>
         </Flex>
         <ScrollArea
@@ -413,13 +409,7 @@ const ShopDetailPage = () => {
         m={rem(32)}
         shadow="xs"
       >
-        <Text
-          fw={500}
-          size="lg"
-          pb={rem(28)}
-        >
-          Edge box
-        </Text>
+        <Text size='lg' fw={'bold'} fz={20} c={"light-blue.4"} mb={10}>Edge Box</Text>
 
         <Flex>
           <Image

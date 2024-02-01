@@ -14,7 +14,7 @@ import classes from "./Sidebar.module.scss";
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
   {
-    label: "Tin mới Việt Nam",
+    label: "News",
     icon: IconNotes,
     initiallyOpened: true,
     links: [

@@ -327,14 +327,14 @@ const ShopDetailPageManager = () => {
         p={rem(32)}
         m={rem(32)}
         shadow="xs"
+        pos="relative"
       >
-        <Box pos="relative">
-          <LoadingOverlay
-            visible={isLoading || updateShopLoading}
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 2 }}
-          />
-
+        <LoadingOverlay
+          visible={isLoading || updateShopLoading}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
+        <Box >
           <form
             onSubmit={form.onSubmit((values) => {
               const updateShopParams: UpdateShopParams = {
@@ -365,13 +365,7 @@ const ShopDetailPageManager = () => {
               });
             })}
           >
-            <Text
-              fw={500}
-              size="lg"
-              pb={rem(28)}
-            >
-              {data?.name}
-            </Text>
+            <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>{data?.name}</Text>
             <EditAndUpdateForm fields={fields} />
 
             <Group
@@ -392,12 +386,7 @@ const ShopDetailPageManager = () => {
           pb={rem(28)}
           justify={"space-between "}
         >
-          <Text
-            fw={500}
-            size="lg"
-          >
-            Employee
-          </Text>
+          <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>EMPLOYEE</Text>
           <Button leftSection={<IconPlus size={14} />}>Add Employee</Button>
         </Flex>
         <ScrollArea
@@ -427,13 +416,7 @@ const ShopDetailPageManager = () => {
         m={rem(32)}
         shadow="xs"
       >
-        <Text
-          fw={500}
-          size="lg"
-          pb={rem(28)}
-        >
-          Edge box
-        </Text>
+        <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>EDGE BOX</Text>
 
         <Flex>
           <Image

@@ -3,7 +3,7 @@ import { checkRole } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { RoleEnum } from "../types/enum";
 import { ShopNavbar } from "../components/navbar/ShopNavbar";
-import { AppShell } from "@mantine/core";
+import { AppShell, useComputedColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import ShopHeader from "../components/header/ShopHeader";
 
@@ -11,6 +11,8 @@ const ShopRoute = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.ShopManager);
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
   useEffect(() => {
     const isUserRoleBrandManager: boolean | undefined = checkRole({
       Id: RoleEnum.BrandManager,
@@ -42,7 +44,7 @@ const ShopRoute = () => {
         >
           <AppShell.Header>
             <ShopHeader mobileOpened={mobileOpened} desktopOpened={desktopOpened}
-              toggleDesktop={toggleDesktop} toggleMobile={toggleMobile}/>
+              toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
           </AppShell.Header>
 
           <AppShell.Navbar>
@@ -50,9 +52,7 @@ const ShopRoute = () => {
           </AppShell.Navbar>
 
           <AppShell.Main
-            style={{
-              backgroundColor: "#f2f4f7",
-            }}
+            style={{ backgroundColor: computedColorScheme === 'light' ? '#f6f8fc' : '#1A1A1A' }}
           >
             <Outlet />
           </AppShell.Main>
