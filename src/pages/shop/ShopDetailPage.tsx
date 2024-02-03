@@ -242,7 +242,7 @@ const ShopDetailPage = () => {
           width={"1082px"}
           height={"720px"}
           url={[
-            { src: "/video2.mp4", type: "audio/mp4" },
+            { src: "/video.mp4", type: "audio/mp4" },
             // { src: "foo.ogg", type: "video/ogg" },
           ]}
           controls
