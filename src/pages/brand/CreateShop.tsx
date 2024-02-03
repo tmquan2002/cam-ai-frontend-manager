@@ -89,7 +89,7 @@ const CreateShop = () => {
       password: isNotEmpty("Name must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379999999",
       province: isNotEmpty("Provice is required"),
@@ -399,13 +399,16 @@ const CreateShop = () => {
         m={rem(32)}
         mb={0}
         p={rem(32)}
+        shadow="xl"
       >
         <Text
-          fw={500}
           size="lg"
-          pb={rem(28)}
+          fw={"bold"}
+          fz={25}
+          c={"light-blue.4"}
+          pb={20}
         >
-          Add new shop
+          ADD NEW SHOP
         </Text>
         <form
           onSubmit={createShopForm.onSubmit(
@@ -458,11 +461,12 @@ const CreateShop = () => {
           p={rem(32)}
         >
           <Text
-            fw={500}
             size="lg"
-            pb={rem(28)}
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
           >
-            Add shop manager account
+            ADD SHOP MANAGER ACCOUNT
           </Text>
           <form
             onReset={createAccountForm.onReset}

@@ -3,7 +3,7 @@ import { MdDarkMode, MdLightMode } from "react-icons/md";
 
 const LightDarkSwitch = ({ size }: { size: string }) => {
 
-    const { setColorScheme } = useMantineColorScheme();
+    const { setColorScheme } = useMantineColorScheme({ keepTransitions: true });
     const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
     return (

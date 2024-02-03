@@ -7,10 +7,24 @@
   padding: 1.25rem;
   box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.06);
   cursor: pointer;
-  background-color: #fff;
+
+  @include light {
+    background-color: white;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
 
   &:hover {
-    background-color: #f8f9fa;
+
+    @include light {
+      background-color: #f8f6fc;
+    }
+
+    @include dark {
+      background-color: #242424;
+    }
   }
 }
 
