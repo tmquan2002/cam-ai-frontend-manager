@@ -35,3 +35,13 @@ export const mapLookupStringValueToArray = (
 
   return result;
 };
+
+export const replaceIfNun = (
+  originalString: string | null | undefined,
+  replaceString: string = "empty"
+): string => {
+  if (!originalString || originalString == "") {
+    return replaceString;
+  }
+  return originalString;
+};

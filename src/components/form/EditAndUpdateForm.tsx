@@ -11,12 +11,13 @@ import {
 import { DateInput } from "@mantine/dates";
 
 const renderTextField = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, type } =
+  const { form, name, placeholder, label, required, disabled, type, readOnly } =
     fieldProps;
   return (
     <TextInput
       type={type}
       disabled={disabled}
+      readOnly={readOnly}
       withAsterisk={required}
       label={label}
       placeholder={placeholder}
@@ -37,6 +38,7 @@ const renderSelect = ({ fieldProps }: any) => {
     loading,
     required,
     rightSection,
+    readOnly,
     rightSectionWidth,
   } = fieldProps;
   if (loading) return <Loader />;
@@ -46,6 +48,7 @@ const renderSelect = ({ fieldProps }: any) => {
       searchable={searchable}
       label={label}
       disabled={disabled}
+      readOnly={readOnly}
       rightSectionWidth={rightSectionWidth}
       rightSectionPointerEvents="all"
       placeholder={placeholder}
@@ -58,12 +61,14 @@ const renderSelect = ({ fieldProps }: any) => {
 };
 
 const renderRadio = ({ fieldProps }: any) => {
-  const { name, label, description, form, data, required } = fieldProps;
+  const { name, label, description, form, data, required, readOnly } =
+    fieldProps;
 
   return (
     <Radio.Group
       name={name}
       label={label}
+      readOnly={readOnly}
       required={required}
       description={description}
       {...form.getInputProps(name)}
@@ -82,14 +87,17 @@ const renderRadio = ({ fieldProps }: any) => {
 };
 
 const renderNumber = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled } = fieldProps;
+  const { form, name, placeholder, label, required, disabled, readOnly } =
+    fieldProps;
   return (
     <NumberInput
       required={required}
       disabled={disabled}
+      readOnly={readOnly}
       withAsterisk={required}
       rightSection={<></>}
       label={label}
+      name={name}
       placeholder={placeholder}
       {...form.getInputProps(name)}
     />
@@ -97,13 +105,15 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled } = fieldProps;
+  const { form, name, placeholder, label, required, disabled, readOnly } =
+    fieldProps;
   return (
     <DateInput
       required={required}
       disabled={disabled}
       withAsterisk={required}
       label={label}
+      readOnly={readOnly}
       placeholder={placeholder}
       {...form.getInputProps(name)}
     />

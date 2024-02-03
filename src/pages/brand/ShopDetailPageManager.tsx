@@ -1,9 +1,11 @@
 import {
+  Badge,
   Box,
   Button,
   Flex,
   Group,
   Image,
+  Loader,
   LoadingOverlay,
   Paper,
   ScrollArea,
@@ -22,143 +24,23 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { UpdateShopParams } from "../../apis/ShopAPI";
-import { IconPlus, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
 import classes from "./ShopDetailPageManager.module.scss";
 import { useParams } from "react-router-dom";
 import { useGetShopById } from "../../hooks/useGetShopById";
-
-const employee = [
-  {
-    name: "Athena Weissnat",
-    company: "Little - Rippin",
-    email: "Elouise.Prohaska@yahoo.com",
-  },
-  {
-    name: "Deangelo Runolfsson",
-    company: "Greenfelder - Krajcik",
-    email: "Kadin_Trantow87@yahoo.com",
-  },
-  {
-    name: "Danny Carter",
-    company: "Kohler and Sons",
-    email: "Marina3@hotmail.com",
-  },
-  {
-    name: "Trace Tremblay PhD",
-    company: "Crona, Aufderhar and Senger",
-    email: "Antonina.Pouros@yahoo.com",
-  },
-  {
-    name: "Derek Dibbert",
-    company: "Gottlieb LLC",
-    email: "Abagail29@hotmail.com",
-  },
-  {
-    name: "Viola Bernhard",
-    company: "Funk, Rohan and Kreiger",
-    email: "Jamie23@hotmail.com",
-  },
-  {
-    name: "Austin Jacobi",
-    company: "Botsford - Corwin",
-    email: "Genesis42@yahoo.com",
-  },
-  {
-    name: "Hershel Mosciski",
-    company: "Okuneva, Farrell and Kilback",
-    email: "Idella.Stehr28@yahoo.com",
-  },
-  {
-    name: "Mylene Ebert",
-    company: "Kirlin and Sons",
-    email: "Hildegard17@hotmail.com",
-  },
-  {
-    name: "Lou Trantow",
-    company: "Parisian - Lemke",
-    email: "Hillard.Barrows1@hotmail.com",
-  },
-  {
-    name: "Dariana Weimann",
-    company: "Schowalter - Donnelly",
-    email: "Colleen80@gmail.com",
-  },
-  {
-    name: "Dr. Christy Herman",
-    company: "VonRueden - Labadie",
-    email: "Lilyan98@gmail.com",
-  },
-  {
-    name: "Katelin Schuster",
-    company: "Jacobson - Smitham",
-    email: "Erich_Brekke76@gmail.com",
-  },
-  {
-    name: "Melyna Macejkovic",
-    company: "Schuster LLC",
-    email: "Kylee4@yahoo.com",
-  },
-  {
-    name: "Pinkie Rice",
-    company: "Wolf, Trantow and Zulauf",
-    email: "Fiona.Kutch@hotmail.com",
-  },
-  {
-    name: "Brain Kreiger",
-    company: "Lueilwitz Group",
-    email: "Rico98@hotmail.com",
-  },
-  {
-    name: "Myrtice McGlynn",
-    company: "Feest, Beahan and Johnston",
-    email: "Julius_Tremblay29@hotmail.com",
-  },
-  {
-    name: "Chester Carter PhD",
-    company: "Gaylord - Labadie",
-    email: "Jensen_McKenzie@hotmail.com",
-  },
-  {
-    name: "Mrs. Ericka Bahringer",
-    company: "Conn and Sons",
-    email: "Lisandro56@hotmail.com",
-  },
-  {
-    name: "Korbin Buckridge Sr.",
-    company: "Mraz, Rolfson and Predovic",
-    email: "Leatha9@yahoo.com",
-  },
-  {
-    name: "Dr. Daisy Becker",
-    company: "Carter - Mueller",
-    email: "Keaton_Sanford27@gmail.com",
-  },
-  {
-    name: "Derrick Buckridge Sr.",
-    company: "O'Reilly LLC",
-    email: "Kay83@yahoo.com",
-  },
-  {
-    name: "Ernie Hickle",
-    company: "Terry, O'Reilly and Farrell",
-    email: "Americo.Leffler89@gmail.com",
-  },
-  {
-    name: "Jewell Littel",
-    company: "O'Connell Group",
-    email: "Hester.Hettinger9@hotmail.com",
-  },
-];
+import { replaceIfNun } from "../../utils/helperFunction";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import _ from "lodash";
 
 export type FormFieldValue = {
   name: string;
   phone: string;
-  province: string;
-  district: string;
-  wardId: string;
+  province: string | null;
+  district: string | null;
+  wardId: string | null;
   addressLine: string;
   brandName: string;
 };
@@ -166,45 +48,67 @@ export type FormFieldValue = {
 const ShopDetailPageManager = () => {
   const [scrolled, setScrolled] = useState(false);
   const { id } = useParams<{ id: string }>();
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
+    useGetEmployeeList({});
 
-  const rows = employee?.map((row) => (
+  const rows = employeeList?.values?.map((row) => (
     <Table.Tr
       style={{
         cursor: "pointer",
       }}
-      key={row.name}
+      key={row.id}
+      // onClick={() => navigate(`/shop/employee/${row.id}`)}
     >
-      <Table.Td>{row.name}</Table.Td>
-      <Table.Td>{row.email}</Table.Td>
-      <Table.Td>{row.company}</Table.Td>
+      <Table.Td>{replaceIfNun(row.name)}</Table.Td>
+      <Table.Td>{replaceIfNun(row.email)}</Table.Td>
+      <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
+      <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
+      <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
+      <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
+      <Table.Td>
+        {_.isEqual(row.employeeStatus.name, "Active") ? (
+          <Badge variant="light">Active</Badge>
+        ) : (
+          <Badge
+            color="gray"
+            variant="light"
+          >
+            Disabled
+          </Badge>
+        )}
+      </Table.Td>
     </Table.Tr>
   ));
-
   const form = useForm<FormFieldValue>({
     initialValues: {
       name: "",
       phone: "",
-      wardId: "0",
+      wardId: null,
       addressLine: "",
       brandName: "",
-      province: "0",
-      district: "0",
+      district: null,
+      province: null,
     },
     validate: {
       name: isNotEmpty("Name should not be empty"),
-      phone: isNotEmpty("Please input valid phone number. ex -0379999999"),
+      phone: (value) =>
+        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          ? null
+          : "Invalid phone number - ex: 0379999999",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
+      province: isNotEmpty("Provice is required"),
+      district: isNotEmpty("District is required"),
     },
   });
   const { data, isLoading, refetch } = useGetShopById(id ?? "0");
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +form.values.province
+    +(form.values.province ?? 0)
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +form.values.district
+    +(form.values.district ?? 0)
   );
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
@@ -243,7 +147,6 @@ const ShopDetailPageManager = () => {
           name: "phone",
           placeholder: "Shop phone",
           label: "Shop phone",
-          required: true,
         },
       },
       {
@@ -275,9 +178,10 @@ const ShopDetailPageManager = () => {
             return { value: `${item.id}`, label: item.name };
           }),
           form,
-          searchable: true,
+
           name: "province",
           loading: isProvicesLoading,
+          required: true,
         },
         spans: 4,
       },
@@ -292,6 +196,7 @@ const ShopDetailPageManager = () => {
           form,
           name: "district",
           loading: isDistrictsLoading,
+          required: true,
         },
         spans: 4,
       },
@@ -340,7 +245,7 @@ const ShopDetailPageManager = () => {
               const updateShopParams: UpdateShopParams = {
                 shopId: data?.id ?? "0",
                 addressLine: values.addressLine,
-                wardId: values.wardId,
+                wardId: values.wardId ?? "0",
                 name: values.name,
                 phone: values.phone,
               };
@@ -366,9 +271,11 @@ const ShopDetailPageManager = () => {
             })}
           >
             <Text
-              fw={500}
               size="lg"
-              pb={rem(28)}
+              fw={"bold"}
+              fz={25}
+              c={"light-blue.4"}
+              pb={rem(20)}
             >
               {data?.name}
             </Text>
@@ -389,37 +296,46 @@ const ShopDetailPageManager = () => {
         shadow="xs"
       >
         <Flex
-          pb={rem(28)}
+          pb={rem(20)}
           justify={"space-between "}
         >
           <Text
-            fw={500}
             size="lg"
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
           >
             Employee
           </Text>
-          <Button leftSection={<IconPlus size={14} />}>Add Employee</Button>
         </Flex>
-        <ScrollArea
-          h={300}
-          onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-        >
-          <Table
-            miw={700}
-            highlightOnHover
-          >
-            <Table.Thead
-              className={clsx(classes.header, { [classes.scrolled]: scrolled })}
+        {isGetEmployeeListLoading ? (
+          <Loader />
+        ) : (
+          <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+            <Table
+              highlightOnHover
+              verticalSpacing={"md"}
+              striped
             >
-              <Table.Tr>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Company</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
-        </ScrollArea>
+              <Table.Thead
+                className={clsx(classes.header, {
+                  [classes.scrolled]: scrolled,
+                })}
+              >
+                <Table.Tr>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Birthday</Table.Th>
+                  <Table.Th>Gender</Table.Th>
+                  <Table.Th>Address</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
+        )}
       </Paper>
 
       <Paper
@@ -428,8 +344,10 @@ const ShopDetailPageManager = () => {
         shadow="xs"
       >
         <Text
-          fw={500}
           size="lg"
+          fw={"bold"}
+          fz={25}
+          c={"light-blue.4"}
           pb={rem(28)}
         >
           Edge box

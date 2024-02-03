@@ -89,7 +89,7 @@ const CreateShop = () => {
       password: isNotEmpty("Name must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379999999",
       province: isNotEmpty("Provice is required"),

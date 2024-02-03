@@ -37,11 +37,11 @@ const mockdata = [
   { label: "Report", icon: IconFileAnalytics, path: "report" },
   { label: "Settings", icon: IconAdjustments },
   {
-    label: "Security",
+    label: "Employee",
     icon: IconLock,
     links: [
-      { label: "Enable 2FA", link: "/" },
-      { label: "Change password", link: "/" },
+      { label: "Create", link: "/shop/employee/create" },
+      { label: "Change password", link: "/empl" },
       { label: "Recovery codes", link: "/" },
     ],
   },
