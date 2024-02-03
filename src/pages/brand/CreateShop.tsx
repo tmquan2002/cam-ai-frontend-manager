@@ -401,7 +401,15 @@ const CreateShop = () => {
         p={rem(32)}
         shadow="xl"
       >
-        <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ADD NEW SHOP</Text>
+        <Text
+          size="lg"
+          fw={"bold"}
+          fz={25}
+          c={"light-blue.4"}
+          pb={20}
+        >
+          ADD NEW SHOP
+        </Text>
         <form
           onSubmit={createShopForm.onSubmit(
             ({ addressLine, name, phone, wardId, shopManagerId }) => {
@@ -452,7 +460,14 @@ const CreateShop = () => {
           m={rem(32)}
           p={rem(32)}
         >
-          <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ADD SHOP MANAGER ACCOUNT</Text>
+          <Text
+            size="lg"
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
+          >
+            ADD SHOP MANAGER ACCOUNT
+          </Text>
           <form
             onReset={createAccountForm.onReset}
             autoComplete="off"
