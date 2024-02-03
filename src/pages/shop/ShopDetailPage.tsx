@@ -125,8 +125,8 @@ const ShopDetailPage = () => {
         wardId: `${values[0].wardId}`,
         addressLine: values[0].addressLine,
         brandName: values[0].brand.name,
-        province: `${values[0].ward.district.province.id}`,
-        district: `${values[0].ward.district.id}`,
+        province: `${values[0].ward?.district?.province?.id}`,
+        district: `${values[0].ward?.district?.id}`,
       };
       form.setValues(initialData);
     }
@@ -371,11 +371,13 @@ const ShopDetailPage = () => {
         shadow="xs"
       >
         <Text
-          fw={500}
           size="lg"
-          pb={rem(28)}
+          fw={"bold"}
+          fz={20}
+          c={"light-blue.4"}
+          mb={10}
         >
-          Edge box
+          Edge Box
         </Text>
 
         <Flex>

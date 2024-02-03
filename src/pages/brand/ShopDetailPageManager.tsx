@@ -232,14 +232,14 @@ const ShopDetailPageManager = () => {
         p={rem(32)}
         m={rem(32)}
         shadow="xs"
+        pos="relative"
       >
-        <Box pos="relative">
-          <LoadingOverlay
-            visible={isLoading || updateShopLoading}
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 2 }}
-          />
-
+        <LoadingOverlay
+          visible={isLoading || updateShopLoading}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 2 }}
+        />
+        <Box>
           <form
             onSubmit={form.onSubmit((values) => {
               const updateShopParams: UpdateShopParams = {

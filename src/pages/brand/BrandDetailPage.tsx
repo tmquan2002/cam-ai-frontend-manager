@@ -9,7 +9,6 @@ import {
   Flex,
   Group,
   Image,
-  Loader,
   LoadingOverlay,
   Menu,
   NumberInput,
@@ -21,8 +20,10 @@ import {
   Text,
   TextInput,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   IconAlignBoxCenterStretch,
   IconFilter,
@@ -32,23 +33,21 @@ import {
   IconPlus,
   IconSearch,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
 import cx from "clsx";
-import classes from "./BrandDetailPage.module.scss";
-import {
-  GetShopListHookParams,
-  useGetShopList,
-} from "../../hooks/useGetShopList";
-import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import * as _ from "lodash";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useForm } from "@mantine/form";
-import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
 import { useGetBrandList } from "../../hooks/useGetBrandList";
+import {
+  GetShopListHookParams,
+  useGetShopList,
+} from "../../hooks/useGetShopList";
+import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
+import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./BrandDetailPage.module.scss";
 
 type SearchShopField = {
   status: string | null;
@@ -229,7 +228,16 @@ const BrandDetailPageManager = () => {
   };
 
   if (isLoading) {
-    return <Loader />;
+    return (
+      <Paper
+        p={rem(32)}
+        style={{ flex: 1 }}
+        pos={"relative"}
+        h={'100vh'}
+      >
+        <LoadingOverlay visible={isLoading} />
+      </Paper>
+    )
   }
 
   if (isError)

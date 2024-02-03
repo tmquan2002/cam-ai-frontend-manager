@@ -10,6 +10,7 @@ import {
   Text,
   ThemeIcon,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import classes from "./ShopHomePage.module.scss";
 import {
@@ -99,6 +100,8 @@ const TitleAndNumberCard = () => {
 };
 
 const ShopHomePage = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
   const rows = elements.map((element) => (
     <Table.Tr key={element.name}>
       <Table.Td>{element.position}</Table.Td>
@@ -122,7 +125,7 @@ const ShopHomePage = () => {
           </Grid.Col>
         ))}
       </Grid>
-      <Card my={rem(32)}>
+      <Card my={rem(32)} style={{ backgroundColor: computedColorScheme === 'light' ? 'white' : '#1f1f1f' }}>
         <Card.Section
           withBorder
           inheritPadding
@@ -131,7 +134,8 @@ const ShopHomePage = () => {
             justify="space-between"
             my={rem(20)}
           >
-            <Text fw={500}>Static values</Text>
+            <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>STATIC VALUES</Text>
+
             <Menu
               withinPortal
               position="bottom-end"
@@ -178,7 +182,6 @@ const ShopHomePage = () => {
           data={data}
           dataKey="date"
           tooltipAnimationDuration={200}
-          bg={"white"}
           py={rem(40)}
           series={[
             { name: "Apples", color: "indigo.6" },
@@ -188,7 +191,7 @@ const ShopHomePage = () => {
         />
       </Card>
 
-      <Card my={rem(32)}>
+      <Card my={rem(32)} style={{ backgroundColor: computedColorScheme === 'light' ? 'white' : '#1f1f1f' }}>
         <Card.Section
           withBorder
           inheritPadding
@@ -197,7 +200,8 @@ const ShopHomePage = () => {
             justify="space-between"
             my={rem(20)}
           >
-            <Text fw={500}>Inicident values</Text>
+            <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>INICIDENT VALUES</Text>
+
             <Menu
               withinPortal
               position="bottom-end"
@@ -242,12 +246,6 @@ const ShopHomePage = () => {
         <Table
           highlightOnHover
           verticalSpacing={"md"}
-          c={"#5F6980"}
-          styles={{
-            th: {
-              color: "#000",
-            },
-          }}
         >
           <Table.Thead>
             <Table.Tr>
@@ -257,7 +255,7 @@ const ShopHomePage = () => {
               <Table.Th>Atomic mass</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody bg={"white"}>{rows}</Table.Tbody>
+          <Table.Tbody>{rows}</Table.Tbody>
         </Table>
       </Card>
     </Box>
