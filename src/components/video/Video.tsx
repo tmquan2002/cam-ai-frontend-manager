@@ -2,7 +2,7 @@ import React from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
-export const VideoJS = (props) => {
+export const VideoJS = (props: any) => {
   const videoRef = React.useRef<any>(null);
   const playerRef = React.useRef<any>(null);
   const { options, onReady } = props;
