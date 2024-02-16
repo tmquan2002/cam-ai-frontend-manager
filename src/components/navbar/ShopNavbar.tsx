@@ -14,11 +14,11 @@ import classes from "./Sidebar.module.scss";
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
   {
-    label: "News",
+    label: "Statictis",
     icon: IconNotes,
     initiallyOpened: true,
     links: [
-      { label: "Overview", link: "/" },
+      { label: "Overview", link: "/shop/overview" },
       { label: "Forecasts", link: "/" },
       { label: "Outlook", link: "/" },
       { label: "Real time", link: "/" },

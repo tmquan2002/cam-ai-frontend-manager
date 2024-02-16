@@ -3,6 +3,7 @@ import "@mantine/core/styles.css";
 import "@mantine/charts/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
+import "@mantine/dropzone/styles.css";
 import "./App.css";
 import AppRoute from "./routes/AppRoute";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -23,7 +24,7 @@ const queryClient = new QueryClient({
 });
 
 const theme = createTheme({
-  fontFamily: "DVN-Poppins",
+  // fontFamily: "DVN-Poppins",
   primaryColor: "light-blue",
   colors: {
     "light-yellow": light_yellow,

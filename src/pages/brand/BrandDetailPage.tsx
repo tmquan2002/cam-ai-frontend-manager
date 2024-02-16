@@ -9,6 +9,7 @@ import {
   Flex,
   Group,
   Image,
+  Loader,
   LoadingOverlay,
   Menu,
   NumberInput,
@@ -20,7 +21,7 @@ import {
   Text,
   TextInput,
   Tooltip,
-  rem
+  rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -47,7 +48,14 @@ import {
 } from "../../hooks/useGetShopList";
 import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
 import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
+import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
+import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import classes from "./BrandDetailPage.module.scss";
+import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
+import { UploadBrandImageType } from "../../apis/BrandAPI";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
+import { notifications } from "@mantine/notifications";
 
 type SearchShopField = {
   status: string | null;
@@ -85,8 +93,9 @@ const BrandDetailPageManager = () => {
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
     SearchCategory.NAME
   );
-  const { data, isLoading, isError } = useGetBrandList({ size: 1 });
-
+  const { data, isLoading, isError, refetch } = useGetBrandList({ size: 1 });
+  const { mutate: uploadBrandimage, isLoading: isUploadBrandImageLoading } =
+    useUploadBrandImage();
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
       size: 12,
@@ -126,6 +135,29 @@ const BrandDetailPageManager = () => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
     setSearch(value);
+  };
+
+  const handleUploadBrandImage = async (files: FileWithPath[]) => {
+    if (!files || files.length <= 0) {
+      return;
+    }
+
+    uploadBrandimage(
+      { file: files[0], type: UploadBrandImageType.Banner },
+      {
+        onSuccess() {
+          refetch();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            title: "Failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
   };
 
   const rows = shopList?.values.map((row, index) => {
@@ -233,11 +265,11 @@ const BrandDetailPageManager = () => {
         p={rem(32)}
         style={{ flex: 1 }}
         pos={"relative"}
-        h={'100vh'}
+        h={"100vh"}
       >
         <LoadingOverlay visible={isLoading} />
       </Paper>
-    )
+    );
   }
 
   if (isError)
@@ -288,18 +320,89 @@ const BrandDetailPageManager = () => {
         p={rem(32)}
         style={{ flex: 1 }}
       >
-        {data?.values[0].bannerUri && (
-          <Tooltip label="Brand banner">
-            <Image
-              mb={rem(16)}
-              radius={"md"}
-              bg={"#000"}
-              height={280}
-              fit="contain"
-              src={data?.values[0].bannerUri}
-            />
-          </Tooltip>
-        )}
+        <Box mb={rem(16)}>
+          {isUploadBrandImageLoading ? (
+            <Loader />
+          ) : (
+            <Dropzone
+              onDrop={handleUploadBrandImage}
+              onReject={(files) => console.log("rejected files", files)}
+              maxSize={5 * 1024 ** 2}
+              maxFiles={1}
+              accept={{
+                "image/*": [],
+              }}
+            >
+              {data?.values[0]?.bannerUri ? (
+                <Tooltip label="Brand banner">
+                  <Image
+                    radius={"md"}
+                    bg={"#000"}
+                    height={280}
+                    fit="contain"
+                    src={data?.values[0].bannerUri}
+                  />
+                </Tooltip>
+              ) : (
+                <Group
+                  justify="center"
+                  gap="xl"
+                  mih={220}
+                  style={{ pointerEvents: "none" }}
+                >
+                  <Dropzone.Accept>
+                    <IconUpload
+                      style={{
+                        width: rem(52),
+                        height: rem(52),
+                        color: "var(--mantine-color-blue-6)",
+                      }}
+                      stroke={1.5}
+                    />
+                  </Dropzone.Accept>
+                  <Dropzone.Reject>
+                    <IconX
+                      style={{
+                        width: rem(52),
+                        height: rem(52),
+                        color: "var(--mantine-color-red-6)",
+                      }}
+                      stroke={1.5}
+                    />
+                  </Dropzone.Reject>
+                  <Dropzone.Idle>
+                    <IconPhoto
+                      style={{
+                        width: rem(52),
+                        height: rem(52),
+                        color: "var(--mantine-color-dimmed)",
+                      }}
+                      stroke={1.5}
+                    />
+                  </Dropzone.Idle>
+
+                  <div>
+                    <Text
+                      size="xl"
+                      inline
+                    >
+                      Upload brand banner
+                    </Text>
+                    <Text
+                      size="sm"
+                      c="dimmed"
+                      inline
+                      mt={7}
+                    >
+                      Only accept .png - .jpeg - .svg+xml - .gif file that are
+                      less than 10mb in size
+                    </Text>
+                  </div>
+                </Group>
+              )}
+            </Dropzone>
+          )}
+        </Box>
 
         <Flex
           align={"center"}

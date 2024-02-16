@@ -8,6 +8,7 @@ export const useGetBrandList = (params: GetBrandListParams) => {
     isError,
     isLoading,
     data,
+    refetch,
     error,
   }: UseQueryResult<CommonResponse<BrandDetail>, Error> = useQuery({
     queryKey: ["brands"],
@@ -16,5 +17,5 @@ export const useGetBrandList = (params: GetBrandListParams) => {
     },
   });
 
-  return { isError, isLoading, data, error };
+  return { isError, isLoading, data, error, refetch };
 };
