@@ -1,3 +1,4 @@
+import { FileWithPath } from "@mantine/dropzone";
 import { getAccessToken } from "../context/AuthContext";
 import { BrandDetail } from "../models/Brand";
 import { CommonResponse } from "../models/Common";
@@ -9,6 +10,16 @@ export type GetBrandListParams = {
   brandId?: string;
   size: number;
   pageIndex?: number;
+};
+
+export enum UploadBrandImageType {
+  Banner = "banner",
+  Logo = "Logo",
+}
+
+export type UploadBrandImageParams = {
+  file: FileWithPath;
+  type: UploadBrandImageType;
 };
 
 export const BrandApi = {
@@ -23,6 +34,20 @@ export const BrandApi = {
         },
       }
     );
+
+    return res?.data;
+  },
+  _uploadBrandImage: async ({ file, type }: UploadBrandImageParams) => {
+    const access_token = getAccessToken();
+    const form = new FormData();
+    form.append("File", file);
+
+    const res = await http.put<any>(`/api/brands/images/${type}`, form, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
     return res?.data;
   },

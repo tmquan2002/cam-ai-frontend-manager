@@ -100,7 +100,9 @@ const TitleAndNumberCard = () => {
 };
 
 const ShopHomePage = () => {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
 
   const rows = elements.map((element) => (
     <Table.Tr key={element.name}>
@@ -125,7 +127,13 @@ const ShopHomePage = () => {
           </Grid.Col>
         ))}
       </Grid>
-      <Card my={rem(32)} style={{ backgroundColor: computedColorScheme === 'light' ? 'white' : '#1f1f1f' }}>
+      <Card
+        my={rem(32)}
+        style={{
+          backgroundColor:
+            computedColorScheme === "light" ? "white" : "#1f1f1f",
+        }}
+      >
         <Card.Section
           withBorder
           inheritPadding
@@ -134,7 +142,14 @@ const ShopHomePage = () => {
             justify="space-between"
             my={rem(20)}
           >
-            <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>STATIC VALUES</Text>
+            <Text
+              size="lg"
+              fw={"bold"}
+              fz={22}
+              c={"light-blue.4"}
+            >
+              STATIC VALUES
+            </Text>
 
             <Menu
               withinPortal
@@ -191,7 +206,13 @@ const ShopHomePage = () => {
         />
       </Card>
 
-      <Card my={rem(32)} style={{ backgroundColor: computedColorScheme === 'light' ? 'white' : '#1f1f1f' }}>
+      <Card
+        my={rem(32)}
+        style={{
+          backgroundColor:
+            computedColorScheme === "light" ? "white" : "#1f1f1f",
+        }}
+      >
         <Card.Section
           withBorder
           inheritPadding
@@ -200,7 +221,14 @@ const ShopHomePage = () => {
             justify="space-between"
             my={rem(20)}
           >
-            <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>INICIDENT VALUES</Text>
+            <Text
+              size="lg"
+              fw={"bold"}
+              fz={22}
+              c={"light-blue.4"}
+            >
+              INICIDENT VALUES
+            </Text>
 
             <Menu
               withinPortal

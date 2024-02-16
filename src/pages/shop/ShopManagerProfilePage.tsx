@@ -37,18 +37,14 @@ const ShopManagerProfilePage = () => {
   const { data: account, isLoading: isAccountLoading } = useGetAccountById(
     getUserId() ?? "0"
   );
-  const
-    {
-      data: accountStatus,
-      // isLoading: isAccountStatusLoading 
-    } =
-      useGetAccountStatusList();
-  const
-    {
-      mutate: updateAccount,
-      // isLoading: updateAccountLoading 
-    } =
-      useUpdateAccount();
+  const {
+    data: accountStatus,
+    // isLoading: isAccountStatusLoading
+  } = useGetAccountStatusList();
+  const {
+    mutate: updateAccount,
+    // isLoading: updateAccountLoading
+  } = useUpdateAccount();
   const form = useForm<ProfileFieldValue>({});
 
   useEffect(() => {
@@ -161,21 +157,40 @@ const ShopManagerProfilePage = () => {
     ];
   }, [gender, form, accountStatus]);
 
-  if (isAccountLoading) return (
-    <Paper
-      style={{ flex: 1, height: '100vh' }}
-      pos={"relative"}
-    >
-      <LoadingOverlay visible={isAccountLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
-    </Paper>
-  );
+  if (isAccountLoading)
+    return (
+      <Paper
+        style={{ flex: 1, height: "100vh" }}
+        pos={"relative"}
+      >
+        <LoadingOverlay
+          visible={isAccountLoading}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 1 }}
+        />
+      </Paper>
+    );
 
   return (
     <Paper
+      m={rem(32)}
       p={rem(32)}
       style={{ flex: 1 }}
     >
-      <Text size='lg' fw={'bold'} fz={25} c={"light-blue.4"}>ACCOUNT PROFILE</Text>
+      <Group
+        align="center"
+        mb={rem(20)}
+      >
+        <Text
+          size="lg"
+          fw={"bold"}
+          fz={22}
+          c={"light-blue.4"}
+        >
+          ACCOUNT PROFILE
+        </Text>
+      </Group>
+
       <form
         onSubmit={form.onSubmit((values) => {
           const params: UpdateAccountParams = {

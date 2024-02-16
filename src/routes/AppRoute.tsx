@@ -15,6 +15,8 @@ import CommonLandingPage from "../pages/common/Landing/CommonLandingPage";
 import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
+import IncidentPage from "../pages/shop/IncidentPage";
+import IncidentDetail from "../pages/shop/IncidentDetail";
 
 const AppRoute = () => {
   return useRoutes([
@@ -62,6 +64,14 @@ const AppRoute = () => {
           element: <CreateEmployeePage />,
         },
         { path: "employee/:id", element: <EmployeeDetailPage /> },
+        {
+          path: "overview",
+          element: <IncidentPage />,
+        },
+        {
+          path: "incident/:id",
+          element: <IncidentDetail />,
+        },
       ],
     },
     {
