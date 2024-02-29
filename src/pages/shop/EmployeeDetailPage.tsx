@@ -3,12 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
-import { useGetGenderList } from "../../hooks/useGetGender";
 import { useEffect, useMemo } from "react";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { mapLookupStringValueToArray } from "../../utils/helperFunction";
 import {
   ActionIcon,
   Button,
@@ -40,6 +38,8 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import { Gender } from "../../models/CamAIEnum";
 
 export type CreateEmployeeField = {
   name: string | undefined;
@@ -106,8 +106,6 @@ const EmployeeDetailPage = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
     +(updateEmployeeForm.values.district ?? 0)
   );
-  const { data: genderList, isLoading: isGetGenderListLoading } =
-    useGetGenderList();
 
   const { mutate: updateEmployee, isLoading: isUpdateEmployeeLoading } =
     useUpdateEmployeeById();
@@ -141,10 +139,9 @@ const EmployeeDetailPage = () => {
         fieldProps: {
           label: "Gender",
           placeholder: "Gender",
-          data: mapLookupStringValueToArray(genderList ?? {}),
+          data: mapLookupToArray(Gender ?? {}),
           form: updateEmployeeForm,
           name: "gender",
-          loading: isGetGenderListLoading,
           required: true,
           readOnly: editMode,
         },
@@ -232,9 +229,7 @@ const EmployeeDetailPage = () => {
   }, [
     updateEmployeeForm,
     districts,
-    genderList,
     isDistrictsLoading,
-    isGetGenderListLoading,
     isProvicesLoading,
     isWardsLoading,
     editMode,

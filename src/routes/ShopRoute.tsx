@@ -1,38 +1,28 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { checkRole } from "../context/AuthContext";
+import { getUserRole } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { RoleEnum } from "../types/enum";
 import { ShopNavbar } from "../components/navbar/ShopNavbar";
 import { AppShell, useComputedColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import ShopHeader from "../components/header/ShopHeader";
+import { Role } from "../models/CamAIEnum";
 
 const ShopRoute = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.ShopManager);
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const [userRole, setUserRole] = useState<Role | null>(Role.ShopManager);
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
 
   useEffect(() => {
-    const isUserRoleBrandManager: boolean | undefined = checkRole({
-      Id: RoleEnum.BrandManager,
-      Name: "",
-    });
+    const currentUserRole: Role | null = getUserRole();
 
-    const isUserRoleShopManager: boolean | undefined = checkRole({
-      Id: RoleEnum.ShopManager,
-      Name: "",
-    });
-
-    if (isUserRoleBrandManager) {
-      setUserRole(RoleEnum.BrandManager);
-    } else if (!isUserRoleShopManager) {
-      setUserRole(RoleEnum.Employee);
-    }
+    setUserRole(currentUserRole);
   }, []);
 
   switch (userRole) {
-    case RoleEnum.ShopManager:
+    case Role.ShopManager:
       return (
         <AppShell
           header={{ height: 60 }}
@@ -43,8 +33,12 @@ const ShopRoute = () => {
           }}
         >
           <AppShell.Header>
-            <ShopHeader mobileOpened={mobileOpened} desktopOpened={desktopOpened}
-              toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
+            <ShopHeader
+              mobileOpened={mobileOpened}
+              desktopOpened={desktopOpened}
+              toggleDesktop={toggleDesktop}
+              toggleMobile={toggleMobile}
+            />
           </AppShell.Header>
 
           <AppShell.Navbar>
@@ -52,13 +46,16 @@ const ShopRoute = () => {
           </AppShell.Navbar>
 
           <AppShell.Main
-            style={{ backgroundColor: computedColorScheme === 'light' ? '#f6f8fc' : '#1A1A1A' }}
+            style={{
+              backgroundColor:
+                computedColorScheme === "light" ? "#f6f8fc" : "#1A1A1A",
+            }}
           >
             <Outlet />
           </AppShell.Main>
         </AppShell>
       );
-    case RoleEnum.BrandManager:
+    case Role.BrandManager:
       return <Navigate to={"/brand"} />;
     default:
       return (

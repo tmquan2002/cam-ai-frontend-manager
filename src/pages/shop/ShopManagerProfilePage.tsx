@@ -1,5 +1,15 @@
-import { Button, Group, LoadingOverlay, Paper, Text, rem } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import {
+  ActionIcon,
+  Button,
+  Group,
+  LoadingOverlay,
+  Menu,
+  Modal,
+  Paper,
+  Text,
+  rem,
+} from "@mantine/core";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { useEffect, useMemo } from "react";
@@ -7,16 +17,15 @@ import { UpdateAccountParams } from "../../apis/AccountAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { getUserId } from "../../context/AuthContext";
-import { useGetAccountById } from "../../hooks/useGetAccountById";
-import { useGetAccountStatusList } from "../../hooks/useGetAccountStatus";
-import { useGetGenderList } from "../../hooks/useGetGender";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { ResponseErrorDetail } from "../../models/Response";
-import {
-  mapLookupStringValueToArray,
-  mapNumberLookupToArray,
-} from "../../utils/helperFunction";
+import { useGetProfile } from "../../hooks/useGetProfile";
+import { useDisclosure } from "@mantine/hooks";
+import { useChangePassword } from "../../hooks/useChangePassword";
+import { ChangePasswordParams } from "../../apis/ProfileAPI";
+import { IconAdjustments, IconArrowsLeftRight } from "@tabler/icons-react";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import { AccountStatus, Gender } from "../../models/CamAIEnum";
 
 type ProfileFieldValue = {
   name: string;
@@ -29,23 +38,71 @@ type ProfileFieldValue = {
   shop: string;
 };
 
+type ChangePasswordFieldValue = {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
 const ShopManagerProfilePage = () => {
-  const {
-    data: gender,
-    // isLoading: isGenderLoading
-  } = useGetGenderList();
-  const { data: account, isLoading: isAccountLoading } = useGetAccountById(
-    getUserId() ?? "0"
-  );
-  const {
-    data: accountStatus,
-    // isLoading: isAccountStatusLoading
-  } = useGetAccountStatusList();
-  const {
-    mutate: updateAccount,
-    // isLoading: updateAccountLoading
-  } = useUpdateAccount();
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const { data: account, isLoading: isAccountLoading } = useGetProfile();
+  const { mutate: updateAccount, isLoading: updateAccountLoading } =
+    useUpdateAccount();
   const form = useForm<ProfileFieldValue>({});
+
+  const { mutate: changePassword, isLoading: isChangingPassword } =
+    useChangePassword();
+
+  const passwordForm = useForm<ChangePasswordFieldValue>({
+    initialValues: {
+      confirmPassword: "",
+      newPassword: "",
+      oldPassword: "",
+    },
+    validate: {
+      oldPassword: isNotEmpty("Old password is required!"),
+      newPassword: isNotEmpty("New password is required!"),
+      confirmPassword: (value, values) => {
+        if (value === "") return "Please confirm password!";
+        if (value !== values.newPassword)
+          return "New password are not the same!";
+      },
+    },
+  });
+
+  const onSubmitNewPassword = ({
+    confirmPassword,
+    newPassword,
+    oldPassword,
+  }: ChangePasswordFieldValue) => {
+    const params: ChangePasswordParams = {
+      oldPassword,
+      newPassword,
+      newPasswordRetype: confirmPassword,
+    };
+    changePassword(params, {
+      onSuccess() {
+        notifications.show({
+          title: "Successfully",
+          message: "Change password successfully!",
+        });
+        close();
+      },
+
+      onError(data) {
+        const error = data as AxiosError<ResponseErrorDetail>;
+        notifications.show({
+          color: "red",
+          title: "Failed",
+          message: error.response?.data?.message,
+        });
+      },
+    });
+  };
+
+  console.log(mapLookupToArray(AccountStatus));
 
   useEffect(() => {
     if (account) {
@@ -55,7 +112,7 @@ const ShopManagerProfilePage = () => {
         phone: account?.phone,
         birthday: account?.birthday,
         address: account?.addressLine,
-        status: account?.accountStatus.id.toString(),
+        status: account?.accountStatus,
         gender: account?.gender,
         shop: account?.managingShop?.name,
       };
@@ -136,7 +193,7 @@ const ShopManagerProfilePage = () => {
         fieldProps: {
           label: "Status",
           placeholder: "Status",
-          data: mapNumberLookupToArray(accountStatus ?? {}),
+          data: mapLookupToArray(AccountStatus ?? {}),
           form,
           name: "status",
           disabled: true,
@@ -148,14 +205,54 @@ const ShopManagerProfilePage = () => {
         fieldProps: {
           label: "Gender",
           placeholder: "Gender",
-          data: mapLookupStringValueToArray(gender ?? {}),
+          data: mapLookupToArray(Gender ?? {}),
           form,
           name: "gender",
         },
         spans: 6,
       },
     ];
-  }, [gender, form, accountStatus]);
+  }, [form]);
+
+  const changePasswordFields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: passwordForm,
+          type: "password",
+          name: "oldPassword",
+          placeholder: "Old password ",
+          label: "Old password",
+          required: true,
+        },
+      },
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: passwordForm,
+          type: "password",
+
+          name: "newPassword",
+          placeholder: "New password ",
+          label: "New password",
+          required: true,
+        },
+      },
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: passwordForm,
+          type: "password",
+
+          name: "confirmPassword",
+          placeholder: "Confirm password ",
+          label: "Confirm password",
+          required: true,
+        },
+      },
+    ];
+  }, [passwordForm]);
 
   if (isAccountLoading)
     return (
@@ -172,65 +269,121 @@ const ShopManagerProfilePage = () => {
     );
 
   return (
-    <Paper
-      m={rem(32)}
-      p={rem(32)}
-      style={{ flex: 1 }}
-    >
-      <Group
-        align="center"
-        mb={rem(20)}
+    <>
+      <Modal
+        opened={opened}
+        onClose={() => {
+          close();
+          passwordForm.reset();
+        }}
+        title="Change password"
+        centered
       >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={22}
-          c={"light-blue.4"}
-        >
-          ACCOUNT PROFILE
-        </Text>
-      </Group>
-
-      <form
-        onSubmit={form.onSubmit((values) => {
-          const params: UpdateAccountParams = {
-            addressLine: values.address,
-            birthday: values.birthday,
-            email: values.email,
-            gender: values.gender,
-            name: values.name,
-            phone: values.phone,
-            wardId: 1,
-          };
-          updateAccount(params, {
-            onSuccess() {
-              notifications.show({
-                title: "Successfully",
-                message: "Update account success!",
-              });
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                color: "red",
-                title: "Failed",
-                message: error.response?.data?.message,
-              });
-            },
-          });
-
-          console.log(values);
-        })}
+        <form onSubmit={passwordForm.onSubmit(onSubmitNewPassword)}>
+          <EditAndUpdateForm fields={changePasswordFields} />
+          <Group
+            justify="flex-end"
+            mt="md"
+          >
+            <Button
+              type="submit"
+              loading={isChangingPassword}
+            >
+              Submit
+            </Button>
+          </Group>
+        </form>
+      </Modal>
+      <Paper
+        m={rem(32)}
+        p={rem(32)}
+        style={{ flex: 1 }}
       >
-        <EditAndUpdateForm fields={fields} />
         <Group
-          justify="flex-end"
-          mt="md"
+          mb={rem(20)}
+          justify="space-between"
         >
-          <Button type="submit">Submit</Button>
+          <Text
+            size="lg"
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
+          >
+            ACCOUNT PROFILE
+          </Text>
+          <Menu shadow="md">
+            <Menu.Target>
+              <ActionIcon
+                variant="filled"
+                aria-label="Settings"
+              >
+                <IconAdjustments
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Label>Modify</Menu.Label>
+              <Menu.Item
+                onClick={open}
+                leftSection={
+                  <IconArrowsLeftRight
+                    style={{ width: rem(14), height: rem(14) }}
+                  />
+                }
+              >
+                New password
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
-      </form>
-    </Paper>
+
+        <form
+          onSubmit={form.onSubmit((values) => {
+            const params: UpdateAccountParams = {
+              addressLine: values.address,
+              birthday: values.birthday,
+              email: values.email,
+              gender: values.gender,
+              name: values.name,
+              phone: values.phone,
+              wardId: 1,
+            };
+            updateAccount(params, {
+              onSuccess() {
+                notifications.show({
+                  title: "Successfully",
+                  message: "Update account success!",
+                });
+              },
+              onError(data) {
+                const error = data as AxiosError<ResponseErrorDetail>;
+                notifications.show({
+                  color: "red",
+                  title: "Failed",
+                  message: error.response?.data?.message,
+                });
+              },
+            });
+          })}
+        >
+          <EditAndUpdateForm fields={fields} />
+          <Group
+            justify="flex-end"
+            mt="md"
+          >
+            <Button
+              type="submit"
+              loading={updateAccountLoading}
+            >
+              Submit
+            </Button>
+          </Group>
+        </form>
+      </Paper>
+    </>
   );
 };
 

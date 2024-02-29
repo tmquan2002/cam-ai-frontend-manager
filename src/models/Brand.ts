@@ -1,14 +1,14 @@
+import { BrandStatus } from "./CamAIEnum";
+import { Image } from "./Image";
+
 export type BrandDetail = {
   name: string;
   email: string;
   phone: string;
-  logoUri: string;
-  bannerUri: string;
+  logo: Image;
+  banner: Image;
   brandManagerId: string;
-  brandStatus: {
-    name: string;
-    description: string;
-  };
+  brandStatus: BrandStatus;
   id: string;
   createdDate: Date;
   modifiedDate: Date;

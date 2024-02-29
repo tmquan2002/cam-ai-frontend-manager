@@ -46,7 +46,6 @@ import {
   GetShopListHookParams,
   useGetShopList,
 } from "../../hooks/useGetShopList";
-import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
 import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
 import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
@@ -56,6 +55,8 @@ import { UploadBrandImageType } from "../../apis/BrandAPI";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import { ShopStatus } from "../../models/CamAIEnum";
 
 type SearchShopField = {
   status: string | null;
@@ -83,7 +84,6 @@ const BrandDetailPageManager = () => {
     },
   });
 
-  const { data: shopStatusList } = useGetShopStatusList();
   const [search, setSearch] = useState<string | number>("");
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
@@ -126,11 +126,11 @@ const BrandDetailPageManager = () => {
           name: "status",
           placeholder: "Shop status",
           label: "Shop status",
-          data: mapLookupToArray(shopStatusList ?? {}),
+          data: mapLookupToArray(ShopStatus ?? {}),
         },
       },
     ];
-  }, [shopStatusList, form]);
+  }, [form]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -324,83 +324,83 @@ const BrandDetailPageManager = () => {
           {isUploadBrandImageLoading ? (
             <Loader />
           ) : (
-            <Dropzone
-              onDrop={handleUploadBrandImage}
-              onReject={(files) => console.log("rejected files", files)}
-              maxSize={5 * 1024 ** 2}
-              maxFiles={1}
-              accept={{
-                "image/*": [],
-              }}
-            >
-              {data?.values[0]?.bannerUri ? (
-                <Tooltip label="Brand banner">
+            <Tooltip label="Brand banner">
+              <Dropzone
+                onDrop={handleUploadBrandImage}
+                onReject={(files) => console.log("rejected files", files)}
+                maxSize={5 * 1024 ** 2}
+                maxFiles={1}
+                accept={{
+                  "image/*": [],
+                }}
+              >
+                {data?.values[0]?.banner ? (
                   <Image
                     radius={"md"}
                     bg={"#000"}
                     height={280}
                     fit="contain"
-                    src={data?.values[0].bannerUri}
+                    src={data?.values[0]?.banner?.hostingUri}
                   />
-                </Tooltip>
-              ) : (
-                <Group
-                  justify="center"
-                  gap="xl"
-                  mih={220}
-                  style={{ pointerEvents: "none" }}
-                >
-                  <Dropzone.Accept>
-                    <IconUpload
-                      style={{
-                        width: rem(52),
-                        height: rem(52),
-                        color: "var(--mantine-color-blue-6)",
-                      }}
-                      stroke={1.5}
-                    />
-                  </Dropzone.Accept>
-                  <Dropzone.Reject>
-                    <IconX
-                      style={{
-                        width: rem(52),
-                        height: rem(52),
-                        color: "var(--mantine-color-red-6)",
-                      }}
-                      stroke={1.5}
-                    />
-                  </Dropzone.Reject>
-                  <Dropzone.Idle>
-                    <IconPhoto
-                      style={{
-                        width: rem(52),
-                        height: rem(52),
-                        color: "var(--mantine-color-dimmed)",
-                      }}
-                      stroke={1.5}
-                    />
-                  </Dropzone.Idle>
+                ) : (
+                  <Group
+                    justify="center"
+                    gap="xl"
+                    mih={220}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    <Dropzone.Accept>
+                      <IconUpload
+                        style={{
+                          width: rem(52),
+                          height: rem(52),
+                          color: "var(--mantine-color-blue-6)",
+                        }}
+                        stroke={1.5}
+                      />
+                    </Dropzone.Accept>
+                    <Dropzone.Reject>
+                      <IconX
+                        style={{
+                          width: rem(52),
+                          height: rem(52),
+                          color: "var(--mantine-color-red-6)",
+                        }}
+                        stroke={1.5}
+                      />
+                    </Dropzone.Reject>
+                    <Dropzone.Idle>
+                      <IconPhoto
+                        style={{
+                          width: rem(52),
+                          height: rem(52),
+                          color: "var(--mantine-color-dimmed)",
+                        }}
+                        stroke={1.5}
+                      />
+                    </Dropzone.Idle>
 
-                  <div>
-                    <Text
-                      size="xl"
-                      inline
-                    >
-                      Upload brand banner
-                    </Text>
-                    <Text
-                      size="sm"
-                      c="dimmed"
-                      inline
-                      mt={7}
-                    >
-                      Only accept .png - .jpeg - .svg+xml - .gif file that are
-                      less than 10mb in size
-                    </Text>
-                  </div>
-                </Group>
-              )}
-            </Dropzone>
+                    <div>
+                      <Text
+                        size="xl"
+                        inline
+                      >
+                        Upload brand banner
+                      </Text>
+                      <Text
+                        size="sm"
+                        c="dimmed"
+                        inline
+                        mt={7}
+                      >
+                        Only accept .png - .jpeg - .svg+xml - .gif file that are
+                        less than 10mb in size
+                      </Text>
+                    </div>
+                  </Group>
+                )}
+              </Dropzone>
+            </Tooltip>
           )}
         </Box>
 
@@ -409,13 +409,28 @@ const BrandDetailPageManager = () => {
           mb={rem(32)}
         >
           <Tooltip label="Brand logo">
-            <Avatar
+            <Dropzone
               mr={rem(32)}
-              h={100}
-              w={100}
-              src={data?.values[0].logoUri}
-            />
+              onDrop={handleUploadBrandImage}
+              onReject={(files) => console.log("rejected files", files)}
+              style={{ border: 0 }}
+              maxSize={5 * 1024 ** 2}
+              maxFiles={1}
+              accept={{
+                "image/*": [],
+              }}
+            >
+              <Avatar
+                h={100}
+                w={100}
+                src={
+                  data?.values[0]?.logo?.hostingUri ?? IMAGE_CONSTANT.NO_IMAGE
+                }
+                className={classes.avatar}
+              />
+            </Dropzone>
           </Tooltip>
+
           <Box>
             <Text
               size="xl"

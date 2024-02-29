@@ -1,4 +1,5 @@
 import { WardDetail } from "./Address";
+import { AccountStatus, Role, ShopStatus } from "./CamAIEnum";
 
 export type AccountDetail = {
   email: string;
@@ -12,11 +13,7 @@ export type AccountDetail = {
   accountStatusId: number;
   ward: WardDetail;
   workingShop: any;
-  accountStatus: {
-    id: number;
-    name: string;
-    description: string;
-  };
+  accountStatus: AccountStatus;
   brand: any;
   managingShop: {
     name: string;
@@ -25,21 +22,15 @@ export type AccountDetail = {
     addressLine: string;
     ward: WardDetail;
     brand: any;
-    shopStatus: string;
+    shopStatus: ShopStatus;
     id: string;
     createdDate: Date;
     modifiedDate: Date;
     timestamp: string;
   };
-  roles: RoleDetail[];
+  role: Role;
   id: string;
   createdDate: string;
   modifiedDate: string;
   timestamp: string;
-};
-
-export type RoleDetail = {
-  id: number;
-  name: string;
-  description: string;
 };

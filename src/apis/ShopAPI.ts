@@ -19,7 +19,6 @@ export type UpdateShopParams = {
   name?: string;
   phone?: string;
   wardId?: string;
-  brandId?: string;
   shopManagerId?: string;
   addressLine?: string;
 };

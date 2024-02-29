@@ -15,12 +15,12 @@ import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
-import { useGetGenderList } from "../../hooks/useGetGender";
-import { mapLookupStringValueToArray } from "../../utils/helperFunction";
 import { useCreateAccount } from "../../hooks/useCreateAccount";
 import { CreateAccountParams } from "../../apis/AccountAPI";
 import { useGetBrandList } from "../../hooks/useGetBrandList";
 import dayjs from "dayjs";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import { Gender } from "../../models/CamAIEnum";
 
 export type CreateShopField = {
   name: string;
@@ -118,8 +118,6 @@ const CreateShop = () => {
   } = useGetDistrictList(+(createAccountForm.values.province ?? 0));
   const { data: createAccountWards, isLoading: isCreateAccountWardsLoading } =
     useGetWardList(+(createAccountForm.values.district ?? 0));
-  const { data: genderList, isLoading: isGetGenderListLoading } =
-    useGetGenderList();
 
   const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
     { size: 1 }
@@ -303,10 +301,9 @@ const CreateShop = () => {
         fieldProps: {
           label: "Gender",
           placeholder: "Gender",
-          data: mapLookupStringValueToArray(genderList ?? {}),
+          data: mapLookupToArray(Gender ?? {}),
           form: createAccountForm,
           name: "gender",
-          loading: isGetGenderListLoading,
           required: true,
         },
         spans: 6,
@@ -383,8 +380,6 @@ const CreateShop = () => {
     ];
   }, [
     createAccountForm,
-    genderList,
-    isGetGenderListLoading,
     provinces,
     isProvicesLoading,
     createAccountDistricts,

@@ -2,6 +2,7 @@ import {
   Badge,
   Box,
   Button,
+  Center,
   Flex,
   Group,
   Image,
@@ -34,6 +35,7 @@ import { useGetShopById } from "../../hooks/useGetShopById";
 import { replaceIfNun } from "../../utils/helperFunction";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import _ from "lodash";
+import { IMAGE_CONSTANT } from "../../types/constant";
 
 export type FormFieldValue = {
   name: string;
@@ -49,7 +51,7 @@ const ShopDetailPageManager = () => {
   const [scrolled, setScrolled] = useState(false);
   const { id } = useParams<{ id: string }>();
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
+    useGetEmployeeList({ shopId: id });
 
   const rows = employeeList?.values?.map((row) => (
     <Table.Tr
@@ -317,22 +319,39 @@ const ShopDetailPageManager = () => {
               verticalSpacing={"md"}
               striped
             >
-              <Table.Thead
-                className={clsx(classes.header, {
-                  [classes.scrolled]: scrolled,
-                })}
-              >
-                <Table.Tr>
-                  <Table.Th>Name</Table.Th>
-                  <Table.Th>Email</Table.Th>
-                  <Table.Th>Phone</Table.Th>
-                  <Table.Th>Birthday</Table.Th>
-                  <Table.Th>Gender</Table.Th>
-                  <Table.Th>Address</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
+              {employeeList?.isValuesEmpty ? (
+                <Center>
+                  <Image
+                    radius={"md"}
+                    src={IMAGE_CONSTANT.NO_DATA}
+                    fit="contain"
+                    h={rem(400)}
+                    w={"auto"}
+                    style={{
+                      borderBottom: "1px solid #dee2e6",
+                    }}
+                  />
+                </Center>
+              ) : (
+                <>
+                  <Table.Thead
+                    className={clsx(classes.header, {
+                      [classes.scrolled]: scrolled,
+                    })}
+                  >
+                    <Table.Tr>
+                      <Table.Th>Name</Table.Th>
+                      <Table.Th>Email</Table.Th>
+                      <Table.Th>Phone</Table.Th>
+                      <Table.Th>Birthday</Table.Th>
+                      <Table.Th>Gender</Table.Th>
+                      <Table.Th>Address</Table.Th>
+                      <Table.Th>Status</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{rows}</Table.Tbody>
+                </>
+              )}
             </Table>
           </ScrollArea>
         )}

@@ -7,11 +7,11 @@ import { useLogin } from "../../../hooks/useLogin";
 import { useForm } from "@mantine/form";
 import { LoginParams } from "../../../apis/LoginAPI";
 import { getStatusFromToken } from "../../../utils/jwt";
-import { StatusEnum } from "../../../types/enum";
 import { MdEmail, MdLockOutline } from "react-icons/md";
 import { AuthToken } from "../../../models/Auth";
 import { useSession } from "../../../context/AuthContext";
 import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
+import { AccountStatus } from "../../../models/CamAIEnum";
 
 const LoginPage = () => {
   const { mutate: login, isLoading } = useLogin();
@@ -46,7 +46,7 @@ const LoginPage = () => {
     login(loginParams, {
       onSuccess(data) {
         const didUserChangePassword: boolean =
-          getStatusFromToken(data.accessToken).Id != StatusEnum.New;
+          getStatusFromToken(data.accessToken) != AccountStatus.New;
 
         if (!didUserChangePassword) {
           setAuthTokens(data);

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Grid,
   Group,
   Loader,
   NumberInput,
+  PasswordInput,
   Radio,
   Select,
   TextInput,
@@ -16,6 +18,21 @@ const renderTextField = ({ fieldProps }: any) => {
   return (
     <TextInput
       type={type}
+      disabled={disabled}
+      readOnly={readOnly}
+      withAsterisk={required}
+      label={label}
+      placeholder={placeholder}
+      {...form.getInputProps(name)}
+    />
+  );
+};
+const renderPasswordInput = ({ fieldProps }: any) => {
+  const { form, name, placeholder, label, required, disabled, readOnly } =
+    fieldProps;
+
+  return (
+    <PasswordInput
       disabled={disabled}
       readOnly={readOnly}
       withAsterisk={required}
@@ -132,6 +149,7 @@ export const FIELD_TYPES = {
   IMAGE_PICKER: "image_picker",
   MULTI_SELECT: "multi_select",
   DATE: "date",
+  PASSWORD_INPUT: "password_input",
 };
 
 const FORM_MAPPING = {
@@ -146,6 +164,7 @@ const FORM_MAPPING = {
   // [FIELD_TYPES.LARGE_MULTILINE]: renderLargeMultiline,
   [FIELD_TYPES.NUMBER]: renderNumber,
   //   [FIELD_TYPES.IMAGE_PICKER]: renderImagePicker,
+  [FIELD_TYPES.PASSWORD_INPUT]: renderPasswordInput,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,9 +1,12 @@
 import {
   Badge,
   Box,
+  Button,
   Divider,
   Flex,
   Group,
+  Loader,
+  MultiSelect,
   Paper,
   Text,
   rem,
@@ -11,8 +14,12 @@ import {
 import classes from "./IncidentDetail.module.scss";
 import ReactPlayer from "react-player";
 import BackButton from "../../components/button/BackButton";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 
 const IncidentDetail = () => {
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
+    useGetEmployeeList({});
+
   return (
     <Box>
       <Box
@@ -142,23 +149,51 @@ const IncidentDetail = () => {
                 Assigned to
               </Text>
               <Divider color="#acacac" />
-              <Box mt={rem(10)}>
-                {[1, 2, 3].map((item) => {
-                  return (
-                    <Box key={item}>
-                      <Group>
-                        <Text className={classes.right_section_desctiption}>
-                          June 28, 2024
-                        </Text>
-                        <Text className={classes.right_section_desctiption}>
-                          Incident release
-                        </Text>
-                      </Group>
-                      {item != 3 && <Divider />}
-                    </Box>
-                  );
-                })}
-              </Box>
+              {true ? (
+                <form>
+                  {isGetEmployeeListLoading ? (
+                    <Loader mt={rem(30)} />
+                  ) : (
+                    <MultiSelect
+                      mt={rem(30)}
+                      placeholder="Pick value"
+                      data={employeeList?.values?.map((item) => {
+                        return {
+                          value: item?.id,
+                          label: item?.name,
+                        };
+                      })}
+                      nothingFoundMessage="Nothing found..."
+                    />
+                  )}
+
+                  <Group
+                    justify="flex-end"
+                    mt="md"
+                    pb={rem(20)}
+                  >
+                    <Button type="submit">Confirm</Button>
+                  </Group>
+                </form>
+              ) : (
+                <Box>
+                  {[1, 2, 3].map((item) => {
+                    return (
+                      <Box key={item}>
+                        <Group>
+                          <Text className={classes.right_section_desctiption}>
+                            June 28, 2024
+                          </Text>
+                          <Text className={classes.right_section_desctiption}>
+                            Incident release
+                          </Text>
+                        </Group>
+                        {item != 3 && <Divider />}
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
             </Box>
           </Paper>
         </Box>
