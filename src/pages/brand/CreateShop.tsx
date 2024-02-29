@@ -411,7 +411,7 @@ const CreateShop = () => {
               const updateParams: CreateShopParams = {
                 addressLine,
                 name,
-                phone,
+                phone: phone == "" ? null : phone,
                 wardId: +(wardId ?? 0),
                 shopManagerId: shopManagerId ?? "0",
               };

@@ -7,7 +7,7 @@ export type GetShopListParams = {
   name?: string;
   phone?: string;
   wardId?: number;
-  statusId?: number | null;
+  status?: string | null;
   brandId?: string;
   shopManagerId?: string;
   size: number;
@@ -17,7 +17,7 @@ export type GetShopListParams = {
 export type UpdateShopParams = {
   shopId: string;
   name?: string;
-  phone?: string;
+  phone?: string | null;
   wardId?: string;
   shopManagerId?: string;
   addressLine?: string;
@@ -25,7 +25,7 @@ export type UpdateShopParams = {
 
 export type CreateShopParams = {
   name: string;
-  phone: string;
+  phone: string | null;
   wardId: number;
   shopManagerId: string;
   addressLine: string;
@@ -62,7 +62,7 @@ export const ShopAPI = {
   _updateShopById: async ({ shopId, ...updateParams }: UpdateShopParams) => {
     const access_token = getAccessToken();
 
-    const res = await http.put<any>(`/api/shops/${shopId}`, updateParams, {
+    const res = await http.put(`/api/shops/${shopId}`, updateParams, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -74,7 +74,7 @@ export const ShopAPI = {
   _createShop: async (params: CreateShopParams) => {
     const access_token = getAccessToken();
 
-    const res = await http.post<any>(`/api/shops`, params, {
+    const res = await http.post(`/api/shops`, params, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

@@ -68,7 +68,7 @@ const ShopDetailPageManager = () => {
       <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
       <Table.Td>
-        {_.isEqual(row.employeeStatus.name, "Active") ? (
+        {_.isEqual(row.employeeStatus, "Active") ? (
           <Badge variant="light">Active</Badge>
         ) : (
           <Badge
@@ -115,11 +115,13 @@ const ShopDetailPageManager = () => {
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
 
+  console.log(data);
+
   useEffect(() => {
     if (data) {
       const initialData: FormFieldValue = {
         name: data.name,
-        phone: data.phone,
+        phone: data?.phone ?? "",
         wardId: `${data.wardId}`,
         addressLine: data.addressLine,
         brandName: data.brand.name,
@@ -168,7 +170,7 @@ const ShopDetailPageManager = () => {
           name: "brandName",
           placeholder: "Brand",
           label: "Brand",
-          disabled: true,
+          readonly: true,
         },
       },
       {
@@ -249,7 +251,7 @@ const ShopDetailPageManager = () => {
                 addressLine: values.addressLine,
                 wardId: values.wardId ?? "0",
                 name: values.name,
-                phone: values.phone,
+                phone: values.phone == "" ? null : values.phone,
               };
 
               updateShop(updateShopParams, {
@@ -314,45 +316,43 @@ const ShopDetailPageManager = () => {
           <Loader />
         ) : (
           <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-            <Table
-              highlightOnHover
-              verticalSpacing={"md"}
-              striped
-            >
-              {employeeList?.isValuesEmpty ? (
-                <Center>
-                  <Image
-                    radius={"md"}
-                    src={IMAGE_CONSTANT.NO_DATA}
-                    fit="contain"
-                    h={rem(400)}
-                    w={"auto"}
-                    style={{
-                      borderBottom: "1px solid #dee2e6",
-                    }}
-                  />
-                </Center>
-              ) : (
-                <>
-                  <Table.Thead
-                    className={clsx(classes.header, {
-                      [classes.scrolled]: scrolled,
-                    })}
-                  >
-                    <Table.Tr>
-                      <Table.Th>Name</Table.Th>
-                      <Table.Th>Email</Table.Th>
-                      <Table.Th>Phone</Table.Th>
-                      <Table.Th>Birthday</Table.Th>
-                      <Table.Th>Gender</Table.Th>
-                      <Table.Th>Address</Table.Th>
-                      <Table.Th>Status</Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>{rows}</Table.Tbody>
-                </>
-              )}
-            </Table>
+            {employeeList?.isValuesEmpty ? (
+              <Center>
+                <Image
+                  radius={"md"}
+                  src={IMAGE_CONSTANT.NO_DATA}
+                  fit="contain"
+                  h={rem(400)}
+                  w={"auto"}
+                  style={{
+                    borderBottom: "1px solid #dee2e6",
+                  }}
+                />
+              </Center>
+            ) : (
+              <Table
+                highlightOnHover
+                verticalSpacing={"md"}
+                striped
+              >
+                <Table.Thead
+                  className={clsx(classes.header, {
+                    [classes.scrolled]: scrolled,
+                  })}
+                >
+                  <Table.Tr>
+                    <Table.Th>Name</Table.Th>
+                    <Table.Th>Email</Table.Th>
+                    <Table.Th>Phone</Table.Th>
+                    <Table.Th>Birthday</Table.Th>
+                    <Table.Th>Gender</Table.Th>
+                    <Table.Th>Address</Table.Th>
+                    <Table.Th>Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            )}
           </ScrollArea>
         )}
       </Paper>

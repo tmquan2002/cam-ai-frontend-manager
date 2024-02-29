@@ -13,11 +13,9 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { useEffect, useMemo } from "react";
-import { UpdateAccountParams } from "../../apis/AccountAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useGetProfile } from "../../hooks/useGetProfile";
 import { useDisclosure } from "@mantine/hooks";
@@ -48,8 +46,6 @@ const ShopManagerProfilePage = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const { data: account, isLoading: isAccountLoading } = useGetProfile();
-  const { mutate: updateAccount, isLoading: updateAccountLoading } =
-    useUpdateAccount();
   const form = useForm<ProfileFieldValue>({});
 
   const { mutate: changePassword, isLoading: isChangingPassword } =
@@ -102,8 +98,6 @@ const ShopManagerProfilePage = () => {
     });
   };
 
-  console.log(mapLookupToArray(AccountStatus));
-
   useEffect(() => {
     if (account) {
       const initialValue: ProfileFieldValue = {
@@ -126,6 +120,7 @@ const ShopManagerProfilePage = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form,
+          readonly: true,
           name: "name",
           placeholder: "User name",
           label: "User name",
@@ -141,6 +136,7 @@ const ShopManagerProfilePage = () => {
           placeholder: "Email",
           label: "Email",
           required: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -152,6 +148,7 @@ const ShopManagerProfilePage = () => {
           placeholder: "Phone",
           label: "Phone",
           required: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -163,6 +160,7 @@ const ShopManagerProfilePage = () => {
           placeholder: "Birthday",
           label: "Birthday",
           required: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -174,6 +172,7 @@ const ShopManagerProfilePage = () => {
           placeholder: "Address",
           label: "Address",
           required: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -184,7 +183,8 @@ const ShopManagerProfilePage = () => {
           name: "shop",
           placeholder: "Shop",
           label: "Shop",
-          disabled: true,
+
+          readonly: true,
         },
         spans: 6,
       },
@@ -196,7 +196,7 @@ const ShopManagerProfilePage = () => {
           data: mapLookupToArray(AccountStatus ?? {}),
           form,
           name: "status",
-          disabled: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -208,6 +208,7 @@ const ShopManagerProfilePage = () => {
           data: mapLookupToArray(Gender ?? {}),
           form,
           name: "gender",
+          readonly: true,
         },
         spans: 6,
       },
@@ -297,6 +298,8 @@ const ShopManagerProfilePage = () => {
       <Paper
         m={rem(32)}
         p={rem(32)}
+        pb={rem(64)}
+        shadow={"xs"}
         style={{ flex: 1 }}
       >
         <Group
@@ -341,36 +344,36 @@ const ShopManagerProfilePage = () => {
         </Group>
 
         <form
-          onSubmit={form.onSubmit((values) => {
-            const params: UpdateAccountParams = {
-              addressLine: values.address,
-              birthday: values.birthday,
-              email: values.email,
-              gender: values.gender,
-              name: values.name,
-              phone: values.phone,
-              wardId: 1,
-            };
-            updateAccount(params, {
-              onSuccess() {
-                notifications.show({
-                  title: "Successfully",
-                  message: "Update account success!",
-                });
-              },
-              onError(data) {
-                const error = data as AxiosError<ResponseErrorDetail>;
-                notifications.show({
-                  color: "red",
-                  title: "Failed",
-                  message: error.response?.data?.message,
-                });
-              },
-            });
-          })}
+        // onSubmit={form.onSubmit((values) => {
+        //   const params: UpdateAccountParams = {
+        //     addressLine: values.address,
+        //     birthday: values.birthday,
+        //     email: values.email,
+        //     gender: values.gender,
+        //     name: values.name,
+        //     phone: values.phone,
+        //     wardId: 1,
+        //   };
+        //   updateAccount(params, {
+        //     onSuccess() {
+        //       notifications.show({
+        //         title: "Successfully",
+        //         message: "Update account success!",
+        //       });
+        //     },
+        //     onError(data) {
+        //       const error = data as AxiosError<ResponseErrorDetail>;
+        //       notifications.show({
+        //         color: "red",
+        //         title: "Failed",
+        //         message: error.response?.data?.message,
+        //       });
+        //     },
+        //   });
+        // })}
         >
           <EditAndUpdateForm fields={fields} />
-          <Group
+          {/* <Group
             justify="flex-end"
             mt="md"
           >
@@ -380,7 +383,7 @@ const ShopManagerProfilePage = () => {
             >
               Submit
             </Button>
-          </Group>
+          </Group> */}
         </form>
       </Paper>
     </>

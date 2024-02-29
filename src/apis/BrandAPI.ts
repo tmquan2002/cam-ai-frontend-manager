@@ -42,7 +42,7 @@ export const BrandApi = {
     const form = new FormData();
     form.append("File", file);
 
-    const res = await http.put<any>(`/api/brands/images/${type}`, form, {
+    const res = await http.put(`/api/brands/images/${type}`, form, {
       headers: {
         Authorization: `Bearer ${access_token}`,
         "Content-Type": "multipart/form-data",

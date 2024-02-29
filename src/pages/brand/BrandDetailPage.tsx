@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Card,
+  Center,
   Collapse,
   Flex,
   Group,
@@ -102,7 +103,7 @@ const BrandDetailPageManager = () => {
       enabled: !isEmpty(data?.values[0].id),
       brandId: data?.values[0].id,
       pageIndex: activePage - 1,
-      statusId: form.values.status ? +form.values.status : null,
+      status: form.values.status ?? null,
     };
     if (searchCategory == SearchCategory.NAME) {
       sb.name = debounced.toString();
@@ -116,6 +117,8 @@ const BrandDetailPageManager = () => {
 
   const { data: shopList, isLoading: isShopListLoading } =
     useGetShopList(searchParams);
+
+  console.log(searchParams);
 
   const fields = useMemo(() => {
     return [
@@ -137,13 +140,16 @@ const BrandDetailPageManager = () => {
     setSearch(value);
   };
 
-  const handleUploadBrandImage = async (files: FileWithPath[]) => {
+  const handleUploadBrandImage = async (
+    files: FileWithPath[],
+    uploadType: UploadBrandImageType
+  ) => {
     if (!files || files.length <= 0) {
       return;
     }
 
     uploadBrandimage(
-      { file: files[0], type: UploadBrandImageType.Banner },
+      { file: files[0], type: uploadType },
       {
         onSuccess() {
           refetch();
@@ -161,20 +167,6 @@ const BrandDetailPageManager = () => {
   };
 
   const rows = shopList?.values.map((row, index) => {
-    if (isShopListLoading)
-      return (
-        <Paper
-          style={{ flex: 1, height: "100vh" }}
-          pos={"relative"}
-        >
-          <LoadingOverlay
-            visible={isShopListLoading}
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 1 }}
-          />
-        </Paper>
-      );
-
     return (
       <Table.Tr
         key={index}
@@ -191,7 +183,7 @@ const BrandDetailPageManager = () => {
         <Table.Td>{row.addressLine}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
         <Table.Td>
-          {_.isEqual(row.shopStatus.name, "Active") ? (
+          {_.isEqual(row.shopStatus, "Active") ? (
             <Badge variant="light">Active</Badge>
           ) : (
             <Badge
@@ -326,7 +318,9 @@ const BrandDetailPageManager = () => {
           ) : (
             <Tooltip label="Brand banner">
               <Dropzone
-                onDrop={handleUploadBrandImage}
+                onDrop={(files) =>
+                  handleUploadBrandImage(files, UploadBrandImageType.Banner)
+                }
                 onReject={(files) => console.log("rejected files", files)}
                 maxSize={5 * 1024 ** 2}
                 maxFiles={1}
@@ -410,8 +404,10 @@ const BrandDetailPageManager = () => {
         >
           <Tooltip label="Brand logo">
             <Dropzone
-              mr={rem(32)}
-              onDrop={handleUploadBrandImage}
+              mr={rem(16)}
+              onDrop={(files) =>
+                handleUploadBrandImage(files, UploadBrandImageType.Logo)
+              }
               onReject={(files) => console.log("rejected files", files)}
               style={{ border: 0 }}
               maxSize={5 * 1024 ** 2}
@@ -532,26 +528,47 @@ const BrandDetailPageManager = () => {
           h={600}
           onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
           mt={"md"}
+          pos={"relative"}
         >
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            verticalSpacing={"md"}
-          >
-            <Table.Thead
-              className={cx(classes.header, { [classes.scrolled]: scrolled })}
+          <LoadingOverlay
+            visible={isShopListLoading}
+            zIndex={1000}
+            overlayProps={{ radius: "sm", blur: 1 }}
+          />
+          {shopList?.isValuesEmpty ? (
+            <Center>
+              <Image
+                radius={"md"}
+                src={IMAGE_CONSTANT.NO_DATA}
+                fit="contain"
+                h={rem(400)}
+                w={"auto"}
+                style={{
+                  borderBottom: "1px solid #dee2e6",
+                }}
+              />
+            </Center>
+          ) : (
+            <Table
+              striped
+              highlightOnHover
+              withTableBorder
+              withColumnBorders
+              verticalSpacing={"md"}
             >
-              <Table.Tr>
-                <Table.Th>Shop name</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Phone</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+              <Table.Thead
+                className={cx(classes.header, { [classes.scrolled]: scrolled })}
+              >
+                <Table.Tr>
+                  <Table.Th>Shop name</Table.Th>
+                  <Table.Th>Address</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          )}
         </ScrollArea>
         <Group
           justify="flex-end"

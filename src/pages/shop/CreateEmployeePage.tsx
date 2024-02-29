@@ -187,7 +187,7 @@ const CreateEmployeePage = () => {
         c={"light-blue.4"}
         pb={rem(28)}
       >
-        Add new Employee
+        Add employee
       </Text>
       <form
         onSubmit={createEmployeeForm.onSubmit(

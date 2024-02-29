@@ -13,13 +13,13 @@ import {
 import { DateInput } from "@mantine/dates";
 
 const renderTextField = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, type, readOnly } =
+  const { form, name, placeholder, label, required, disabled, type, readonly } =
     fieldProps;
   return (
     <TextInput
       type={type}
       disabled={disabled}
-      readOnly={readOnly}
+      readOnly={readonly}
       withAsterisk={required}
       label={label}
       placeholder={placeholder}
@@ -28,13 +28,13 @@ const renderTextField = ({ fieldProps }: any) => {
   );
 };
 const renderPasswordInput = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readOnly } =
+  const { form, name, placeholder, label, required, disabled, readonly } =
     fieldProps;
 
   return (
     <PasswordInput
       disabled={disabled}
-      readOnly={readOnly}
+      readonly={readonly}
       withAsterisk={required}
       label={label}
       placeholder={placeholder}
@@ -55,7 +55,7 @@ const renderSelect = ({ fieldProps }: any) => {
     loading,
     required,
     rightSection,
-    readOnly,
+    readonly,
     rightSectionWidth,
   } = fieldProps;
   if (loading) return <Loader />;
@@ -65,7 +65,7 @@ const renderSelect = ({ fieldProps }: any) => {
       searchable={searchable}
       label={label}
       disabled={disabled}
-      readOnly={readOnly}
+      readonly={readonly}
       rightSectionWidth={rightSectionWidth}
       rightSectionPointerEvents="all"
       placeholder={placeholder}
@@ -78,24 +78,24 @@ const renderSelect = ({ fieldProps }: any) => {
 };
 
 const renderRadio = ({ fieldProps }: any) => {
-  const { name, label, description, form, data, required, readOnly } =
+  const { name, label, description, form, data, required, readonly } =
     fieldProps;
 
   return (
     <Radio.Group
       name={name}
       label={label}
-      readOnly={readOnly}
+      readonly={readonly}
       required={required}
       description={description}
       {...form.getInputProps(name)}
     >
       <Group mt={"xs"}>
-        {data.map(({ value, label }: { value: string; label: string }) => (
+        {data.map(({ key, value }: { key: string; value: string }) => (
           <Radio
-            key={value}
-            value={value}
-            label={label}
+            key={key}
+            value={key}
+            label={value}
           />
         ))}
       </Group>
@@ -104,13 +104,13 @@ const renderRadio = ({ fieldProps }: any) => {
 };
 
 const renderNumber = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readOnly } =
+  const { form, name, placeholder, label, required, disabled, readonly } =
     fieldProps;
   return (
     <NumberInput
       required={required}
       disabled={disabled}
-      readOnly={readOnly}
+      readonly={readonly}
       withAsterisk={required}
       rightSection={<></>}
       label={label}
@@ -122,7 +122,7 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readOnly } =
+  const { form, name, placeholder, label, required, disabled, readonly } =
     fieldProps;
   return (
     <DateInput
@@ -130,7 +130,7 @@ const renderDate = ({ fieldProps }: any) => {
       disabled={disabled}
       withAsterisk={required}
       label={label}
-      readOnly={readOnly}
+      readonly={readonly}
       placeholder={placeholder}
       {...form.getInputProps(name)}
     />
