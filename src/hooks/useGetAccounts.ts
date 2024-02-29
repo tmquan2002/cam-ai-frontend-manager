@@ -1,9 +1,9 @@
 import { UseQueryResult, useQuery } from "react-query";
-import { AccountAPI } from "../apis/AccountAPI";
+import { AccountAPI, GetAccountParams } from "../apis/AccountAPI";
 import { CommonResponse } from "../models/Common";
 import { AccountDetail } from "../models/Account";
 
-export const useGetAccountList = () => {
+export const useGetAccountList = (params: GetAccountParams) => {
   const {
     isLoading,
     data,
@@ -11,9 +11,9 @@ export const useGetAccountList = () => {
     error,
     refetch,
   }: UseQueryResult<CommonResponse<AccountDetail>, Error> = useQuery({
-    queryKey: ["accounts"],
+    queryKey: ["accounts", params],
     queryFn: async () => {
-      return await AccountAPI._getAccounts();
+      return await AccountAPI._getAccounts(params);
     },
   });
 

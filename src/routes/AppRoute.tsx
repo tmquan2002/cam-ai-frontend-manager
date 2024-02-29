@@ -18,6 +18,7 @@ import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
 import IncidentPage from "../pages/shop/IncidentPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
 import EmployeeListPage from "../pages/shop/EmployeeListPage";
+import BrandAccountPage from "../pages/brand/BrandAccountPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -86,6 +87,10 @@ const AppRoute = () => {
         {
           path: "",
           element: <BrandDetailPage />,
+        },
+        {
+          path: "account",
+          element: <BrandAccountPage />,
         },
         {
           path: "profile",

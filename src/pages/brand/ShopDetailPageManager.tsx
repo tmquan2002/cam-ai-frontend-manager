@@ -115,8 +115,6 @@ const ShopDetailPageManager = () => {
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
 
-  console.log(data);
-
   useEffect(() => {
     if (data) {
       const initialData: FormFieldValue = {

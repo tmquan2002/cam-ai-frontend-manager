@@ -102,7 +102,7 @@ const CreateShop = () => {
     data: accountList,
     isLoading: isAccountListLoading,
     refetch: refetchAccountList,
-  } = useGetAccountList();
+  } = useGetAccountList({});
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
