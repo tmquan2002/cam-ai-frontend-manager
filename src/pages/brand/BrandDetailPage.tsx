@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Card,
+  Center,
   Collapse,
   Flex,
   Group,
@@ -46,7 +47,6 @@ import {
   GetShopListHookParams,
   useGetShopList,
 } from "../../hooks/useGetShopList";
-import { useGetShopStatusList } from "../../hooks/useGetShopStatus";
 import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
 import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
@@ -56,6 +56,8 @@ import { UploadBrandImageType } from "../../apis/BrandAPI";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import { ShopStatus } from "../../models/CamAIEnum";
 
 type SearchShopField = {
   status: string | null;
@@ -83,7 +85,6 @@ const BrandDetailPageManager = () => {
     },
   });
 
-  const { data: shopStatusList } = useGetShopStatusList();
   const [search, setSearch] = useState<string | number>("");
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
@@ -102,7 +103,7 @@ const BrandDetailPageManager = () => {
       enabled: !isEmpty(data?.values[0].id),
       brandId: data?.values[0].id,
       pageIndex: activePage - 1,
-      statusId: form.values.status ? +form.values.status : null,
+      status: form.values.status ?? null,
     };
     if (searchCategory == SearchCategory.NAME) {
       sb.name = debounced.toString();
@@ -117,6 +118,8 @@ const BrandDetailPageManager = () => {
   const { data: shopList, isLoading: isShopListLoading } =
     useGetShopList(searchParams);
 
+  console.log(searchParams);
+
   const fields = useMemo(() => {
     return [
       {
@@ -126,24 +129,27 @@ const BrandDetailPageManager = () => {
           name: "status",
           placeholder: "Shop status",
           label: "Shop status",
-          data: mapLookupToArray(shopStatusList ?? {}),
+          data: mapLookupToArray(ShopStatus ?? {}),
         },
       },
     ];
-  }, [shopStatusList, form]);
+  }, [form]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
     setSearch(value);
   };
 
-  const handleUploadBrandImage = async (files: FileWithPath[]) => {
+  const handleUploadBrandImage = async (
+    files: FileWithPath[],
+    uploadType: UploadBrandImageType
+  ) => {
     if (!files || files.length <= 0) {
       return;
     }
 
     uploadBrandimage(
-      { file: files[0], type: UploadBrandImageType.Banner },
+      { file: files[0], type: uploadType },
       {
         onSuccess() {
           refetch();
@@ -161,20 +167,6 @@ const BrandDetailPageManager = () => {
   };
 
   const rows = shopList?.values.map((row, index) => {
-    if (isShopListLoading)
-      return (
-        <Paper
-          style={{ flex: 1, height: "100vh" }}
-          pos={"relative"}
-        >
-          <LoadingOverlay
-            visible={isShopListLoading}
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 1 }}
-          />
-        </Paper>
-      );
-
     return (
       <Table.Tr
         key={index}
@@ -191,7 +183,7 @@ const BrandDetailPageManager = () => {
         <Table.Td>{row.addressLine}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
         <Table.Td>
-          {_.isEqual(row.shopStatus.name, "Active") ? (
+          {_.isEqual(row.shopStatus, "Active") ? (
             <Badge variant="light">Active</Badge>
           ) : (
             <Badge
@@ -324,83 +316,85 @@ const BrandDetailPageManager = () => {
           {isUploadBrandImageLoading ? (
             <Loader />
           ) : (
-            <Dropzone
-              onDrop={handleUploadBrandImage}
-              onReject={(files) => console.log("rejected files", files)}
-              maxSize={5 * 1024 ** 2}
-              maxFiles={1}
-              accept={{
-                "image/*": [],
-              }}
-            >
-              {data?.values[0]?.bannerUri ? (
-                <Tooltip label="Brand banner">
+            <Tooltip label="Brand banner">
+              <Dropzone
+                onDrop={(files) =>
+                  handleUploadBrandImage(files, UploadBrandImageType.Banner)
+                }
+                onReject={(files) => console.log("rejected files", files)}
+                maxSize={5 * 1024 ** 2}
+                maxFiles={1}
+                accept={{
+                  "image/*": [],
+                }}
+              >
+                {data?.values[0]?.banner ? (
                   <Image
                     radius={"md"}
                     bg={"#000"}
                     height={280}
                     fit="contain"
-                    src={data?.values[0].bannerUri}
+                    src={data?.values[0]?.banner?.hostingUri}
                   />
-                </Tooltip>
-              ) : (
-                <Group
-                  justify="center"
-                  gap="xl"
-                  mih={220}
-                  style={{ pointerEvents: "none" }}
-                >
-                  <Dropzone.Accept>
-                    <IconUpload
-                      style={{
-                        width: rem(52),
-                        height: rem(52),
-                        color: "var(--mantine-color-blue-6)",
-                      }}
-                      stroke={1.5}
-                    />
-                  </Dropzone.Accept>
-                  <Dropzone.Reject>
-                    <IconX
-                      style={{
-                        width: rem(52),
-                        height: rem(52),
-                        color: "var(--mantine-color-red-6)",
-                      }}
-                      stroke={1.5}
-                    />
-                  </Dropzone.Reject>
-                  <Dropzone.Idle>
-                    <IconPhoto
-                      style={{
-                        width: rem(52),
-                        height: rem(52),
-                        color: "var(--mantine-color-dimmed)",
-                      }}
-                      stroke={1.5}
-                    />
-                  </Dropzone.Idle>
+                ) : (
+                  <Group
+                    justify="center"
+                    gap="xl"
+                    mih={220}
+                    style={{ pointerEvents: "none" }}
+                  >
+                    <Dropzone.Accept>
+                      <IconUpload
+                        style={{
+                          width: rem(52),
+                          height: rem(52),
+                          color: "var(--mantine-color-blue-6)",
+                        }}
+                        stroke={1.5}
+                      />
+                    </Dropzone.Accept>
+                    <Dropzone.Reject>
+                      <IconX
+                        style={{
+                          width: rem(52),
+                          height: rem(52),
+                          color: "var(--mantine-color-red-6)",
+                        }}
+                        stroke={1.5}
+                      />
+                    </Dropzone.Reject>
+                    <Dropzone.Idle>
+                      <IconPhoto
+                        style={{
+                          width: rem(52),
+                          height: rem(52),
+                          color: "var(--mantine-color-dimmed)",
+                        }}
+                        stroke={1.5}
+                      />
+                    </Dropzone.Idle>
 
-                  <div>
-                    <Text
-                      size="xl"
-                      inline
-                    >
-                      Upload brand banner
-                    </Text>
-                    <Text
-                      size="sm"
-                      c="dimmed"
-                      inline
-                      mt={7}
-                    >
-                      Only accept .png - .jpeg - .svg+xml - .gif file that are
-                      less than 10mb in size
-                    </Text>
-                  </div>
-                </Group>
-              )}
-            </Dropzone>
+                    <div>
+                      <Text
+                        size="xl"
+                        inline
+                      >
+                        Upload brand banner
+                      </Text>
+                      <Text
+                        size="sm"
+                        c="dimmed"
+                        inline
+                        mt={7}
+                      >
+                        Only accept .png - .jpeg - .svg+xml - .gif file that are
+                        less than 10mb in size
+                      </Text>
+                    </div>
+                  </Group>
+                )}
+              </Dropzone>
+            </Tooltip>
           )}
         </Box>
 
@@ -409,13 +403,30 @@ const BrandDetailPageManager = () => {
           mb={rem(32)}
         >
           <Tooltip label="Brand logo">
-            <Avatar
-              mr={rem(32)}
-              h={100}
-              w={100}
-              src={data?.values[0].logoUri}
-            />
+            <Dropzone
+              mr={rem(16)}
+              onDrop={(files) =>
+                handleUploadBrandImage(files, UploadBrandImageType.Logo)
+              }
+              onReject={(files) => console.log("rejected files", files)}
+              style={{ border: 0 }}
+              maxSize={5 * 1024 ** 2}
+              maxFiles={1}
+              accept={{
+                "image/*": [],
+              }}
+            >
+              <Avatar
+                h={100}
+                w={100}
+                src={
+                  data?.values[0]?.logo?.hostingUri ?? IMAGE_CONSTANT.NO_IMAGE
+                }
+                className={classes.avatar}
+              />
+            </Dropzone>
           </Tooltip>
+
           <Box>
             <Text
               size="xl"
@@ -517,26 +528,47 @@ const BrandDetailPageManager = () => {
           h={600}
           onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
           mt={"md"}
+          pos={"relative"}
         >
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            verticalSpacing={"md"}
-          >
-            <Table.Thead
-              className={cx(classes.header, { [classes.scrolled]: scrolled })}
+          <LoadingOverlay
+            visible={isShopListLoading}
+            zIndex={1000}
+            overlayProps={{ radius: "sm", blur: 1 }}
+          />
+          {shopList?.isValuesEmpty ? (
+            <Center>
+              <Image
+                radius={"md"}
+                src={IMAGE_CONSTANT.NO_DATA}
+                fit="contain"
+                h={rem(400)}
+                w={"auto"}
+                style={{
+                  borderBottom: "1px solid #dee2e6",
+                }}
+              />
+            </Center>
+          ) : (
+            <Table
+              striped
+              highlightOnHover
+              withTableBorder
+              withColumnBorders
+              verticalSpacing={"md"}
             >
-              <Table.Tr>
-                <Table.Th>Shop name</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Phone</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+              <Table.Thead
+                className={cx(classes.header, { [classes.scrolled]: scrolled })}
+              >
+                <Table.Tr>
+                  <Table.Th>Shop name</Table.Th>
+                  <Table.Th>Address</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          )}
         </ScrollArea>
         <Group
           justify="flex-end"

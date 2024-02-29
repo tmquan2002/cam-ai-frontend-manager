@@ -2,38 +2,27 @@ import { AppShell, useComputedColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { checkRole } from "../context/AuthContext";
-import { RoleEnum } from "../types/enum";
+import { getUserRole } from "../context/AuthContext";
 // import ShopHeader from "../components/header/ShopHeader";
 import BrandHeader from "../components/header/BrandHeader";
 import { BrandNavbar } from "../components/navbar/BrandNavbar";
+import { Role } from "../models/CamAIEnum";
 
 const BrandRoute = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-  const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.BrandManager);
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const [userRole, setUserRole] = useState<Role | null>(Role.BrandManager);
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
 
   useEffect(() => {
-    const isUserRoleBrandManager: boolean | undefined = checkRole({
-      Id: RoleEnum.BrandManager,
-      Name: "",
-    });
-
-    const isUserRoleShopManager: boolean | undefined = checkRole({
-      Id: RoleEnum.ShopManager,
-      Name: "",
-    });
-
-    if (isUserRoleShopManager) {
-      setUserRole(RoleEnum.ShopManager);
-    } else if (!isUserRoleBrandManager) {
-      setUserRole(RoleEnum.Employee);
-    }
+    const currentUserRole: Role | null = getUserRole();
+    setUserRole(currentUserRole);
   }, []);
 
   switch (userRole) {
-    case RoleEnum.BrandManager:
+    case Role.BrandManager:
       return (
         <AppShell
           header={{ height: 60 }}
@@ -57,13 +46,16 @@ const BrandRoute = () => {
           </AppShell.Navbar>
 
           <AppShell.Main
-            style={{ backgroundColor: computedColorScheme === 'light' ? '#f6f8fc' : '#1A1A1A' }}
+            style={{
+              backgroundColor:
+                computedColorScheme === "light" ? "#f6f8fc" : "#1A1A1A",
+            }}
           >
             <Outlet />
           </AppShell.Main>
         </AppShell>
       );
-    case RoleEnum.ShopManager:
+    case Role.ShopManager:
       return <Navigate to={"/shop"} />;
     default:
       return (

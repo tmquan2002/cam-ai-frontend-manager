@@ -102,7 +102,7 @@ const ShopDetailPage = () => {
       <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
       <Table.Td>
-        {_.isEqual(row.employeeStatus.name, "Active") ? (
+        {_.isEqual(row.employeeStatus, "Active") ? (
           <Badge variant="light">Active</Badge>
         ) : (
           <Badge

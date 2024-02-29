@@ -1,35 +1,19 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { checkRole } from "../context/AuthContext";
-import { RoleEnum } from "../types/enum";
+import { getUserRole } from "../context/AuthContext";
+import { Role } from "../models/CamAIEnum";
 
 const CommonRoute = () => {
-  const [userRole, setUserRole] = useState<RoleEnum>(RoleEnum.Employee);
+  const [userRole, setUserRole] = useState<Role | null>(Role.Employee);
   useEffect(() => {
-    const isUserRoleBrandManager: boolean | undefined = checkRole({
-      Id: RoleEnum.BrandManager,
-      Name: "",
-    });
-
-    const isUserRoleShopManager: boolean | undefined = checkRole({
-      Id: RoleEnum.ShopManager,
-      Name: "",
-    });
-
-    if (isUserRoleBrandManager) {
-      setUserRole(RoleEnum.BrandManager);
-      return;
-    }
-    if (isUserRoleShopManager) {
-      setUserRole(RoleEnum.ShopManager);
-      return;
-    }
+    const currentUserRole: Role | null = getUserRole();
+    setUserRole(currentUserRole);
   }, []);
 
   switch (userRole) {
-    case RoleEnum.BrandManager:
+    case Role.BrandManager:
       return <Navigate to={"/brand"} />;
-    case RoleEnum.ShopManager:
+    case Role.ShopManager:
       return <Navigate to={"/shop"} />;
     default:
       return <Outlet />;

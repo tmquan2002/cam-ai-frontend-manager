@@ -6,7 +6,7 @@ import { CommonConstant } from "../types/constant";
 import http from "../utils/http";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { RoleDetail } from "../utils/jwt";
+import { Role } from "../models/CamAIEnum";
 
 const AuthContext = createContext<{
   signIn: (params: AuthToken) => void;
@@ -34,12 +34,12 @@ export const getRefreshToken = (): string | null => {
   return REFRESH_TOKEN;
 };
 
-export function getUserRoles(): RoleDetail[] | null {
+export function getUserRole(): Role | null {
   const accessToken: string | null = getAccessToken();
 
   if (accessToken) {
-    const roles: jwt.RoleDetail[] = jwt.getRolesFromToken(accessToken);
-    return roles;
+    const role: Role = jwt.getRoleFromToken(accessToken);
+    return role;
   }
 
   return null;
@@ -56,20 +56,13 @@ export function getUserId(): string | null {
   return null;
 }
 
-export function checkRole(acceptableRole: RoleDetail): boolean {
-  let check = false;
-  const userRole = getUserRoles();
+export const checkRole = (acceptableRole: Role): boolean => {
+  const userRole = getUserRole();
   if (!userRole) return false;
 
-  userRole?.forEach((role) => {
-    if (role.Id == acceptableRole.Id) {
-      check = true;
-      return;
-    }
-  });
-
-  return check;
-}
+  if (userRole == acceptableRole) return true;
+  else return false;
+};
 
 export function SessionProvider(props: React.PropsWithChildren) {
   const [[isAccessTokenLoading], setAccessToken] = useStorageState(

@@ -7,14 +7,14 @@ import { useMemo } from "react";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
-import { mapLookupStringValueToArray } from "../../utils/helperFunction";
-import { useGetGenderList } from "../../hooks/useGetGender";
 import { useCreateEmployee } from "../../hooks/useCreateEmployee";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
 import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import { Gender } from "../../models/CamAIEnum";
 
 export type CreateEmployeeField = {
   name: string | null;
@@ -55,9 +55,6 @@ const CreateEmployeePage = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
     +(createEmployeeForm.values.district ?? 0)
   );
-  const { data: genderList, isLoading: isGetGenderListLoading } =
-    useGetGenderList();
-
   const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
     useCreateEmployee();
 
@@ -88,10 +85,9 @@ const CreateEmployeePage = () => {
         fieldProps: {
           label: "Gender",
           placeholder: "Gender",
-          data: mapLookupStringValueToArray(genderList ?? {}),
+          data: mapLookupToArray(Gender ?? {}),
           form: createEmployeeForm,
           name: "gender",
-          loading: isGetGenderListLoading,
           required: true,
         },
         spans: 6,
@@ -172,9 +168,7 @@ const CreateEmployeePage = () => {
   }, [
     createEmployeeForm,
     districts,
-    genderList,
     isDistrictsLoading,
-    isGetGenderListLoading,
     isProvicesLoading,
     isWardsLoading,
     provinces,
@@ -193,7 +187,7 @@ const CreateEmployeePage = () => {
         c={"light-blue.4"}
         pb={rem(28)}
       >
-        Add new Employee
+        Add employee
       </Text>
       <form
         onSubmit={createEmployeeForm.onSubmit(

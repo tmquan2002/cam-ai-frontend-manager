@@ -1,9 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-
-export type RoleDetail = {
-  Id: number;
-  Name: string;
-};
+import { AccountStatus, Role } from "../models/CamAIEnum";
 
 export type StatusDetail = {
   Id: number;
@@ -12,8 +8,8 @@ export type StatusDetail = {
 
 export type UserDetail = {
   id: string;
-  roles: string;
-  status: string;
+  role: Role;
+  status: AccountStatus;
   exp: number;
 };
 
@@ -22,9 +18,9 @@ export const getPayloadFromToken = (token: string): UserDetail => {
   return user_detail;
 };
 
-export const getRolesFromToken = (token: string): RoleDetail[] => {
-  const roles: RoleDetail[] = JSON.parse(getPayloadFromToken(token).roles);
-  return roles;
+export const getRoleFromToken = (token: string): Role => {
+  const role = getPayloadFromToken(token).role;
+  return role;
 };
 
 export const getIdFromToken = (token: string): string => {
@@ -32,7 +28,7 @@ export const getIdFromToken = (token: string): string => {
   return id;
 };
 
-export const getStatusFromToken = (token: string): StatusDetail => {
-  const status: StatusDetail = JSON.parse(getPayloadFromToken(token).status);
+export const getStatusFromToken = (token: string): AccountStatus => {
+  const status: AccountStatus = getPayloadFromToken(token).status;
   return status;
 };

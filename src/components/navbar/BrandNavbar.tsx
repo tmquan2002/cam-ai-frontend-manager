@@ -4,8 +4,6 @@ import {
   IconGauge,
   IconPresentationAnalytics,
   IconFileAnalytics,
-  IconAdjustments,
-  IconLock,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
@@ -17,34 +15,15 @@ const mockdata = [
     label: "Brand News",
     icon: IconNotes,
     initiallyOpened: true,
-    links: [
-      { label: "Overview", link: "/" },
-      { label: "Forecasts", link: "/" },
-      { label: "Outlook", link: "/" },
-      { label: "Real time", link: "/" },
-    ],
+    links: [{ label: "Overview", link: "/" }],
   },
   {
     label: "Your Shop",
     icon: IconCalendarStats,
-    links: [
-      { label: "Add shop ", link: "/brand/create/shop" },
-      { label: "Previous releases", link: "/" },
-      { label: "Releases schedule", link: "/" },
-    ],
+    links: [{ label: "Add shop ", link: "/brand/create/shop" }],
   },
   { label: "Detail", icon: IconPresentationAnalytics, path: "detail" },
   { label: "Report", icon: IconFileAnalytics, path: "report" },
-  { label: "Settings", icon: IconAdjustments },
-  {
-    label: "Security",
-    icon: IconLock,
-    links: [
-      { label: "Enable 2FA", link: "/security" },
-      { label: "Change password", link: "/security" },
-      { label: "Recovery codes", link: "/security" },
-    ],
-  },
 ];
 
 export function BrandNavbar() {

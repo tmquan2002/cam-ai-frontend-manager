@@ -3,4 +3,5 @@ export interface CommonResponse<T> {
   pageIndex: number;
   pageSize: number;
   totalCount: number;
+  isValuesEmpty: boolean;
 }

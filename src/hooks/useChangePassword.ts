@@ -1,11 +1,11 @@
 import { useMutation } from "react-query";
-import { ChangePasswordParams, LoginAPI } from "../apis/LoginAPI";
+import { ChangePasswordParams, ProfileAPI } from "../apis/ProfileAPI";
 
 export const useChangePassword = () => {
   const { mutate, isLoading, error, data } = useMutation({
     mutationKey: "change-password",
     mutationFn: async (params: ChangePasswordParams) => {
-      return await LoginAPI._changePassword(params);
+      return await ProfileAPI._changePassword(params);
     },
   });
 

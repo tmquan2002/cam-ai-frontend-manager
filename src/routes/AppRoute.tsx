@@ -17,6 +17,7 @@ import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
 import IncidentPage from "../pages/shop/IncidentPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
+import EmployeeListPage from "../pages/shop/EmployeeListPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -58,6 +59,10 @@ const AppRoute = () => {
         {
           path: "profile",
           element: <ShopManagerProfilePage />,
+        },
+        {
+          path: "employee",
+          element: <EmployeeListPage />,
         },
         {
           path: "employee/create",

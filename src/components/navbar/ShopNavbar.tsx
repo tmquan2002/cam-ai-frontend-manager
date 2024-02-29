@@ -1,10 +1,8 @@
 import {
   IconNotes,
-  IconCalendarStats,
   IconGauge,
   IconPresentationAnalytics,
   IconFileAnalytics,
-  IconAdjustments,
   IconLock,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
@@ -17,33 +15,22 @@ const mockdata = [
     label: "Statictis",
     icon: IconNotes,
     initiallyOpened: true,
-    links: [
-      { label: "Overview", link: "/shop/overview" },
-      { label: "Forecasts", link: "/" },
-      { label: "Outlook", link: "/" },
-      { label: "Real time", link: "/" },
-    ],
+    links: [{ label: "Overview", link: "/shop/overview" }],
   },
+
   {
-    label: "Your brand",
-    icon: IconCalendarStats,
+    label: "Detail",
+    icon: IconPresentationAnalytics,
     links: [
-      { label: "Detail", link: "/shop/brand/detail" },
-      { label: "Previous releases", link: "/" },
-      { label: "Releases schedule", link: "/" },
+      { label: "Overview", link: "/shop/detail" },
+      { label: "Employee", link: "/shop/employee" },
     ],
   },
-  { label: "Detail", icon: IconPresentationAnalytics, path: "detail" },
   { label: "Report", icon: IconFileAnalytics, path: "report" },
-  { label: "Settings", icon: IconAdjustments },
   {
     label: "Employee",
     icon: IconLock,
-    links: [
-      { label: "Create", link: "/shop/employee/create" },
-      { label: "Change password", link: "/empl" },
-      { label: "Recovery codes", link: "/" },
-    ],
+    links: [{ label: "Create", link: "/shop/employee/create" }],
   },
 ];
 
