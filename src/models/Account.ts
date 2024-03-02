@@ -8,7 +8,7 @@ export type AccountDetail = {
   gender: string;
   phone: string;
   birthday: string;
-  wardId: string;
+  wardId: number;
   addressLine: string;
   ward: WardDetail;
   accountStatus: AccountStatus;
@@ -16,7 +16,7 @@ export type AccountDetail = {
   managingShop: {
     name: string;
     phone: string;
-    wardId: string;
+    wardId: number;
     addressLine: string;
     ward: WardDetail;
     shopStatus: ShopStatus;

@@ -21,7 +21,7 @@ export type CreateAccountParams = {
   wardId: number;
   addressLine: string;
   brandId: string;
-  roleIds: number[];
+  role: Role;
 };
 
 export type GetAccountParams = {

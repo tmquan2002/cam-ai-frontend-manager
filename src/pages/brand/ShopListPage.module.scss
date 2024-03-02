@@ -1,0 +1,20 @@
+.pointer-style {
+  cursor: pointer;
+}
+.pointer-style:hover {
+  text-decoration: underline;
+}
+
+.search_input {
+  border-radius: rem(20px);
+  background-color: "#f6f6f6";
+  // width: rem(800px),
+  height: rem(48px);
+}
+
+.filter_button {
+  border-radius: 20%/50%;
+  padding: 0 rem(20px);
+  height: rem(48px);
+  margin-left: rem(24px);
+}

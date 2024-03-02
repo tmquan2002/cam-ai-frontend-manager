@@ -6,6 +6,7 @@ import {
   Group,
   Image,
   LoadingOverlay,
+  Pagination,
   Paper,
   Table,
   Text,
@@ -17,10 +18,18 @@ import { AccountStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { IconPlus } from "@tabler/icons-react";
 import classes from "./BrandAccountPage.module.scss";
+import { useNavigate } from "react-router-dom";
+import { AccountDetail } from "../../models/Account";
+import { useState } from "react";
 
 const BrandAccountPage = () => {
-  //   const navigate = useNavigate();
-  const { data, isLoading } = useGetAccountList({});
+  const navigate = useNavigate();
+  const [activePage, setPage] = useState(1);
+
+  const { data, isLoading } = useGetAccountList({
+    size: 12,
+    pageIndex: activePage - 1,
+  });
 
   const renderAccountStatusRow = (status: AccountStatus) => {
     switch (status) {
@@ -33,10 +42,13 @@ const BrandAccountPage = () => {
     }
   };
 
-  const rows = data?.values.map((row) => (
+  const rows = data?.values.map((row: AccountDetail) => (
     <Table.Tr key={row?.id}>
-      <Table.Td>
-        <Text className={classes.clickable_link}>
+      <Table.Td onClick={() => navigate(`/brand/account/${row?.id}`)}>
+        <Text
+          size={rem(14)}
+          className={classes.clickable_link}
+        >
           {replaceIfNun(row?.name)}
         </Text>
       </Table.Td>
@@ -47,7 +59,11 @@ const BrandAccountPage = () => {
       <Table.Td>{replaceIfNun(row?.addressLine)}</Table.Td>
       <Table.Td>{renderAccountStatusRow(row?.accountStatus)}</Table.Td>
       <Table.Td>
-        <Text className={classes.clickable_link}>
+        <Text
+          onClick={() => navigate(`/brand/shop/${row?.managingShop?.id}`)}
+          size={rem(14)}
+          className={classes.clickable_link}
+        >
           {row?.managingShop?.name}
         </Text>
       </Table.Td>
@@ -76,8 +92,9 @@ const BrandAccountPage = () => {
         <Button
           leftSection={<IconPlus size={14} />}
           ml={rem(12)}
+          onClick={() => navigate("/brand/create/manager")}
         >
-          Add shop
+          Add manager
         </Button>
       </Group>
       <Box pos={"relative"}>
@@ -86,42 +103,53 @@ const BrandAccountPage = () => {
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 1 }}
         />
-        <Table
-          miw={1000}
-          highlightOnHover
-          verticalSpacing={"md"}
-          striped
-          withTableBorder
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Phone</Table.Th>
-              <Table.Th>Birthday</Table.Th>
-              <Table.Th>Gender</Table.Th>
-              <Table.Th>Address</Table.Th>
-              <Table.Th>Status</Table.Th>
-              <Table.Th>Managing shop</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          {data?.isValuesEmpty ? (
-            <Center>
-              <Image
-                radius={"md"}
-                src={IMAGE_CONSTANT.NO_DATA}
-                fit="contain"
-                h={rem(400)}
-                w={"auto"}
-                style={{
-                  borderBottom: "1px solid #dee2e6",
-                }}
-              />
-            </Center>
-          ) : (
+
+        {data?.isValuesEmpty ? (
+          <Center>
+            <Image
+              radius={"md"}
+              src={IMAGE_CONSTANT.NO_DATA}
+              fit="contain"
+              h={rem(400)}
+              w={"auto"}
+              style={{
+                borderBottom: "1px solid #dee2e6",
+              }}
+            />
+          </Center>
+        ) : (
+          <Table
+            miw={1000}
+            highlightOnHover
+            verticalSpacing={"md"}
+            striped
+            withTableBorder
+          >
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Name</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Phone</Table.Th>
+                <Table.Th>Birthday</Table.Th>
+                <Table.Th>Gender</Table.Th>
+                <Table.Th>Address</Table.Th>
+                <Table.Th>Status</Table.Th>
+                <Table.Th>Managing shop</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
-          )}
-        </Table>
+          </Table>
+        )}
+        <Group
+          justify="flex-end"
+          mt="lg"
+        >
+          <Pagination
+            value={activePage}
+            onChange={setPage}
+            total={Math.ceil((data?.totalCount ?? 0) / 12)}
+          />
+        </Group>
       </Box>
     </Paper>
   );

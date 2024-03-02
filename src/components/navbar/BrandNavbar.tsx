@@ -21,14 +21,15 @@ const mockdata = [
     icon: IconNotes,
     links: [
       { label: "Shop manager ", link: "/brand/account" },
-      { label: "Employee ", link: "brand/employee" },
+      { label: "Create manager ", link: "/brand/create/manager" },
+      { label: "Employee ", link: "/brand/employee" },
     ],
   },
   {
     label: "Your Shop",
     icon: IconCalendarStats,
     links: [
-      { label: "Shop list ", link: "/brand/create/shop" },
+      { label: "Shop list ", link: "/brand/shop" },
       { label: "Add shop ", link: "/brand/create/shop" },
     ],
   },
