@@ -18,6 +18,11 @@ import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
 import IncidentPage from "../pages/shop/IncidentPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
 import EmployeeListPage from "../pages/shop/EmployeeListPage";
+import BrandAccountPage from "../pages/brand/BrandAccountPage";
+import CreateManagerPage from "../pages/brand/CreateManagerPage";
+import AccountDetailPage from "../pages/brand/AccountDetailPage";
+import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
+import ShopListPage from "../pages/brand/ShopListPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -88,6 +93,30 @@ const AppRoute = () => {
           element: <BrandDetailPage />,
         },
         {
+          path: "account",
+          element: <BrandAccountPage />,
+        },
+        {
+          path: "account/:id",
+          element: <AccountDetailPage />,
+        },
+        {
+          path: "employee",
+          element: <BrandEmployeePage />,
+        },
+        {
+          path: "employee/:id",
+          element: <EmployeeDetailPage />,
+        },
+        {
+          path: "shop",
+          element: <ShopListPage />,
+        },
+        {
+          path: "shop/:id",
+          element: <ShopDetailPageManager />,
+        },
+        {
           path: "profile",
           element: <BrandManagerProfilePage />,
         },
@@ -96,8 +125,8 @@ const AppRoute = () => {
           element: <CreateShop />,
         },
         {
-          path: "shop/:id",
-          element: <ShopDetailPageManager />,
+          path: "create/manager",
+          element: <CreateManagerPage />,
         },
       ],
     },

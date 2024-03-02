@@ -20,16 +20,16 @@ import { CreateAccountParams } from "../../apis/AccountAPI";
 import { useGetBrandList } from "../../hooks/useGetBrandList";
 import dayjs from "dayjs";
 import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender } from "../../models/CamAIEnum";
+import { Gender, Role } from "../../models/CamAIEnum";
 
 export type CreateShopField = {
   name: string;
   phone: string;
-  wardId: string | null;
+  wardId: number | null;
   shopManagerId: string | null;
   addressLine: string;
-  province: string | null;
-  district: string | null;
+  province: number | null;
+  district: number | null;
 };
 
 export type CreateAccountField = {
@@ -41,8 +41,8 @@ export type CreateAccountField = {
   birthday: Date | null;
   wardId: number | null;
   addressLine: string;
-  province: string | null;
-  district: string | null;
+  province: number | null;
+  district: number | null;
 };
 
 const CreateShop = () => {
@@ -102,7 +102,7 @@ const CreateShop = () => {
     data: accountList,
     isLoading: isAccountListLoading,
     refetch: refetchAccountList,
-  } = useGetAccountList();
+  } = useGetAccountList({});
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -116,6 +116,7 @@ const CreateShop = () => {
     data: createAccountDistricts,
     isLoading: isCreateAccountDistrictsLoading,
   } = useGetDistrictList(+(createAccountForm.values.province ?? 0));
+
   const { data: createAccountWards, isLoading: isCreateAccountWardsLoading } =
     useGetWardList(+(createAccountForm.values.district ?? 0));
 
@@ -486,7 +487,7 @@ const CreateShop = () => {
                   name,
                   password,
                   phone,
-                  roleIds: [4],
+                  role: Role.ShopManager,
                   wardId: wardId ?? 0,
                 };
 

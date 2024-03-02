@@ -18,6 +18,7 @@ import {
   Pagination,
   Paper,
   ScrollArea,
+  Skeleton,
   Table,
   Text,
   TextInput,
@@ -95,7 +96,10 @@ const BrandDetailPageManager = () => {
     SearchCategory.NAME
   );
   const { data, isLoading, isError, refetch } = useGetBrandList({ size: 1 });
-  const { mutate: uploadBrandimage, isLoading: isUploadBrandImageLoading } =
+  const { mutate: uploadBrandBanner, isLoading: isUploadBrandBannerLoading } =
+    useUploadBrandImage();
+
+  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } =
     useUploadBrandImage();
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
@@ -117,8 +121,6 @@ const BrandDetailPageManager = () => {
 
   const { data: shopList, isLoading: isShopListLoading } =
     useGetShopList(searchParams);
-
-  console.log(searchParams);
 
   const fields = useMemo(() => {
     return [
@@ -147,23 +149,41 @@ const BrandDetailPageManager = () => {
     if (!files || files.length <= 0) {
       return;
     }
-
-    uploadBrandimage(
-      { file: files[0], type: uploadType },
-      {
-        onSuccess() {
-          refetch();
-        },
-        onError(data) {
-          const error = data as AxiosError<ResponseErrorDetail>;
-          notifications.show({
-            color: "red",
-            title: "Failed",
-            message: error.response?.data?.message,
-          });
-        },
-      }
-    );
+    if (uploadType == UploadBrandImageType.Banner) {
+      uploadBrandBanner(
+        { file: files[0], type: uploadType },
+        {
+          onSuccess() {
+            refetch();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              title: "Failed",
+              message: error.response?.data?.message,
+            });
+          },
+        }
+      );
+    } else {
+      uploadBrandLogo(
+        { file: files[0], type: uploadType },
+        {
+          onSuccess() {
+            refetch();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              title: "Failed",
+              message: error.response?.data?.message,
+            });
+          },
+        }
+      );
+    }
   };
 
   const rows = shopList?.values.map((row, index) => {
@@ -313,7 +333,7 @@ const BrandDetailPageManager = () => {
         style={{ flex: 1 }}
       >
         <Box mb={rem(16)}>
-          {isUploadBrandImageLoading ? (
+          {isUploadBrandBannerLoading ? (
             <Loader />
           ) : (
             <Tooltip label="Brand banner">
@@ -416,14 +436,21 @@ const BrandDetailPageManager = () => {
                 "image/*": [],
               }}
             >
-              <Avatar
-                h={100}
-                w={100}
-                src={
-                  data?.values[0]?.logo?.hostingUri ?? IMAGE_CONSTANT.NO_IMAGE
-                }
-                className={classes.avatar}
-              />
+              {isUploadBrandLogoLoading ? (
+                <Skeleton
+                  height={100}
+                  circle
+                />
+              ) : (
+                <Avatar
+                  h={100}
+                  w={100}
+                  src={
+                    data?.values[0]?.logo?.hostingUri ?? IMAGE_CONSTANT.NO_IMAGE
+                  }
+                  className={classes.avatar}
+                />
+              )}
             </Dropzone>
           </Tooltip>
 

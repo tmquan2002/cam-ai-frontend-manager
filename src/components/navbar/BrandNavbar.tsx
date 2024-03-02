@@ -2,7 +2,6 @@ import {
   IconNotes,
   IconCalendarStats,
   IconGauge,
-  IconPresentationAnalytics,
   IconFileAnalytics,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
@@ -12,17 +11,28 @@ import classes from "./Sidebar.module.scss";
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/brand" },
   {
-    label: "Brand News",
+    label: "Brand",
     icon: IconNotes,
     initiallyOpened: true,
     links: [{ label: "Overview", link: "/" }],
   },
   {
+    label: "Account",
+    icon: IconNotes,
+    links: [
+      { label: "Shop manager ", link: "/brand/account" },
+      { label: "Create manager ", link: "/brand/create/manager" },
+      { label: "Employee ", link: "/brand/employee" },
+    ],
+  },
+  {
     label: "Your Shop",
     icon: IconCalendarStats,
-    links: [{ label: "Add shop ", link: "/brand/create/shop" }],
+    links: [
+      { label: "Shop list ", link: "/brand/shop" },
+      { label: "Add shop ", link: "/brand/create/shop" },
+    ],
   },
-  { label: "Detail", icon: IconPresentationAnalytics, path: "detail" },
   { label: "Report", icon: IconFileAnalytics, path: "report" },
 ];
 
