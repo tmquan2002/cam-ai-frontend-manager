@@ -63,9 +63,10 @@ const CreateShop = () => {
 
   const createAccountForm = useForm<CreateAccountField>({
     validate: {
+      name: isNotEmpty("Name is required"),
       email: (value) =>
         /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
-      password: isNotEmpty("Name must not be empty"),
+      password: isNotEmpty("Password must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
@@ -73,6 +74,7 @@ const CreateShop = () => {
           : "Invalid phone number - ex: 0379999999",
       province: isNotEmpty("Provice is required"),
       district: isNotEmpty("District is required"),
+      wardId: isNotEmpty("Ward is required"),
     },
   });
 
@@ -263,6 +265,7 @@ const CreateShop = () => {
           name: "name",
           placeholder: "Name",
           label: "Name",
+          required: true,
         },
         spans: 6,
       },
@@ -385,7 +388,7 @@ const CreateShop = () => {
           c={"light-blue.4"}
           pb={20}
         >
-          ADD NEW SHOP
+          Create shop
         </Text>
         <form
           onSubmit={createShopForm.onSubmit(
@@ -443,7 +446,7 @@ const CreateShop = () => {
             fz={25}
             c={"light-blue.4"}
           >
-            ADD SHOP MANAGER ACCOUNT
+            Add shop manager account
           </Text>
           <form
             onReset={createAccountForm.onReset}

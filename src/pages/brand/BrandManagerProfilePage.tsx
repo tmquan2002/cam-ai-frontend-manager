@@ -26,7 +26,7 @@ import { useChangePassword } from "../../hooks/useChangePassword";
 import { ChangePasswordParams } from "../../apis/ProfileAPI";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
-import { getAccessToken } from "../../context/AuthContext";
+import { getAccessToken, getUserId } from "../../context/AuthContext";
 
 type ProfileFieldValue = {
   name: string;
@@ -316,11 +316,11 @@ const BrandManagerProfilePage = () => {
             const params: UpdateAccountParams = {
               addressLine: values.address,
               birthday: values.birthday,
-              email: values.email,
               gender: values.gender,
               name: values.name,
               phone: values.phone,
               wardId: 1,
+              userId: getUserId() ?? "",
             };
             updateAccount(params, {
               onSuccess() {

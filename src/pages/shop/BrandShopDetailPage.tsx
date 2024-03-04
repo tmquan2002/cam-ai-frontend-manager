@@ -7,7 +7,7 @@ import {
   Paper,
   Text,
   Tooltip,
-  rem
+  rem,
 } from "@mantine/core";
 import { IconMail, IconPhone } from "@tabler/icons-react";
 import { useGetBrandList } from "../../hooks/useGetBrandList";
@@ -15,14 +15,19 @@ import { useGetBrandList } from "../../hooks/useGetBrandList";
 const BrandShopDetailPage = () => {
   const { data, isLoading } = useGetBrandList({ size: 1 });
 
-  if (isLoading) return (
-    <Paper
-      style={{ flex: 1, height: '100vh' }}
-      pos={"relative"}
-    >
-      <LoadingOverlay visible={isLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 1 }} />
-    </Paper>
-  );
+  if (isLoading)
+    return (
+      <Paper
+        style={{ flex: 1, height: "100vh" }}
+        pos={"relative"}
+      >
+        <LoadingOverlay
+          visible={isLoading}
+          zIndex={1000}
+          overlayProps={{ radius: "sm", blur: 1 }}
+        />
+      </Paper>
+    );
 
   return (
     <Paper
@@ -39,7 +44,7 @@ const BrandShopDetailPage = () => {
             mr={rem(32)}
             h={100}
             w={100}
-            src={data?.values[0].logoUri}
+            src={data?.values[0].logo?.hostingUri}
           />
         </Tooltip>
         <Box>
@@ -72,7 +77,7 @@ const BrandShopDetailPage = () => {
           bg={"#000"}
           height={400}
           fit="contain"
-          src={data?.values[0].bannerUri}
+          src={data?.values[0].banner?.hostingUri}
         />
       </Tooltip>
     </Paper>
