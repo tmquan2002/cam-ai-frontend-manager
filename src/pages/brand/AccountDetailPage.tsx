@@ -19,17 +19,23 @@ import { useParams } from "react-router-dom";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateAccount } from "../../hooks/useUpdateAccount";
+import { UpdateAccountParams } from "../../apis/AccountAPI";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
+import dayjs from "dayjs";
 
 type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: string;
+  birthday: Date;
   addressLine: string;
-  gender: string;
-  wardId: number | null;
-  province: number | null;
-  district: number | null;
+  gender: Gender;
+  wardId: string;
+  province: string;
+  district: string;
 };
 
 const AccountDetailPage = () => {
@@ -60,22 +66,24 @@ const AccountDetailPage = () => {
   const { data: accountData, isLoading: isAccountDataLoading } =
     useGetAccountById(id ?? "");
 
-  console.log(accountData);
+  const { mutate: updateAccount, isLoading: isUpdateAccountLoading } =
+    useUpdateAccount();
 
   useEffect(() => {
     if (accountData) {
-      const params: ProfileFieldValue = {
+      form.setValues({
         addressLine: accountData?.addressLine,
-        birthday: accountData?.birthday,
-        district: accountData?.ward?.districtId,
+        birthday: accountData.birthday
+          ? new Date(accountData.birthday)
+          : undefined,
+        district: accountData?.ward?.districtId?.toString(),
         email: accountData?.email,
         gender: accountData?.gender,
         name: accountData?.name,
         phone: accountData?.phone,
-        province: accountData?.ward?.district?.provinceId,
-        wardId: accountData?.wardId,
-      };
-      form.setValues(params);
+        province: accountData?.ward?.district?.provinceId?.toString(),
+        wardId: accountData?.wardId?.toString(),
+      });
     }
   }, [accountData]);
 
@@ -100,6 +108,7 @@ const AccountDetailPage = () => {
           placeholder: "Email",
           label: "Email",
           required: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -115,7 +124,7 @@ const AccountDetailPage = () => {
         spans: 6,
       },
       {
-        type: FIELD_TYPES.TEXT,
+        type: FIELD_TYPES.DATE,
         fieldProps: {
           form,
           name: "birthday",
@@ -135,7 +144,7 @@ const AccountDetailPage = () => {
           form,
           name: "gender",
         },
-        spans: 6,
+        spans: 12,
       },
       {
         type: FIELD_TYPES.SELECT,
@@ -191,7 +200,7 @@ const AccountDetailPage = () => {
           label: "Address",
           required: true,
         },
-        spans: 6,
+        spans: 12,
       },
     ];
   }, [
@@ -203,6 +212,8 @@ const AccountDetailPage = () => {
     provinces,
     wards,
   ]);
+
+  console.log({ accountData });
 
   return (
     <Paper
@@ -221,7 +232,7 @@ const AccountDetailPage = () => {
           fz={25}
           c={"light-blue.4"}
         >
-          ACCOUNT PROFILE
+          Manager profile - {accountData?.name}
         </Text>
       </Group>
       <Box pos={"relative"}>
@@ -232,33 +243,35 @@ const AccountDetailPage = () => {
           />
         ) : (
           <form
-          // onSubmit={form.onSubmit((values) => {
-          //     const params: UpdateAccountParams = {
-          //       addressLine: values.address,
-          //       birthday: values.birthday,
-          //       email: values.email,
-          //       gender: values.gender,
-          //       name: values.name,
-          //       phone: values.phone,
-          //       wardId: 1,
-          //     };
-          //     updateAccount(params, {
-          //       onSuccess() {
-          //         notifications.show({
-          //           title: "Successfully",
-          //           message: "Update account success!",
-          //         });
-          //       },
-          //       onError(data) {
-          //         const error = data as AxiosError<ResponseErrorDetail>;
-          //         notifications.show({
-          //           color: "red",
-          //           title: "Failed",
-          //           message: error.response?.data?.message,
-          //         });
-          //       },
-          //     });
-          // })}
+            onSubmit={form.onSubmit((values) => {
+              const params: UpdateAccountParams = {
+                addressLine: values.addressLine,
+                birthday: values.birthday
+                  ? dayjs(values.birthday).format("YYYY-MM-DD")
+                  : null,
+                gender: values.gender,
+                name: values.name,
+                phone: values.phone,
+                wardId: +values?.wardId,
+                userId: id ?? "",
+              };
+              updateAccount(params, {
+                onSuccess() {
+                  notifications.show({
+                    title: "Successfully",
+                    message: "Update account success!",
+                  });
+                },
+                onError(data) {
+                  const error = data as AxiosError<ResponseErrorDetail>;
+                  notifications.show({
+                    color: "red",
+                    title: "Failed",
+                    message: error.response?.data?.message,
+                  });
+                },
+              });
+            })}
           >
             <EditAndUpdateForm fields={fields} />
             <Group
@@ -267,7 +280,7 @@ const AccountDetailPage = () => {
               pb={rem(10)}
             >
               <Button
-                // loading={updateAccountLoading}
+                loading={isUpdateAccountLoading}
                 type="submit"
                 mt={10}
               >

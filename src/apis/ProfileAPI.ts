@@ -3,6 +3,7 @@ import { AccountDetail } from "../models/Account";
 import http from "../utils/http";
 
 export type ChangePasswordParams = {
+  accessToken: string;
   oldPassword: string;
   newPassword: string;
   newPasswordRetype: string;
@@ -20,11 +21,11 @@ export const ProfileAPI = {
     return res?.data;
   },
   _changePassword: async (params: ChangePasswordParams) => {
-    const access_token = getAccessToken();
+    const { accessToken, ...rest } = params;
 
-    const res = await http.post(`/api/auth/password`, params, {
+    const res = await http.post(`/api/auth/password`, rest, {
       headers: {
-        Authorization: `Bearer ${access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return res.data;

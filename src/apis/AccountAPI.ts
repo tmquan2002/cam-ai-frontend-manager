@@ -1,21 +1,21 @@
-import { getAccessToken, getUserId } from "../context/AuthContext";
-import { AccountStatus, Role } from "../models/CamAIEnum";
+import { getAccessToken } from "../context/AuthContext";
+import { AccountStatus, Gender, Role } from "../models/CamAIEnum";
 import http, { toQueryParams } from "../utils/http";
 
 export type UpdateAccountParams = {
-  email: string;
   name: string;
-  gender: string;
+  gender: Gender | null;
   phone: string;
-  birthday: string;
+  birthday: string | null;
   wardId: number;
   addressLine: string;
+  userId: string;
 };
 export type CreateAccountParams = {
   email: string;
   password: string;
   name: string;
-  gender: number;
+  gender: Gender | null;
   phone: string;
   birthday: string;
   wardId: number;
@@ -41,9 +41,9 @@ export const AccountAPI = {
   },
   _updateAccountById: async (params: UpdateAccountParams) => {
     const access_token = getAccessToken();
-    const accountId = getUserId();
+    const { userId, ...rest } = params;
 
-    const res = await http.put(`/api/accounts/${accountId}`, params, {
+    const res = await http.put(`/api/accounts/${userId}`, rest, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

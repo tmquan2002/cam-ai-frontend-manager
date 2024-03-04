@@ -119,16 +119,18 @@ const ShopDetailPage = () => {
   useEffect(() => {
     if (data) {
       const { values } = data;
-      const initialData: FormFieldValue = {
-        name: values[0].name,
-        phone: values[0].phone,
-        wardId: `${values[0].wardId}`,
-        addressLine: values[0].addressLine,
-        brandName: values[0].brand.name,
-        province: `${values[0].ward?.district?.province?.id}`,
-        district: `${values[0].ward?.district?.id}`,
-      };
-      form.setValues(initialData);
+      if (!_.isEmpty(values)) {
+        const initialData: FormFieldValue = {
+          name: values[0]?.name,
+          phone: values[0]?.phone,
+          wardId: `${values[0]?.wardId}`,
+          addressLine: values[0]?.addressLine,
+          brandName: values[0]?.brand.name,
+          province: `${values[0]?.ward?.district?.province?.id}`,
+          district: `${values[0]?.ward?.district?.id}`,
+        };
+        form.setValues(initialData);
+      }
     }
   }, [data]);
 

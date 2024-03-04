@@ -1,11 +1,11 @@
 import { WardDetail } from "./Address";
-import { EmployeeStatus } from "./CamAIEnum";
+import { EmployeeStatus, Gender } from "./CamAIEnum";
 import { ShopDetail } from "./Shop";
 
 export type EmployeeDetail = {
   name: string;
   email: string;
-  gender: string;
+  gender: Gender;
   phone: string;
   image: string;
   birthday: string;

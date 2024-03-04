@@ -10,7 +10,7 @@ export const useGetEmployeeList = (params: GetEmployeeListParams) => {
     data,
     error,
   }: UseQueryResult<CommonResponse<EmployeeDetail>, Error> = useQuery({
-    queryKey: ["employees"],
+    queryKey: ["employees", params],
     queryFn: async () => {
       return await EmployeeApi._getEmployeeList(params);
     },

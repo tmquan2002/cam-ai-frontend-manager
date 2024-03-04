@@ -1,4 +1,5 @@
 import { getAccessToken } from "../context/AuthContext";
+import { Gender } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
 import { EmployeeDetail } from "../models/Employee";
 import http, { toQueryParams } from "../utils/http";
@@ -15,7 +16,7 @@ export type GetEmployeeListParams = {
 export type CreateEmployeeParams = {
   name: string;
   email: string;
-  gender: number;
+  gender: Gender;
   phone?: string | null;
   birthday?: string | null;
   addressLine?: string | null;
@@ -25,7 +26,7 @@ export type CreateEmployeeParams = {
 export type UpdateEmployeeParams = {
   name: string;
   email: string;
-  gender: string;
+  gender: Gender;
   phone?: string | null;
   birthday?: string | null;
   addressLine?: string | null;
@@ -89,7 +90,7 @@ export const EmployeeApi = {
   _deleteEmployeeById: async (employeeId: string) => {
     const access_token = getAccessToken();
 
-    const res = await http.delete<any>(`/api/employees/${employeeId}`, {
+    const res = await http.delete(`/api/employees/${employeeId}`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

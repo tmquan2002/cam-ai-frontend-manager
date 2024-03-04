@@ -24,6 +24,7 @@ import { ChangePasswordParams } from "../../apis/ProfileAPI";
 import { IconAdjustments, IconArrowsLeftRight } from "@tabler/icons-react";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { AccountStatus, Gender } from "../../models/CamAIEnum";
+import { getAccessToken } from "../../context/AuthContext";
 
 type ProfileFieldValue = {
   name: string;
@@ -32,7 +33,7 @@ type ProfileFieldValue = {
   birthday: string;
   address: string;
   status: string;
-  gender: string;
+  gender: Gender;
   shop: string;
 };
 
@@ -74,6 +75,7 @@ const ShopManagerProfilePage = () => {
     oldPassword,
   }: ChangePasswordFieldValue) => {
     const params: ChangePasswordParams = {
+      accessToken: getAccessToken() ?? "",
       oldPassword,
       newPassword,
       newPasswordRetype: confirmPassword,
@@ -312,7 +314,7 @@ const ShopManagerProfilePage = () => {
             fz={25}
             c={"light-blue.4"}
           >
-            ACCOUNT PROFILE
+            Account profile - {account?.name}
           </Text>
           <Menu shadow="md">
             <Menu.Target>
