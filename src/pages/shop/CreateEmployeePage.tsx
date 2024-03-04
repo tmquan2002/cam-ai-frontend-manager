@@ -19,7 +19,7 @@ import { Gender } from "../../models/CamAIEnum";
 export type CreateEmployeeField = {
   name: string | null;
   email: string | null;
-  gender: number | null;
+  gender: Gender;
   phone: string | null;
   birthday: string | null;
   addressLine: string | null;
@@ -30,17 +30,6 @@ export type CreateEmployeeField = {
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
   const createEmployeeForm = useForm<CreateEmployeeField>({
-    initialValues: {
-      name: null,
-      email: null,
-      gender: null,
-      phone: null,
-      birthday: null,
-      addressLine: null,
-      wardId: null,
-      province: null,
-      district: null,
-    },
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
@@ -195,7 +184,7 @@ const CreateEmployeePage = () => {
             const createEmployeeParams: CreateEmployeeParams = {
               email: email ?? "",
               name: name ?? "",
-              gender: gender ?? 0,
+              gender: gender,
               addressLine,
               birthday,
               phone,
