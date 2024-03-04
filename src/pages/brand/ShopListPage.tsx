@@ -123,7 +123,7 @@ const ShopListPage = () => {
     return (
       <Table.Tr
         key={index}
-        onClick={() => navigate(`shop/${row.id}`)}
+        onClick={() => navigate(`/brand/shop/${row.id}`)}
       >
         <Table.Td>
           <Text

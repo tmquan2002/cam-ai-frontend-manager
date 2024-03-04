@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   Group,
   Image,
   LoadingOverlay,
@@ -10,25 +11,32 @@ import {
   Paper,
   Table,
   Text,
+  TextInput,
   rem,
 } from "@mantine/core";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { replaceIfNun } from "../../utils/helperFunction";
 import { AccountStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT } from "../../types/constant";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
 import classes from "./BrandAccountPage.module.scss";
 import { useNavigate } from "react-router-dom";
 import { AccountDetail } from "../../models/Account";
 import { useState } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const BrandAccountPage = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState<string>("");
+
+  const [debounced] = useDebouncedValue(search, 400);
+
   const [activePage, setPage] = useState(1);
 
   const { data, isLoading } = useGetAccountList({
     size: 12,
     pageIndex: activePage - 1,
+    name: debounced,
   });
 
   const renderAccountStatusRow = (status: AccountStatus) => {
@@ -40,6 +48,11 @@ const BrandAccountPage = () => {
       case AccountStatus.Inactive:
         return <Badge color="gray">{status}</Badge>;
     }
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+    setSearch(value);
   };
 
   const rows = data?.values.map((row: AccountDetail) => (
@@ -78,7 +91,7 @@ const BrandAccountPage = () => {
       shadow="xl"
     >
       <Group
-        pb={32}
+        pb={12}
         justify="space-between"
       >
         <Text
@@ -89,14 +102,37 @@ const BrandAccountPage = () => {
         >
           Shop manager list
         </Text>
+      </Group>
+
+      <Flex
+        align={"center"}
+        my={"md"}
+      >
+        <TextInput
+          style={{ flex: 1 }}
+          placeholder="Search by name"
+          classNames={{ input: classes.search_input }}
+          rightSectionWidth={52}
+          leftSectionWidth={52}
+          leftSection={
+            <IconSearch
+              style={{ width: rem(16), height: rem(16) }}
+              stroke={1.5}
+            />
+          }
+          value={search}
+          onChange={handleSearchChange}
+        />
         <Button
           leftSection={<IconPlus size={14} />}
           ml={rem(12)}
+          radius={"xl"}
           onClick={() => navigate("/brand/create/manager")}
+          h={rem(48)}
         >
           Add manager
         </Button>
-      </Group>
+      </Flex>
       <Box pos={"relative"}>
         <LoadingOverlay
           visible={isLoading}

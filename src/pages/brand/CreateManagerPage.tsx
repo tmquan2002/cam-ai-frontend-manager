@@ -22,13 +22,13 @@ export type CreateAccountField = {
   email: string;
   password: string;
   name: string;
-  gender: number | null;
+  gender: Gender;
   phone: string;
   birthday: Date | null;
-  wardId: number | null;
+  wardId: string;
   addressLine: string;
-  province: number | null;
-  district: number | null;
+  province: string;
+  district: string;
 };
 
 const CreateManagerPage = () => {
@@ -41,18 +41,6 @@ const CreateManagerPage = () => {
     useCreateAccount();
 
   const createAccountForm = useForm<CreateAccountField>({
-    initialValues: {
-      email: "",
-      password: "",
-      name: "",
-      gender: null,
-      phone: "",
-      birthday: null,
-      wardId: null,
-      addressLine: "",
-      district: null,
-      province: null,
-    },
     validate: {
       email: (value) =>
         /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
@@ -243,18 +231,18 @@ const CreateManagerPage = () => {
             password,
             phone,
             wardId,
-          }) => {
+          }: CreateAccountField) => {
             const params: CreateAccountParams = {
               addressLine,
               birthday: dayjs(birthday).format("YYYY-MM-DD"),
               brandId: brandList?.values[0].id ?? "",
               email,
-              gender: gender ?? 0,
+              gender: gender ?? null,
               name,
               password,
               phone,
               role: Role.ShopManager,
-              wardId: wardId ?? 0,
+              wardId: +wardId,
             };
 
             createAccount(params, {

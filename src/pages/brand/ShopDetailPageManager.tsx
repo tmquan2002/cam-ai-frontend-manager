@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
@@ -8,13 +9,14 @@ import {
   Image,
   Loader,
   LoadingOverlay,
+  Menu,
   Paper,
   ScrollArea,
   Table,
   Text,
   rem,
 } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useEffect, useMemo, useState } from "react";
 import EditAndUpdateForm, {
   FIELD_TYPES,
@@ -25,7 +27,11 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { UpdateShopParams } from "../../apis/ShopAPI";
-import { IconX } from "@tabler/icons-react";
+import {
+  IconAdjustments,
+  IconArrowsLeftRight,
+  IconX,
+} from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
@@ -36,6 +42,9 @@ import { replaceIfNun } from "../../utils/helperFunction";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import _ from "lodash";
 import { IMAGE_CONSTANT } from "../../types/constant";
+import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
+import { ShopStatus } from "../../models/CamAIEnum";
+import { modals } from "@mantine/modals";
 
 export type FormFieldValue = {
   name: string;
@@ -52,6 +61,9 @@ const ShopDetailPageManager = () => {
   const { id } = useParams<{ id: string }>();
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({ shopId: id });
+
+  const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } =
+    useChangeShopStatus();
 
   const rows = employeeList?.values?.map((row) => (
     <Table.Tr
@@ -92,7 +104,10 @@ const ShopDetailPageManager = () => {
       province: null,
     },
     validate: {
-      name: isNotEmpty("Name should not be empty"),
+      name: hasLength(
+        { min: 2, max: 50 },
+        "Shop name must be 1- 50 characters long"
+      ),
       phone: (value) =>
         value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
@@ -114,6 +129,49 @@ const ShopDetailPageManager = () => {
   );
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
+
+  const handleToggleShopStatus = (currentStatus: ShopStatus) => {
+    changeShopStatus(
+      {
+        shopId: id ?? "",
+        status:
+          currentStatus == ShopStatus.Active
+            ? ShopStatus.Inactive
+            : ShopStatus.Active,
+      },
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Successfully",
+            message: "Update shop successfully!",
+          });
+          refetch();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            title: "Failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
+  };
+
+  const openModal = (currentStatus: ShopStatus) =>
+    modals.openConfirmModal({
+      title: "Please confirm your action",
+      children: (
+        <Text size="sm">
+          Do you really want to{" "}
+          {currentStatus == ShopStatus.Active ? "Disable" : "Enable"} this shop!
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => {},
+      onConfirm: () => handleToggleShopStatus(currentStatus),
+    });
 
   useEffect(() => {
     if (data) {
@@ -242,6 +300,62 @@ const ShopDetailPageManager = () => {
           overlayProps={{ radius: "sm", blur: 2 }}
         />
         <Box>
+          <Group
+            justify="space-between"
+            pb={rem(20)}
+          >
+            <Group align="center">
+              <Text
+                size="lg"
+                fw={"bold"}
+                fz={25}
+                c={"light-blue.4"}
+              >
+                {data?.name}
+              </Text>
+              <Badge
+                mt={rem(6)}
+                color={data?.shopStatus == ShopStatus.Active ? "green" : "red"}
+              >
+                {data?.shopStatus}
+              </Badge>
+            </Group>
+            <Menu shadow="md">
+              <Menu.Target>
+                <ActionIcon
+                  variant="filled"
+                  aria-label="Settings"
+                >
+                  <IconAdjustments
+                    style={{ width: "70%", height: "70%" }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Label>Modify</Menu.Label>
+                {isChangeShopStatusLoading ? (
+                  <Loader />
+                ) : (
+                  <Menu.Item
+                    c={data?.shopStatus == ShopStatus.Active ? "red" : "green"}
+                    onClick={() =>
+                      openModal(data?.shopStatus ?? ShopStatus.Inactive)
+                    }
+                    leftSection={
+                      <IconArrowsLeftRight
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                  >
+                    {data?.shopStatus == ShopStatus.Active
+                      ? "Disable shop"
+                      : "Enable shop"}
+                  </Menu.Item>
+                )}
+              </Menu.Dropdown>
+            </Menu>
+          </Group>
           <form
             onSubmit={form.onSubmit((values) => {
               const updateShopParams: UpdateShopParams = {
@@ -272,15 +386,6 @@ const ShopDetailPageManager = () => {
               });
             })}
           >
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={25}
-              c={"light-blue.4"}
-              pb={rem(20)}
-            >
-              {data?.name}
-            </Text>
             <EditAndUpdateForm fields={fields} />
 
             <Group

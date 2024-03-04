@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
@@ -25,40 +25,31 @@ import { Gender, Role } from "../../models/CamAIEnum";
 export type CreateShopField = {
   name: string;
   phone: string;
-  wardId: number | null;
+  wardId: string;
   shopManagerId: string | null;
   addressLine: string;
-  province: number | null;
-  district: number | null;
+  province: string;
+  district: string;
 };
 
 export type CreateAccountField = {
   email: string;
   password: string;
   name: string;
-  gender: number | null;
+  gender: Gender;
   phone: string;
   birthday: Date | null;
-  wardId: number | null;
+  wardId: string;
   addressLine: string;
-  province: number | null;
-  district: number | null;
+  province: string;
+  district: string;
 };
 
 const CreateShop = () => {
   const [opened, { toggle }] = useDisclosure(false);
   const createShopForm = useForm<CreateShopField>({
-    initialValues: {
-      name: "",
-      phone: "",
-      wardId: null,
-      shopManagerId: null,
-      addressLine: "",
-      province: null,
-      district: null,
-    },
     validate: {
-      name: isNotEmpty("Name is required"),
+      name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) =>
         value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
@@ -71,18 +62,6 @@ const CreateShop = () => {
   });
 
   const createAccountForm = useForm<CreateAccountField>({
-    initialValues: {
-      email: "",
-      password: "",
-      name: "",
-      gender: null,
-      phone: "",
-      birthday: null,
-      wardId: null,
-      addressLine: "",
-      district: null,
-      province: null,
-    },
     validate: {
       email: (value) =>
         /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
@@ -128,6 +107,8 @@ const CreateShop = () => {
     useCreateShop();
   const { mutate: createAccount, isLoading: isCreateAccountLoading } =
     useCreateAccount();
+
+  console.log(accountList);
 
   const fields = useMemo(() => {
     return [
@@ -483,12 +464,12 @@ const CreateShop = () => {
                   birthday: dayjs(birthday).format("YYYY-MM-DD"),
                   brandId: brandList?.values[0].id ?? "",
                   email,
-                  gender: gender ?? 0,
+                  gender,
                   name,
                   password,
                   phone,
                   role: Role.ShopManager,
-                  wardId: wardId ?? 0,
+                  wardId: +wardId,
                 };
 
                 createAccount(params, {

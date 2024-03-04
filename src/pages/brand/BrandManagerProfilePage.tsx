@@ -26,6 +26,7 @@ import { useChangePassword } from "../../hooks/useChangePassword";
 import { ChangePasswordParams } from "../../apis/ProfileAPI";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
+import { getAccessToken } from "../../context/AuthContext";
 
 type ProfileFieldValue = {
   name: string;
@@ -33,7 +34,7 @@ type ProfileFieldValue = {
   phone: string;
   birthday: string;
   address: string;
-  gender: string;
+  gender: Gender;
 };
 
 type ChangePasswordFieldValue = {
@@ -74,6 +75,7 @@ const BrandManagerProfilePage = () => {
     oldPassword,
   }: ChangePasswordFieldValue) => {
     const params: ChangePasswordParams = {
+      accessToken: getAccessToken() ?? "",
       oldPassword,
       newPassword,
       newPasswordRetype: confirmPassword,

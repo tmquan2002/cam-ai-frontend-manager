@@ -1,11 +1,11 @@
 import { WardDetail } from "./Address";
 import { BrandDetail } from "./Brand";
-import { AccountStatus, Role, ShopStatus } from "./CamAIEnum";
+import { AccountStatus, Gender, Role, ShopStatus } from "./CamAIEnum";
 
 export type AccountDetail = {
   email: string;
   name: string;
-  gender: string;
+  gender: Gender;
   phone: string;
   birthday: string;
   wardId: number;

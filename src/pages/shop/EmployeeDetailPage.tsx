@@ -42,15 +42,15 @@ import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
 
 export type CreateEmployeeField = {
-  name: string | undefined;
-  email: string | undefined;
-  gender: string | undefined;
-  phone: string | undefined;
-  birthday: Date | undefined;
-  addressLine: string | undefined;
-  wardId: string | undefined;
-  province: string | undefined;
-  district: string | undefined;
+  name: string;
+  email: string;
+  gender: Gender;
+  phone: string;
+  birthday: Date;
+  addressLine: string;
+  wardId: string;
+  province: string;
+  district: string;
 };
 
 const EmployeeDetailPage = () => {

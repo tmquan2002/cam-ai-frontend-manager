@@ -1,4 +1,5 @@
 import { getAccessToken } from "../context/AuthContext";
+import { ShopStatus } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
 import { ShopDetail } from "../models/Shop";
 import http, { toQueryParams } from "../utils/http";
@@ -79,6 +80,21 @@ export const ShopAPI = {
         Authorization: `Bearer ${access_token}`,
       },
     });
+
+    return res?.data;
+  },
+  _changeShopStatus: async (status: ShopStatus, shopId: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.patch(
+      `/api/shops/${shopId}/status/${status}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
 
     return res?.data;
   },

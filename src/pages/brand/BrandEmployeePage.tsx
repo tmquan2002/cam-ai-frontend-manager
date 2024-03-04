@@ -2,6 +2,7 @@ import {
   Badge,
   Box,
   Center,
+  Flex,
   Group,
   Image,
   LoadingOverlay,
@@ -9,6 +10,7 @@ import {
   Paper,
   Table,
   Text,
+  TextInput,
   rem,
 } from "@mantine/core";
 import { EmployeeStatus } from "../../models/CamAIEnum";
@@ -19,14 +21,19 @@ import classes from "./BrandEmployeePage.module.scss";
 import { replaceIfNun } from "../../utils/helperFunction";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { useState } from "react";
+import { IconSearch } from "@tabler/icons-react";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const BrandEmployeePage = () => {
   const navigate = useNavigate();
   const [activePage, setPage] = useState(1);
+  const [search, setSearch] = useState<string>("");
+  const [debounced] = useDebouncedValue(search, 400);
 
   const { data, isLoading } = useGetEmployeeList({
     size: 12,
     pageIndex: activePage - 1,
+    search: debounced,
   });
 
   const renderAccountStatusRow = (status: EmployeeStatus) => {
@@ -36,6 +43,11 @@ const BrandEmployeePage = () => {
       case EmployeeStatus.Inactive:
         return <Badge color="gray">{status}</Badge>;
     }
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.currentTarget;
+    setSearch(value);
   };
 
   const rows = data?.values.map((row: EmployeeDetail) => (
@@ -75,7 +87,7 @@ const BrandEmployeePage = () => {
       shadow="xl"
     >
       <Group
-        pb={32}
+        pb={12}
         justify="space-between"
       >
         <Text
@@ -87,48 +99,80 @@ const BrandEmployeePage = () => {
           Brand employee list
         </Text>
       </Group>
+
+      <Flex
+        align={"center"}
+        my={"md"}
+      >
+        <TextInput
+          style={{ flex: 1 }}
+          placeholder="Search by anything"
+          classNames={{ input: classes.search_input }}
+          rightSectionWidth={52}
+          leftSectionWidth={52}
+          leftSection={
+            <IconSearch
+              style={{ width: rem(16), height: rem(16) }}
+              stroke={1.5}
+            />
+          }
+          value={search}
+          onChange={handleSearchChange}
+        />
+        {/* <Button
+          leftSection={<IconPlus size={14} />}
+          ml={rem(12)}
+          radius={"xl"}
+          onClick={() => navigate("/brand/create/employee")}
+          h={rem(48)}
+        >
+          Add employee
+        </Button> */}
+      </Flex>
+
       <Box pos={"relative"}>
         <LoadingOverlay
           visible={isLoading}
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 1 }}
         />
-        <Table
-          miw={1000}
-          highlightOnHover
-          verticalSpacing={"md"}
-          striped
-          withTableBorder
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Name</Table.Th>
-              <Table.Th>Email</Table.Th>
-              <Table.Th>Phone</Table.Th>
-              <Table.Th>Birthday</Table.Th>
-              <Table.Th>Gender</Table.Th>
-              <Table.Th>Address</Table.Th>
-              <Table.Th>Status</Table.Th>
-              <Table.Th>Shop</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          {data?.isValuesEmpty ? (
-            <Center>
-              <Image
-                radius={"md"}
-                src={IMAGE_CONSTANT.NO_DATA}
-                fit="contain"
-                h={rem(400)}
-                w={"auto"}
-                style={{
-                  borderBottom: "1px solid #dee2e6",
-                }}
-              />
-            </Center>
-          ) : (
+
+        {data?.isValuesEmpty ? (
+          <Center>
+            <Image
+              radius={"md"}
+              src={IMAGE_CONSTANT.NO_DATA}
+              fit="contain"
+              h={rem(400)}
+              w={"auto"}
+              style={{
+                borderBottom: "1px solid #dee2e6",
+              }}
+            />
+          </Center>
+        ) : (
+          <Table
+            miw={1000}
+            highlightOnHover
+            verticalSpacing={"md"}
+            striped
+            withTableBorder
+          >
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Name</Table.Th>
+                <Table.Th>Email</Table.Th>
+                <Table.Th>Phone</Table.Th>
+                <Table.Th>Birthday</Table.Th>
+                <Table.Th>Gender</Table.Th>
+                <Table.Th>Address</Table.Th>
+                <Table.Th>Status</Table.Th>
+                <Table.Th>Shop</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
-          )}
-        </Table>
+          </Table>
+        )}
         <Group
           justify="flex-end"
           mt="lg"
