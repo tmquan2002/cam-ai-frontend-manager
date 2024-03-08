@@ -34,7 +34,7 @@ const renderPasswordInput = ({ fieldProps }: any) => {
   return (
     <PasswordInput
       disabled={disabled}
-      readonly={readonly}
+      readOnly={readonly}
       withAsterisk={required}
       label={label}
       placeholder={placeholder}
@@ -65,7 +65,7 @@ const renderSelect = ({ fieldProps }: any) => {
       searchable={searchable}
       label={label}
       disabled={disabled}
-      readonly={readonly}
+      readOnly={readonly}
       rightSectionWidth={rightSectionWidth}
       rightSectionPointerEvents="all"
       placeholder={placeholder}
@@ -85,7 +85,7 @@ const renderRadio = ({ fieldProps }: any) => {
     <Radio.Group
       name={name}
       label={label}
-      readonly={readonly}
+      readOnly={readonly}
       required={required}
       description={description}
       {...form.getInputProps(name)}
@@ -110,7 +110,7 @@ const renderNumber = ({ fieldProps }: any) => {
     <NumberInput
       required={required}
       disabled={disabled}
-      readonly={readonly}
+      readOnly={readonly}
       withAsterisk={required}
       rightSection={<></>}
       label={label}
@@ -130,7 +130,7 @@ const renderDate = ({ fieldProps }: any) => {
       disabled={disabled}
       withAsterisk={required}
       label={label}
-      readonly={readonly}
+      readOnly={readonly}
       placeholder={placeholder}
       {...form.getInputProps(name)}
     />

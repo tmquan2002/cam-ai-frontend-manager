@@ -15,13 +15,14 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
+import dayjs from "dayjs";
 
 export type CreateEmployeeField = {
   name: string | null;
   email: string | null;
   gender: Gender;
   phone: string | null;
-  birthday: string | null;
+  birthday: Date | null;
   addressLine: string | null;
   wardId: number | null;
   province: string | null;
@@ -186,13 +187,13 @@ const CreateEmployeePage = () => {
               name: name ?? "",
               gender: gender,
               addressLine,
-              birthday,
+              birthday: dayjs(birthday).format("YYYY-MM-DD"),
               phone,
               wardId,
             };
             craeteEmployee(createEmployeeParams, {
-              onSuccess(data) {
-                navigate(`/shop/employee/${data.id}`);
+              onSuccess() {
+                navigate(`/shop/employee`);
               },
               onError(data) {
                 const error = data as AxiosError<ResponseErrorDetail>;

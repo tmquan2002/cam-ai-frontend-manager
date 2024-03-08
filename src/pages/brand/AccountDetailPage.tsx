@@ -13,7 +13,7 @@ import EditAndUpdateForm, {
 import { useEffect, useMemo } from "react";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
 import { useParams } from "react-router-dom";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
@@ -43,16 +43,15 @@ const AccountDetailPage = () => {
   const form = useForm<ProfileFieldValue>({
     validate: {
       name: isNotEmpty("Name is required"),
-      email: isEmail("Invalid email - ex: huy@gmail.com"),
-      phone: (value) =>
-        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
-          ? null
-          : "Invalid phone number - ex: 0379999999",
-      addressLine: isNotEmpty("Address line is required"),
-      wardId: isNotEmpty("Ward is required"),
-      province: isNotEmpty("Provice is required"),
+      email: (value) =>
+        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      district: isNotEmpty("District is required"),
+      phone: (value) =>
+        value == "" ||
+        value == null ||
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          ? null
+          : "Invalid phone number - ex: 0379,999,999",
     },
   });
   const { data: provinces, isLoading: isProvicesLoading } =
@@ -119,7 +118,6 @@ const AccountDetailPage = () => {
           name: "phone",
           placeholder: "Phone",
           label: "Phone",
-          required: true,
         },
         spans: 6,
       },
@@ -130,7 +128,6 @@ const AccountDetailPage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          required: true,
         },
         spans: 6,
       },
@@ -157,7 +154,6 @@ const AccountDetailPage = () => {
           form: form,
           name: "province",
           loading: isProvicesLoading,
-          required: true,
         },
         spans: 4,
       },
@@ -172,7 +168,6 @@ const AccountDetailPage = () => {
           form: form,
           name: "district",
           loading: isDistrictsLoading,
-          required: true,
         },
         spans: 4,
       },
@@ -187,7 +182,6 @@ const AccountDetailPage = () => {
           form: form,
           name: "wardId",
           loading: isWardsLoading,
-          required: true,
         },
         spans: 4,
       },
@@ -198,22 +192,19 @@ const AccountDetailPage = () => {
           name: "addressLine",
           placeholder: "Address",
           label: "Address",
-          required: true,
         },
         spans: 12,
       },
     ];
   }, [
-    districts,
     form,
+    districts,
     isDistrictsLoading,
     isProvicesLoading,
     isWardsLoading,
     provinces,
     wards,
   ]);
-
-  console.log({ accountData });
 
   return (
     <Paper
