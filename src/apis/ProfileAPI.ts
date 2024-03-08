@@ -9,6 +9,15 @@ export type ChangePasswordParams = {
   newPasswordRetype: string;
 };
 
+export type UpdateProfileParams = {
+  email: string;
+  gender: string;
+  phone: string | null;
+  birthday: string | null;
+  wardId: number | null;
+  addressLine: string | null;
+};
+
 export const ProfileAPI = {
   _getProfile: async () => {
     const access_token = getAccessToken();
@@ -26,6 +35,16 @@ export const ProfileAPI = {
     const res = await http.post(`/api/auth/password`, rest, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return res.data;
+  },
+  _updateProfile: async (params: UpdateProfileParams) => {
+    const access_token = getAccessToken();
+
+    const res = await http.put(`/api/profile`, params, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
       },
     });
     return res.data;

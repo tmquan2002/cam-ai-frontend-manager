@@ -42,16 +42,17 @@ const CreateManagerPage = () => {
 
   const createAccountForm = useForm<CreateAccountField>({
     validate: {
+      name: isNotEmpty("Name is required"),
       email: (value) =>
         /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
       password: isNotEmpty("Name must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
-        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        value == "" ||
+        value == null ||
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
-          : "Invalid phone number - ex: 0379999999",
-      province: isNotEmpty("Provice is required"),
-      district: isNotEmpty("District is required"),
+          : "Invalid phone number - ex: 0379,999,999",
     },
   });
 
@@ -68,6 +69,17 @@ const CreateManagerPage = () => {
 
   const addNewAccountfields = useMemo(() => {
     return [
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: createAccountForm,
+          name: "name",
+          placeholder: "Name",
+          label: "Name",
+          required: true,
+        },
+        spans: 6,
+      },
       {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
@@ -95,20 +107,9 @@ const CreateManagerPage = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form: createAccountForm,
-          name: "name",
-          placeholder: "Name",
-          label: "Name",
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
           name: "phone",
           placeholder: "Phone",
           label: "Phone",
-          required: true,
         },
         spans: 6,
       },
@@ -146,7 +147,6 @@ const CreateManagerPage = () => {
           }),
           form: createAccountForm,
           name: "province",
-          required: true,
 
           loading: isProvicesLoading,
         },
@@ -163,7 +163,6 @@ const CreateManagerPage = () => {
           form: createAccountForm,
           name: "district",
           loading: isCreateAccountDistrictsLoading,
-          required: true,
 
           // disabled: true,
         },
@@ -180,8 +179,6 @@ const CreateManagerPage = () => {
           form: createAccountForm,
           name: "wardId",
           loading: isCreateAccountWardsLoading,
-          required: true,
-          // disabled: true,
         },
         spans: 4,
       },

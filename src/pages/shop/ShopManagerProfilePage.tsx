@@ -20,21 +20,31 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { useGetProfile } from "../../hooks/useGetProfile";
 import { useDisclosure } from "@mantine/hooks";
 import { useChangePassword } from "../../hooks/useChangePassword";
-import { ChangePasswordParams } from "../../apis/ProfileAPI";
+import {
+  ChangePasswordParams,
+  UpdateProfileParams,
+} from "../../apis/ProfileAPI";
 import { IconAdjustments, IconArrowsLeftRight } from "@tabler/icons-react";
 import { mapLookupToArray } from "../../utils/helperFunction";
-import { AccountStatus, Gender } from "../../models/CamAIEnum";
+import { Gender } from "../../models/CamAIEnum";
 import { getAccessToken } from "../../context/AuthContext";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateProfile } from "../../hooks/useUpdateProfile";
+import dayjs from "dayjs";
 
 type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: string;
+  birthday: Date;
   address: string;
-  status: string;
   gender: Gender;
   shop: string;
+  wardId: string;
+  province: string;
+  district: string;
 };
 
 type ChangePasswordFieldValue = {
@@ -47,7 +57,20 @@ const ShopManagerProfilePage = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
   const { data: account, isLoading: isAccountLoading } = useGetProfile();
-  const form = useForm<ProfileFieldValue>({});
+  const form = useForm<ProfileFieldValue>({
+    validate: {
+      name: isNotEmpty("Name is required"),
+      email: (value) =>
+        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+      gender: isNotEmpty("Please select gender"),
+      phone: (value) =>
+        value == "" ||
+        value == null ||
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          ? null
+          : "Invalid phone number - ex: 0379,999,999",
+    },
+  });
 
   const { mutate: changePassword, isLoading: isChangingPassword } =
     useChangePassword();
@@ -100,19 +123,32 @@ const ShopManagerProfilePage = () => {
     });
   };
 
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(form.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(form.values.district ?? 0)
+  );
+
+  const { mutate: updateProfile, isLoading: updateProfileLoading } =
+    useUpdateProfile();
+
   useEffect(() => {
     if (account) {
-      const initialValue: ProfileFieldValue = {
+      form.setValues({
         name: account?.name,
         email: account?.email,
         phone: account?.phone,
-        birthday: account?.birthday,
+        birthday: account?.birthday ? new Date(account?.birthday) : undefined,
         address: account?.addressLine,
-        status: account?.accountStatus,
         gender: account?.gender,
         shop: account?.managingShop?.name,
-      };
-      form.setValues(initialValue);
+        district: account?.ward?.districtId.toString(),
+        province: account?.ward?.district?.provinceId.toString(),
+        wardId: account?.wardId.toString(),
+      });
     }
   }, [account]);
 
@@ -122,10 +158,10 @@ const ShopManagerProfilePage = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form,
-          readonly: true,
           name: "name",
           placeholder: "User name",
           label: "User name",
+          readonly: true,
           required: true,
         },
         spans: 6,
@@ -138,7 +174,6 @@ const ShopManagerProfilePage = () => {
           placeholder: "Email",
           label: "Email",
           required: true,
-          readonly: true,
         },
         spans: 6,
       },
@@ -149,35 +184,20 @@ const ShopManagerProfilePage = () => {
           name: "phone",
           placeholder: "Phone",
           label: "Phone",
-          required: true,
-          readonly: true,
         },
         spans: 6,
       },
       {
-        type: FIELD_TYPES.TEXT,
+        type: FIELD_TYPES.DATE,
         fieldProps: {
           form,
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          required: true,
-          readonly: true,
         },
         spans: 6,
       },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form,
-          name: "address",
-          placeholder: "Address",
-          label: "Address",
-          required: true,
-          readonly: true,
-        },
-        spans: 6,
-      },
+
       {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
@@ -185,23 +205,11 @@ const ShopManagerProfilePage = () => {
           name: "shop",
           placeholder: "Shop",
           label: "Shop",
+          readonly: true,
+        },
+        spans: 6,
+      },
 
-          readonly: true,
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Status",
-          placeholder: "Status",
-          data: mapLookupToArray(AccountStatus ?? {}),
-          form,
-          name: "status",
-          readonly: true,
-        },
-        spans: 6,
-      },
       {
         type: FIELD_TYPES.SELECT,
         fieldProps: {
@@ -210,12 +218,72 @@ const ShopManagerProfilePage = () => {
           data: mapLookupToArray(Gender ?? {}),
           form,
           name: "gender",
-          readonly: true,
+          required: true,
         },
         spans: 6,
       },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "Province",
+          placeholder: "Province",
+          data: provinces?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form: form,
+          name: "province",
+          loading: isProvicesLoading,
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "District",
+          placeholder: "District",
+          data: districts?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form: form,
+          name: "district",
+          loading: isDistrictsLoading,
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "Ward",
+          placeholder: "Ward",
+          data: wards?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form: form,
+          name: "wardId",
+          loading: isWardsLoading,
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form,
+          name: "address",
+          placeholder: "Address",
+          label: "Address",
+        },
+        spans: 12,
+      },
     ];
-  }, [form]);
+  }, [
+    districts,
+    form,
+    isDistrictsLoading,
+    isProvicesLoading,
+    isWardsLoading,
+    provinces,
+    wards,
+  ]);
 
   const changePasswordFields = useMemo(() => {
     return [
@@ -314,7 +382,7 @@ const ShopManagerProfilePage = () => {
             fz={25}
             c={"light-blue.4"}
           >
-            Account profile - {account?.name}
+            Account profile
           </Text>
           <Menu shadow="md">
             <Menu.Target>
@@ -346,46 +414,49 @@ const ShopManagerProfilePage = () => {
         </Group>
 
         <form
-        // onSubmit={form.onSubmit((values) => {
-        //   const params: UpdateAccountParams = {
-        //     addressLine: values.address,
-        //     birthday: values.birthday,
-        //     email: values.email,
-        //     gender: values.gender,
-        //     name: values.name,
-        //     phone: values.phone,
-        //     wardId: 1,
-        //   };
-        //   updateAccount(params, {
-        //     onSuccess() {
-        //       notifications.show({
-        //         title: "Successfully",
-        //         message: "Update account success!",
-        //       });
-        //     },
-        //     onError(data) {
-        //       const error = data as AxiosError<ResponseErrorDetail>;
-        //       notifications.show({
-        //         color: "red",
-        //         title: "Failed",
-        //         message: error.response?.data?.message,
-        //       });
-        //     },
-        //   });
-        // })}
+          onSubmit={form.onSubmit((values) => {
+            const params: UpdateProfileParams = {
+              addressLine: values.address,
+              birthday: values?.birthday
+                ? dayjs(values.birthday).format("YYYY-MM-DD")
+                : null,
+              gender: values.gender,
+              phone: values.phone,
+              wardId: +values?.wardId,
+              email: values?.email,
+            };
+            updateProfile(params, {
+              onSuccess() {
+                notifications.show({
+                  title: "Successfully",
+                  message: "Update account success!",
+                });
+              },
+              onError(data) {
+                const error = data as AxiosError<ResponseErrorDetail>;
+                notifications.show({
+                  color: "red",
+                  title: "Failed",
+                  message: error.response?.data?.message,
+                });
+              },
+            });
+          })}
         >
           <EditAndUpdateForm fields={fields} />
-          {/* <Group
+          <Group
             justify="flex-end"
             mt="md"
+            pb={rem(10)}
           >
             <Button
+              loading={updateProfileLoading}
               type="submit"
-              loading={updateAccountLoading}
+              mt={10}
             >
               Submit
             </Button>
-          </Group> */}
+          </Group>
         </form>
       </Paper>
     </>

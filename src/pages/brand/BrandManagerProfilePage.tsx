@@ -13,28 +13,37 @@ import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { useEffect, useMemo } from "react";
-import { UpdateAccountParams } from "../../apis/AccountAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useGetProfile } from "../../hooks/useGetProfile";
 import { IconAdjustments, IconArrowsLeftRight } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useChangePassword } from "../../hooks/useChangePassword";
-import { ChangePasswordParams } from "../../apis/ProfileAPI";
+import {
+  ChangePasswordParams,
+  UpdateProfileParams,
+} from "../../apis/ProfileAPI";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
-import { getAccessToken, getUserId } from "../../context/AuthContext";
+import { getAccessToken } from "../../context/AuthContext";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateProfile } from "../../hooks/useUpdateProfile";
+import dayjs from "dayjs";
 
 type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: string;
+  birthday: Date;
   address: string;
   gender: Gender;
+  wardId: string;
+  province: string;
+  district: string;
 };
 
 type ChangePasswordFieldValue = {
@@ -49,10 +58,32 @@ const BrandManagerProfilePage = () => {
   const { data: account, isLoading: isAccountLoading } = useGetProfile();
   const { mutate: changePassword, isLoading: isChangingPassword } =
     useChangePassword();
+  const form = useForm<ProfileFieldValue>({
+    validate: {
+      name: isNotEmpty("Name is required"),
+      email: (value) =>
+        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+      gender: isNotEmpty("Please select gender"),
+      phone: (value) =>
+        value == "" ||
+        value == null ||
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          ? null
+          : "Invalid phone number - ex: 0379,999,999",
+    },
+  });
 
-  const { mutate: updateAccount, isLoading: updateAccountLoading } =
-    useUpdateAccount();
-  const form = useForm<ProfileFieldValue>({});
+  const { mutate: updateProfile, isLoading: updateProfileLoading } =
+    useUpdateProfile();
+
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(form.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(form.values.district ?? 0)
+  );
   const passwordForm = useForm<ChangePasswordFieldValue>({
     initialValues: {
       confirmPassword: "",
@@ -102,15 +133,17 @@ const BrandManagerProfilePage = () => {
 
   useEffect(() => {
     if (account) {
-      const initialValue: ProfileFieldValue = {
+      form.setValues({
         name: account?.name,
         email: account?.email,
         phone: account?.phone,
-        birthday: account?.birthday,
+        birthday: account?.birthday ? new Date(account?.birthday) : undefined,
         address: account?.addressLine,
         gender: account?.gender,
-      };
-      form.setValues(initialValue);
+        district: account?.ward?.districtId?.toString(),
+        province: account?.ward?.district?.provinceId?.toString(),
+        wardId: account?.wardId?.toString(),
+      });
     }
   }, [account]);
 
@@ -123,6 +156,7 @@ const BrandManagerProfilePage = () => {
           name: "name",
           placeholder: "User name",
           label: "User name",
+          readonly: true,
           required: true,
         },
         spans: 6,
@@ -145,29 +179,16 @@ const BrandManagerProfilePage = () => {
           name: "phone",
           placeholder: "Phone",
           label: "Phone",
-          required: true,
         },
         spans: 6,
       },
       {
-        type: FIELD_TYPES.TEXT,
+        type: FIELD_TYPES.DATE,
         fieldProps: {
           form,
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          required: true,
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form,
-          name: "address",
-          placeholder: "Address",
-          label: "Address",
-          required: true,
         },
         spans: 6,
       },
@@ -179,11 +200,73 @@ const BrandManagerProfilePage = () => {
           data: mapLookupToArray(Gender ?? {}),
           form,
           name: "gender",
+          required: true,
         },
-        spans: 6,
+        spans: 12,
+      },
+
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "Province",
+          placeholder: "Province",
+          data: provinces?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form: form,
+          name: "province",
+          loading: isProvicesLoading,
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "District",
+          placeholder: "District",
+          data: districts?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form: form,
+          name: "district",
+          loading: isDistrictsLoading,
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "Ward",
+          placeholder: "Ward",
+          data: wards?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form: form,
+          name: "wardId",
+          loading: isWardsLoading,
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form,
+          name: "address",
+          placeholder: "Address",
+          label: "Address",
+        },
+        spans: 12,
       },
     ];
-  }, [form]);
+  }, [
+    form,
+    districts,
+    isDistrictsLoading,
+    isProvicesLoading,
+    isWardsLoading,
+    provinces,
+    wards,
+  ]);
 
   const changePasswordFields = useMemo(() => {
     return [
@@ -281,7 +364,7 @@ const BrandManagerProfilePage = () => {
             fz={25}
             c={"light-blue.4"}
           >
-            ACCOUNT PROFILE
+            Acount profile
           </Text>
           <Menu shadow="md">
             <Menu.Target>
@@ -313,16 +396,17 @@ const BrandManagerProfilePage = () => {
         </Group>
         <form
           onSubmit={form.onSubmit((values) => {
-            const params: UpdateAccountParams = {
+            const params: UpdateProfileParams = {
               addressLine: values.address,
-              birthday: values.birthday,
+              birthday: values?.birthday
+                ? dayjs(values.birthday).format("YYYY-MM-DD")
+                : null,
               gender: values.gender,
-              name: values.name,
               phone: values.phone,
-              wardId: 1,
-              userId: getUserId() ?? "",
+              wardId: +values?.wardId,
+              email: values?.email,
             };
-            updateAccount(params, {
+            updateProfile(params, {
               onSuccess() {
                 notifications.show({
                   title: "Successfully",
@@ -349,7 +433,7 @@ const BrandManagerProfilePage = () => {
             pb={rem(10)}
           >
             <Button
-              loading={updateAccountLoading}
+              loading={updateProfileLoading}
               type="submit"
               mt={10}
             >

@@ -101,6 +101,7 @@ const BrandDetailPageManager = () => {
 
   const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } =
     useUploadBrandImage();
+
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
       size: 12,
@@ -141,6 +142,7 @@ const BrandDetailPageManager = () => {
     const { value } = event.currentTarget;
     setSearch(value);
   };
+
 
   const handleUploadBrandImage = async (
     files: FileWithPath[],
