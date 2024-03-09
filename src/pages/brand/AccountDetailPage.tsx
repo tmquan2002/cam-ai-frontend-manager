@@ -41,6 +41,17 @@ type ProfileFieldValue = {
 const AccountDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const form = useForm<ProfileFieldValue>({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthday: new Date("01/01/2000"),
+      gender: Gender.Male,
+      addressLine: "",
+      district: "",
+      province: "",
+      wardId: "",
+    },
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>

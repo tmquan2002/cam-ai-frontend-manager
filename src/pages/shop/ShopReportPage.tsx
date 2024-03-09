@@ -11,10 +11,10 @@ import {
   ThemeIcon,
   rem,
 } from "@mantine/core";
-import classes from "./ShopReportPage.module.scss";
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
 import ReactPlayer from "react-player";
 import { useNavigate } from "react-router-dom";
+import classes from "./ShopReportPage.module.scss";
 
 type RenderContentType = {
   key: number;
@@ -130,6 +130,10 @@ const ShopReportPage = () => {
       </Card>
     );
   };
+
+  // const renderJson = (shops: ChartReportData) => {
+
+  // }
 
   return (
     <Box pb={rem(40)}>

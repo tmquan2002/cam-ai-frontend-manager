@@ -58,6 +58,19 @@ const ShopManagerProfilePage = () => {
 
   const { data: account, isLoading: isAccountLoading } = useGetProfile();
   const form = useForm<ProfileFieldValue>({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthday: new Date("01/01/2000"),
+      address: "",
+      gender: Gender.Male,
+      shop: "",
+      district: "",
+      province: "",
+      wardId: "",
+    },
+
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
@@ -65,8 +78,8 @@ const ShopManagerProfilePage = () => {
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-        value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          value == null ||
+          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379,999,999",
     },

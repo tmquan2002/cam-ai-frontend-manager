@@ -1,3 +1,4 @@
+import { BarChart } from "@mantine/charts";
 import {
   ActionIcon,
   Box,
@@ -10,9 +11,8 @@ import {
   Text,
   ThemeIcon,
   rem,
-  useComputedColorScheme,
+  useComputedColorScheme
 } from "@mantine/core";
-import classes from "./ShopHomePage.module.scss";
 import {
   IconDots,
   IconEye,
@@ -20,41 +20,18 @@ import {
   IconList,
   IconTrash,
 } from "@tabler/icons-react";
-import { LineChart } from "@mantine/charts";
 import * as _ from "lodash";
+import { useEffect, useState } from "react";
+import useWebSocket from "react-use-websocket";
+import { getAccessToken } from "../../context/AuthContext";
+import { removeDate, removeFirstUpdateLastArray } from "../../utils/helperFunction";
+import classes from "./ShopHomePage.module.scss";
 
-const data = [
-  {
-    date: "Mar 22",
-    Apples: 2890,
-    Oranges: 2338,
-    Tomatoes: 2452,
-  },
-  {
-    date: "Mar 23",
-    Apples: 2756,
-    Oranges: 2103,
-    Tomatoes: 2402,
-  },
-  {
-    date: "Mar 24",
-    Apples: 3322,
-    Oranges: 986,
-    Tomatoes: 1821,
-  },
-  {
-    date: "Mar 25",
-    Apples: 3470,
-    Oranges: 2108,
-    Tomatoes: 2809,
-  },
-  {
-    date: "Mar 26",
-    Apples: 3129,
-    Oranges: 1726,
-    Tomatoes: 2290,
-  },
-];
+export interface ChartReportData {
+  Time: string;
+  Total: number;
+  ShopId: string
+}
 
 const elements = [
   { position: 6, mass: 12.011, symbol: "C", name: "Carbon" },
@@ -103,6 +80,32 @@ const ShopHomePage = () => {
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
+
+  const { lastJsonMessage } = useWebSocket<ChartReportData>(process.env.REACT_APP_VITE_WEB_SOCKET_LINK + "/api/shops/chart/customer", {
+    protocols: ["Bearer", `${getAccessToken()}`]
+  })
+
+  const [data, setData] = useState<ChartReportData[]>(Array.apply(null, Array(10))
+    .map(function () {
+      return {
+        Time: "00:00:00",
+        Total: 0,
+        ShopId: "",
+      }
+    }))
+
+  useEffect(() => {
+    if (lastJsonMessage) {
+
+      const updatedJson = {
+        ...lastJsonMessage,
+        Time: removeDate(lastJsonMessage.Time)
+      };
+
+      const newArray = removeFirstUpdateLastArray<ChartReportData>(data, updatedJson, 10);
+      setData(newArray);
+    }
+  }, [lastJsonMessage]);
 
   const rows = elements.map((element) => (
     <Table.Tr key={element.name}>
@@ -192,16 +195,15 @@ const ShopHomePage = () => {
             </Menu>
           </Group>
         </Card.Section>
-        <LineChart
+        <Text mt={20}>Last update: {removeDate(lastJsonMessage ? lastJsonMessage.Time : "00:00:00", true)}</Text>
+        <BarChart
           h={300}
           data={data}
-          dataKey="date"
+          dataKey="Time"
           tooltipAnimationDuration={200}
           py={rem(40)}
           series={[
-            { name: "Apples", color: "indigo.6" },
-            { name: "Oranges", color: "blue.6" },
-            { name: "Tomatoes", color: "teal.6" },
+            { name: "Total", color: "light-blue.6" },
           ]}
         />
       </Card>
