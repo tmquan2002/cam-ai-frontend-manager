@@ -24,6 +24,7 @@ import AccountDetailPage from "../pages/brand/AccountDetailPage";
 import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
 import ShopListPage from "../pages/brand/ShopListPage";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
+import BranddReportPage from "../pages/brand/BrandReportPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -128,6 +129,10 @@ const AppRoute = () => {
         {
           path: "create/manager",
           element: <CreateManagerPage />,
+        },
+        {
+          path: "report",
+          element: <BranddReportPage />,
         },
       ],
     },

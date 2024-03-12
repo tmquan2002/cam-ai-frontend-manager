@@ -1,20 +1,15 @@
 import {
-  Box,
-  Card,
-  Divider,
-  Flex,
-  Group,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-  rem,
-  useComputedColorScheme
+  Box, Card, Divider, Flex, Group, Paper, ScrollArea, Select, Stack, Text,
+  rem, useComputedColorScheme
 } from "@mantine/core";
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
-import ReactPlayer from "react-player";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import classes from "./ShopReportPage.module.scss";
+import { useGetShopListSelect } from "../../hooks/useGetShopList";
+import { useReportByShop } from "../../hooks/useReport";
+import classes from "./BrandReportPage.module.scss";
+import { LineChart } from "@mantine/charts";
+import { getDateTime, returnWebsocketConnection } from "../../utils/helperFunction";
 
 type RenderContentType = {
   key: number;
@@ -52,9 +47,20 @@ const list: RenderContentType[] = [
   },
 ];
 
-const ShopReportPage = () => {
+
+const BranddReportPage = () => {
   const navigate = useNavigate();
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
+  const [filterSearch, setFilterSearch] = useState("");
+  const [filterSearchId, setFilterSearchId] = useState<string | null>("None");
+
+  const { data: shopList
+  } = useGetShopListSelect({ name: filterSearch || "", size: 5, enabled: true });
+
+  const { data, readyState, lastJsonMessage } = useReportByShop(filterSearchId || "");
+  console.log(data)
+
   const renderContent = ({ key, content }: RenderContentType) => {
     return (
       <Card
@@ -101,6 +107,7 @@ const ShopReportPage = () => {
               <Text
                 fw={500}
                 size="sm"
+                pr={5}
               >
                 12
               </Text>
@@ -142,28 +149,44 @@ const ShopReportPage = () => {
 
       <Flex>
         <Box flex={1}>
-          <Paper
-            mx={rem(40)}
-            shadow="xs"
-            px={rem(32)}
-            py={rem(20)}
-          >
-            <Text
-              fw={500}
-              size={rem(18)}
-              mb={rem(20)}
-            >
+          <Paper mx={rem(40)} shadow="xs" px={rem(32)} py={rem(20)}>
+            <Text fw={500} size={rem(18)} mb={rem(20)}>
+              Live Count
+            </Text>
+            <Divider color="#acacac" mb={rem(20)} />
+            <Box mb={rem(20)}>
+              {/* <ReactPlayer url="https://www.youtube.com/watch?v=TSwPIYczhPc&t=1s" /> */}
+            </Box>
+          </Paper>
+
+          <Paper mx={rem(40)} shadow="xs" px={rem(32)} py={rem(20)}>
+            <Text fw={500} size={rem(18)} mb={rem(20)}>
               Live Footage
             </Text>
-            <Divider
-              color="#acacac"
-              mb={rem(20)}
-            />
+            <Divider color="#acacac" mb={rem(20)} />
             <Box mb={rem(20)}>
-              <ReactPlayer url="https://www.youtube.com/watch?v=TSwPIYczhPc&t=1s" />
+              <Select data={shopList || []} limit={5} size='sm'
+                nothingFoundMessage={shopList && "Not Found"}
+                value={filterSearchId} placeholder="Pick value" clearable searchable
+                searchValue={filterSearch}
+                onSearchChange={(value) => setFilterSearch(value)}
+                onChange={(value) => setFilterSearchId(value)}
+              />
+              <Text mt={20}>Connection status: {returnWebsocketConnection(readyState)}</Text>
+              <Text mt={10}>Last update: {lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}</Text>
+              <LineChart
+                h={300}
+                data={data}
+                dataKey="Time"
+                py={rem(40)}
+                series={[
+                  { name: "Total", color: "light-blue.6" },
+                ]}
+              />
             </Box>
           </Paper>
         </Box>
+
 
         <ScrollArea
           h={"80vh"}
@@ -177,4 +200,4 @@ const ShopReportPage = () => {
   );
 };
 
-export default ShopReportPage;
+export default BranddReportPage;

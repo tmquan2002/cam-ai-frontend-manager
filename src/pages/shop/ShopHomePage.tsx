@@ -5,18 +5,9 @@ import {
 } from "@mantine/core";
 import { IconList } from "@tabler/icons-react";
 import * as _ from "lodash";
-import { useEffect, useRef, useState } from "react";
-import useWebSocket from "react-use-websocket";
-import { getAccessToken } from "../../context/AuthContext";
-import { getDateTime, removeDate, removeFirstUpdateLastArray, returnWebsocketConnection } from "../../utils/helperFunction";
+import { useReports } from "../../hooks/useReport";
+import { getDateTime, returnWebsocketConnection } from "../../utils/helperFunction";
 import classes from "./ShopHomePage.module.scss";
-
-export interface ChartReportData {
-  Time: string;
-  Total: number;
-  ShopId: string
-}
-
 
 export type TitleAndNumberCard = {
   title: string;
@@ -58,35 +49,7 @@ const ShopHomePage = () => {
     getInitialValueInEffect: true,
   });
 
-  const { lastJsonMessage, readyState } = useWebSocket<ChartReportData>(process.env.REACT_APP_VITE_WEB_SOCKET_LINK + "/api/shops/chart/customer", {
-    protocols: ["Bearer", `${getAccessToken()}`]
-  })
-
-  const [data, setData] = useState<ChartReportData[]>(Array.apply(null, Array(5))
-    .map(function () {
-      return {
-        Time: "00:00:00",
-        Total: 0,
-        ShopId: "",
-      }
-    }))
-
-  const latestDataRef = useRef(data);
-
-  useEffect(() => {
-    if (lastJsonMessage) {
-
-      const updatedJson = {
-        ...lastJsonMessage,
-        Time: removeDate(lastJsonMessage.Time, true)
-      };
-
-      const newArray = removeFirstUpdateLastArray<ChartReportData>(data, updatedJson);
-      latestDataRef.current = newArray;
-      console.log(newArray)
-      setData(newArray);
-    }
-  }, [lastJsonMessage]);
+  const { data, lastJsonMessage, readyState } = useReports();
 
   return (
     <Box m={rem(32)}>
@@ -124,7 +87,7 @@ const ShopHomePage = () => {
               fz={22}
               c={"light-blue.4"}
             >
-              TOTAL PEOPLE CURRENTLY IN THE SHOP
+              LIVE SHOP COUNT
             </Text>
           </Group>
         </Card.Section>
@@ -132,7 +95,7 @@ const ShopHomePage = () => {
         <Text mt={10}>Last update: {lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}</Text>
         <LineChart
           h={300}
-          data={latestDataRef.current}
+          data={data}
           dataKey="Time"
           py={rem(40)}
           series={[
