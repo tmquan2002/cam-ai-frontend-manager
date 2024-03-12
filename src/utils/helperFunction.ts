@@ -37,13 +37,27 @@ export function removeDate(date: string, withSecond?: boolean) {
   }
 }
 
-export function removeFirstUpdateLastArray<T>(arr: T[], newItem: T, maxLength: number) {
-  if (arr.length > maxLength) return arr;
+export function removeTime(date: string) {
+  return (new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()) + "-"
+    + (new Date(date).getMonth() + 1 < 10 ? `0${new Date(date).getMonth() + 1}` : new Date(date).getMonth() + 1) + "-"
+    + (new Date(date).getFullYear());
+}
 
-  if (arr.length == maxLength) {
-    arr.shift();
-  }
+export function getDateTime(date: string) {
+  return removeDate(date) + " " + removeTime(date);
+}
 
+export function removeFirstUpdateLastArray<T>(arr: T[], newItem: T) {
+  arr.shift();
   arr.push(newItem);
   return arr;
+}
+
+export function returnWebsocketConnection(status: number) {
+  if (status == -1) return "Uninstantiated";
+  if (status == 0) return "Connecting";
+  if (status == 1) return "Open";
+  if (status == 2) return "Closing";
+  if (status == 3) return "Closed or Connect failed";
+  return "None"
 }

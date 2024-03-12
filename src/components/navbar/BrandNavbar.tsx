@@ -33,6 +33,7 @@ const mockdata = [
       { label: "Add shop ", link: "/brand/create/shop" },
     ],
   },
+  // TODO: Add a chart report each shops live status
   { label: "Report", icon: IconFileAnalytics, path: "report" },
 ];
 

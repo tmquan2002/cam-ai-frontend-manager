@@ -74,7 +74,7 @@ const ShopManagerProfilePage = () => {
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||

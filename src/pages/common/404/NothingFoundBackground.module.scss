@@ -1,0 +1,60 @@
+.root {
+    padding-top: rem(80px);
+    padding-bottom: rem(80px);
+}
+
+.inner {
+    position: relative;
+}
+
+.image {
+    position: absolute;
+    inset: 0;
+    opacity: 0.75;
+
+    @include light {
+        color: #d8d8d8;
+    }
+
+    @include dark {
+        color: #4a4a4a;
+    }
+}
+
+.content {
+    padding-top: rem(220px);
+    position: relative;
+    justify-content: center;
+    z-index: 1;
+
+    @media (max-width: $mantine-breakpoint-sm) {
+        padding-top: rem(120px);
+    }
+
+    .title {
+        text-align: center;
+        font-weight: 900;
+        font-size: rem(38px);
+        margin-top: 20px;
+
+        @include light {
+            color: #363636;
+        }
+
+        @include dark {
+            color: #b3b3b3;
+        }
+
+        @media (max-width: $mantine-breakpoint-sm) {
+            font-size: rem(32px);
+        }
+    }
+
+    .description {
+        text-align: center;
+        max-width: rem(600px);
+        margin: auto;
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+}

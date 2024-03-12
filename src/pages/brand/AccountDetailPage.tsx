@@ -55,12 +55,12 @@ const AccountDetailPage = () => {
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: huy@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-        value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          value == null ||
+          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379,999,999",
     },

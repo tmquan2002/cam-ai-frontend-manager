@@ -23,6 +23,7 @@ import CreateManagerPage from "../pages/brand/CreateManagerPage";
 import AccountDetailPage from "../pages/brand/AccountDetailPage";
 import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
 import ShopListPage from "../pages/brand/ShopListPage";
+import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
 
 const AppRoute = () => {
   return useRoutes([
@@ -129,6 +130,10 @@ const AppRoute = () => {
           element: <CreateManagerPage />,
         },
       ],
+    },
+    {
+      path: "*",
+      element: <NothingFoundBackground />,
     },
   ]);
 };
