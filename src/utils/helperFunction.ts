@@ -37,9 +37,14 @@ export function removeDate(date: string, withSecond?: boolean) {
   }
 }
 
-export function removeTime(date: string) {
-  return (new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()) + "-"
-    + (new Date(date).getMonth() + 1 < 10 ? `0${new Date(date).getMonth() + 1}` : new Date(date).getMonth() + 1) + "-"
+export function removeTime(date: string, separator?: string, format?: "dd/MM/yyyy" | "yyyy/MM/dd") {
+  if (format == "yyyy/MM/dd") {
+    return (new Date(date).getFullYear()) + (separator || "-")
+      + (new Date(date).getMonth() + 1 < 10 ? `0${new Date(date).getMonth() + 1}` : new Date(date).getMonth() + 1) + (separator || "-")
+      + (new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate())
+  }
+  return (new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()) + (separator || "-")
+    + (new Date(date).getMonth() + 1 < 10 ? `0${new Date(date).getMonth() + 1}` : new Date(date).getMonth() + 1) + (separator || "-")
     + (new Date(date).getFullYear());
 }
 
@@ -60,4 +65,14 @@ export function returnWebsocketConnection(status: number) {
   if (status == 2) return "Closing";
   if (status == 3) return "Closed or Connect failed";
   return "None"
+}
+
+/** Return the day yearLength years before today
+ * 
+ * @param yearLength 
+ * @returns 
+ */
+export function getDateFromSetYear(yearLength: number) {
+  const today = new Date();
+  return new Date(today.getFullYear() - yearLength, today.getMonth(), today.getDate());
 }

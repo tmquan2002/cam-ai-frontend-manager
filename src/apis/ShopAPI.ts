@@ -11,7 +11,7 @@ export type GetShopListParams = {
   status?: string | null;
   brandId?: string;
   shopManagerId?: string;
-  size: number;
+  size?: number;
   pageIndex?: number;
 };
 

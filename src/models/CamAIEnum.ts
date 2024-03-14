@@ -82,3 +82,24 @@ export enum Zone {
   Cashier = "Cashier",
   Customer = "Customer",
 }
+
+export enum IncidnetType {
+  Phone = "Phone",
+  Uniform = "Uniform"
+}
+
+export enum IncidnetStatus {
+  New = "New",
+  Accepted = "Accepted",
+  Rejected = "Rejected"
+}
+
+export enum EvidenceType {
+  Image = "Image",
+}
+
+export enum EvidenceStatus {
+  ToBeFetched = "ToBeFetched",
+  Fetched = "Fetched",
+  NotFound = "NotFound"
+}
