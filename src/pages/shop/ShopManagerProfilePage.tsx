@@ -57,15 +57,28 @@ const ShopManagerProfilePage = () => {
 
   const { data: account, isLoading: isAccountLoading } = useGetProfile();
   const form = useForm<ProfileFieldValue>({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthday: new Date("01/01/2000"),
+      address: "",
+      gender: Gender.Male,
+      shop: "",
+      district: "",
+      province: "",
+      wardId: "",
+    },
+
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-        value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          value == null ||
+          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379,999,999",
     },

@@ -78,14 +78,13 @@ const renderSelect = ({ fieldProps }: any) => {
 };
 
 const renderRadio = ({ fieldProps }: any) => {
-  const { name, label, description, form, data, required, readonly } =
+  const { name, label, description, form, data, required } =
     fieldProps;
 
   return (
     <Radio.Group
       name={name}
       label={label}
-      readOnly={readonly}
       required={required}
       description={description}
       {...form.getInputProps(name)}

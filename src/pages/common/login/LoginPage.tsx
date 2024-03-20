@@ -1,8 +1,8 @@
-import styled from "./styles/login.module.scss";
+import styled from "./login.module.scss";
 import AuthImage from "../../../assets/images/login_signup_main.png";
 import { Button, Group, Modal, TextInput } from "@mantine/core";
 import { useState } from "react";
-import { ChangePasswordForm } from "./components/ChangePasswordForm";
+import { ChangePasswordForm } from "./ChangePasswordForm";
 import { useLogin } from "../../../hooks/useLogin";
 import { useForm } from "@mantine/form";
 import { LoginParams } from "../../../apis/LoginAPI";
@@ -12,6 +12,8 @@ import { AuthToken } from "../../../models/Auth";
 import { useSession } from "../../../context/AuthContext";
 import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
 import { AccountStatus } from "../../../models/CamAIEnum";
+import axios from "axios";
+import { notifications } from "@mantine/notifications";
 
 const LoginPage = () => {
   const { mutate: login, isLoading } = useLogin();
@@ -29,9 +31,9 @@ const LoginPage = () => {
       email: (value) =>
         value.trim().length === 0
           ? "Email is required"
-          : /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/.test(value)
-          ? null
-          : "Invalid email",
+          : /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
+            ? null
+            : "Invalid email",
       password: (value) =>
         value.trim().length === 0 ? "Password is required" : null,
     },
@@ -56,7 +58,21 @@ const LoginPage = () => {
         }
       },
       onError(error) {
-        console.log(error);
+        if (axios.isAxiosError(error)) {
+          // console.error(error.response?.data as ApiErrorResponse);
+          notifications.show({
+            message: error.response?.data.message,
+            color: "pale-red.5",
+            withCloseButton: true,
+          });
+        } else {
+          // console.error(error);
+          notifications.show({
+            message: "Something wrong happen trying to login",
+            color: "pale-red.5",
+            withCloseButton: true,
+          });
+        }
       },
     });
   };
@@ -89,6 +105,7 @@ const LoginPage = () => {
               withAsterisk
               label="Email"
               placeholder="your@email.com"
+              mt={10}
               leftSection={<MdEmail />}
               size="md"
               {...form.getInputProps("email")}
@@ -99,6 +116,7 @@ const LoginPage = () => {
               label="Password"
               type="password"
               placeholder="Password"
+              mt={20}
               leftSection={<MdLockOutline />}
               size="md"
               {...form.getInputProps("password")}

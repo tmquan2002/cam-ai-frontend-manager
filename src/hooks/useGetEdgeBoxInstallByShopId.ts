@@ -1,6 +1,6 @@
 import { UseQueryResult, useQuery } from "react-query";
-import { EdgeBoxInstallDetail } from "../models/Edgebox";
 import { EdgeBoxApi } from "../apis/EdgeBoxAPI";
+import { EdgeBoxInstallDetail } from "../models/Edgebox";
 
 export const useGetEdgeBoxInstallByShopId = (shopId: string) => {
   const {
