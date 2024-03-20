@@ -213,7 +213,7 @@ const CreateManagerPage = () => {
         c={"light-blue.4"}
         mb={rem(30)}
       >
-        Create manager account
+        Create shop manager
       </Text>
       <form
         onReset={createAccountForm.onReset}
@@ -270,6 +270,7 @@ const CreateManagerPage = () => {
           <Button
             type="submit"
             loading={isCreateAccountLoading || isGetBrandListLoading}
+            disabled={!createAccountForm.isDirty()}
           >
             Create
           </Button>

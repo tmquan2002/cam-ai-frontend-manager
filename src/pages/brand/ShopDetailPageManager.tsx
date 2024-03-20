@@ -1,19 +1,22 @@
 import {
+  Accordion,
   ActionIcon,
   Badge,
   Box,
   Button,
   Center,
+  Collapse,
   Flex,
   Group,
   Image,
   Loader,
   LoadingOverlay,
-  Menu,
   Paper,
   ScrollArea,
+  Stack,
   Table,
   Text,
+  Tooltip,
   rem,
 } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
@@ -28,23 +31,35 @@ import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { UpdateShopParams } from "../../apis/ShopAPI";
 import {
-  IconAdjustments,
-  IconArrowsLeftRight,
+  IconMail,
+  IconRepeat,
+  IconTrash,
+  IconUser,
   IconX,
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
 import classes from "./ShopDetailPageManager.module.scss";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetShopById } from "../../hooks/useGetShopById";
 import { replaceIfNun } from "../../utils/helperFunction";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import _ from "lodash";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
-import { ShopStatus } from "../../models/CamAIEnum";
+import {
+  EdgeBoxLocation,
+  EdgeBoxStatus,
+  EdgeboxInstallStatus,
+  ShopStatus,
+} from "../../models/CamAIEnum";
 import { modals } from "@mantine/modals";
+import { IconCaretRight } from "@tabler/icons-react";
+import { useDisclosure } from "@mantine/hooks";
+import { useGetAccountList } from "../../hooks/useGetAccounts";
+import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
+import BackButton from "../../components/button/BackButton";
 
 export type FormFieldValue = {
   name: string;
@@ -56,14 +71,68 @@ export type FormFieldValue = {
   brandName: string;
 };
 
+const renderEdboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
+  switch (status) {
+    case EdgeBoxStatus.Active:
+      return <Badge color="green">{EdgeBoxStatus.Active}</Badge>;
+    case EdgeBoxStatus.Broken:
+      return <Badge color={"orange"}>{EdgeBoxStatus.Active}</Badge>;
+    case EdgeBoxStatus.Inactive:
+      return <Badge color={"red"}>{EdgeBoxStatus.Active}</Badge>;
+    case EdgeBoxStatus.Disposed:
+      return <Badge color={"gray"}>{EdgeBoxStatus.Disposed}</Badge>;
+    case undefined:
+      return <Badge>Empty</Badge>;
+  }
+};
+const renderEdgeboxInstallStatusBadge = (
+  status: EdgeboxInstallStatus | undefined
+) => {
+  switch (status) {
+    case EdgeboxInstallStatus.Working:
+      return <Badge color="green">{EdgeboxInstallStatus.Working}</Badge>;
+    case EdgeboxInstallStatus.Unhealthy:
+      return <Badge color={"yellow"}>{EdgeboxInstallStatus.Unhealthy}</Badge>;
+    case EdgeboxInstallStatus.Disabled:
+      return <Badge color={"gray"}>{EdgeboxInstallStatus.Disabled}</Badge>;
+    case EdgeboxInstallStatus.New:
+      return <Badge color={"blue"}>{EdgeboxInstallStatus.New}</Badge>;
+    case EdgeboxInstallStatus.Connected:
+      return <Badge color={"teal"}>{EdgeboxInstallStatus.Connected}</Badge>;
+    case undefined:
+      return <Badge>Empty</Badge>;
+  }
+};
+const renderEdboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
+  switch (location) {
+    case EdgeBoxLocation.Disposed:
+      return <Badge color="teal">{EdgeBoxLocation.Disposed}</Badge>;
+    case EdgeBoxLocation.Idle:
+      return <Badge color={"blue"}>{EdgeBoxLocation.Idle}</Badge>;
+    case EdgeBoxLocation.Installing:
+      return <Badge color={"yellow"}>{EdgeBoxLocation.Installing}</Badge>;
+    case EdgeBoxLocation.Occupied:
+      return <Badge color={"green"}>{EdgeBoxLocation.Occupied}</Badge>;
+    case EdgeBoxLocation.Uninstalling:
+      return <Badge color={"orange"}>{EdgeBoxLocation.Uninstalling}</Badge>;
+    case undefined:
+      return <Badge>Empty</Badge>;
+  }
+};
+
 const ShopDetailPageManager = () => {
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [opened, { toggle }] = useDisclosure(false);
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({ shopId: id });
 
   const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } =
     useChangeShopStatus();
+
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
+    useGetEdgeBoxInstallByShopId(id ?? "");
 
   const rows = employeeList?.values?.map((row) => (
     <Table.Tr
@@ -71,7 +140,7 @@ const ShopDetailPageManager = () => {
         cursor: "pointer",
       }}
       key={row.id}
-      // onClick={() => navigate(`/shop/employee/${row.id}`)}
+      onClick={() => navigate(`/brand/employee/${row.id}`)}
     >
       <Table.Td>{replaceIfNun(row.name)}</Table.Td>
       <Table.Td>{replaceIfNun(row.email)}</Table.Td>
@@ -119,6 +188,8 @@ const ShopDetailPageManager = () => {
     },
   });
   const { data, isLoading, refetch } = useGetShopById(id ?? "0");
+  const { data: accountList, isLoading: isAccountListLoading } =
+    useGetAccountList({});
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -173,6 +244,65 @@ const ShopDetailPageManager = () => {
       onConfirm: () => handleToggleShopStatus(currentStatus),
     });
 
+  const accountListItem = accountList?.values.map((item) => (
+    <Accordion.Item
+      value={item.id}
+      key={item.id}
+    >
+      <Accordion.Control disabled={item?.managingShop != null}>
+        <Group wrap="nowrap">
+          <div>
+            <Text>{item.name}</Text>
+            <Text
+              size="sm"
+              c="dimmed"
+              fw={400}
+            >
+              {item.email}
+            </Text>
+          </div>
+        </Group>
+      </Accordion.Control>
+      <Accordion.Panel>
+        <Group justify="flex-end">
+          <Button
+            onClick={() => {
+              const params: UpdateShopParams = {
+                shopId: id ?? "",
+                addressLine: data?.addressLine ?? undefined,
+                name: data?.name,
+                phone: data?.phone ?? null,
+                shopManagerId: item?.id,
+                wardId: data?.wardId ? data?.wardId.toString() : undefined,
+              };
+              updateShop(params, {
+                onSuccess() {
+                  notifications.show({
+                    title: "Assign account successfully",
+                    message: "Shop updated!",
+                  });
+                  refetch();
+                  toggle();
+                },
+                onError(data) {
+                  const error = data as AxiosError<ResponseErrorDetail>;
+                  notifications.show({
+                    color: "red",
+                    icon: <IconX />,
+                    title: "Update failed",
+                    message: error.response?.data?.message,
+                  });
+                },
+              });
+            }}
+          >
+            Assign this account to shop
+          </Button>
+        </Group>
+      </Accordion.Panel>
+    </Accordion.Item>
+  ));
+
   useEffect(() => {
     if (data) {
       const initialData: FormFieldValue = {
@@ -184,7 +314,8 @@ const ShopDetailPageManager = () => {
         province: `${data.ward.district.province.id}`,
         district: `${data.ward.district.id}`,
       };
-      form.setValues(initialData);
+      form.setInitialValues(initialData);
+      form.reset();
     }
   }, [data]);
 
@@ -305,6 +436,7 @@ const ShopDetailPageManager = () => {
             pb={rem(20)}
           >
             <Group align="center">
+              <BackButton />
               <Text
                 size="lg"
                 fw={"bold"}
@@ -320,41 +452,23 @@ const ShopDetailPageManager = () => {
                 {data?.shopStatus}
               </Badge>
             </Group>
-            <Menu shadow="md">
-              <Menu.Target>
-                <ActionIcon
-                  variant="filled"
-                  aria-label="Settings"
-                >
-                  <IconAdjustments
-                    style={{ width: "70%", height: "70%" }}
-                    stroke={1.5}
-                  />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Label>Modify</Menu.Label>
-                {isChangeShopStatusLoading ? (
-                  <Loader />
+
+            {isChangeShopStatusLoading ? (
+              <Loader />
+            ) : (
+              <ActionIcon
+                color={data?.shopStatus == ShopStatus.Active ? "red" : "green"}
+                onClick={() =>
+                  openModal(data?.shopStatus ?? ShopStatus.Inactive)
+                }
+              >
+                {data?.shopStatus == ShopStatus.Active ? (
+                  <IconTrash style={{ width: rem(16), height: rem(16) }} />
                 ) : (
-                  <Menu.Item
-                    c={data?.shopStatus == ShopStatus.Active ? "red" : "green"}
-                    onClick={() =>
-                      openModal(data?.shopStatus ?? ShopStatus.Inactive)
-                    }
-                    leftSection={
-                      <IconArrowsLeftRight
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    }
-                  >
-                    {data?.shopStatus == ShopStatus.Active
-                      ? "Disable shop"
-                      : "Enable shop"}
-                  </Menu.Item>
+                  <IconRepeat style={{ width: rem(16), height: rem(16) }} />
                 )}
-              </Menu.Dropdown>
-            </Menu>
+              </ActionIcon>
+            )}
           </Group>
           <form
             onSubmit={form.onSubmit((values) => {
@@ -392,11 +506,91 @@ const ShopDetailPageManager = () => {
               justify="flex-end"
               mt="md"
             >
-              <Button type="submit">Submit</Button>
+              <Button
+                disabled={!form.isDirty()}
+                type="submit"
+              >
+                Submit
+              </Button>
             </Group>
           </form>
         </Box>
       </Paper>
+
+      <Paper
+        p={rem(32)}
+        m={rem(32)}
+        shadow="xs"
+      >
+        <Group pb={rem(20)}>
+          <Text
+            size="lg"
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
+          >
+            Shop manager
+          </Text>
+        </Group>
+
+        {isAccountListLoading ? (
+          <Loader />
+        ) : (
+          <Button
+            onClick={toggle}
+            rightSection={<IconCaretRight />}
+            variant="light"
+            fullWidth
+            autoContrast
+            justify="space-between"
+            size="xl"
+            px={rem(16)}
+          >
+            <Stack
+              align="flex-start"
+              justify="flex-start"
+              gap={0}
+              className={classes["pointer-style"]}
+              onClick={() =>
+                navigate(`/brand/account/${data?.shopManager?.id}`)
+              }
+            >
+              {data?.shopManager ? (
+                <>
+                  <Group>
+                    <IconUser className={classes.icon} />
+
+                    <Text size="lg">{data?.shopManager?.name}</Text>
+                  </Group>
+                  <Group>
+                    <IconMail className={classes.icon} />
+
+                    <Text
+                      size="sm"
+                      c={"dimmed"}
+                      fw={400}
+                    >
+                      {data?.shopManager?.email}
+                    </Text>
+                  </Group>
+                </>
+              ) : (
+                <Text size="lg">Assign a shop manager to this shop</Text>
+              )}
+            </Stack>
+          </Button>
+        )}
+
+        <Collapse in={opened}>
+          <Accordion
+            chevronPosition="right"
+            variant="contained"
+          >
+            {accountListItem}
+          </Accordion>
+        </Collapse>
+      </Paper>
+
       <Paper
         p={rem(32)}
         m={rem(32)}
@@ -459,38 +653,54 @@ const ShopDetailPageManager = () => {
           </ScrollArea>
         )}
       </Paper>
-
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-          pb={rem(28)}
+      {isEdgeboxInstallListLoading ? (
+        <Loader />
+      ) : (
+        <Paper
+          p={rem(32)}
+          m={rem(32)}
+          shadow="xs"
         >
-          Edge box
-        </Text>
-
-        <Flex>
-          <Image
-            radius={"md"}
-            src={
-              "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
-            }
-          />
-          <Box ml={rem(40)}>
-            <Text fw={500}>Model</Text>
-            <Text fw={500}>Version</Text>
-            <Text fw={500}>Status</Text>
-            <Text fw={500}>Location</Text>
-            <Text fw={500}>Type</Text>
-          </Box>
-        </Flex>
-      </Paper>
+          <Group
+            align="center"
+            pb={rem(28)}
+            gap={"sm"}
+          >
+            <Text
+              size="lg"
+              fw={"bold"}
+              fz={25}
+              c={"light-blue.4"}
+            >
+              Edge box
+            </Text>
+            <Tooltip
+              label="Edgebox install status"
+              transitionProps={{ transition: "slide-up", duration: 300 }}
+            >
+              {renderEdgeboxInstallStatusBadge(
+                edgeBoxInstallList?.[0]?.edgeBoxInstallStatus
+              )}
+            </Tooltip>
+            <Tooltip
+              label="Edgebox status"
+              transitionProps={{ transition: "slide-up", duration: 300 }}
+            >
+              {renderEdboxStatusBadge(
+                edgeBoxInstallList?.[0]?.edgeBox.edgeBoxStatus
+              )}
+            </Tooltip>
+            <Tooltip
+              label="Edgebox location"
+              transitionProps={{ transition: "slide-up", duration: 300 }}
+            >
+              {renderEdboxLocationBadge(
+                edgeBoxInstallList?.[0]?.edgeBox.edgeBoxLocation
+              )}
+            </Tooltip>
+          </Group>
+        </Paper>
+      )}
     </Box>
   );
 };

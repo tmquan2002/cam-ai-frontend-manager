@@ -3,7 +3,6 @@ import {
   Button,
   Group,
   LoadingOverlay,
-  Menu,
   Modal,
   Paper,
   Text,
@@ -18,7 +17,7 @@ import EditAndUpdateForm, {
 } from "../../components/form/EditAndUpdateForm";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useGetProfile } from "../../hooks/useGetProfile";
-import { IconAdjustments, IconArrowsLeftRight } from "@tabler/icons-react";
+import { IconKey } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useChangePassword } from "../../hooks/useChangePassword";
 import {
@@ -38,7 +37,7 @@ type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: Date;
+  birthday?: Date;
   address: string;
   gender: Gender;
   wardId: string;
@@ -133,7 +132,7 @@ const BrandManagerProfilePage = () => {
 
   useEffect(() => {
     if (account) {
-      form.setValues({
+      form.setInitialValues({
         name: account?.name,
         email: account?.email,
         phone: account?.phone,
@@ -144,6 +143,7 @@ const BrandManagerProfilePage = () => {
         province: account?.ward?.district?.provinceId?.toString(),
         wardId: account?.wardId?.toString(),
       });
+      form.reset();
     }
   }, [account]);
 
@@ -364,35 +364,15 @@ const BrandManagerProfilePage = () => {
             fz={25}
             c={"light-blue.4"}
           >
-            Acount profile
+            Your profile
           </Text>
-          <Menu shadow="md">
-            <Menu.Target>
-              <ActionIcon
-                variant="filled"
-                aria-label="Settings"
-              >
-                <IconAdjustments
-                  style={{ width: "70%", height: "70%" }}
-                  stroke={1.5}
-                />
-              </ActionIcon>
-            </Menu.Target>
 
-            <Menu.Dropdown>
-              <Menu.Label>Modify</Menu.Label>
-              <Menu.Item
-                onClick={open}
-                leftSection={
-                  <IconArrowsLeftRight
-                    style={{ width: rem(14), height: rem(14) }}
-                  />
-                }
-              >
-                New password
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+          <ActionIcon
+            onClick={open}
+            size={"lg"}
+          >
+            <IconKey style={{ width: rem(20), height: rem(20) }} />
+          </ActionIcon>
         </Group>
         <form
           onSubmit={form.onSubmit((values) => {
@@ -422,8 +402,6 @@ const BrandManagerProfilePage = () => {
                 });
               },
             });
-
-            console.log(values);
           })}
         >
           <EditAndUpdateForm fields={fields} />
@@ -433,6 +411,7 @@ const BrandManagerProfilePage = () => {
             pb={rem(10)}
           >
             <Button
+              disabled={!form.isDirty()}
               loading={updateProfileLoading}
               type="submit"
               mt={10}

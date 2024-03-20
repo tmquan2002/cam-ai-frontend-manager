@@ -214,6 +214,7 @@ const CreateEmployeePage = () => {
         >
           <Button
             type="submit"
+            disabled={!createEmployeeForm.isDirty()}
             loading={isCreateEmployeeLoading}
           >
             Create

@@ -15,7 +15,6 @@ import CommonLandingPage from "../pages/common/Landing/CommonLandingPage";
 import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
-import IncidentPage from "../pages/shop/IncidentPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
 import EmployeeListPage from "../pages/shop/EmployeeListPage";
 import BrandAccountPage from "../pages/brand/BrandAccountPage";
@@ -23,6 +22,10 @@ import CreateManagerPage from "../pages/brand/CreateManagerPage";
 import AccountDetailPage from "../pages/brand/AccountDetailPage";
 import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
 import ShopListPage from "../pages/brand/ShopListPage";
+import ShopIncidentListPage from "../pages/shop/ShopIncidentListPage";
+import IncidentListPage from "../pages/brand/IncidentListPage";
+import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
+import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -50,6 +53,10 @@ const AppRoute = () => {
           index: true,
         },
         {
+          path: "incident",
+          element: <ShopIncidentListPage />,
+        },
+        {
           path: "detail",
           element: <ShopDetailPage />,
         },
@@ -74,10 +81,7 @@ const AppRoute = () => {
           element: <CreateEmployeePage />,
         },
         { path: "employee/:id", element: <EmployeeDetailPage /> },
-        {
-          path: "overview",
-          element: <IncidentPage />,
-        },
+
         {
           path: "incident/:id",
           element: <IncidentDetail />,
@@ -106,7 +110,7 @@ const AppRoute = () => {
         },
         {
           path: "employee/:id",
-          element: <EmployeeDetailPage />,
+          element: <ShopEmployeeDetailPage />,
         },
         {
           path: "shop",
@@ -128,6 +132,8 @@ const AppRoute = () => {
           path: "create/manager",
           element: <CreateManagerPage />,
         },
+        { path: "incident", element: <IncidentListPage /> },
+        { path: "incident/:id", element: <ShopIncidentDetailPage /> },
       ],
     },
   ]);

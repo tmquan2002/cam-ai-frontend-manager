@@ -136,6 +136,9 @@ const ShopListPage = () => {
         <Table.Td>{row.addressLine}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
         <Table.Td>
+          {row?.shopManager ? row.shopManager?.name : "No manager"}
+        </Table.Td>
+        <Table.Td>
           {_.isEqual(row.shopStatus, "Active") ? (
             <Badge variant="light">Active</Badge>
           ) : (
@@ -325,6 +328,7 @@ const ShopListPage = () => {
                 <Table.Th>Shop name</Table.Th>
                 <Table.Th>Address</Table.Th>
                 <Table.Th>Phone</Table.Th>
+                <Table.Th>Shop manager</Table.Th>
                 <Table.Th>Status</Table.Th>
               </Table.Tr>
             </Table.Thead>

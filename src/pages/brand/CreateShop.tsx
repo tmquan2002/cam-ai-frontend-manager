@@ -21,6 +21,7 @@ import { useGetBrandList } from "../../hooks/useGetBrandList";
 import dayjs from "dayjs";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender, Role } from "../../models/CamAIEnum";
+import BackButton from "../../components/button/BackButton";
 
 export type CreateShopField = {
   name: string;
@@ -51,7 +52,9 @@ const CreateShop = () => {
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) =>
-        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        value == "" ||
+        value == null ||
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379999999",
       addressLine: isNotEmpty("Address line is required"),
@@ -69,7 +72,9 @@ const CreateShop = () => {
       password: isNotEmpty("Password must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
-        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        value == "" ||
+        value == null ||
+        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379999999",
       province: isNotEmpty("Provice is required"),
@@ -109,8 +114,6 @@ const CreateShop = () => {
     useCreateShop();
   const { mutate: createAccount, isLoading: isCreateAccountLoading } =
     useCreateAccount();
-
-  console.log(accountList);
 
   const fields = useMemo(() => {
     return [
@@ -381,15 +384,20 @@ const CreateShop = () => {
         p={rem(32)}
         shadow="xl"
       >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
+        <Group
           pb={20}
+          align="center"
         >
-          Create shop
-        </Text>
+          <BackButton />
+          <Text
+            size="lg"
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
+          >
+            Create shop
+          </Text>
+        </Group>
         <form
           onSubmit={createShopForm.onSubmit(
             ({ addressLine, name, phone, wardId, shopManagerId }) => {
@@ -398,7 +406,7 @@ const CreateShop = () => {
                 name,
                 phone: phone == "" ? null : phone,
                 wardId: +(wardId ?? 0),
-                shopManagerId: shopManagerId ?? "0",
+                shopManagerId: shopManagerId ?? null,
               };
               createShop(updateParams, {
                 onSuccess(data) {
@@ -427,6 +435,7 @@ const CreateShop = () => {
             mt="md"
           >
             <Button
+              disabled={!createShopForm.isDirty()}
               type="submit"
               loading={isCreateShopLoading}
             >
@@ -503,6 +512,7 @@ const CreateShop = () => {
             >
               <Button
                 type="submit"
+                disabled={!createAccountForm.isDirty()}
                 loading={isCreateAccountLoading || isGetBrandListLoading}
               >
                 Create

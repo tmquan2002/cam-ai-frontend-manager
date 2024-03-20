@@ -25,12 +25,13 @@ import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import dayjs from "dayjs";
+import BackButton from "../../components/button/BackButton";
 
 type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: Date;
+  birthday?: Date;
   addressLine: string;
   gender: Gender;
   wardId: string;
@@ -70,7 +71,7 @@ const AccountDetailPage = () => {
 
   useEffect(() => {
     if (accountData) {
-      form.setValues({
+      form.setInitialValues({
         addressLine: accountData?.addressLine,
         birthday: accountData.birthday
           ? new Date(accountData.birthday)
@@ -83,6 +84,7 @@ const AccountDetailPage = () => {
         province: accountData?.ward?.district?.provinceId?.toString(),
         wardId: accountData?.wardId?.toString(),
       });
+      form.reset();
     }
   }, [accountData]);
 
@@ -215,8 +217,9 @@ const AccountDetailPage = () => {
     >
       <Group
         mb={rem(20)}
-        justify="space-between"
+        align="center"
       >
+        <BackButton />
         <Text
           size="lg"
           fw={"bold"}
@@ -271,6 +274,7 @@ const AccountDetailPage = () => {
               pb={rem(10)}
             >
               <Button
+                disabled={!form.isDirty()}
                 loading={isUpdateAccountLoading}
                 type="submit"
                 mt={10}
