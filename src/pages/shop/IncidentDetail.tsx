@@ -1,30 +1,187 @@
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
   Divider,
   Flex,
   Group,
+  Image,
   Loader,
-  MultiSelect,
   Paper,
+  Select,
   Text,
+  Tooltip,
   rem,
 } from "@mantine/core";
-import classes from "./IncidentDetail.module.scss";
-import ReactPlayer from "react-player";
 import BackButton from "../../components/button/BackButton";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { EvidenceDetail } from "../../models/Evidence";
+import { IconIdOff, IconX } from "@tabler/icons-react";
+import { modals } from "@mantine/modals";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { notifications } from "@mantine/notifications";
+import { ResponseErrorDetail } from "../../models/Response";
+import { AxiosError } from "axios";
+
+type IncidentFormField = {
+  employeeId: string | null;
+};
+
+const renderIncidentFootage = (evidence: EvidenceDetail) => {
+  switch (evidence.evidenceType) {
+    case EvidenceType.Image:
+      return (
+        <Box>
+          <Group
+            align="center"
+            mb={rem(12)}
+          >
+            <Group gap={"xl"}>
+              <Box>
+                <Text
+                  fw={500}
+                  c={"dimmed"}
+                >
+                  Created time
+                </Text>
+                <Text fw={500}>
+                  {dayjs(evidence?.createdDate).format("DD/MM/YYYY h:mm A")}
+                </Text>
+              </Box>
+              <Box>
+                <Text
+                  fw={500}
+                  c={"dimmed"}
+                >
+                  Camera
+                </Text>
+                <Text fw={500}>{evidence?.cameraId}</Text>
+              </Box>
+            </Group>
+          </Group>
+
+          <Image
+            radius={"md"}
+            bg={"#000"}
+            fit="contain"
+            src={evidence?.image?.hostingUri}
+          />
+        </Box>
+      );
+  }
+};
+
+const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
+  switch (status) {
+    case IncidentStatus.New:
+      return <Badge color="yellow">{IncidentStatus.New}</Badge>;
+    case IncidentStatus.Accepted:
+      return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
+    case IncidentStatus.Rejected:
+      return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
+    case undefined:
+      return <></>;
+  }
+};
 
 const IncidentDetail = () => {
+  const { id } = useParams<{ id: string }>();
+  const form = useForm<IncidentFormField>();
+
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({});
 
+  const {
+    data: incidentData,
+    isLoading: isGetIncidentLoading,
+    refetch: refetchIncident,
+  } = useGetIncidentById(id ?? "");
+
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
+    useRejectIncidentById();
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
+    useAssignIncident();
+
+  const onAssignIncident = (fieldValues: IncidentFormField) => {
+    assignIncident(
+      { employeeId: fieldValues.employeeId ?? "", incidentId: id ?? "" },
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Assign successfully",
+            message: "Incident assign success!",
+          });
+          refetchIncident();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            icon: <IconX />,
+            title: "Assign failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
+  };
+
+  const openModal = () =>
+    modals.openConfirmModal({
+      title: "Please confirm your action",
+      confirmProps: { color: "red" },
+      children: <Text size="sm">Confirm reject this incident?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        rejectIncident(id ?? "", {
+          onSuccess() {
+            notifications.show({
+              title: "Reject successfully",
+              message: "Reject assign success!",
+            });
+            refetchIncident();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              icon: <IconX />,
+              title: "Reject failed",
+              message: error.response?.data?.message,
+            });
+          },
+        });
+      },
+    });
+
+  useEffect(() => {
+    if (incidentData?.employeeId) {
+      form.setValues({ employeeId: incidentData?.employeeId });
+    } else {
+      form.setValues({ employeeId: null });
+    }
+  }, [incidentData]);
+
+  if (isGetIncidentLoading) {
+    return <Loader />;
+  }
+
   return (
     <Box>
-      <Box
+      <Group
         px={rem(64)}
         bg={"white"}
+        justify="space-between"
+        align="center"
       >
         <Group
           py={rem(32)}
@@ -39,11 +196,26 @@ const IncidentDetail = () => {
             size={rem(20)}
             fw={500}
           >
-            Incidents number 1
+            {incidentData?.incidentType} Incident -{" "}
+            {dayjs(incidentData?.time).format("DD/MM/YYYY h:mm A")}
           </Text>
-          <Badge color="green">Badge</Badge>
+          {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
         </Group>
-      </Box>
+        <Tooltip label="Reject incident">
+          <ActionIcon
+            variant="filled"
+            aria-label="Settings"
+            color={"red"}
+            onClick={openModal}
+            loading={isRejectIncidentLoading}
+          >
+            <IconIdOff
+              style={{ width: "70%", height: "70%" }}
+              stroke={1.5}
+            />
+          </ActionIcon>
+        </Tooltip>
+      </Group>
       <Divider />
       <Flex>
         <Box
@@ -56,37 +228,12 @@ const IncidentDetail = () => {
             mx={rem(64)}
             my={rem(40)}
             px={rem(32)}
-            py={rem(20)}
+            py={rem(28)}
           >
             <Text
               fw={500}
-              size={rem(18)}
-              mb={rem(20)}
-            >
-              Description
-            </Text>
-            <Divider
-              color="#acacac"
-              mb={rem(16)}
-            />
-            <Text>
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Cumque,
-              repudiandae quos nam iure quo, laboriosam eos dolore quibusdam
-              obcaecati enim omnis inventore animi nostrum et dolorum, est
-              pariatur commodi excepturi.
-            </Text>
-          </Paper>
-          <Paper
-            shadow="xs"
-            mx={rem(64)}
-            my={rem(40)}
-            px={rem(32)}
-            py={rem(20)}
-          >
-            <Text
-              fw={500}
-              size={rem(18)}
-              mb={rem(20)}
+              size={rem(20)}
+              mb={rem(28)}
             >
               Evidence
             </Text>
@@ -94,12 +241,22 @@ const IncidentDetail = () => {
               color="#acacac"
               mb={rem(20)}
             />
-            <Box mb={rem(20)}>
+            {incidentData?.evidences?.map((item) => {
+              return (
+                <Box
+                  key={item.id}
+                  mb={rem(20)}
+                >
+                  {renderIncidentFootage(item)}
+                </Box>
+              );
+            })}
+            {/* <Box mb={rem(20)}>
               <ReactPlayer url="https://www.youtube.com/watch?v=TSwPIYczhPc&t=1s" />
             </Box>
             <Box>
               <ReactPlayer url="https://www.youtube.com/watch?v=e-EP1gMHP4k" />
-            </Box>
+            </Box> */}
           </Paper>
         </Box>
         <Box w={rem(500)}>
@@ -109,7 +266,7 @@ const IncidentDetail = () => {
             mr={rem(20)}
             py={rem(4)}
           >
-            <Box px={rem(32)}>
+            {/* <Box px={rem(32)}>
               <Text
                 fw={500}
                 size={rem(20)}
@@ -124,7 +281,9 @@ const IncidentDetail = () => {
                     <Box key={item}>
                       <Group>
                         <Text className={classes.right_section_desctiption}>
-                          June 28, 2024
+                          {dayjs(incidentData?.time).format(
+                            "DD/MM/YYYY h:mm A"
+                          )}
                         </Text>
                         <Text className={classes.right_section_desctiption}>
                           Incident release
@@ -139,7 +298,7 @@ const IncidentDetail = () => {
             <Divider
               color="#acacac"
               mt={rem(16)}
-            />
+            /> */}
             <Box px={rem(32)}>
               <Text
                 fw={500}
@@ -149,51 +308,39 @@ const IncidentDetail = () => {
                 Assigned to
               </Text>
               <Divider color="#acacac" />
-              {true ? (
-                <form>
-                  {isGetEmployeeListLoading ? (
-                    <Loader mt={rem(30)} />
-                  ) : (
-                    <MultiSelect
-                      mt={rem(30)}
-                      placeholder="Pick value"
-                      data={employeeList?.values?.map((item) => {
-                        return {
-                          value: item?.id,
-                          label: item?.name,
-                        };
-                      })}
-                      nothingFoundMessage="Nothing found..."
-                    />
-                  )}
 
-                  <Group
-                    justify="flex-end"
-                    mt="md"
-                    pb={rem(20)}
+              <form onSubmit={form.onSubmit(onAssignIncident)}>
+                {isGetEmployeeListLoading ? (
+                  <Loader mt={rem(30)} />
+                ) : (
+                  <Select
+                    mt={rem(24)}
+                    {...form.getInputProps("employeeId")}
+                    placeholder="Pick value"
+                    data={employeeList?.values?.map((item) => {
+                      return {
+                        value: item?.id,
+                        label: item?.name,
+                      };
+                    })}
+                    nothingFoundMessage="Nothing found..."
+                  />
+                )}
+
+                <Group
+                  justify="flex-end"
+                  mt="md"
+                  pb={rem(20)}
+                >
+                  <Button
+                    type="submit"
+                    loading={isAssignIncidentLoading}
+                    disabled={!form.isDirty()}
                   >
-                    <Button type="submit">Confirm</Button>
-                  </Group>
-                </form>
-              ) : (
-                <Box>
-                  {[1, 2, 3].map((item) => {
-                    return (
-                      <Box key={item}>
-                        <Group>
-                          <Text className={classes.right_section_desctiption}>
-                            June 28, 2024
-                          </Text>
-                          <Text className={classes.right_section_desctiption}>
-                            Incident release
-                          </Text>
-                        </Group>
-                        {item != 3 && <Divider />}
-                      </Box>
-                    );
-                  })}
-                </Box>
-              )}
+                    Confirm
+                  </Button>
+                </Group>
+              </form>
             </Box>
           </Paper>
         </Box>

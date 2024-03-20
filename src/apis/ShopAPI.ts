@@ -11,7 +11,7 @@ export type GetShopListParams = {
   status?: string | null;
   brandId?: string;
   shopManagerId?: string;
-  size: number;
+  size?: number;
   pageIndex?: number;
 };
 
@@ -28,7 +28,7 @@ export type CreateShopParams = {
   name: string;
   phone: string | null;
   wardId: number;
-  shopManagerId: string;
+  shopManagerId: string | null;
   addressLine: string;
 };
 

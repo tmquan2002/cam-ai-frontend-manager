@@ -8,13 +8,13 @@ import {
   ScrollArea,
   Stack,
   Text,
-  ThemeIcon,
   rem,
+  useComputedColorScheme
 } from "@mantine/core";
-import classes from "./ShopReportPage.module.scss";
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
 import ReactPlayer from "react-player";
 import { useNavigate } from "react-router-dom";
+import classes from "./ShopReportPage.module.scss";
 
 type RenderContentType = {
   key: number;
@@ -54,6 +54,7 @@ const list: RenderContentType[] = [
 
 const ShopReportPage = () => {
   const navigate = useNavigate();
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const renderContent = ({ key, content }: RenderContentType) => {
     return (
       <Card
@@ -71,9 +72,8 @@ const ShopReportPage = () => {
           mb={"md"}
         >
           <Text fw={500}>{content}</Text>
-          <ThemeIcon variant="white">
-            <IconCaretRight style={{ width: "80%", height: "80%" }} />
-          </ThemeIcon>
+          <IconCaretRight style={{ width: "20px", height: "20px" }}
+            color={computedColorScheme == "dark" ? "#5787db" : "#39588f"} />
         </Group>
         <Card.Section className={classes.card_footer}>
           <div>
@@ -104,12 +104,8 @@ const ShopReportPage = () => {
               >
                 12
               </Text>
-              <ThemeIcon
-                variant="white"
-                color="green"
-              >
-                <IconTrendingUp style={{ width: "70%", height: "70%" }} />
-              </ThemeIcon>
+              <IconTrendingUp style={{ width: "30%", height: "30%" }}
+                color={computedColorScheme == "dark" ? "#45b445" : "green"} />
             </Flex>
           </div>
           <div>

@@ -3,7 +3,6 @@ import {
   Button,
   Group,
   LoadingOverlay,
-  Menu,
   Modal,
   Paper,
   Text,
@@ -24,7 +23,7 @@ import {
   ChangePasswordParams,
   UpdateProfileParams,
 } from "../../apis/ProfileAPI";
-import { IconAdjustments, IconArrowsLeftRight } from "@tabler/icons-react";
+import { IconKey } from "@tabler/icons-react";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
 import { getAccessToken } from "../../context/AuthContext";
@@ -38,7 +37,7 @@ type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: Date;
+  birthday?: Date;
   address: string;
   gender: Gender;
   shop: string;
@@ -58,15 +57,28 @@ const ShopManagerProfilePage = () => {
 
   const { data: account, isLoading: isAccountLoading } = useGetProfile();
   const form = useForm<ProfileFieldValue>({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthday: new Date("01/01/2000"),
+      address: "",
+      gender: Gender.Male,
+      shop: "",
+      district: "",
+      province: "",
+      wardId: "",
+    },
+
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-        value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          value == null ||
+          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379,999,999",
     },
@@ -137,7 +149,7 @@ const ShopManagerProfilePage = () => {
 
   useEffect(() => {
     if (account) {
-      form.setValues({
+      form.setInitialValues({
         name: account?.name,
         email: account?.email,
         phone: account?.phone,
@@ -149,6 +161,7 @@ const ShopManagerProfilePage = () => {
         province: account?.ward?.district?.provinceId.toString(),
         wardId: account?.wardId.toString(),
       });
+      form.reset();
     }
   }, [account]);
 
@@ -357,6 +370,7 @@ const ShopManagerProfilePage = () => {
             mt="md"
           >
             <Button
+              disabled={!passwordForm.isDirty()}
               type="submit"
               loading={isChangingPassword}
             >
@@ -382,35 +396,15 @@ const ShopManagerProfilePage = () => {
             fz={25}
             c={"light-blue.4"}
           >
-            Account profile
+            Your profile
           </Text>
-          <Menu shadow="md">
-            <Menu.Target>
-              <ActionIcon
-                variant="filled"
-                aria-label="Settings"
-              >
-                <IconAdjustments
-                  style={{ width: "70%", height: "70%" }}
-                  stroke={1.5}
-                />
-              </ActionIcon>
-            </Menu.Target>
 
-            <Menu.Dropdown>
-              <Menu.Label>Modify</Menu.Label>
-              <Menu.Item
-                onClick={open}
-                leftSection={
-                  <IconArrowsLeftRight
-                    style={{ width: rem(14), height: rem(14) }}
-                  />
-                }
-              >
-                New password
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
+          <ActionIcon
+            onClick={open}
+            size={"lg"}
+          >
+            <IconKey style={{ width: rem(20), height: rem(20) }} />
+          </ActionIcon>
         </Group>
 
         <form
@@ -452,6 +446,7 @@ const ShopManagerProfilePage = () => {
             <Button
               loading={updateProfileLoading}
               type="submit"
+              disabled={!form.isDirty()}
               mt={10}
             >
               Submit

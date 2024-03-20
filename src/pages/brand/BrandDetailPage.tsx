@@ -355,7 +355,7 @@ const BrandDetailPageManager = () => {
                     radius={"md"}
                     bg={"#000"}
                     height={280}
-                    fit="contain"
+                    fit="cover"
                     src={data?.values[0]?.banner?.hostingUri}
                   />
                 ) : (

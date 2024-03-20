@@ -1,3 +1,4 @@
+import { AccountDetail } from "./Account";
 import { WardDetail } from "./Address";
 import { BrandDetail } from "./Brand";
 import { ShopStatus } from "./CamAIEnum";
@@ -14,4 +15,5 @@ export type ShopDetail = {
   ward: WardDetail;
   brand: BrandDetail;
   shopStatus: ShopStatus;
+  shopManager: AccountDetail;
 };

@@ -6,9 +6,9 @@ const BackButton = (props: ActionIconProps) => {
   const navigate = useNavigate();
   return (
     <ActionIcon
-      variant="white"
+      variant="outline"
       aria-label="Settings"
-      color="#000"
+      color="gray"
       w={rem(36)}
       h={rem(36)}
       {...props}

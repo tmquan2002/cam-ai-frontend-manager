@@ -10,7 +10,7 @@ import {
   TextInput,
 } from "@mantine/core";
 
-import { DateInput } from "@mantine/dates";
+import { DateInput, DateTimePicker } from "@mantine/dates";
 
 const renderTextField = ({ fieldProps }: any) => {
   const { form, name, placeholder, label, required, disabled, type, readonly } =
@@ -78,14 +78,13 @@ const renderSelect = ({ fieldProps }: any) => {
 };
 
 const renderRadio = ({ fieldProps }: any) => {
-  const { name, label, description, form, data, required, readonly } =
+  const { name, label, description, form, data, required } =
     fieldProps;
 
   return (
     <Radio.Group
       name={name}
       label={label}
-      readOnly={readonly}
       required={required}
       description={description}
       {...form.getInputProps(name)}
@@ -137,6 +136,22 @@ const renderDate = ({ fieldProps }: any) => {
   );
 };
 
+const renderDateTime = ({ fieldProps }: any) => {
+  const { form, name, placeholder, label, required, disabled, readonly } =
+    fieldProps;
+  return (
+    <DateTimePicker
+      required={required}
+      disabled={disabled}
+      withAsterisk={required}
+      label={label}
+      readOnly={readonly}
+      placeholder={placeholder}
+      {...form.getInputProps(name)}
+    />
+  );
+};
+
 export const FIELD_TYPES = {
   TEXT: "text",
   SELECT: "select",
@@ -149,6 +164,7 @@ export const FIELD_TYPES = {
   IMAGE_PICKER: "image_picker",
   MULTI_SELECT: "multi_select",
   DATE: "date",
+  DATE_TIME: "date_time",
   PASSWORD_INPUT: "password_input",
 };
 
@@ -158,6 +174,7 @@ const FORM_MAPPING = {
   [FIELD_TYPES.SELECT]: renderSelect,
   [FIELD_TYPES.RADIO]: renderRadio,
   [FIELD_TYPES.DATE]: renderDate,
+  [FIELD_TYPES.DATE_TIME]: renderDateTime,
   //   [FIELD_TYPES.MULTI_SELECT]: renderMultiSelect,
   // [FIELD_TYPES.AUTOCOMPLETE]: renderAutoComplete,
   // [FIELD_TYPES.UPLOAD]: renderUpload,
@@ -171,11 +188,12 @@ const FORM_MAPPING = {
 const EditAndUpdateForm = ({ fields }: any) => {
   return (
     <Grid>
-      {fields.map(({ type, fieldProps, spans }: any, index: number) => {
+      {fields.map(({ type, fieldProps, spans, margin }: any, index: number) => {
         return (
           <Grid.Col
             span={spans ?? 12}
             key={index}
+            m={margin ?? 0}
           >
             {FORM_MAPPING[type]({
               fieldProps: fieldProps,

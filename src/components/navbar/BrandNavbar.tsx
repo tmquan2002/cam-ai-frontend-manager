@@ -33,7 +33,11 @@ const mockdata = [
       { label: "Add shop ", link: "/brand/create/shop" },
     ],
   },
-  { label: "Report", icon: IconFileAnalytics, path: "report" },
+  {
+    label: "Report",
+    icon: IconFileAnalytics,
+    links: [{ label: "Incidents", link: "/brand/incident" }],
+  },
 ];
 
 export function BrandNavbar() {

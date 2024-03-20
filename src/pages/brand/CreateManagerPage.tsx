@@ -44,13 +44,13 @@ const CreateManagerPage = () => {
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
       password: isNotEmpty("Name must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-        value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          value == null ||
+          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379,999,999",
     },
@@ -213,7 +213,7 @@ const CreateManagerPage = () => {
         c={"light-blue.4"}
         mb={rem(30)}
       >
-        Create manager account
+        Create shop manager
       </Text>
       <form
         onReset={createAccountForm.onReset}
@@ -270,6 +270,7 @@ const CreateManagerPage = () => {
           <Button
             type="submit"
             loading={isCreateAccountLoading || isGetBrandListLoading}
+            disabled={!createAccountForm.isDirty()}
           >
             Create
           </Button>

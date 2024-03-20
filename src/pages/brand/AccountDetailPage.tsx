@@ -25,12 +25,13 @@ import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import dayjs from "dayjs";
+import BackButton from "../../components/button/BackButton";
 
 type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday: Date;
+  birthday?: Date;
   addressLine: string;
   gender: Gender;
   wardId: string;
@@ -41,15 +42,26 @@ type ProfileFieldValue = {
 const AccountDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const form = useForm<ProfileFieldValue>({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      birthday: new Date("01/01/2000"),
+      gender: Gender.Male,
+      addressLine: "",
+      district: "",
+      province: "",
+      wardId: "",
+    },
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@\S+$/.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: huy@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-        value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          value == null ||
+          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
           ? null
           : "Invalid phone number - ex: 0379,999,999",
     },
@@ -70,7 +82,7 @@ const AccountDetailPage = () => {
 
   useEffect(() => {
     if (accountData) {
-      form.setValues({
+      form.setInitialValues({
         addressLine: accountData?.addressLine,
         birthday: accountData.birthday
           ? new Date(accountData.birthday)
@@ -83,6 +95,7 @@ const AccountDetailPage = () => {
         province: accountData?.ward?.district?.provinceId?.toString(),
         wardId: accountData?.wardId?.toString(),
       });
+      form.reset();
     }
   }, [accountData]);
 
@@ -215,8 +228,9 @@ const AccountDetailPage = () => {
     >
       <Group
         mb={rem(20)}
-        justify="space-between"
+        align="center"
       >
+        <BackButton />
         <Text
           size="lg"
           fw={"bold"}
@@ -271,6 +285,7 @@ const AccountDetailPage = () => {
               pb={rem(10)}
             >
               <Button
+                disabled={!form.isDirty()}
                 loading={isUpdateAccountLoading}
                 type="submit"
                 mt={10}

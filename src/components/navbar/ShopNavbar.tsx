@@ -26,7 +26,14 @@ const mockdata = [
       { label: "Employee", link: "/shop/employee" },
     ],
   },
-  { label: "Report", icon: IconFileAnalytics, path: "report" },
+  {
+    label: "Report",
+    icon: IconFileAnalytics,
+    links: [
+      { label: "Incident", link: "/shop/incident" },
+      { label: "Live", link: "/shop/report" },
+    ],
+  },
   {
     label: "Employee",
     icon: IconLock,

@@ -8,17 +8,13 @@ import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
 import {
-  ActionIcon,
   Badge,
   Box,
-  Button,
   Center,
   Group,
   Image,
   Loader,
   LoadingOverlay,
-  Mark,
-  Modal,
   Pagination,
   Paper,
   Table,
@@ -26,20 +22,12 @@ import {
   rem,
 } from "@mantine/core";
 import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
-import { useDisclosure } from "@mantine/hooks";
-import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
-import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
 import dayjs from "dayjs";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
-import { notifications } from "@mantine/notifications";
-import { IconTrash } from "@tabler/icons-react";
-import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender, IncidentStatus } from "../../models/CamAIEnum";
 import BackButton from "../../components/button/BackButton";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
-import classes from "./EmployeeDetailPage.module.scss";
+import classes from "./ShopEmployeeDetailPage.module.scss";
 import { IMAGE_CONSTANT } from "../../types/constant";
 
 export type CreateEmployeeField = {
@@ -54,16 +42,14 @@ export type CreateEmployeeField = {
   district: string;
 };
 
-const EmployeeDetailPage = () => {
+const ShopEmployeeDetailPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [activePage, setPage] = useState(1);
 
-  const [opened, { open, close }] = useDisclosure(false);
   const {
     data: employeeData,
     isLoading: isEmployeeDataLoading,
-    refetch,
     isFetching,
   } = useGetEmployeeById(params?.id ?? "");
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
@@ -84,8 +70,6 @@ const EmployeeDetailPage = () => {
           : "Invalid phone number - ex: 0379999999",
     },
   });
-  const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
-    useDeleteEmployeeById();
 
   useEffect(() => {
     if (employeeData) {
@@ -115,9 +99,6 @@ const EmployeeDetailPage = () => {
     +(updateEmployeeForm.values.district ?? 0)
   );
 
-  const { mutate: updateEmployee, isLoading: isUpdateEmployeeLoading } =
-    useUpdateEmployeeById();
-
   const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
     switch (status) {
       case IncidentStatus.New:
@@ -136,19 +117,16 @@ const EmployeeDetailPage = () => {
       <Table.Tr
         key={index}
         className={classes["clickable"]}
-        onClick={() => navigate(`/shop/incident/${row.id}`)}
+        onClick={() => navigate(`/brand/incident/${row.id}`)}
       >
         <Table.Td>
           <Text>{row.incidentType}</Text>
         </Table.Td>
-        <Table.Td>{dayjs(row.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
+        <Table.Td>{dayjs(row?.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
           <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/shop/employee/${row?.employee?.id}`);
             }}
           >
             {row?.employee?.name}
@@ -170,6 +148,7 @@ const EmployeeDetailPage = () => {
           placeholder: "Name",
           label: "Name",
           required: true,
+          readonly: true,
         },
       },
       {
@@ -180,6 +159,7 @@ const EmployeeDetailPage = () => {
           placeholder: "Email",
           label: "Email",
           required: true,
+          readonly: true,
         },
       },
       {
@@ -191,6 +171,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "gender",
           required: true,
+          readonly: true,
         },
         spans: 6,
       },
@@ -203,6 +184,7 @@ const EmployeeDetailPage = () => {
           type: "number",
           placeholder: "Phone",
           label: "Phone",
+          readonly: true,
         },
         spans: 6,
       },
@@ -213,6 +195,7 @@ const EmployeeDetailPage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
+          readonly: true,
         },
       },
       {
@@ -226,6 +209,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "province",
           loading: isProvicesLoading,
+          readonly: true,
         },
         spans: 4,
       },
@@ -240,6 +224,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "district",
           loading: isDistrictsLoading,
+          readonly: true,
         },
         spans: 4,
       },
@@ -254,6 +239,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "wardId",
           loading: isWardsLoading,
+          readonly: true,
         },
         spans: 4,
       },
@@ -264,6 +250,7 @@ const EmployeeDetailPage = () => {
           name: "addressLine",
           placeholder: "Employee address",
           label: "Employee address",
+          readonly: true,
         },
       },
     ];
@@ -301,78 +288,13 @@ const EmployeeDetailPage = () => {
               Employee - {employeeData?.name}
             </Text>
           </Group>
-
-          <ActionIcon
-            color="red"
-            onClick={open}
-            size={"lg"}
-          >
-            <IconTrash style={{ width: rem(20), height: rem(20) }} />
-          </ActionIcon>
         </Group>
         {isEmployeeDataLoading ? (
           <Loader />
         ) : (
-          <form
-            onSubmit={updateEmployeeForm.onSubmit(
-              ({
-                name,
-                addressLine,
-                birthday,
-                email,
-                gender,
-                phone,
-                wardId,
-              }) => {
-                const createEmployeeParams: UpdateEmployeeParams = {
-                  email: email ?? "",
-                  name: name ?? "",
-                  gender: gender ?? "",
-                  addressLine,
-                  birthday: birthday
-                    ? dayjs(birthday).format("YYYY-MM-DD")
-                    : null,
-                  phone,
-                  wardId: wardId ? +wardId : null,
-                };
-                updateEmployee(
-                  { ...createEmployeeParams, employeeId: params.id ?? "" },
-                  {
-                    onSuccess() {
-                      refetch();
-
-                      notifications.show({
-                        title: "Successfully",
-                        message: "Update employee successfully!",
-                      });
-                    },
-                    onError(data) {
-                      const error = data as AxiosError<ResponseErrorDetail>;
-                      notifications.show({
-                        color: "red",
-                        title: "Failed",
-                        message: error.response?.data?.message,
-                      });
-                    },
-                  }
-                );
-              }
-            )}
-          >
+          <Box pb={rem(20)}>
             <EditAndUpdateForm fields={fields} />
-            <Group
-              justify="flex-end"
-              mt="md"
-            >
-              <Button
-                type="submit"
-                disabled={!updateEmployeeForm.isDirty()}
-                loading={isUpdateEmployeeLoading}
-              >
-                Update
-              </Button>
-            </Group>
-          </form>
+          </Box>
         )}
       </Paper>
 
@@ -443,59 +365,8 @@ const EmployeeDetailPage = () => {
           />
         </Group>
       </Paper>
-
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={
-          <Text>
-            Confirm delete <Mark>{employeeData?.name}</Mark> account ?
-          </Text>
-        }
-        // centered
-      >
-        <Group
-          justify="flex-end"
-          mt="md"
-        >
-          <Button
-            loading={isDeleteEmployeeLoading}
-            onClick={() => {
-              deleteEmployee(params.id ?? "", {
-                onSuccess() {
-                  notifications.show({
-                    title: "Successfully",
-                    message: "Delete employee successfully!",
-                  });
-                  navigate("/shop/detail");
-                },
-                onError(data) {
-                  const error = data as AxiosError<ResponseErrorDetail>;
-                  notifications.show({
-                    color: "red",
-                    title: "Failed",
-                    message: error.response?.data?.message,
-                  });
-                },
-              });
-            }}
-            variant="filled"
-            size="xs"
-          >
-            Yes
-          </Button>
-          <Button
-            onClick={close}
-            color={"red"}
-            variant="outline"
-            size="xs"
-          >
-            No
-          </Button>
-        </Group>
-      </Modal>
     </Box>
   );
 };
 
-export default EmployeeDetailPage;
+export default ShopEmployeeDetailPage;

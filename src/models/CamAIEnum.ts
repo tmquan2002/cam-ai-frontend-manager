@@ -8,8 +8,11 @@ export enum BrandStatus {
   Inactive = "Inactive",
 }
 export enum EdgeboxInstallStatus {
-  Valid = "Valid",
-  Expired = "Expired",
+  Working = "Working",
+  Unhealthy = "Unhealthy",
+  Disabled = "Disabled",
+  New = "New",
+  Connected = "Connected",
 }
 export enum EdgeBoxLocation {
   Idle = "Idle",
@@ -23,6 +26,7 @@ export enum EdgeBoxStatus {
   Active = "Active",
   Inactive = "Inactive",
   Broken = "Broken",
+  Disposed = "Disposed",
 }
 
 export enum EmployeeStatus {
@@ -81,4 +85,25 @@ export enum TokenType {
 export enum Zone {
   Cashier = "Cashier",
   Customer = "Customer",
+}
+
+export enum IncidentType {
+  Phone = "Phone",
+  Uniform = "Uniform",
+}
+
+export enum IncidentStatus {
+  New = "New",
+  Accepted = "Accepted",
+  Rejected = "Rejected",
+}
+
+export enum EvidenceStatus {
+  ToBeFetched = "ToBeFetched",
+  Fetched = "Fetched",
+  NotFound = "NotFound",
+}
+
+export enum EvidenceType {
+  Image = "Image",
 }

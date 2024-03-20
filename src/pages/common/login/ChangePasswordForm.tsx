@@ -4,11 +4,11 @@ import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { MdLockOutline } from "react-icons/md";
-import { useSession } from "../../../../context/AuthContext";
-import { useChangePassword } from "../../../../hooks/useChangePassword";
-import { AuthToken } from "../../../../models/Auth";
-import { ResponseErrorDetail } from "../../../../models/Response";
-import { ChangePasswordParams } from "../../../../apis/ProfileAPI";
+import { ChangePasswordParams } from "../../../apis/ProfileAPI";
+import { useSession } from "../../../context/AuthContext";
+import { useChangePassword } from "../../../hooks/useChangePassword";
+import { AuthToken } from "../../../models/Auth";
+import { ResponseErrorDetail } from "../../../models/Response";
 
 export const ChangePasswordForm = (data: AuthToken) => {
   const sessionHook = useSession();

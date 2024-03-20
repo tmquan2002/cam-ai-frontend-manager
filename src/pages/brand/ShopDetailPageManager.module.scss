@@ -18,3 +18,15 @@
 .scrolled {
   box-shadow: var(--mantine-shadow-sm);
 }
+
+.pointer-style {
+  cursor: pointer;
+}
+.pointer-style:hover {
+  text-decoration: underline;
+}
+
+.icon {
+  width: rem(20);
+  height: auto;
+}

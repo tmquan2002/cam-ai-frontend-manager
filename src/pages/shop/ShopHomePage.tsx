@@ -1,68 +1,13 @@
-import {
-  ActionIcon,
-  Box,
-  Card,
-  Flex,
-  Grid,
-  Group,
-  Menu,
-  Table,
-  Text,
-  ThemeIcon,
-  rem,
-  useComputedColorScheme,
-} from "@mantine/core";
-import classes from "./ShopHomePage.module.scss";
-import {
-  IconDots,
-  IconEye,
-  IconFileZip,
-  IconList,
-  IconTrash,
-} from "@tabler/icons-react";
 import { LineChart } from "@mantine/charts";
+import {
+  Box, Card, Flex, Grid, Group,
+  Text, ThemeIcon, rem, useComputedColorScheme
+} from "@mantine/core";
+import { IconList } from "@tabler/icons-react";
 import * as _ from "lodash";
-
-const data = [
-  {
-    date: "Mar 22",
-    Apples: 2890,
-    Oranges: 2338,
-    Tomatoes: 2452,
-  },
-  {
-    date: "Mar 23",
-    Apples: 2756,
-    Oranges: 2103,
-    Tomatoes: 2402,
-  },
-  {
-    date: "Mar 24",
-    Apples: 3322,
-    Oranges: 986,
-    Tomatoes: 1821,
-  },
-  {
-    date: "Mar 25",
-    Apples: 3470,
-    Oranges: 2108,
-    Tomatoes: 2809,
-  },
-  {
-    date: "Mar 26",
-    Apples: 3129,
-    Oranges: 1726,
-    Tomatoes: 2290,
-  },
-];
-
-const elements = [
-  { position: 6, mass: 12.011, symbol: "C", name: "Carbon" },
-  { position: 7, mass: 14.007, symbol: "N", name: "Nitrogen" },
-  { position: 39, mass: 88.906, symbol: "Y", name: "Yttrium" },
-  { position: 56, mass: 137.33, symbol: "Ba", name: "Barium" },
-  { position: 58, mass: 140.12, symbol: "Ce", name: "Cerium" },
-];
+import { useReports } from "../../hooks/useReport";
+import { getDateTime, returnWebsocketConnection } from "../../utils/helperFunction";
+import classes from "./ShopHomePage.module.scss";
 
 export type TitleAndNumberCard = {
   title: string;
@@ -104,14 +49,8 @@ const ShopHomePage = () => {
     getInitialValueInEffect: true,
   });
 
-  const rows = elements.map((element) => (
-    <Table.Tr key={element.name}>
-      <Table.Td>{element.position}</Table.Td>
-      <Table.Td>{element.name}</Table.Td>
-      <Table.Td>{element.symbol}</Table.Td>
-      <Table.Td>{element.mass}</Table.Td>
-    </Table.Tr>
-  ));
+  const { data, lastJsonMessage, readyState } = useReports();
+
   return (
     <Box m={rem(32)}>
       <Grid
@@ -148,143 +87,21 @@ const ShopHomePage = () => {
               fz={22}
               c={"light-blue.4"}
             >
-              STATIC VALUES
+              LIVE SHOP COUNT
             </Text>
-
-            <Menu
-              withinPortal
-              position="bottom-end"
-              shadow="sm"
-            >
-              <Menu.Target>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                >
-                  <IconDots style={{ width: rem(16), height: rem(16) }} />
-                </ActionIcon>
-              </Menu.Target>
-
-              <Menu.Dropdown>
-                <Menu.Item
-                  leftSection={
-                    <IconFileZip style={{ width: rem(14), height: rem(14) }} />
-                  }
-                >
-                  Download zip
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={
-                    <IconEye style={{ width: rem(14), height: rem(14) }} />
-                  }
-                >
-                  Preview all
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={
-                    <IconTrash style={{ width: rem(14), height: rem(14) }} />
-                  }
-                  color="red"
-                >
-                  Delete all
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
           </Group>
         </Card.Section>
+        <Text mt={20}>Connection status: {returnWebsocketConnection(readyState)}</Text>
+        <Text mt={10}>Last update: {lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}</Text>
         <LineChart
           h={300}
           data={data}
-          dataKey="date"
-          tooltipAnimationDuration={200}
+          dataKey="Time"
           py={rem(40)}
           series={[
-            { name: "Apples", color: "indigo.6" },
-            { name: "Oranges", color: "blue.6" },
-            { name: "Tomatoes", color: "teal.6" },
+            { name: "Total", color: "light-blue.6" },
           ]}
         />
-      </Card>
-
-      <Card
-        my={rem(32)}
-        style={{
-          backgroundColor:
-            computedColorScheme === "light" ? "white" : "#1f1f1f",
-        }}
-      >
-        <Card.Section
-          withBorder
-          inheritPadding
-        >
-          <Group
-            justify="space-between"
-            my={rem(20)}
-          >
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={22}
-              c={"light-blue.4"}
-            >
-              INICIDENT VALUES
-            </Text>
-
-            <Menu
-              withinPortal
-              position="bottom-end"
-              shadow="sm"
-            >
-              <Menu.Target>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                >
-                  <IconDots style={{ width: rem(16), height: rem(16) }} />
-                </ActionIcon>
-              </Menu.Target>
-
-              <Menu.Dropdown>
-                <Menu.Item
-                  leftSection={
-                    <IconFileZip style={{ width: rem(14), height: rem(14) }} />
-                  }
-                >
-                  Download zip
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={
-                    <IconEye style={{ width: rem(14), height: rem(14) }} />
-                  }
-                >
-                  Preview all
-                </Menu.Item>
-                <Menu.Item
-                  leftSection={
-                    <IconTrash style={{ width: rem(14), height: rem(14) }} />
-                  }
-                  color="red"
-                >
-                  Delete all
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-          </Group>
-        </Card.Section>
-        <Table
-          highlightOnHover
-          verticalSpacing={"md"}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>Element position</Table.Th>
-              <Table.Th>Element name</Table.Th>
-              <Table.Th>Symbol</Table.Th>
-              <Table.Th>Atomic mass</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
       </Card>
     </Box>
   );
