@@ -2,7 +2,7 @@ trigger:
 - deploy/vps
 
 pool:
-  name: 'Default'
+  name: 'Azure Pipelines'
 
 variables:
 - group: web-admin-group
