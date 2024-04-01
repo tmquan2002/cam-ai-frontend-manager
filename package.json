@@ -20,6 +20,7 @@
     "@mantine/notifications": "^7.4.2",
     "@tabler/icons-react": "^2.46.0",
     "axios": "^1.6.3",
+    "axios-auth-refresh": "^3.3.6",
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
     "firebase": "^8.2.0",

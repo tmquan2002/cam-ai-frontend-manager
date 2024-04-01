@@ -42,7 +42,6 @@ import {
   EdgeBoxStatus,
   EdgeboxInstallStatus,
 } from "../../models/CamAIEnum";
-import dayjs from "dayjs";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 
 export type FormFieldValue = {
@@ -131,7 +130,7 @@ const ShopDetailPage = () => {
     },
   });
   const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
-  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading} =
     useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? "");
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
@@ -459,7 +458,7 @@ const ShopDetailPage = () => {
               transitionProps={{ transition: "slide-up", duration: 300 }}
             >
               {renderEdgeboxInstallStatusBadge(
-                edgeBoxInstallList?.[0].edgeBoxInstallStatus
+                edgeBoxInstallList?.values?.[0].edgeBoxInstallStatus
               )}
             </Tooltip>
             <Tooltip
@@ -467,7 +466,7 @@ const ShopDetailPage = () => {
               transitionProps={{ transition: "slide-up", duration: 300 }}
             >
               {renderEdboxStatusBadge(
-                edgeBoxInstallList?.[0].edgeBox.edgeBoxStatus
+                edgeBoxInstallList?.values?.[0].edgeBox.edgeBoxStatus
               )}
             </Tooltip>
             <Tooltip
@@ -475,7 +474,7 @@ const ShopDetailPage = () => {
               transitionProps={{ transition: "slide-up", duration: 300 }}
             >
               {renderEdboxLocationBadge(
-                edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
+                edgeBoxInstallList?.values?.[0].edgeBox.edgeBoxLocation
               )}
             </Tooltip>
           </Group>
@@ -499,33 +498,7 @@ const ShopDetailPage = () => {
                   >
                     Name
                   </Text>
-                  <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
-                </Box>
-                <Box>
-                  <Text
-                    fw={500}
-                    c={"dimmed"}
-                  >
-                    Valid from
-                  </Text>
-                  <Text fw={500}>
-                    {dayjs(edgeBoxInstallList?.[0].validFrom).format(
-                      "YYYY-MM-DD"
-                    )}
-                  </Text>
-                </Box>
-                <Box>
-                  <Text
-                    fw={500}
-                    c={"dimmed"}
-                  >
-                    Valid until
-                  </Text>
-                  <Text fw={500}>
-                    {dayjs(edgeBoxInstallList?.[0].validUntil).format(
-                      "YYYY-MM-DD"
-                    )}
-                  </Text>
+                  <Text fw={500}>{edgeBoxInstallList?.values?.[0].edgeBox.name}</Text>
                 </Box>
               </Group>
               <Divider my={rem(20)} />

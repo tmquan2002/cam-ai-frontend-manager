@@ -1,4 +1,6 @@
+import { BrandDetail } from "./Brand";
 import {
+  EdgeBoxActivationStatus,
   EdgeBoxLocation,
   EdgeBoxStatus,
   EdgeboxInstallStatus,
@@ -26,21 +28,16 @@ export type EdgeBoxModelDetail = {
   storage: string;
   os: string;
   id: string;
-  createdDate: string;
-  modifiedDate: string;
 };
 
 export type EdgeBoxInstallDetail = {
   edgeBoxId: string;
   shopId: string;
-  ipAddress: string;
-  port: number;
-  validFrom: string;
-  validUntil: string;
+  uninstalledTime: string | null;
+  activationStatus: EdgeBoxActivationStatus;
   edgeBoxInstallStatus: EdgeboxInstallStatus;
   edgeBox: EdgeboxDetail;
   shop: ShopDetail;
+  brand: BrandDetail;
   id: string;
-  createdDate: string;
-  modifiedDate: string;
 };

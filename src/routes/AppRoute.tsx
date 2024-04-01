@@ -11,7 +11,6 @@ import BrandRoute from "./BrandRoute";
 import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
 import CreateShop from "../pages/brand/CreateShop";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
-import CommonLandingPage from "../pages/common/Landing/CommonLandingPage";
 import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
@@ -35,11 +34,7 @@ const AppRoute = () => {
       element: <CommonRoute />,
       children: [
         {
-          path: "",
-          element: <CommonLandingPage />,
-        },
-        {
-          path: "/login",
+          path: "*",
           element: <LoginPage />,
           index: true,
         },

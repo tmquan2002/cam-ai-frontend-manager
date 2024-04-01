@@ -1,3 +1,4 @@
+import { CommonResponse } from './../models/Common';
 import { UseQueryResult, useQuery } from "react-query";
 import { EdgeBoxApi } from "../apis/EdgeBoxAPI";
 import { EdgeBoxInstallDetail } from "../models/Edgebox";
@@ -10,7 +11,7 @@ export const useGetEdgeBoxInstallByShopId = (shopId: string) => {
     isFetching,
     refetch,
     error,
-  }: UseQueryResult<EdgeBoxInstallDetail[], Error> = useQuery({
+  }: UseQueryResult<CommonResponse<EdgeBoxInstallDetail>, Error> = useQuery({
     queryKey: ["EdgeBoxInstall", shopId],
     queryFn: async () => {
       return await EdgeBoxApi._getEdgeBoxInstallByShopId(shopId);
