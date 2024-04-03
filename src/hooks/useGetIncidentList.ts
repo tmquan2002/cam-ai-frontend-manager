@@ -9,6 +9,7 @@ export const useGetIncidentList = (params: GetIncidentParams) => {
     isLoading,
     data,
     error,
+    refetch,
   }: UseQueryResult<CommonResponse<IncidentDetail>, Error> = useQuery({
     queryKey: ["incidents", params],
     queryFn: async () => {
@@ -16,5 +17,5 @@ export const useGetIncidentList = (params: GetIncidentParams) => {
     },
   });
 
-  return { isError, isLoading, data, error };
+  return { isError, isLoading, data, error, refetch };
 };

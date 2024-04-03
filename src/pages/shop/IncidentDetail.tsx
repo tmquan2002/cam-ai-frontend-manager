@@ -197,7 +197,7 @@ const IncidentDetail = () => {
             fw={500}
           >
             {incidentData?.incidentType} Incident -{" "}
-            {dayjs(incidentData?.time).format("DD/MM/YYYY h:mm A")}
+            {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
           </Text>
           {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
         </Group>
@@ -266,39 +266,7 @@ const IncidentDetail = () => {
             mr={rem(20)}
             py={rem(4)}
           >
-            {/* <Box px={rem(32)}>
-              <Text
-                fw={500}
-                size={rem(20)}
-                my={rem(20)}
-              >
-                Time line
-              </Text>
-              <Divider color="#acacac" />
-              <Box mt={rem(10)}>
-                {[1, 2, 3].map((item) => {
-                  return (
-                    <Box key={item}>
-                      <Group>
-                        <Text className={classes.right_section_desctiption}>
-                          {dayjs(incidentData?.time).format(
-                            "DD/MM/YYYY h:mm A"
-                          )}
-                        </Text>
-                        <Text className={classes.right_section_desctiption}>
-                          Incident release
-                        </Text>
-                      </Group>
-                      {item != 3 && <Divider />}
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Box>
-            <Divider
-              color="#acacac"
-              mt={rem(16)}
-            /> */}
+            
             <Box px={rem(32)}>
               <Text
                 fw={500}
