@@ -84,9 +84,10 @@ export function SessionProvider(props: React.PropsWithChildren) {
               localStorage.clear();
               navigate("/");
             }
+          }else{
+            Promise.reject(err);
           }
 
-        Promise.reject(err);
       }
     );
   }, []);

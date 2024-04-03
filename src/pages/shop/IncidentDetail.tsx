@@ -30,6 +30,8 @@ import { useAssignIncident } from "../../hooks/useAssignIncident";
 import { notifications } from "@mantine/notifications";
 import { ResponseErrorDetail } from "../../models/Response";
 import { AxiosError } from "axios";
+import NoImage from "../../components/image/NoImage";
+import _ from "lodash";
 
 type IncidentFormField = {
   employeeId: string | null;
@@ -40,16 +42,10 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
     case EvidenceType.Image:
       return (
         <Box>
-          <Group
-            align="center"
-            mb={rem(12)}
-          >
+          <Group align="center" mb={rem(12)}>
             <Group gap={"xl"}>
               <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
+                <Text fw={500} c={"dimmed"}>
                   Created time
                 </Text>
                 <Text fw={500}>
@@ -57,10 +53,7 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
                 </Text>
               </Box>
               <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
+                <Text fw={500} c={"dimmed"}>
                   Camera
                 </Text>
                 <Text fw={500}>{evidence?.cameraId}</Text>
@@ -165,10 +158,12 @@ const IncidentDetail = () => {
 
   useEffect(() => {
     if (incidentData?.employeeId) {
-      form.setValues({ employeeId: incidentData?.employeeId });
+      form.setInitialValues({ employeeId: incidentData?.employeeId });
     } else {
-      form.setValues({ employeeId: null });
+      form.setInitialValues({ employeeId: null });
     }
+    form.reset()
+
   }, [incidentData]);
 
   if (isGetIncidentLoading) {
@@ -177,25 +172,10 @@ const IncidentDetail = () => {
 
   return (
     <Box>
-      <Group
-        px={rem(64)}
-        bg={"white"}
-        justify="space-between"
-        align="center"
-      >
-        <Group
-          py={rem(32)}
-          align="center"
-        >
-          <BackButton
-            color="#000"
-            w={rem(36)}
-            h={rem(36)}
-          />
-          <Text
-            size={rem(20)}
-            fw={500}
-          >
+      <Group px={rem(64)} bg={"white"} justify="space-between" align="center">
+        <Group py={rem(32)} align="center">
+          <BackButton color="#000" w={rem(36)} h={rem(36)} />
+          <Text size={rem(20)} fw={500}>
             {incidentData?.incidentType} Incident -{" "}
             {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
           </Text>
@@ -209,10 +189,7 @@ const IncidentDetail = () => {
             onClick={openModal}
             loading={isRejectIncidentLoading}
           >
-            <IconIdOff
-              style={{ width: "70%", height: "70%" }}
-              stroke={1.5}
-            />
+            <IconIdOff style={{ width: "70%", height: "70%" }} stroke={1.5} />
           </ActionIcon>
         </Tooltip>
       </Group>
@@ -230,27 +207,22 @@ const IncidentDetail = () => {
             px={rem(32)}
             py={rem(28)}
           >
-            <Text
-              fw={500}
-              size={rem(20)}
-              mb={rem(28)}
-            >
+            <Text fw={500} size={rem(20)} mb={rem(28)}>
               Evidence
             </Text>
-            <Divider
-              color="#acacac"
-              mb={rem(20)}
-            />
-            {incidentData?.evidences?.map((item) => {
-              return (
-                <Box
-                  key={item.id}
-                  mb={rem(20)}
-                >
-                  {renderIncidentFootage(item)}
-                </Box>
-              );
-            })}
+            <Divider color="#acacac" mb={rem(20)} />
+            {_.isEmpty(incidentData?.evidences) ? (
+              <NoImage />
+            ) : (
+              incidentData?.evidences?.map((item) => {
+                return (
+                  <Box key={item.id} mb={rem(20)}>
+                    {renderIncidentFootage(item)}
+                  </Box>
+                );
+              })
+            )}
+
             {/* <Box mb={rem(20)}>
               <ReactPlayer url="https://www.youtube.com/watch?v=TSwPIYczhPc&t=1s" />
             </Box>
@@ -260,19 +232,9 @@ const IncidentDetail = () => {
           </Paper>
         </Box>
         <Box w={rem(500)}>
-          <Paper
-            shadow="xs"
-            mt={rem(40)}
-            mr={rem(20)}
-            py={rem(4)}
-          >
-            
+          <Paper shadow="xs" mt={rem(40)} mr={rem(20)} py={rem(4)}>
             <Box px={rem(32)}>
-              <Text
-                fw={500}
-                size={rem(20)}
-                my={rem(20)}
-              >
+              <Text fw={500} size={rem(20)} my={rem(20)}>
                 Assigned to
               </Text>
               <Divider color="#acacac" />
@@ -295,11 +257,7 @@ const IncidentDetail = () => {
                   />
                 )}
 
-                <Group
-                  justify="flex-end"
-                  mt="md"
-                  pb={rem(20)}
-                >
+                <Group justify="flex-end" mt="md" pb={rem(20)}>
                   <Button
                     type="submit"
                     loading={isAssignIncidentLoading}

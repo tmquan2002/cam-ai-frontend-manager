@@ -679,7 +679,7 @@ const ShopDetailPageManager = () => {
               transitionProps={{ transition: "slide-up", duration: 300 }}
             >
               {renderEdgeboxInstallStatusBadge(
-                edgeBoxInstallList?.[0]?.edgeBoxInstallStatus
+                edgeBoxInstallList?.values?.[0]?.edgeBoxInstallStatus
               )}
             </Tooltip>
             <Tooltip
@@ -687,7 +687,7 @@ const ShopDetailPageManager = () => {
               transitionProps={{ transition: "slide-up", duration: 300 }}
             >
               {renderEdboxStatusBadge(
-                edgeBoxInstallList?.[0]?.edgeBox.edgeBoxStatus
+                edgeBoxInstallList?.values?.[0]?.edgeBox.edgeBoxStatus
               )}
             </Tooltip>
             <Tooltip
@@ -695,7 +695,7 @@ const ShopDetailPageManager = () => {
               transitionProps={{ transition: "slide-up", duration: 300 }}
             >
               {renderEdboxLocationBadge(
-                edgeBoxInstallList?.[0]?.edgeBox.edgeBoxLocation
+                edgeBoxInstallList?.values?.[0]?.edgeBox.edgeBoxLocation
               )}
             </Tooltip>
           </Group>

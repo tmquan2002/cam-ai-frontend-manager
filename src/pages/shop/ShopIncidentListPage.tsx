@@ -8,6 +8,7 @@ import {
   Divider,
   Flex,
   Group,
+  Image,
   Loader,
   Paper,
   ScrollArea,
@@ -157,6 +158,15 @@ const ShopIncidentListPage = () => {
       setSelectedIncident(null);
     }
   }, [form.isDirty(), form.values]);
+
+  useEffect(() => {
+    if (incidentData?.employeeId) {
+      assignIncidentForm.setInitialValues({ employeeId: incidentData?.employeeId });
+    } else {
+      assignIncidentForm.setInitialValues({ employeeId: null });
+    }
+    assignIncidentForm.reset()
+  }, [incidentData]);
 
   const openModal = () =>
     modals.openConfirmModal({
@@ -404,7 +414,7 @@ const ShopIncidentListPage = () => {
           >
             <Skeleton visible={isGetIncidentLoading}>
               <Box pl={rem(12)} pr={rem(32)}>
-                <Group bg={"white"} justify="space-between" align="center">
+                <Group  justify="space-between" align="center">
                   <Group py={rem(32)} align="center">
                     <Text size={rem(20)} fw={500}>
                       {incidentData?.incidentType} Incident -{" "}
@@ -445,7 +455,7 @@ const ShopIncidentListPage = () => {
                   })
                 )}
 
-                <Box px={rem(32)}>
+                <Box >
                   <Text fw={500} size={rem(20)} my={rem(20)}>
                     Assigned to
                   </Text>

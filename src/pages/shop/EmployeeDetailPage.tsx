@@ -141,7 +141,7 @@ const EmployeeDetailPage = () => {
         <Table.Td>
           <Text>{row.incidentType}</Text>
         </Table.Td>
-        <Table.Td>{dayjs(row.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
+        <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
           <Text
             className={classes["pointer-style"]}
