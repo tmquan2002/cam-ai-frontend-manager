@@ -188,8 +188,10 @@ const ShopDetailPageManager = () => {
     },
   });
   const { data, isLoading, refetch } = useGetShopById(id ?? "0");
-  const { data: accountList, isLoading: isAccountListLoading } =
-    useGetAccountList({});
+  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList } =
+    useGetAccountList({
+      size: 999
+    });
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -266,6 +268,7 @@ const ShopDetailPageManager = () => {
       <Accordion.Panel>
         <Group justify="flex-end">
           <Button
+          disabled={data?.shopManager?.id == item?.id}
             onClick={() => {
               const params: UpdateShopParams = {
                 shopId: id ?? "",
@@ -282,6 +285,7 @@ const ShopDetailPageManager = () => {
                     message: "Shop updated!",
                   });
                   refetch();
+                  refetchAccountList();
                   toggle();
                 },
                 onError(data) {

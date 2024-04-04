@@ -1,6 +1,5 @@
 import _ from "lodash";
 import { getAccessToken, getRefreshToken } from "../context/AuthContext";
-import { setHeaderToken } from "../utils/http";
 import { CommonConstant } from "../types/constant";
 import { LoginAPI } from "../apis/LoginAPI";
 
@@ -22,7 +21,6 @@ export const refreshAuth = async (failedRequest: any) => {
   
     if (newToken) {
       failedRequest.response.config.headers.Authorization = "Bearer " + newToken;
-      setHeaderToken(newToken);
       localStorage.setItem(CommonConstant.USER_ACCESS_TOKEN, newToken)
       return Promise.resolve(newToken);
     } else {

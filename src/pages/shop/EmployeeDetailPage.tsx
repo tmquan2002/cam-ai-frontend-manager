@@ -70,6 +70,7 @@ const EmployeeDetailPage = () => {
     useGetIncidentList({
       size: 12,
       pageIndex: activePage - 1,
+      employeeId: params?.id?? undefined
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
