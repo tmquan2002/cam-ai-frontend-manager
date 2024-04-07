@@ -81,11 +81,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
       (err) => {
           if (err?.response?.status == 401) {
             if (err?.response?.headers.auto != "True") {
+            console.log("clear tokens auth context");
               localStorage.clear();
               navigate("/");
             }
           }
-          return err;
+          throw err;
 
       }
     );
@@ -101,6 +102,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
           navigate(0);
         },
         signOut: () => {
+          
           localStorage.clear()
           navigate("/login");
         },

@@ -1,5 +1,5 @@
 import firebase from "firebase/app";
-import "firebase/messaging";
+import  "firebase/messaging";
 
 if (!firebase.apps.length) {
   firebase.initializeApp({

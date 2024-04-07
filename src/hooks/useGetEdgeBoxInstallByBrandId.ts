@@ -3,7 +3,7 @@ import { UseQueryResult, useQuery } from "react-query";
 import { EdgeBoxApi } from "../apis/EdgeBoxAPI";
 import { EdgeBoxInstallDetail } from "../models/Edgebox";
 
-export const useGetEdgeBoxInstallByShopId = (shopId: string | null) => {
+export const useGetEdgeBoxInstallByBrandId = (brandId: string | null) => {
   const {
     isError,
     isLoading,
@@ -12,10 +12,10 @@ export const useGetEdgeBoxInstallByShopId = (shopId: string | null) => {
     refetch,
     error,
   }: UseQueryResult<CommonResponse<EdgeBoxInstallDetail>, Error> = useQuery({
-    queryKey: ["EdgeBoxInstall", shopId],
-    enabled: !!shopId,
+    queryKey: ["EdgeBoxInstall", brandId],
+    enabled: !!brandId,
     queryFn: async () => {
-      return await EdgeBoxApi._getEdgeBoxInstallByShopId(shopId ?? "");
+      return await EdgeBoxApi._getEdgeBoxInstallByBrandId(brandId ?? "");
     },
   });
 

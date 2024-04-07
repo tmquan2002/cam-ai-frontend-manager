@@ -12,12 +12,14 @@ import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { MantineProvider, createTheme } from "@mantine/core";
 import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
+import { useEffect } from "react";
+import { getMessagingToken, onMessageListener } from "./utils/firebase";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: false,
+      retry: 2,
     },
   },
 });
@@ -33,7 +35,24 @@ const theme = createTheme({
   },
 });
 
+const handleMessageListener = () => {
+  onMessageListener()
+  .then((data) => {
+    console.log("Receive foreground: ", data);
+  })
+  .catch((err) => console.log(err));
+}
+
 function App() {
+
+  useEffect(() => {
+    getMessagingToken();
+  }, []);
+
+  useEffect(() => {
+    handleMessageListener()
+  })
+
   return (
     <MantineProvider
       theme={theme}

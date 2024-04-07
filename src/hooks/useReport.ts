@@ -45,7 +45,6 @@ export const useReports = () => {
         data,
         updatedJson
       );
-      console.log(newArray);
       setData(newArray);
     }
   }, [lastJsonMessage]);

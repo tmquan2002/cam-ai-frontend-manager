@@ -27,6 +27,7 @@ import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
 import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
 import BranddReportPage from "../pages/brand/BrandReportPage";
+import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -131,6 +132,9 @@ const AppRoute = () => {
         },
         { path: "incident", element: <IncidentListPage /> },
         { path: "incident/:id", element: <ShopIncidentDetailPage /> },
+        {
+          path: "edgeBox", element: <EdgeBoxListPage/>
+        },
         {
           path: "report",
           element: <BranddReportPage />,

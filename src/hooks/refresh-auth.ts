@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { getAccessToken, getRefreshToken } from "../context/AuthContext";
 import { CommonConstant } from "../types/constant";
 import { LoginAPI } from "../apis/LoginAPI";
@@ -6,13 +5,13 @@ import { LoginAPI } from "../apis/LoginAPI";
 
 
 export const refreshAuth = async (failedRequest: any) => {
-    const accessToken = getAccessToken();
-    const refreshToken = getRefreshToken()
+    // const accessToken = getAccessToken();
+    // const refreshToken = getRefreshToken()
 
-    if(_.isEmpty(accessToken) || _.isEmpty(refreshToken)) {
-        localStorage.clear();
+    // if(_.isEmpty(accessToken) || _.isEmpty(refreshToken)) {
+    //     localStorage.clear();
 
-    }
+    // }
 
     const newToken = await LoginAPI.refresh({
         accessToken: getAccessToken() ?? "",
@@ -24,7 +23,10 @@ export const refreshAuth = async (failedRequest: any) => {
       localStorage.setItem(CommonConstant.USER_ACCESS_TOKEN, newToken)
       return Promise.resolve(newToken);
     } else {
+      console.log("clear tokens refresh-auth");
         localStorage.clear()
+        location.reload();
+
       return Promise.reject();
     }
   };

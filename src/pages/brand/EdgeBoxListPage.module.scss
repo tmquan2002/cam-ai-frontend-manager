@@ -1,0 +1,17 @@
+.edgeBox-button {
+    border-bottom: 1px solid #ccc;
+}
+
+.edgeBox-button-active{
+    background-color: #eee;
+}
+
+.edgeBox-collapse{
+    border-bottom: 1px solid #ccc;
+    background-color: #eee;
+}
+
+.edgeBox-button:hover, .edgeBox-collapse:hover, .edgeBox-button-active:hover{
+    background-color:  #eee;
+    cursor: pointer;
+}

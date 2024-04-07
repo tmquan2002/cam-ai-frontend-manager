@@ -17,6 +17,7 @@ class Http {
       statusCodes: [401], // default: [ 401 ]
       shouldRefresh:(err) => err?.response?.headers?.auto == "True",
       pauseInstanceWhileRefreshing: true,
+      
     });
   }
 }

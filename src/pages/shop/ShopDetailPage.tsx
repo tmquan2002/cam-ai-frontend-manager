@@ -131,7 +131,7 @@ const ShopDetailPage = () => {
   });
   const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
   const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading} =
-    useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? "");
+    useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
