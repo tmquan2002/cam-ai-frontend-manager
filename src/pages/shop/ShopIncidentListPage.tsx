@@ -1,25 +1,31 @@
-import { useNavigate } from "react-router-dom";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
+  ActionIcon,
   Badge,
   Box,
   Button,
-  Center,
   Collapse,
+  Divider,
+  Flex,
   Group,
   Image,
-  LoadingOverlay,
-  Pagination,
+  Loader,
   Paper,
-  Table,
+  ScrollArea,
+  Select,
+  Skeleton,
   Text,
+  Tooltip,
   rem,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { useEffect, useMemo, useState } from "react";
 import classes from "./ShopIncidentListPage.module.scss";
-import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IconFilter } from "@tabler/icons-react";
+import {
+  EvidenceType,
+  IncidentStatus,
+  IncidentType,
+} from "../../models/CamAIEnum";
+import { IconFilter, IconIdOff, IconX } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import EditAndUpdateForm, {
   FIELD_TYPES,
@@ -30,6 +36,15 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { GetIncidentParams } from "../../apis/IncidentAPI";
 import dayjs from "dayjs";
 import _ from "lodash";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
+import { EvidenceDetail } from "../../models/Evidence";
+import NoImage from "../../components/image/NoImage";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -44,11 +59,45 @@ type SearchIncidentField = {
   pageIndex?: number;
 };
 
-const ShopIncidentListPage = () => {
-  const navigate = useNavigate();
-  const [opened, { toggle }] = useDisclosure(false);
+type IncidentFormField = {
+  employeeId: string | null;
+};
 
-  const [activePage, setPage] = useState(1);
+const ShopIncidentListPage = () => {
+  const [opened, { toggle }] = useDisclosure(false);
+  const [selectedIncident, setSelectedIncident] = useState<{
+    id: string;
+  } | null>(null);
+
+  const assignIncidentForm = useForm<IncidentFormField>();
+
+  const onAssignIncident = (fieldValues: IncidentFormField) => {
+    assignIncident(
+      {
+        employeeId: fieldValues.employeeId ?? "",
+        incidentId: selectedIncident?.id ?? "",
+      },
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Assign successfully",
+            message: "Incident assign success!",
+          });
+          refetchIncident();
+          refetchIncidentList();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            icon: <IconX />,
+            title: "Assign failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
+  };
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
@@ -57,8 +106,7 @@ const ShopIncidentListPage = () => {
       status: null,
       toTime: null,
       incidentType: null,
-      size: 12,
-      pageIndex: activePage - 1,
+      size: 999,
     },
   });
 
@@ -73,13 +121,11 @@ const ShopIncidentListPage = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: 12,
-      pageIndex: activePage - 1,
+      size: form?.values.size,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
     return sb;
   }, [
-    activePage,
     form.values.employeeId,
     form.values.fromTime,
     form.values.incidentType,
@@ -87,11 +133,70 @@ const ShopIncidentListPage = () => {
     form.values.toTime,
   ]);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList(searchParams);
+  const {
+    data: incidentList,
+    isLoading: isGetIncidentListLoading,
+    refetch: refetchIncidentList,
+  } = useGetIncidentList(searchParams);
 
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({});
+
+  const {
+    data: incidentData,
+    isLoading: isGetIncidentLoading,
+    refetch: refetchIncident,
+  } = useGetIncidentById(selectedIncident?.id ?? null);
+
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
+    useRejectIncidentById();
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
+    useAssignIncident();
+
+  useEffect(() => {
+    if (form.isDirty()) {
+      setSelectedIncident(null);
+    }
+  }, [form.isDirty(), form.values]);
+
+  useEffect(() => {
+    if (incidentData?.employeeId) {
+      assignIncidentForm.setInitialValues({ employeeId: incidentData?.employeeId });
+    } else {
+      assignIncidentForm.setInitialValues({ employeeId: null });
+    }
+    assignIncidentForm.reset()
+  }, [incidentData]);
+
+  const openModal = () =>
+    modals.openConfirmModal({
+      title: "Please confirm your action",
+      confirmProps: { color: "red" },
+      children: <Text size="sm">Confirm reject this incident?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        rejectIncident(selectedIncident?.id ?? "", {
+          onSuccess() {
+            notifications.show({
+              title: "Reject successfully",
+              message: "Reject assign success!",
+            });
+            refetchIncident();
+            refetchIncidentList();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              icon: <IconX />,
+              title: "Reject failed",
+              message: error.response?.data?.message,
+            });
+          },
+        });
+      },
+    });
 
   const fields = useMemo(() => {
     return [
@@ -155,72 +260,118 @@ const ShopIncidentListPage = () => {
     ];
   }, [employeeList?.values, form, isGetEmployeeListLoading]);
 
-  const renderIncidentStatusBadge = (status: IncidentStatus) => {
+  const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
     switch (status) {
       case IncidentStatus.New:
-        return <Badge color="yellow">{IncidentStatus.New}</Badge>;
+        return (
+          <Badge color="yellow" radius={"sm"}>
+            {IncidentStatus.New}
+          </Badge>
+        );
       case IncidentStatus.Accepted:
-        return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
+        return (
+          <Badge color="green" radius={"sm"}>
+            {IncidentStatus.Accepted}
+          </Badge>
+        );
       case IncidentStatus.Rejected:
-        return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
+        return (
+          <Badge color="red" radius={"sm"}>
+            {IncidentStatus.Rejected}
+          </Badge>
+        );
+      case undefined:
+        return <></>;
     }
   };
 
-  const rows = incidentList?.values.map((row, index) => {
-    return (
-      <Table.Tr
-        key={index}
-        className={classes["clickable"]}
-        onClick={() => navigate(`/shop/incident/${row.id}`)}
-      >
-        <Table.Td>
-          <Text>{row.incidentType}</Text>
-        </Table.Td>
-        <Table.Td>{dayjs(row.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
-        <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/shop/employee/${row?.employee?.id}`);
-            }}
-          >
-            {row?.employee?.name}
-          </Text>
-        </Table.Td>
+  const orderedIncidentList = useMemo(() => {
+    return _.orderBy(incidentList?.values || [], ["startTime"], ["asc"]);
+  }, [incidentList]);
 
-        <Table.Td>{renderIncidentStatusBadge(row?.status)}</Table.Td>
-      </Table.Tr>
-    );
-  });
+  const renderIncidentList = orderedIncidentList.map((row) => (
+    <Box
+      w={rem(300)}
+      py={rem(14)}
+      px={rem(18)}
+      key={row?.id}
+      onClick={() => {
+        setSelectedIncident({ id: row?.id });
+      }}
+      className={
+        row?.id == selectedIncident?.id
+          ? classes["incident_card_active"]
+          : classes["incident_card"]
+      }
+    >
+      <Group justify="space-between">
+        <Text size="md">{row?.incidentType} incident</Text>
+        {renderIncidentStatusBadge(row?.status)}
+      </Group>
+      <Text c="dimmed" size="sm">
+        {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
+      </Text>
+      {/* <Text>{dayjs(row?.endTime).format("DD/MM/YYYY h:mm A")}</Text> */}
+    </Box>
+  ));
+
+  const renderIncidentFootage = (evidence: EvidenceDetail) => {
+    switch (evidence.evidenceType) {
+      case EvidenceType.Image:
+        return (
+          <Box>
+            <Group align="center" mb={rem(12)}>
+              <Group gap={"xl"}>
+                <Box>
+                  <Text fw={500} c={"dimmed"}>
+                    Created time
+                  </Text>
+                  <Text fw={500}>
+                    {dayjs(evidence?.createdDate).format("DD/MM/YYYY h:mm A")}
+                  </Text>
+                </Box>
+                <Box>
+                  <Text fw={500} c={"dimmed"}>
+                    Camera
+                  </Text>
+                  <Text fw={500}>{evidence?.cameraId}</Text>
+                </Box>
+              </Group>
+            </Group>
+
+            <Image
+              radius={"md"}
+              bg={"#000"}
+              fit="contain"
+              src={evidence?.image?.hostingUri}
+            />
+          </Box>
+        );
+    }
+  };
 
   return (
     <Paper
-      p={rem(32)}
-      m={rem(32)}
+      m={rem(16)}
       shadow="xs"
+      style={{
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+      }}
     >
       <Group
+        p={rem(24)}
+        pb={!opened ? rem(24) : rem(0)}
         align="center"
         justify="space-between"
-        mb={"lg"}
       >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incident list
         </Text>
         <Group>
           {form.isDirty() ? (
-            <Button
-              variant="transparent"
-              ml={"auto"}
-              onClick={form.reset}
-            >
+            <Button variant="transparent" ml={"auto"} onClick={form.reset}>
               Clear all filter
             </Button>
           ) : (
@@ -237,62 +388,116 @@ const ShopIncidentListPage = () => {
           </Button>
         </Group>
       </Group>
-      <Collapse
-        in={opened}
-        mb={"lg"}
-      >
+      <Collapse px={rem(28)} in={opened} mb={"lg"}>
         <EditAndUpdateForm fields={fields} />
       </Collapse>
+      <Flex flex={1} className={classes["body_container"]}>
+        <ScrollArea
+          type="hover"
+          mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
+        >
+          <Skeleton  visible={isGetIncidentListLoading}>
+            {renderIncidentList}
+          </Skeleton>
+        </ScrollArea>
+        <Divider mr={rem(4)} orientation="vertical" />
+        <Divider mr={rem(8)} orientation="vertical" />
 
-      <Box
-        pos={"relative"}
-        mb={"lg"}
-      >
-        <LoadingOverlay
-          visible={isGetIncidentListLoading}
-          zIndex={1000}
-          overlayProps={{ radius: "sm", blur: 1 }}
-        />
-        {incidentList?.isValuesEmpty ? (
-          <Center>
-            <Image
-              radius={"md"}
-              src={IMAGE_CONSTANT.NO_DATA}
-              fit="contain"
-              h={rem(400)}
-              w={"auto"}
-              style={{
-                borderBottom: "1px solid #dee2e6",
-              }}
-            />
-          </Center>
-        ) : (
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            verticalSpacing={"md"}
+        {selectedIncident ? (
+          <ScrollArea
+            style={{
+              display: "flex",
+              flex: 1,
+            }}
+            type="hover"
+            mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
           >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Incident type</Table.Th>
-                <Table.Th>Time</Table.Th>
-                <Table.Th>Assigned to</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+            <Skeleton visible={isGetIncidentLoading}>
+              <Box pl={rem(12)} pr={rem(32)}>
+                <Group  justify="space-between" align="center">
+                  <Group py={rem(32)} align="center">
+                    <Text size={rem(20)} fw={500}>
+                      {incidentData?.incidentType} Incident -{" "}
+                      {dayjs(incidentData?.startTime).format(
+                        "DD/MM/YYYY h:mm A"
+                      )}
+                    </Text>
+                    {renderIncidentStatusBadge(incidentData?.status)}
+                  </Group>
+                  <Tooltip label="Reject incident">
+                    <ActionIcon
+                      variant="filled"
+                      aria-label="Settings"
+                      color={"red"}
+                      onClick={openModal}
+                      loading={isRejectIncidentLoading}
+                    >
+                      <IconIdOff
+                        style={{ width: "70%", height: "70%" }}
+                        stroke={1.5}
+                      />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
+                <Text fw={500} size={rem(20)} mb={rem(12)}>
+                  Evidence
+                </Text>
+                <Divider color="#acacac" mb={rem(20)} />
+                {_.isEmpty(incidentData?.evidences) ? (
+                  <NoImage />
+                ) : (
+                  incidentData?.evidences?.map((item) => {
+                    return (
+                      <Box key={item.id} mb={rem(20)}>
+                        {renderIncidentFootage(item)}
+                      </Box>
+                    );
+                  })
+                )}
+
+                <Box >
+                  <Text fw={500} size={rem(20)} my={rem(20)}>
+                    Assigned to
+                  </Text>
+                  <Divider color="#acacac" />
+
+                  <form
+                    onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}
+                  >
+                    <Group align="center" mt={rem(20)} pb={rem(20)}>
+                      {isGetEmployeeListLoading ? (
+                        <Loader mt={rem(30)} />
+                      ) : (
+                        <Select
+                          w={rem(600)}
+                          {...assignIncidentForm.getInputProps("employeeId")}
+                          placeholder="Assign incident to an employee"
+                          data={employeeList?.values?.map((item) => {
+                            return {
+                              value: item?.id,
+                              label: item?.name,
+                            };
+                          })}
+                          nothingFoundMessage="Nothing found..."
+                        />
+                      )}
+                      <Button
+                        type="submit"
+                        loading={isAssignIncidentLoading}
+                        disabled={!assignIncidentForm.isDirty()}
+                      >
+                        Confirm
+                      </Button>
+                    </Group>
+                  </form>
+                </Box>
+              </Box>
+            </Skeleton>
+          </ScrollArea>
+        ) : (
+          <></>
         )}
-      </Box>
-      <Group justify="flex-end">
-        <Pagination
-          value={activePage}
-          onChange={setPage}
-          total={Math.ceil((incidentList?.totalCount ?? 0) / 12)}
-        />
-      </Group>
+      </Flex>
     </Paper>
   );
 };

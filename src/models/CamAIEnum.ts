@@ -7,6 +7,14 @@ export enum BrandStatus {
   Active = "Active",
   Inactive = "Inactive",
 }
+
+export enum EdgeBoxActivationStatus
+{
+    NotActivated = "NotActivated",
+    Activated = "Activated",
+    Pending = "Pending",
+    Failed = "Failed"
+}
 export enum EdgeboxInstallStatus {
   Working = "Working",
   Unhealthy = "Unhealthy",

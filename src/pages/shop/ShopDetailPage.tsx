@@ -42,7 +42,6 @@ import {
   EdgeBoxStatus,
   EdgeboxInstallStatus,
 } from "../../models/CamAIEnum";
-import dayjs from "dayjs";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 
@@ -155,32 +154,7 @@ const renderEdgeboxList = (
                 </Text>
                 <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
               </Box>
-              <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
-                  Valid from
-                </Text>
-                <Text fw={500}>
-                  {dayjs(edgeBoxInstallList?.[0].validFrom).format(
-                    "DD-MM-YYYY"
-                  )}
-                </Text>
-              </Box>
-              <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
-                  Valid until
-                </Text>
-                <Text fw={500}>
-                  {dayjs(edgeBoxInstallList?.[0].validUntil).format(
-                    "DD-MM-YYYY"
-                  )}
-                </Text>
-              </Box>
+              
               <Box>
                 <Text
                   fw={500}
@@ -371,8 +345,8 @@ const ShopDetailPage = () => {
     },
   });
   const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
-  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
-    useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? "");
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading} =
+    useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -711,7 +685,7 @@ const ShopDetailPage = () => {
       {isEdgeboxInstallListLoading ? (
         <Loader />
       ) : (
-        renderEdgeboxList(edgeBoxInstallList)
+        renderEdgeboxList(edgeBoxInstallList?.values)
       )}
     </Box>
   );

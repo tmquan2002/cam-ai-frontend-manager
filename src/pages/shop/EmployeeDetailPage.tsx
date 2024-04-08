@@ -70,6 +70,7 @@ const EmployeeDetailPage = () => {
     useGetIncidentList({
       size: 12,
       pageIndex: activePage - 1,
+      employeeId: params?.id?? undefined
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
@@ -141,7 +142,7 @@ const EmployeeDetailPage = () => {
         <Table.Td>
           <Text>{row.incidentType}</Text>
         </Table.Td>
-        <Table.Td>{dayjs(row.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
+        <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
           <Text
             className={classes["pointer-style"]}

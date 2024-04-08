@@ -11,7 +11,6 @@ import BrandRoute from "./BrandRoute";
 import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
 import CreateShop from "../pages/brand/CreateShop";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
-import CommonLandingPage from "../pages/common/Landing/CommonLandingPage";
 import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
@@ -28,6 +27,7 @@ import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
 import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
 import BranddReportPage from "../pages/brand/BrandReportPage";
+import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -35,11 +35,7 @@ const AppRoute = () => {
       element: <CommonRoute />,
       children: [
         {
-          path: "",
-          element: <CommonLandingPage />,
-        },
-        {
-          path: "/login",
+          path: "*",
           element: <LoginPage />,
           index: true,
         },
@@ -136,6 +132,9 @@ const AppRoute = () => {
         },
         { path: "incident", element: <IncidentListPage /> },
         { path: "incident/:id", element: <ShopIncidentDetailPage /> },
+        {
+          path: "edgeBox", element: <EdgeBoxListPage/>
+        },
         {
           path: "report",
           element: <BranddReportPage />,

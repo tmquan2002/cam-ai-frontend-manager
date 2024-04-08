@@ -214,7 +214,7 @@ const IncidentListPage = () => {
         >
           <Text>{row?.shop?.name}</Text>
         </Table.Td>
-        <Table.Td>{dayjs(row?.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
+        <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
           <Text
             className={classes["pointer-style"]}

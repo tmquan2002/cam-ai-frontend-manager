@@ -10,11 +10,13 @@ import {
   Flex,
   Group,
   Image,
+  Input,
   Loader,
   LoadingOverlay,
   Paper,
   ScrollArea,
   SimpleGrid,
+  Skeleton,
   Stack,
   Table,
   Text,
@@ -52,6 +54,7 @@ import _ from "lodash";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
 import {
+  EdgeBoxActivationStatus,
   EdgeBoxLocation,
   EdgeBoxStatus,
   EdgeboxInstallStatus,
@@ -63,8 +66,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 import BackButton from "../../components/button/BackButton";
-import dayjs from "dayjs";
 import { EdgeBoxInstallDetail } from "../../models/Edgebox";
+import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
 
 export type FormFieldValue = {
   name: string;
@@ -78,14 +81,33 @@ export type FormFieldValue = {
   closeTime: string;
 };
 
-const renderEdboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
+export type ActivationFormValue = {
+  activationCode: string
+}
+
+const renderEdgeBoxActivationStatusBadge = (status: EdgeBoxActivationStatus | undefined) => {
+  switch (status) {
+    case EdgeBoxActivationStatus.Activated:
+      return <Badge color="green">{EdgeBoxActivationStatus.Activated}</Badge>;
+    case EdgeBoxActivationStatus.Pending:
+      return <Badge color={"orange"}>{EdgeBoxActivationStatus.Pending}</Badge>;
+    case EdgeBoxActivationStatus.NotActivated:
+      return <Badge color={"gray"}>INACTIVE</Badge>;
+    case EdgeBoxActivationStatus.Failed:
+      return <Badge color={"red"}>{EdgeBoxActivationStatus.Failed}</Badge>;
+    case undefined:
+      return <Badge>Empty</Badge>;
+  }
+};
+
+const renderEdgeboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
   switch (status) {
     case EdgeBoxStatus.Active:
       return <Badge color="green">{EdgeBoxStatus.Active}</Badge>;
     case EdgeBoxStatus.Broken:
-      return <Badge color={"orange"}>{EdgeBoxStatus.Active}</Badge>;
+      return <Badge color={"orange"}>{EdgeBoxStatus.Broken}</Badge>;
     case EdgeBoxStatus.Inactive:
-      return <Badge color={"red"}>{EdgeBoxStatus.Active}</Badge>;
+      return <Badge color={"red"}>{EdgeBoxStatus.Inactive}</Badge>;
     case EdgeBoxStatus.Disposed:
       return <Badge color={"gray"}>{EdgeBoxStatus.Disposed}</Badge>;
     case undefined:
@@ -112,7 +134,7 @@ const renderEdgeboxInstallStatusBadge = (
   }
 };
 
-const renderEdboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
+const renderEdgeboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
   switch (location) {
     case EdgeBoxLocation.Disposed:
       return <Badge color="teal">{EdgeBoxLocation.Disposed}</Badge>;
@@ -153,30 +175,6 @@ const renderEdgeboxList = (
           >
             Edge Box
           </Text>
-          <Tooltip
-            label="Edgebox install status"
-            transitionProps={{ transition: "slide-up", duration: 300 }}
-          >
-            {renderEdgeboxInstallStatusBadge(
-              edgeBoxInstallList?.[0].edgeBoxInstallStatus
-            )}
-          </Tooltip>
-          <Tooltip
-            label="Edgebox status"
-            transitionProps={{ transition: "slide-up", duration: 300 }}
-          >
-            {renderEdboxStatusBadge(
-              edgeBoxInstallList?.[0].edgeBox.edgeBoxStatus
-            )}
-          </Tooltip>
-          <Tooltip
-            label="Edgebox location"
-            transitionProps={{ transition: "slide-up", duration: 300 }}
-          >
-            {renderEdboxLocationBadge(
-              edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
-            )}
-          </Tooltip>
         </Group>
         <Flex>
           <Image
@@ -199,32 +197,66 @@ const renderEdgeboxList = (
                 </Text>
                 <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
               </Box>
+              
               <Box>
                 <Text
                   fw={500}
                   c={"dimmed"}
                 >
-                  Valid from
+                  Edgebox status
                 </Text>
-                <Text fw={500}>
-                  {dayjs(edgeBoxInstallList?.[0].validFrom).format(
-                    "DD-MM-YYYY"
-                  )}
-                </Text>
+                {renderEdgeboxStatusBadge(
+                  edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxStatus
+                )}
               </Box>
+
               <Box>
                 <Text
                   fw={500}
                   c={"dimmed"}
                 >
-                  Valid until
+                  Edgebox location
                 </Text>
-                <Text fw={500}>
-                  {dayjs(edgeBoxInstallList?.[0].validUntil).format(
-                    "DD-MM-YYYY"
-                  )}
-                </Text>
+                {renderEdgeboxLocationBadge(
+                  edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
+                )}
               </Box>
+
+                <Box>
+                  <Text
+                    fw={500}
+                    c={"dimmed"}
+                  >
+                    Activation status
+                  </Text>
+                  {renderEdgeBoxActivationStatusBadge(
+                    edgeBoxInstallList?.[0].activationStatus
+                  )}
+                </Box>
+               
+              <Box>
+                <Text
+                  fw={500}
+                  c={"dimmed"}
+                >
+                  Install status
+                </Text>
+                {renderEdgeboxInstallStatusBadge(
+                  edgeBoxInstallList?.[0].edgeBoxInstallStatus
+                )}
+              </Box>
+            </Group>
+            <Divider my={rem(20)} />
+            <Group>
+              <Text
+                miw={rem(120)}
+                fw={600}
+              >
+                Description :
+              </Text>
+              <Text>
+                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.description}
+              </Text>
             </Group>
             <Divider my={rem(20)} />
             <SimpleGrid cols={2}>
@@ -239,17 +271,7 @@ const renderEdgeboxList = (
                   {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.name}
                 </Text>
               </Group>
-              <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
-                  Description :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.description}
-                </Text>
-              </Group>
+
               <Group>
                 <Text
                   miw={rem(120)}
@@ -355,12 +377,7 @@ const renderEdgeboxList = (
           ml={rem(40)}
           style={{ flex: 1 }}
         >
-          <Title
-            order={4}
-            size={"h3"}
-          >
-            No edgebox available
-          </Title>
+          <Text>No edgebox available</Text>
         </Box>
       </Flex>
     </Paper>
@@ -378,7 +395,7 @@ const ShopDetailPageManager = () => {
   const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } =
     useChangeShopStatus();
 
-  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading, refetch: refetchEdgeBoxInstallList } =
     useGetEdgeBoxInstallByShopId(id ?? "");
 
   const rows = employeeList?.values?.map((row) => (
@@ -399,10 +416,7 @@ const ShopDetailPageManager = () => {
         {_.isEqual(row.employeeStatus, "Active") ? (
           <Badge variant="light">Active</Badge>
         ) : (
-          <Badge
-            color="gray"
-            variant="light"
-          >
+          <Badge color="gray" variant="light">
             Disabled
           </Badge>
         )}
@@ -425,9 +439,16 @@ const ShopDetailPageManager = () => {
       district: isNotEmpty("District is required"),
     },
   });
+  const activationForm = useForm<ActivationFormValue>();
+
   const { data, isLoading, refetch } = useGetShopById(id ?? "0");
-  const { data: accountList, isLoading: isAccountListLoading } =
-    useGetAccountList({ size: 999 });
+  const {
+    data: accountList,
+    isLoading: isAccountListLoading,
+    refetch: refetchAccountList,
+  } = useGetAccountList({
+    size: 999,
+  });
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -440,6 +461,8 @@ const ShopDetailPageManager = () => {
     useUpdateShopById();
   const { mutate: updateShopManager, isLoading: updateShopManagerLoading } =
     useUpdateShopById();
+
+    const {mutate: activeEdgeBox, isLoading: isActiveEdgeBoxLoading} =useActiveEdgeBoxByShopId()
 
   const handleToggleShopStatus = (currentStatus: ShopStatus) => {
     changeShopStatus(
@@ -484,20 +507,38 @@ const ShopDetailPageManager = () => {
       onConfirm: () => handleToggleShopStatus(currentStatus),
     });
 
+    const onAssignIncident = ({activationCode}: ActivationFormValue
+      ) => {
+      activeEdgeBox(
+        { shopId: id ?? "", activationCode: activationCode },
+        {
+          onSuccess() {
+            notifications.show({
+              title: "Assign successfully",
+              message: "EdgeBox assign success!",
+            });
+            refetchEdgeBoxInstallList();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              icon: <IconX />,
+              title: "Assign failed",
+              message: error.response?.data?.message,
+            });
+          },
+        }
+      );
+    };
+
   const accountListItem = accountList?.values.map((item) => (
-    <Accordion.Item
-      value={item.id}
-      key={item.id}
-    >
+    <Accordion.Item value={item.id} key={item.id}>
       <Accordion.Control disabled={item?.managingShop != null}>
         <Group wrap="nowrap">
           <div>
             <Text>{item.name}</Text>
-            <Text
-              size="sm"
-              c="dimmed"
-              fw={400}
-            >
+            <Text size="sm" c="dimmed" fw={400}>
               {item.email}
             </Text>
           </div>
@@ -507,6 +548,7 @@ const ShopDetailPageManager = () => {
         <Group justify="flex-end">
           <Button
             loading={updateShopManagerLoading}
+            disabled={data?.shopManager?.id == item?.id}
             onClick={() => {
               const params: UpdateShopParams = {
                 shopId: id ?? "",
@@ -523,6 +565,7 @@ const ShopDetailPageManager = () => {
                     message: "Shop updated!",
                   });
                   refetch();
+                  refetchAccountList();
                   toggle();
                 },
                 onError(data) {
@@ -683,30 +726,17 @@ const ShopDetailPageManager = () => {
 
   return (
     <Box pb={20}>
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-        pos="relative"
-      >
+      <Paper p={rem(32)} m={rem(32)} shadow="xs" pos="relative">
         <LoadingOverlay
           visible={isLoading || updateShopLoading}
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 2 }}
         />
         <Box>
-          <Group
-            justify="space-between"
-            pb={rem(20)}
-          >
+          <Group justify="space-between" pb={rem(20)}>
             <Group align="center">
               <BackButton />
-              <Text
-                size="lg"
-                fw={"bold"}
-                fz={25}
-                c={"light-blue.4"}
-              >
+              <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                 {data?.name}
               </Text>
               <Badge
@@ -768,14 +798,8 @@ const ShopDetailPageManager = () => {
           >
             <EditAndUpdateForm fields={fields} />
 
-            <Group
-              justify="flex-end"
-              mt="md"
-            >
-              <Button
-                disabled={!form.isDirty()}
-                type="submit"
-              >
+            <Group justify="flex-end" mt="md">
+              <Button disabled={!form.isDirty()} type="submit">
                 Submit
               </Button>
             </Group>
@@ -783,18 +807,9 @@ const ShopDetailPageManager = () => {
         </Box>
       </Paper>
 
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
+      <Paper p={rem(32)} m={rem(32)} shadow="xs">
         <Group pb={rem(20)}>
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Shop manager
           </Text>
         </Group>
@@ -831,11 +846,7 @@ const ShopDetailPageManager = () => {
                   <Group>
                     <IconMail className={classes.icon} />
 
-                    <Text
-                      size="sm"
-                      c={"dimmed"}
-                      fw={400}
-                    >
+                    <Text size="sm" c={"dimmed"} fw={400}>
                       {data?.shopManager?.email}
                     </Text>
                   </Group>
@@ -848,30 +859,15 @@ const ShopDetailPageManager = () => {
         )}
 
         <Collapse in={opened}>
-          <Accordion
-            chevronPosition="right"
-            variant="contained"
-          >
+          <Accordion chevronPosition="right" variant="contained">
             {accountListItem}
           </Accordion>
         </Collapse>
       </Paper>
 
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
-        <Flex
-          pb={rem(20)}
-          justify={"space-between "}
-        >
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+      <Paper p={rem(32)} m={rem(32)} shadow="xs">
+        <Flex pb={rem(20)} justify={"space-between "}>
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Employee
           </Text>
         </Flex>
@@ -893,11 +889,7 @@ const ShopDetailPageManager = () => {
                 />
               </Center>
             ) : (
-              <Table
-                highlightOnHover
-                verticalSpacing={"md"}
-                striped
-              >
+              <Table highlightOnHover verticalSpacing={"md"} striped>
                 <Table.Thead
                   className={clsx(classes.header, {
                     [classes.scrolled]: scrolled,
@@ -919,11 +911,38 @@ const ShopDetailPageManager = () => {
           </ScrollArea>
         )}
       </Paper>
-      {isEdgeboxInstallListLoading ? (
-        <Loader />
-      ) : (
-        renderEdgeboxList(edgeBoxInstallList)
-      )}
+      <Skeleton visible={isEdgeboxInstallListLoading}>
+        {edgeBoxInstallList?.isValuesEmpty
+        //  || edgeBoxInstallList?.values?.[0].activationStatus == EdgeBoxActivationStatus.NotActivated 
+         ? (
+          <Paper p={rem(32)} m={rem(32)} shadow="xs">
+            <Group align="center" pb={rem(28)} gap={"sm"}>
+              <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                Edge box
+              </Text>
+            </Group>
+            <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
+                  <Input
+                    {...activationForm.getInputProps("activationCode")}
+                    placeholder="Enter an activation code here"
+                  />
+                
+
+                <Group justify="flex-end" mt="md" pb={rem(8)}>
+                  <Button
+                    type="submit"
+                    loading={isActiveEdgeBoxLoading}
+                    disabled={!activationForm.isDirty()}
+                  >
+                    Confirm
+                  </Button>
+                </Group>
+              </form>
+          </Paper>
+        ) : (
+          renderEdgeboxList(edgeBoxInstallList?.values)
+        )}
+      </Skeleton>
     </Box>
   );
 };
