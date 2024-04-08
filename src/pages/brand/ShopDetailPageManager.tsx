@@ -6,6 +6,7 @@ import {
   Button,
   Center,
   Collapse,
+  Divider,
   Flex,
   Group,
   Image,
@@ -13,9 +14,11 @@ import {
   LoadingOverlay,
   Paper,
   ScrollArea,
+  SimpleGrid,
   Stack,
   Table,
   Text,
+  Title,
   Tooltip,
   rem,
 } from "@mantine/core";
@@ -60,6 +63,8 @@ import { useDisclosure } from "@mantine/hooks";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 import BackButton from "../../components/button/BackButton";
+import dayjs from "dayjs";
+import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 
 export type FormFieldValue = {
   name: string;
@@ -69,6 +74,8 @@ export type FormFieldValue = {
   wardId: string | null;
   addressLine: string;
   brandName: string;
+  openTime: string;
+  closeTime: string;
 };
 
 const renderEdboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
@@ -85,6 +92,7 @@ const renderEdboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
       return <Badge>Empty</Badge>;
   }
 };
+
 const renderEdgeboxInstallStatusBadge = (
   status: EdgeboxInstallStatus | undefined
 ) => {
@@ -103,6 +111,7 @@ const renderEdgeboxInstallStatusBadge = (
       return <Badge>Empty</Badge>;
   }
 };
+
 const renderEdboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
   switch (location) {
     case EdgeBoxLocation.Disposed:
@@ -118,6 +127,244 @@ const renderEdboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
     case undefined:
       return <Badge>Empty</Badge>;
   }
+};
+
+const renderEdgeboxList = (
+  edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined
+) => {
+  if (edgeBoxInstallList && edgeBoxInstallList.length > 0) {
+    return (
+      <Paper
+        p={rem(32)}
+        m={rem(32)}
+        shadow="xs"
+      >
+        <Group
+          align="center"
+          pb={rem(28)}
+          gap={"sm"}
+        >
+          <Text
+            size="lg"
+            fw={"bold"}
+            fz={25}
+            c={"light-blue.4"}
+            mr={"sm"}
+          >
+            Edge Box
+          </Text>
+          <Tooltip
+            label="Edgebox install status"
+            transitionProps={{ transition: "slide-up", duration: 300 }}
+          >
+            {renderEdgeboxInstallStatusBadge(
+              edgeBoxInstallList?.[0].edgeBoxInstallStatus
+            )}
+          </Tooltip>
+          <Tooltip
+            label="Edgebox status"
+            transitionProps={{ transition: "slide-up", duration: 300 }}
+          >
+            {renderEdboxStatusBadge(
+              edgeBoxInstallList?.[0].edgeBox.edgeBoxStatus
+            )}
+          </Tooltip>
+          <Tooltip
+            label="Edgebox location"
+            transitionProps={{ transition: "slide-up", duration: 300 }}
+          >
+            {renderEdboxLocationBadge(
+              edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
+            )}
+          </Tooltip>
+        </Group>
+        <Flex>
+          <Image
+            radius={"md"}
+            src={
+              "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
+            }
+          />
+          <Box
+            ml={rem(40)}
+            style={{ flex: 1 }}
+          >
+            <Group gap={rem(80)}>
+              <Box>
+                <Text
+                  fw={500}
+                  c={"dimmed"}
+                >
+                  Name
+                </Text>
+                <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
+              </Box>
+              <Box>
+                <Text
+                  fw={500}
+                  c={"dimmed"}
+                >
+                  Valid from
+                </Text>
+                <Text fw={500}>
+                  {dayjs(edgeBoxInstallList?.[0].validFrom).format(
+                    "DD-MM-YYYY"
+                  )}
+                </Text>
+              </Box>
+              <Box>
+                <Text
+                  fw={500}
+                  c={"dimmed"}
+                >
+                  Valid until
+                </Text>
+                <Text fw={500}>
+                  {dayjs(edgeBoxInstallList?.[0].validUntil).format(
+                    "DD-MM-YYYY"
+                  )}
+                </Text>
+              </Box>
+            </Group>
+            <Divider my={rem(20)} />
+            <SimpleGrid cols={2}>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  Model name :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.name}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  Description :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.description}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  Model code :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.modelCode}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  Manufacturer :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.manufacturer}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  CPU :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.cpu}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  RAM :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.ram}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  Storage :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.storage}
+                </Text>
+              </Group>
+              <Group>
+                <Text
+                  miw={rem(120)}
+                  fw={600}
+                >
+                  OS :
+                </Text>
+                <Text>
+                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.os}
+                </Text>
+              </Group>
+            </SimpleGrid>
+          </Box>
+        </Flex>
+      </Paper>
+    );
+  }
+
+  return (
+    <Paper
+      p={rem(32)}
+      m={rem(32)}
+      shadow="xs"
+    >
+      <Group
+        align="center"
+        pb={rem(28)}
+        gap={"sm"}
+      >
+        <Text
+          size="lg"
+          fw={"bold"}
+          fz={25}
+          c={"light-blue.4"}
+          mr={"sm"}
+        >
+          Edge Box
+        </Text>
+      </Group>
+      <Flex>
+        <Image
+          radius={"md"}
+          src={
+            "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
+          }
+        />
+        <Box
+          ml={rem(40)}
+          style={{ flex: 1 }}
+        >
+          <Title
+            order={4}
+            size={"h3"}
+          >
+            No edgebox available
+          </Title>
+        </Box>
+      </Flex>
+    </Paper>
+  );
 };
 
 const ShopDetailPageManager = () => {
@@ -163,15 +410,6 @@ const ShopDetailPageManager = () => {
     </Table.Tr>
   ));
   const form = useForm<FormFieldValue>({
-    initialValues: {
-      name: "",
-      phone: "",
-      wardId: null,
-      addressLine: "",
-      brandName: "",
-      district: null,
-      province: null,
-    },
     validate: {
       name: hasLength(
         { min: 2, max: 50 },
@@ -189,7 +427,7 @@ const ShopDetailPageManager = () => {
   });
   const { data, isLoading, refetch } = useGetShopById(id ?? "0");
   const { data: accountList, isLoading: isAccountListLoading } =
-    useGetAccountList({});
+    useGetAccountList({ size: 999 });
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -199,6 +437,8 @@ const ShopDetailPageManager = () => {
     +(form.values.district ?? 0)
   );
   const { mutate: updateShop, isLoading: updateShopLoading } =
+    useUpdateShopById();
+  const { mutate: updateShopManager, isLoading: updateShopManagerLoading } =
     useUpdateShopById();
 
   const handleToggleShopStatus = (currentStatus: ShopStatus) => {
@@ -266,6 +506,7 @@ const ShopDetailPageManager = () => {
       <Accordion.Panel>
         <Group justify="flex-end">
           <Button
+            loading={updateShopManagerLoading}
             onClick={() => {
               const params: UpdateShopParams = {
                 shopId: id ?? "",
@@ -275,7 +516,7 @@ const ShopDetailPageManager = () => {
                 shopManagerId: item?.id,
                 wardId: data?.wardId ? data?.wardId.toString() : undefined,
               };
-              updateShop(params, {
+              updateShopManager(params, {
                 onSuccess() {
                   notifications.show({
                     title: "Assign account successfully",
@@ -313,6 +554,8 @@ const ShopDetailPageManager = () => {
         brandName: data.brand.name,
         province: `${data.ward.district.province.id}`,
         district: `${data.ward.district.id}`,
+        openTime: data?.openTime,
+        closeTime: data?.closeTime,
       };
       form.setInitialValues(initialData);
       form.reset();
@@ -340,15 +583,26 @@ const ShopDetailPageManager = () => {
           label: "Shop phone",
         },
       },
+
       {
-        type: FIELD_TYPES.TEXT,
+        type: FIELD_TYPES.TIME,
         fieldProps: {
           form,
-          name: "addressLine",
-          placeholder: "Shop address",
-          label: "Shop address",
-          required: true,
+          name: "openTime",
+          placeholder: "Open Time",
+          label: "Open time",
         },
+        spans: 6,
+      },
+      {
+        type: FIELD_TYPES.TIME,
+        fieldProps: {
+          form,
+          name: "closeTime",
+          placeholder: "Close Time",
+          label: "Close time",
+        },
+        spans: 6,
       },
       {
         type: FIELD_TYPES.TEXT,
@@ -405,6 +659,16 @@ const ShopDetailPageManager = () => {
           required: true,
         },
         spans: 4,
+      },
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form,
+          name: "addressLine",
+          placeholder: "Shop address",
+          label: "Shop address",
+          required: true,
+        },
       },
     ];
   }, [
@@ -478,6 +742,8 @@ const ShopDetailPageManager = () => {
                 wardId: values.wardId ?? "0",
                 name: values.name,
                 phone: values.phone == "" ? null : values.phone,
+                openTime: values?.openTime,
+                closeTime: values?.closeTime,
               };
 
               updateShop(updateShopParams, {
@@ -656,50 +922,7 @@ const ShopDetailPageManager = () => {
       {isEdgeboxInstallListLoading ? (
         <Loader />
       ) : (
-        <Paper
-          p={rem(32)}
-          m={rem(32)}
-          shadow="xs"
-        >
-          <Group
-            align="center"
-            pb={rem(28)}
-            gap={"sm"}
-          >
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={25}
-              c={"light-blue.4"}
-            >
-              Edge box
-            </Text>
-            <Tooltip
-              label="Edgebox install status"
-              transitionProps={{ transition: "slide-up", duration: 300 }}
-            >
-              {renderEdgeboxInstallStatusBadge(
-                edgeBoxInstallList?.[0]?.edgeBoxInstallStatus
-              )}
-            </Tooltip>
-            <Tooltip
-              label="Edgebox status"
-              transitionProps={{ transition: "slide-up", duration: 300 }}
-            >
-              {renderEdboxStatusBadge(
-                edgeBoxInstallList?.[0]?.edgeBox.edgeBoxStatus
-              )}
-            </Tooltip>
-            <Tooltip
-              label="Edgebox location"
-              transitionProps={{ transition: "slide-up", duration: 300 }}
-            >
-              {renderEdboxLocationBadge(
-                edgeBoxInstallList?.[0]?.edgeBox.edgeBoxLocation
-              )}
-            </Tooltip>
-          </Group>
-        </Paper>
+        renderEdgeboxList(edgeBoxInstallList)
       )}
     </Box>
   );

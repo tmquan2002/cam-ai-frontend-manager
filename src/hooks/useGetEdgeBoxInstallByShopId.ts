@@ -12,6 +12,7 @@ export const useGetEdgeBoxInstallByShopId = (shopId: string) => {
     error,
   }: UseQueryResult<EdgeBoxInstallDetail[], Error> = useQuery({
     queryKey: ["EdgeBoxInstall", shopId],
+    enabled: !!shopId,
     queryFn: async () => {
       return await EdgeBoxApi._getEdgeBoxInstallByShopId(shopId);
     },

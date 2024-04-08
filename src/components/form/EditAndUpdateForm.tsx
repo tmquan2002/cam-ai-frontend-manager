@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 
 import { DateInput, DateTimePicker } from "@mantine/dates";
+import CustomTimeInput from "../input/CustomTimeInput";
 
 const renderTextField = ({ fieldProps }: any) => {
   const { form, name, placeholder, label, required, disabled, type, readonly } =
@@ -78,8 +79,7 @@ const renderSelect = ({ fieldProps }: any) => {
 };
 
 const renderRadio = ({ fieldProps }: any) => {
-  const { name, label, description, form, data, required } =
-    fieldProps;
+  const { name, label, description, form, data, required } = fieldProps;
 
   return (
     <Radio.Group
@@ -152,6 +152,22 @@ const renderDateTime = ({ fieldProps }: any) => {
   );
 };
 
+const renderTime = ({ fieldProps }: any) => {
+  const { form, name, placeholder, label, required, disabled, readonly } =
+    fieldProps;
+  return (
+    <CustomTimeInput
+      required={required}
+      disabled={disabled}
+      withAsterisk={required}
+      label={label}
+      readOnly={readonly}
+      placeholder={placeholder}
+      {...form.getInputProps(name)}
+    />
+  );
+};
+
 export const FIELD_TYPES = {
   TEXT: "text",
   SELECT: "select",
@@ -166,6 +182,7 @@ export const FIELD_TYPES = {
   DATE: "date",
   DATE_TIME: "date_time",
   PASSWORD_INPUT: "password_input",
+  TIME: "time",
 };
 
 const FORM_MAPPING = {
@@ -182,6 +199,7 @@ const FORM_MAPPING = {
   [FIELD_TYPES.NUMBER]: renderNumber,
   //   [FIELD_TYPES.IMAGE_PICKER]: renderImagePicker,
   [FIELD_TYPES.PASSWORD_INPUT]: renderPasswordInput,
+  [FIELD_TYPES.TIME]: renderTime,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

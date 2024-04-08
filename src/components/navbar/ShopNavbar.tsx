@@ -1,5 +1,4 @@
 import {
-  IconNotes,
   IconGauge,
   IconPresentationAnalytics,
   IconFileAnalytics,
@@ -11,12 +10,6 @@ import classes from "./Sidebar.module.scss";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
-  {
-    label: "Statictis",
-    icon: IconNotes,
-    initiallyOpened: true,
-    links: [{ label: "Overview", link: "/shop/overview" }],
-  },
 
   {
     label: "Detail",
