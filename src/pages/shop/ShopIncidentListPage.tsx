@@ -4,6 +4,7 @@ import {
   Badge,
   Box,
   Button,
+  Center,
   Collapse,
   Divider,
   Flex,
@@ -161,11 +162,13 @@ const ShopIncidentListPage = () => {
 
   useEffect(() => {
     if (incidentData?.employeeId) {
-      assignIncidentForm.setInitialValues({ employeeId: incidentData?.employeeId });
+      assignIncidentForm.setInitialValues({
+        employeeId: incidentData?.employeeId,
+      });
     } else {
       assignIncidentForm.setInitialValues({ employeeId: null });
     }
-    assignIncidentForm.reset()
+    assignIncidentForm.reset();
   }, [incidentData]);
 
   const openModal = () =>
@@ -305,11 +308,13 @@ const ShopIncidentListPage = () => {
       }
     >
       <Group justify="space-between">
-        <Text size="md">{row?.incidentType} incident</Text>
+        <Text size="md">
+          {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
+        </Text>
         {renderIncidentStatusBadge(row?.status)}
       </Group>
       <Text c="dimmed" size="sm">
-        {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
+        {row?.incidentType} incident
       </Text>
       {/* <Text>{dayjs(row?.endTime).format("DD/MM/YYYY h:mm A")}</Text> */}
     </Box>
@@ -388,7 +393,7 @@ const ShopIncidentListPage = () => {
           </Button>
         </Group>
       </Group>
-      <Collapse px={rem(28)} in={opened} mb={"lg"}>
+      <Collapse px={rem(28)} in={opened} mb={"xl"} mt={"xs"}>
         <EditAndUpdateForm fields={fields} />
       </Collapse>
       <Flex flex={1} className={classes["body_container"]}>
@@ -396,7 +401,7 @@ const ShopIncidentListPage = () => {
           type="hover"
           mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
         >
-          <Skeleton  visible={isGetIncidentListLoading}>
+          <Skeleton visible={isGetIncidentListLoading}>
             {renderIncidentList}
           </Skeleton>
         </ScrollArea>
@@ -414,7 +419,7 @@ const ShopIncidentListPage = () => {
           >
             <Skeleton visible={isGetIncidentLoading}>
               <Box pl={rem(12)} pr={rem(32)}>
-                <Group  justify="space-between" align="center">
+                <Group justify="space-between" align="center">
                   <Group py={rem(32)} align="center">
                     <Text size={rem(20)} fw={500}>
                       {incidentData?.incidentType} Incident -{" "}
@@ -455,7 +460,7 @@ const ShopIncidentListPage = () => {
                   })
                 )}
 
-                <Box >
+                <Box>
                   <Text fw={500} size={rem(20)} my={rem(20)}>
                     Assigned to
                   </Text>
@@ -495,7 +500,16 @@ const ShopIncidentListPage = () => {
             </Skeleton>
           </ScrollArea>
         ) : (
-          <></>
+          <Center
+            style={{
+              display: "flex",
+              flex: 1,
+            }}
+          >
+            <Text fw={500} size="lg">
+              Select an incident to view
+            </Text>
+          </Center>
         )}
       </Flex>
     </Paper>

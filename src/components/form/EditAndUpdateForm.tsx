@@ -91,11 +91,7 @@ const renderRadio = ({ fieldProps }: any) => {
     >
       <Group mt={"xs"}>
         {data.map(({ key, value }: { key: string; value: string }) => (
-          <Radio
-            key={key}
-            value={key}
-            label={value}
-          />
+          <Radio key={key} value={key} label={value} />
         ))}
       </Group>
     </Radio.Group>
@@ -157,7 +153,7 @@ const renderTime = ({ fieldProps }: any) => {
     fieldProps;
   return (
     <CustomTimeInput
-      required={required}
+      // required={required}
       disabled={disabled}
       withAsterisk={required}
       label={label}
@@ -208,11 +204,7 @@ const EditAndUpdateForm = ({ fields }: any) => {
     <Grid>
       {fields.map(({ type, fieldProps, spans, margin }: any, index: number) => {
         return (
-          <Grid.Col
-            span={spans ?? 12}
-            key={index}
-            m={margin ?? 0}
-          >
+          <Grid.Col span={spans ?? 12} key={index} m={margin ?? 0}>
             {FORM_MAPPING[type]({
               fieldProps: fieldProps,
             })}

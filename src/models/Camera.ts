@@ -1,12 +1,9 @@
-import { ShopDetail } from "./Shop";
+import { CameraStatus, Zone } from "./CamAIEnum";
 
-export interface Camera {
-    timestamp: string;
-    id: string;
-    createdDate: string;
-    modifiedDate: string;
-    name: string;
-    shopId: string;
-    shop: ShopDetail[];
-    zone: string[];
+export type CameraDetail = {
+    name: string,
+    shopId: string,
+    zone: Zone,
+    status: CameraStatus,
+    id: string,
 }

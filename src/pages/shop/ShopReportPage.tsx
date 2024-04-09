@@ -1,6 +1,8 @@
 import {
   Box,
+  Button,
   Card,
+  Center,
   Divider,
   Flex,
   Group,
@@ -12,9 +14,12 @@ import {
   useComputedColorScheme
 } from "@mantine/core";
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
-import ReactPlayer from "react-player";
+// import ReactPlayer from "react-player";
 import { useNavigate } from "react-router-dom";
 import classes from "./ShopReportPage.module.scss";
+import { useEffect, useId, useRef, useState } from "react";
+//@ts-ignore
+import JSMpeg from '@cycjimmy/jsmpeg-player';
 
 type RenderContentType = {
   key: number;
@@ -54,6 +59,13 @@ const list: RenderContentType[] = [
 
 const ShopReportPage = () => {
   const navigate = useNavigate();
+  const videoWrapperID = useId();
+  const [videoPLayer, setVideoPLayer] = useState<any>()
+  useEffect(() => {
+    const video = new JSMpeg.VideoElement(`#${CSS.escape(videoWrapperID)}`, "wss://stream.camai.io.vn/8001/N3ACW2LWT2SQETLQ6O8B", { autoplay: true} )
+    setVideoPLayer(video)
+  }, [])
+  
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const renderContent = ({ key, content }: RenderContentType) => {
     return (
@@ -79,7 +91,7 @@ const ShopReportPage = () => {
           <div>
             <Text
               size="xs"
-              color="dimmed"
+              c="dimmed"
             >
               Total
             </Text>
@@ -93,7 +105,7 @@ const ShopReportPage = () => {
           <div>
             <Text
               size="xs"
-              color="dimmed"
+              c="dimmed"
             >
               Variation
             </Text>
@@ -111,7 +123,7 @@ const ShopReportPage = () => {
           <div>
             <Text
               size="xs"
-              color="dimmed"
+              c="dimmed"
             >
               Time
             </Text>
@@ -159,9 +171,10 @@ const ShopReportPage = () => {
               color="#acacac"
               mb={rem(20)}
             />
-            <Box mb={rem(20)}>
-              <ReactPlayer url="https://www.youtube.com/watch?v=TSwPIYczhPc&t=1s" />
-            </Box>
+            <Center mb={rem(20)}>
+              <Box  w={rem(980)} h={rem(540)} id={videoWrapperID}></Box>
+            {/* <ReactPlayer url="wss://stream.camai.io.vn/8001/55ZHRKFLO0LKJ3J4VBC5" /> */}
+            </Center>
           </Paper>
         </Box>
 

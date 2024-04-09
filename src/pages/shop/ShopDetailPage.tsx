@@ -33,11 +33,11 @@ import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
 import classes from "./ShopDetailPage.module.scss";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import ReactPlayer from "react-player";
 import { replaceIfNun } from "../../utils/helperFunction";
 import _ from "lodash";
 import { useNavigate } from "react-router-dom";
 import {
+  EdgeBoxActivationStatus,
   EdgeBoxLocation,
   EdgeBoxStatus,
   EdgeboxInstallStatus,
@@ -55,6 +55,23 @@ export type FormFieldValue = {
   brandName: string;
   openTime: string;
   closeTime: string;
+};
+
+const renderEdgeBoxActivationStatusBadge = (
+  status: EdgeBoxActivationStatus | undefined
+) => {
+  switch (status) {
+    case EdgeBoxActivationStatus.Activated:
+      return <Badge color="green">{EdgeBoxActivationStatus.Activated}</Badge>;
+    case EdgeBoxActivationStatus.Pending:
+      return <Badge color={"orange"}>{EdgeBoxActivationStatus.Pending}</Badge>;
+    case EdgeBoxActivationStatus.NotActivated:
+      return <Badge color={"gray"}>INACTIVE</Badge>;
+    case EdgeBoxActivationStatus.Failed:
+      return <Badge color={"red"}>{EdgeBoxActivationStatus.Failed}</Badge>;
+    case undefined:
+      return <Badge>Empty</Badge>;
+  }
 };
 
 const renderEdboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
@@ -113,23 +130,9 @@ const renderEdgeboxList = (
 ) => {
   if (edgeBoxInstallList && edgeBoxInstallList.length > 0) {
     return (
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
-        <Group
-          align="center"
-          pb={rem(28)}
-          gap={"sm"}
-        >
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-            mr={"sm"}
-          >
+      <Paper p={rem(32)} m={rem(32)} shadow="xs">
+        <Group align="center" pb={rem(28)} gap={"sm"}>
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mr={"sm"}>
             Edge Box
           </Text>
         </Group>
@@ -140,61 +143,51 @@ const renderEdgeboxList = (
               "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
             }
           />
-          <Box
-            ml={rem(40)}
-            style={{ flex: 1 }}
-          >
-            <Group gap={rem(80)}>
+          <Box ml={rem(40)} style={{ flex: 1 }}>
+            <Group gap={rem(40)}>
               <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
+                <Text fw={500} c={"dimmed"}>
                   Name
                 </Text>
                 <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
               </Box>
-              
               <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
-                  Install status
-                </Text>
-                {renderEdgeboxInstallStatusBadge(
-                  edgeBoxInstallList?.[0].edgeBoxInstallStatus
-                )}
-              </Box>
-              <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
+                <Text fw={500} c={"dimmed"}>
                   Active status
                 </Text>
                 {renderEdboxStatusBadge(
                   edgeBoxInstallList?.[0].edgeBox.edgeBoxStatus
                 )}
               </Box>
+
               <Box>
-                <Text
-                  fw={500}
-                  c={"dimmed"}
-                >
-                  Location
+                <Text fw={500} c={"dimmed"}>
+                  EdgeBox location
                 </Text>
                 {renderEdboxLocationBadge(
                   edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
                 )}
               </Box>
+              <Box>
+                <Text fw={500} c={"dimmed"}>
+                  Activation status
+                </Text>
+                {renderEdgeBoxActivationStatusBadge(
+                  edgeBoxInstallList?.[0].activationStatus
+                )}
+              </Box>
+              <Box>
+                <Text fw={500} c={"dimmed"}>
+                  Install status
+                </Text>
+                {renderEdgeboxInstallStatusBadge(
+                  edgeBoxInstallList?.[0].edgeBoxInstallStatus
+                )}
+              </Box>
             </Group>
             <Divider my={rem(20)} />
             <Group>
-              <Text
-                miw={rem(120)}
-                fw={600}
-              >
+              <Text miw={rem(120)} fw={600}>
                 Description :
               </Text>
               <Text>
@@ -204,10 +197,7 @@ const renderEdgeboxList = (
             <Divider my={rem(20)} />
             <SimpleGrid cols={2}>
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   Model name :
                 </Text>
                 <Text>
@@ -216,10 +206,7 @@ const renderEdgeboxList = (
               </Group>
 
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   Model code :
                 </Text>
                 <Text>
@@ -227,10 +214,7 @@ const renderEdgeboxList = (
                 </Text>
               </Group>
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   Manufacturer :
                 </Text>
                 <Text>
@@ -238,10 +222,7 @@ const renderEdgeboxList = (
                 </Text>
               </Group>
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   CPU :
                 </Text>
                 <Text>
@@ -249,10 +230,7 @@ const renderEdgeboxList = (
                 </Text>
               </Group>
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   RAM :
                 </Text>
                 <Text>
@@ -260,10 +238,7 @@ const renderEdgeboxList = (
                 </Text>
               </Group>
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   Storage :
                 </Text>
                 <Text>
@@ -271,10 +246,7 @@ const renderEdgeboxList = (
                 </Text>
               </Group>
               <Group>
-                <Text
-                  miw={rem(120)}
-                  fw={600}
-                >
+                <Text miw={rem(120)} fw={600}>
                   OS :
                 </Text>
                 <Text>
@@ -289,23 +261,9 @@ const renderEdgeboxList = (
   }
 
   return (
-    <Paper
-      p={rem(32)}
-      m={rem(32)}
-      shadow="xs"
-    >
-      <Group
-        align="center"
-        pb={rem(28)}
-        gap={"sm"}
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-          mr={"sm"}
-        >
+    <Paper p={rem(32)} m={rem(32)} shadow="xs">
+      <Group align="center" pb={rem(28)} gap={"sm"}>
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mr={"sm"}>
           Edge Box
         </Text>
       </Group>
@@ -316,10 +274,7 @@ const renderEdgeboxList = (
             "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
           }
         />
-        <Box
-          ml={rem(40)}
-          style={{ flex: 1 }}
-        >
+        <Box ml={rem(40)} style={{ flex: 1 }}>
           <Text>No edgebox available</Text>
         </Box>
       </Flex>
@@ -342,10 +297,12 @@ const ShopDetailPage = () => {
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
       district: isNotEmpty("District is required"),
+      openTime: isNotEmpty("Open time is required"),
+      closeTime: isNotEmpty("Close time is required"),
     },
   });
   const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
-  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading} =
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
     useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
@@ -378,10 +335,7 @@ const ShopDetailPage = () => {
         {_.isEqual(row.employeeStatus, "Active") ? (
           <Badge variant="light">Active</Badge>
         ) : (
-          <Badge
-            color="gray"
-            variant="light"
-          >
+          <Badge color="gray" variant="light">
             Disabled
           </Badge>
         )}
@@ -453,6 +407,7 @@ const ShopDetailPage = () => {
           name: "openTime",
           placeholder: "Open Time",
           label: "Open time",
+          required: true,
         },
         spans: 6,
       },
@@ -464,6 +419,7 @@ const ShopDetailPage = () => {
           name: "closeTime",
           placeholder: "Close Time",
           label: "Close time",
+          required: true,
         },
         spans: 6,
       },
@@ -540,28 +496,7 @@ const ShopDetailPage = () => {
 
   return (
     <Box pb={20}>
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
-        <ReactPlayer
-          // playing
-          width={"1082px"}
-          height={"720px"}
-          url={[
-            { src: "/video.mp4", type: "audio/mp4" },
-            // { src: "foo.ogg", type: "video/ogg" },
-          ]}
-          controls
-        />
-      </Paper>
-
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
+      <Paper p={rem(32)} m={rem(32)} shadow="xs">
         <Box pos="relative">
           <LoadingOverlay
             visible={isLoading || updateShopLoading}
@@ -601,21 +536,12 @@ const ShopDetailPage = () => {
               });
             })}
           >
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={25}
-              c={"light-blue.4"}
-              mb={20}
-            >
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={20}>
               SHOP DETAIL
             </Text>
             <EditAndUpdateForm fields={fields} />
 
-            <Group
-              justify="flex-end"
-              mt="md"
-            >
+            <Group justify="flex-end" mt="md">
               {/* <Button
                 type="submit"
                 disabled={!form.isDirty()}
@@ -627,21 +553,9 @@ const ShopDetailPage = () => {
         </Box>
       </Paper>
 
-      <Paper
-        p={rem(32)}
-        m={rem(32)}
-        shadow="xs"
-      >
-        <Flex
-          pb={rem(28)}
-          justify={"space-between "}
-        >
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+      <Paper p={rem(32)} m={rem(32)} shadow="xs">
+        <Flex pb={rem(28)} justify={"space-between "}>
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Employee
           </Text>
           <Button
@@ -655,12 +569,7 @@ const ShopDetailPage = () => {
           <Loader />
         ) : (
           <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-            <Table
-              miw={1000}
-              highlightOnHover
-              verticalSpacing={"md"}
-              striped
-            >
+            <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
               <Table.Thead
                 className={clsx(classes.header, {
                   [classes.scrolled]: scrolled,

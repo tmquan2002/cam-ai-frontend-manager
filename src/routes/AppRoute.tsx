@@ -28,6 +28,7 @@ import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
 import BranddReportPage from "../pages/brand/BrandReportPage";
 import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
+import CameraDetailPage from "../pages/brand/CameraDetailPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -139,6 +140,10 @@ const AppRoute = () => {
           path: "report",
           element: <BranddReportPage />,
         },
+        {
+          path: "camera/:id",
+          element: <CameraDetailPage/>
+        }
       ],
     },
     {

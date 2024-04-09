@@ -13,11 +13,13 @@ import {
   rem,
 } from "@mantine/core";
 import classes from "./Notification.module.scss";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { useGetNotificationList } from "../../hooks/useGetNotificationList";
 import dayjs from "dayjs";
 import { NotificationStatus } from "../../models/CamAIEnum";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
+import { useNotification } from "../../hooks/useNotification";
+import { ReadyState } from "react-use-websocket";
 
 export const TabsHeader = ({
   active,
@@ -49,6 +51,7 @@ export const TabsHeader = ({
     </Flex>
   );
 };
+
 const DetailCard = (props: {
   title: string;
   content: string;
@@ -101,13 +104,20 @@ const DetailCard = (props: {
   );
 };
 
+
+
 const Notification = () => {
   const { data, isLoading, refetch } = useGetNotificationList();
+  const { lastJsonMessage, readyState } = useNotification();
 
+  useEffect(() => {
+    if (readyState == ReadyState.OPEN && lastJsonMessage) {
+      refetch()
+    }
+  }, [readyState, lastJsonMessage]);
+ 
   const { mutate: updateNotificationStatus } = useUpdateNotificationStatus();
 
- 
-  
 
   const [activeTab, setActiveTab] = useState<string | null>("gallery");
   return (

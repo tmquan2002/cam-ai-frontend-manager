@@ -10,7 +10,10 @@ const CustomTimeInput = (props: TimeInputProps) => {
     <ActionIcon
       variant="subtle"
       color="gray"
-      onClick={() => ref.current?.showPicker()}
+      onClick={(e) => {
+        e.preventDefault()
+        ref.current?.showPicker()
+      }}
     >
       <IconClock
         style={{ width: rem(16), height: rem(16) }}

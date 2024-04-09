@@ -8,12 +8,11 @@ export enum BrandStatus {
   Inactive = "Inactive",
 }
 
-export enum EdgeBoxActivationStatus
-{
-    NotActivated = "NotActivated",
-    Activated = "Activated",
-    Pending = "Pending",
-    Failed = "Failed"
+export enum EdgeBoxActivationStatus {
+  NotActivated = "NotActivated",
+  Activated = "Activated",
+  Pending = "Pending",
+  Failed = "Failed",
 }
 export enum EdgeboxInstallStatus {
   Working = "Working",
@@ -114,4 +113,11 @@ export enum EvidenceStatus {
 
 export enum EvidenceType {
   Image = "Image",
+}
+
+export enum CameraStatus {
+  New = "New",
+  Connected = "Connected",
+  Disconnected = "Disconnected",
+  Disabled = "Disabled",
 }
