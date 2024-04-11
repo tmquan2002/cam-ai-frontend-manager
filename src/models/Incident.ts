@@ -5,7 +5,8 @@ import { ShopDetail } from "./Shop";
 
 export type IncidentDetail = {
   incidentType: IncidentType;
-  time: string;
+  startTime: string;
+  endTime: string;
   edgeBoxId: string;
   employeeId: string;
   status: IncidentStatus;

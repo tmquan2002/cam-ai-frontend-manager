@@ -34,6 +34,11 @@ const mockdata = [
     ],
   },
   {
+    label: "EdgeBox",
+    icon: IconCalendarStats,
+    path: "/brand/edgeBox"
+  },
+  {
     label: "Report",
     icon: IconFileAnalytics,
     links: [{ label: "Incidents", link: "/brand/incident" }],

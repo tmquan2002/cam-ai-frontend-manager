@@ -2,7 +2,7 @@ import { UseQueryResult, useQuery } from "react-query";
 import { IncidentDetail } from "../models/Incident";
 import { IncidentApi } from "../apis/IncidentAPI";
 
-export const useGetIncidentById = (id: string) => {
+export const useGetIncidentById = (id: string | null) => {
   const {
     isError,
     isLoading,
@@ -12,8 +12,9 @@ export const useGetIncidentById = (id: string) => {
     error,
   }: UseQueryResult<IncidentDetail, Error> = useQuery({
     queryKey: ["Incident", id],
+    enabled: !!id,
     queryFn: async () => {
-      return await IncidentApi._getIncidentById(id);
+      return await IncidentApi._getIncidentById(id??"");
     },
   });
 

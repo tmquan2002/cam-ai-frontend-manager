@@ -28,24 +28,61 @@ export const replaceIfNun = (
 
 export function removeDate(date: string, withSecond?: boolean) {
   if (withSecond) {
-    return (new Date(date).getHours() < 10 ? `0${new Date(date).getHours()}` : new Date(date).getHours()) + ":"
-      + (new Date(date).getMinutes() < 10 ? `0${new Date(date).getMinutes()}` : new Date(date).getMinutes()) + ":"
-      + (new Date(date).getSeconds() < 10 ? `0${new Date(date).getSeconds()}` : new Date(date).getSeconds());
+    return (
+      (new Date(date).getHours() < 10
+        ? `0${new Date(date).getHours()}`
+        : new Date(date).getHours()) +
+      ":" +
+      (new Date(date).getMinutes() < 10
+        ? `0${new Date(date).getMinutes()}`
+        : new Date(date).getMinutes()) +
+      ":" +
+      (new Date(date).getSeconds() < 10
+        ? `0${new Date(date).getSeconds()}`
+        : new Date(date).getSeconds())
+    );
   } else {
-    return (new Date(date).getHours() < 10 ? `0${new Date(date).getHours()}` : new Date(date).getHours()) + ":"
-      + (new Date(date).getMinutes() < 10 ? `0${new Date(date).getMinutes()}` : new Date(date).getMinutes());
+    return (
+      (new Date(date).getHours() < 10
+        ? `0${new Date(date).getHours()}`
+        : new Date(date).getHours()) +
+      ":" +
+      (new Date(date).getMinutes() < 10
+        ? `0${new Date(date).getMinutes()}`
+        : new Date(date).getMinutes())
+    );
   }
 }
 
-export function removeTime(date: string, separator?: string, format?: "dd/MM/yyyy" | "yyyy/MM/dd") {
+export function removeTime(
+  date: string,
+  separator?: string,
+  format?: "dd/MM/yyyy" | "yyyy/MM/dd"
+) {
   if (format == "yyyy/MM/dd") {
-    return (new Date(date).getFullYear()) + (separator || "-")
-      + (new Date(date).getMonth() + 1 < 10 ? `0${new Date(date).getMonth() + 1}` : new Date(date).getMonth() + 1) + (separator || "-")
-      + (new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate())
+    return (
+      new Date(date).getFullYear() +
+      (separator || "-") +
+      (new Date(date).getMonth() + 1 < 10
+        ? `0${new Date(date).getMonth() + 1}`
+        : new Date(date).getMonth() + 1) +
+      (separator || "-") +
+      (new Date(date).getDate() < 10
+        ? `0${new Date(date).getDate()}`
+        : new Date(date).getDate())
+    );
   }
-  return (new Date(date).getDate() < 10 ? `0${new Date(date).getDate()}` : new Date(date).getDate()) + (separator || "-")
-    + (new Date(date).getMonth() + 1 < 10 ? `0${new Date(date).getMonth() + 1}` : new Date(date).getMonth() + 1) + (separator || "-")
-    + (new Date(date).getFullYear());
+  return (
+    (new Date(date).getDate() < 10
+      ? `0${new Date(date).getDate()}`
+      : new Date(date).getDate()) +
+    (separator || "-") +
+    (new Date(date).getMonth() + 1 < 10
+      ? `0${new Date(date).getMonth() + 1}`
+      : new Date(date).getMonth() + 1) +
+    (separator || "-") +
+    new Date(date).getFullYear()
+  );
 }
 
 export function getDateTime(date: string) {
@@ -64,15 +101,19 @@ export function returnWebsocketConnection(status: number) {
   if (status == 1) return "Open";
   if (status == 2) return "Closing";
   if (status == 3) return "Closed or Connect failed";
-  return "None"
+  return "None";
 }
 
 /** Return the day yearLength years before today
- * 
- * @param yearLength 
- * @returns 
+ *
+ * @param yearLength
+ * @returns
  */
 export function getDateFromSetYear(yearLength: number) {
   const today = new Date();
-  return new Date(today.getFullYear() - yearLength, today.getMonth(), today.getDate());
+  return new Date(
+    today.getFullYear() - yearLength,
+    today.getMonth(),
+    today.getDate()
+  );
 }

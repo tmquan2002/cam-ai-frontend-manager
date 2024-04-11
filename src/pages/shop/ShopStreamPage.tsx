@@ -1,6 +1,7 @@
 import {
   Box,
   Card,
+  Center,
   Divider,
   Flex,
   Group,
@@ -9,12 +10,14 @@ import {
   Stack,
   Text,
   rem,
-  useComputedColorScheme
+  useComputedColorScheme,
 } from "@mantine/core";
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
-import ReactPlayer from "react-player";
 import { useNavigate } from "react-router-dom";
-import classes from "./ShopReportPage.module.scss";
+import classes from "./ShopStreamPage.module.scss";
+import { useEffect, useId, useState } from "react";
+//@ts-ignore
+import JSMpeg from "@cycjimmy/jsmpeg-player";
 
 type RenderContentType = {
   key: number;
@@ -52,9 +55,22 @@ const list: RenderContentType[] = [
   },
 ];
 
-const ShopReportPage = () => {
+const ShopStreamPage = () => {
   const navigate = useNavigate();
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const videoWrapperID = useId();
+  const [videoPLayer, setVideoPLayer] = useState<any>();
+  useEffect(() => {
+    const video = new JSMpeg.VideoElement(
+      `#${CSS.escape(videoWrapperID)}`,
+      "wss://stream.camai.io.vn/8001/N3ACW2LWT2SQETLQ6O8B",
+      { autoplay: true }
+    );
+    setVideoPLayer(video);
+  }, []);
+
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const renderContent = ({ key, content }: RenderContentType) => {
     return (
       <Card
@@ -66,59 +82,41 @@ const ShopReportPage = () => {
         p="md"
         onClick={() => navigate(`/shop/incident/${key}`)}
       >
-        <Group
-          justify="space-between"
-          align="center"
-          mb={"md"}
-        >
+        <Group justify="space-between" align="center" mb={"md"}>
           <Text fw={500}>{content}</Text>
-          <IconCaretRight style={{ width: "20px", height: "20px" }}
-            color={computedColorScheme == "dark" ? "#5787db" : "#39588f"} />
+          <IconCaretRight
+            style={{ width: "20px", height: "20px" }}
+            color={computedColorScheme == "dark" ? "#5787db" : "#39588f"}
+          />
         </Group>
         <Card.Section className={classes.card_footer}>
           <div>
-            <Text
-              size="xs"
-              color="dimmed"
-            >
+            <Text size="xs" c="dimmed">
               Total
             </Text>
-            <Text
-              fw={500}
-              size="sm"
-            >
+            <Text fw={500} size="sm">
               20 people
             </Text>
           </div>
           <div>
-            <Text
-              size="xs"
-              color="dimmed"
-            >
+            <Text size="xs" c="dimmed">
               Variation
             </Text>
             <Flex align={"center"}>
-              <Text
-                fw={500}
-                size="sm"
-              >
+              <Text fw={500} size="sm">
                 12
               </Text>
-              <IconTrendingUp style={{ width: "30%", height: "30%" }}
-                color={computedColorScheme == "dark" ? "#45b445" : "green"} />
+              <IconTrendingUp
+                style={{ width: "30%", height: "30%" }}
+                color={computedColorScheme == "dark" ? "#45b445" : "green"}
+              />
             </Flex>
           </div>
           <div>
-            <Text
-              size="xs"
-              color="dimmed"
-            >
+            <Text size="xs" c="dimmed">
               Time
             </Text>
-            <Text
-              fw={500}
-              size="sm"
-            >
+            <Text fw={500} size="sm">
               Jan, 20 2023
             </Text>
           </div>
@@ -137,39 +135,24 @@ const ShopReportPage = () => {
         ml={rem(40)}
         my={rem(20)}
       >
-        REPORTS
+        STREAM
       </Text>
 
       <Flex>
         <Box flex={1}>
-          <Paper
-            mx={rem(40)}
-            shadow="xs"
-            px={rem(32)}
-            py={rem(20)}
-          >
-            <Text
-              fw={500}
-              size={rem(18)}
-              mb={rem(20)}
-            >
+          <Paper mx={rem(40)} shadow="xs" px={rem(32)} py={rem(20)}>
+            <Text fw={500} size={rem(18)} mb={rem(20)}>
               Live Footage
             </Text>
-            <Divider
-              color="#acacac"
-              mb={rem(20)}
-            />
-            <Box mb={rem(20)}>
-              <ReactPlayer url="https://www.youtube.com/watch?v=TSwPIYczhPc&t=1s" />
-            </Box>
+            <Divider color="#acacac" mb={rem(20)} />
+            <Center mb={rem(20)}>
+              <Box w={rem(980)} h={rem(540)} id={videoWrapperID}></Box>
+              {/* <ReactPlayer url="wss://stream.camai.io.vn/8001/55ZHRKFLO0LKJ3J4VBC5" /> */}
+            </Center>
           </Paper>
         </Box>
 
-        <ScrollArea
-          h={"80vh"}
-          className={classes.scroll_area}
-          mr={rem(40)}
-        >
+        <ScrollArea h={"80vh"} className={classes.scroll_area} mr={rem(40)}>
           <Stack gap={"lg"}>{list.map((item) => renderContent(item))}</Stack>
         </ScrollArea>
       </Flex>
@@ -177,4 +160,4 @@ const ShopReportPage = () => {
   );
 };
 
-export default ShopReportPage;
+export default ShopStreamPage;
