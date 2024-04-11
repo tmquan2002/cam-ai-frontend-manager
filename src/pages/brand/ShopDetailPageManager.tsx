@@ -37,7 +37,6 @@ import { UpdateShopParams } from "../../apis/ShopAPI";
 import {
   IconMail,
   IconMapPin,
-  IconPointFilled,
   IconRepeat,
   IconTrash,
   IconUser,
@@ -71,7 +70,6 @@ import BackButton from "../../components/button/BackButton";
 import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
-import { IconCaretRightFilled } from "@tabler/icons-react";
 import { IconAlertCircle } from "@tabler/icons-react";
 
 export type FormFieldValue = {
@@ -813,34 +811,38 @@ const ShopDetailPageManager = () => {
         <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
           Camera list
         </Text>
-        {cameraList?.values?.map((item) => (
-          <Tooltip label="View camera" key={item?.id}>
-            <Button
-              variant="outline"
-              fullWidth
-              size={rem(52)}
-              justify="space-between"
-              onClick={() => navigate(`/brand/camera/${item?.id}`)}
-              rightSection={<IconCaretRight style={{ width: rem(24) }} />}
-              px={rem(16)}
-            >
-              <Group>
-                <Group mr={rem(20)}>
-                  <IconVideo style={{ width: rem(20) }} />
-                  <Text key={item?.id}> {item?.name}</Text>
-                </Group>
-                <Group mr={rem(20)}>
-                  <IconMapPin style={{ width: rem(20) }} />
-                  <Text key={item?.id}> {item?.zone}</Text>
-                </Group>
+        {isGetCameraListLoading ? (
+          <Loader />
+        ) : (
+          cameraList?.values?.map((item) => (
+            <Tooltip label="View camera" key={item?.id}>
+              <Button
+                variant="outline"
+                fullWidth
+                size={rem(52)}
+                justify="space-between"
+                onClick={() => navigate(`/brand/camera/${item?.id}`)}
+                rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                px={rem(16)}
+              >
                 <Group>
-                  <IconAlertCircle style={{ width: rem(20) }} />
-                  <Text key={item?.id}> {item?.status}</Text>
+                  <Group mr={rem(20)}>
+                    <IconVideo style={{ width: rem(20) }} />
+                    <Text key={item?.id}> {item?.name}</Text>
+                  </Group>
+                  <Group mr={rem(20)}>
+                    <IconMapPin style={{ width: rem(20) }} />
+                    <Text key={item?.id}> {item?.zone}</Text>
+                  </Group>
+                  <Group>
+                    <IconAlertCircle style={{ width: rem(20) }} />
+                    <Text key={item?.id}> {item?.status}</Text>
+                  </Group>
                 </Group>
-              </Group>
-            </Button>
-          </Tooltip>
-        ))}
+              </Button>
+            </Tooltip>
+          ))
+        )}
       </Paper>
 
       <Paper p={rem(32)} m={rem(32)} shadow="xs">

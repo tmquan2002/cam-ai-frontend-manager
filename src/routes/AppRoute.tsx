@@ -4,7 +4,6 @@ import LoginPage from "../pages/common/login/LoginPage";
 import ShopRoute from "./ShopRoute";
 import ShopHomePage from "../pages/shop/ShopHomePage";
 import ShopDetailPage from "../pages/shop/ShopDetailPage";
-import ShopReportPage from "../pages/shop/ShopReportPage";
 import BrandDetailPage from "../pages/brand/BrandDetailPage";
 import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
 import BrandRoute from "./BrandRoute";
@@ -29,6 +28,11 @@ import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackgrou
 import BranddReportPage from "../pages/brand/BrandReportPage";
 import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 import CameraDetailPage from "../pages/brand/CameraDetailPage";
+import ShopStreamPage from "../pages/shop/ShopStreamPage";
+import ShopReportPage from "../pages/shop/report/common/ShopReportPage";
+import CustomerReportPage from "../pages/shop/report/customer/CustomerReportTab";
+import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
+import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -60,6 +64,10 @@ const AppRoute = () => {
           element: <ShopDetailPage />,
         },
         {
+          path: "stream",
+          element: <ShopStreamPage />,
+        },
+        {
           path: "report",
           element: <ShopReportPage />,
         },
@@ -84,6 +92,22 @@ const AppRoute = () => {
         {
           path: "incident/:id",
           element: <IncidentDetail />,
+        },
+        {
+          path: "camera/:id",
+          element: <CameraDetailPage />,
+        },
+        {
+          path: "report/customer",
+          element: <CustomerReportPage />,
+        },
+        {
+          path: "report/incident",
+          element: <IncidentReportPage />,
+        },
+        {
+          path: "report/interaction",
+          element: <InteractionReportPage />,
         },
       ],
     },
@@ -134,7 +158,8 @@ const AppRoute = () => {
         { path: "incident", element: <IncidentListPage /> },
         { path: "incident/:id", element: <ShopIncidentDetailPage /> },
         {
-          path: "edgeBox", element: <EdgeBoxListPage/>
+          path: "edgeBox",
+          element: <EdgeBoxListPage />,
         },
         {
           path: "report",
@@ -142,8 +167,8 @@ const AppRoute = () => {
         },
         {
           path: "camera/:id",
-          element: <CameraDetailPage/>
-        }
+          element: <CameraDetailPage />,
+        },
       ],
     },
     {

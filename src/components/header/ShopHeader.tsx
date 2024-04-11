@@ -19,6 +19,8 @@ import { ReadyState } from "react-use-websocket";
 import { useEffect } from "react";
 import { notifications } from "@mantine/notifications";
 import _ from "lodash";
+import { useGetNotificationList } from "../../hooks/useGetNotificationList";
+import { NotificationStatus } from "../../models/CamAIEnum";
 
 interface BurgerProps {
   mobileOpened: boolean;
@@ -31,17 +33,27 @@ const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
   const session = useSession();
   const navigate = useNavigate();
   const { lastJsonMessage, readyState } = useNotification();
+  const {
+    data: notificationList,
+    isLoading: isGetNotificationListLoading,
+    refetch: refetchNotificationList,
+  } = useGetNotificationList();
 
   useEffect(() => {
-    
-    if ((readyState == ReadyState.OPEN) && !_.isEmpty(lastJsonMessage)) {
-
+    if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
       notifications.show({
-        title: "123",
+        title: lastJsonMessage?.title,
         message: lastJsonMessage?.content,
       });
     }
   }, [readyState, lastJsonMessage]);
+
+  const isNotificationAllRead: boolean =
+    notificationList?.isValuesEmpty ||
+    notificationList?.values == undefined ||
+    notificationList?.values?.filter(
+      (n) => n.status == NotificationStatus.Unread
+    ).length > 0;
 
   return (
     <Flex justify="space-between" px={rem(32)} align={"center"} h={"100%"}>
@@ -56,7 +68,10 @@ const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
         <Popover position="bottom-end" withArrow shadow="md">
           <Tooltip label="Notification" withArrow>
             <Popover.Target>
-              <Indicator size={5} color="pale-red.6">
+              <Indicator
+                size={isNotificationAllRead ? 5 : 0}
+                color="pale-red.6"
+              >
                 <ActionIcon variant="default" aria-label="Notifications">
                   <MdNotifications style={{ width: 18, height: 18 }} />
                 </ActionIcon>
@@ -65,7 +80,11 @@ const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
           </Tooltip>
 
           <Popover.Dropdown p={0}>
-            <Notification />
+            <Notification
+              notificationList={notificationList?.values ?? []}
+              isNotificationListLoading={isGetNotificationListLoading}
+              refetchNotification={refetchNotificationList}
+            />
           </Popover.Dropdown>
         </Popover>
 

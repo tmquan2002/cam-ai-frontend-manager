@@ -13,6 +13,7 @@ import {
   SimpleGrid,
   Table,
   Text,
+  Tooltip,
   rem,
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
@@ -27,7 +28,14 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { UpdateShopParams } from "../../apis/ShopAPI";
-import { IconPlus, IconX } from "@tabler/icons-react";
+import {
+  IconAlertCircle,
+  IconCaretRight,
+  IconMapPin,
+  IconPlus,
+  IconVideo,
+  IconX,
+} from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
@@ -44,6 +52,7 @@ import {
 } from "../../models/CamAIEnum";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 import { EdgeBoxInstallDetail } from "../../models/Edgebox";
+import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 
 export type FormFieldValue = {
   name: string;
@@ -306,6 +315,10 @@ const ShopDetailPage = () => {
     useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
+
+  const { data: cameraList, isLoading: isGetCameraListLoading } =
+    useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
+
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
     +(form.values.province ?? 0)
   );
@@ -551,6 +564,45 @@ const ShopDetailPage = () => {
             </Group>
           </form>
         </Box>
+      </Paper>
+
+      <Paper p={rem(32)} m={rem(32)} shadow="xs">
+        <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
+          Camera list
+        </Text>
+        {isGetCameraListLoading ? (
+          <Loader />
+        ) : (
+          cameraList?.values?.map((item) => (
+            <Tooltip label="View camera" key={item?.id}>
+              <Button
+                variant="outline"
+                fullWidth
+                size={rem(52)}
+                justify="space-between"
+                onClick={() => navigate(`/shop/camera/${item?.id}`)}
+                rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                px={rem(16)}
+                mb={rem(16)}
+              >
+                <Group>
+                  <Group mr={rem(20)}>
+                    <IconVideo style={{ width: rem(20) }} />
+                    <Text key={item?.id}> {item?.name}</Text>
+                  </Group>
+                  <Group mr={rem(20)}>
+                    <IconMapPin style={{ width: rem(20) }} />
+                    <Text key={item?.id}> {item?.zone}</Text>
+                  </Group>
+                  <Group>
+                    <IconAlertCircle style={{ width: rem(20) }} />
+                    <Text key={item?.id}> {item?.status}</Text>
+                  </Group>
+                </Group>
+              </Button>
+            </Tooltip>
+          ))
+        )}
       </Paper>
 
       <Paper p={rem(32)} m={rem(32)} shadow="xs">

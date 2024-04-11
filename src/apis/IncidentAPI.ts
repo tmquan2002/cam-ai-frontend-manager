@@ -1,7 +1,15 @@
 import { getAccessToken } from "../context/AuthContext";
-import { IncidentStatus, IncidentType } from "../models/CamAIEnum";
+import {
+  IncidentStatus,
+  IncidentType,
+  ReportInterval,
+} from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
 import { IncidentDetail } from "../models/Incident";
+import {
+  IncidentReportByTimeDataDetail,
+  IncidentReportByTimeDetail,
+} from "../models/Report";
 import http, { toQueryParams } from "../utils/http";
 
 export type GetIncidentParams = {
@@ -20,6 +28,13 @@ export type GetIncidentParams = {
 export type AssignIncidentParams = {
   incidentId: string;
   employeeId: string;
+};
+
+export type GetIncidentReportByTimeParams = {
+  shopId?: string;
+  startDate?: string;
+  endDate?: string;
+  interval: ReportInterval;
 };
 
 export const IncidentApi = {
@@ -69,6 +84,20 @@ export const IncidentApi = {
     const res = await http.put(
       `/api/incidents/${incidentId}/employee/${employeeId}`,
       {},
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    return res?.data;
+  },
+  _getIncidentReportByTime: async (params: GetIncidentReportByTimeParams) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<IncidentReportByTimeDetail>(
+      `/api/incidents/count?${toQueryParams(params)}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`,

@@ -13,13 +13,12 @@ import {
   rem,
 } from "@mantine/core";
 import classes from "./Notification.module.scss";
-import {  useEffect, useState } from "react";
-import { useGetNotificationList } from "../../hooks/useGetNotificationList";
+import { useState } from "react";
 import dayjs from "dayjs";
-import { NotificationStatus } from "../../models/CamAIEnum";
+import { NotificationStatus, NotificationType } from "../../models/CamAIEnum";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
-import { useNotification } from "../../hooks/useNotification";
-import { ReadyState } from "react-use-websocket";
+import { NotificationDetail } from "../../models/Notification";
+import { useNavigate } from "react-router-dom";
 
 export const TabsHeader = ({
   active,
@@ -104,20 +103,28 @@ const DetailCard = (props: {
   );
 };
 
+export type NotificationProps = {
+  notificationList: NotificationDetail[];
+  refetchNotification: () => void;
+  isNotificationListLoading: boolean;
+};
 
+const Notification = ({
+  notificationList,
+  refetchNotification,
+  isNotificationListLoading,
+}: NotificationProps) => {
+  const navigate = useNavigate();
 
-const Notification = () => {
-  const { data, isLoading, refetch } = useGetNotificationList();
-  const { lastJsonMessage, readyState } = useNotification();
-
-  useEffect(() => {
-    if (readyState == ReadyState.OPEN && lastJsonMessage) {
-      refetch()
-    }
-  }, [readyState, lastJsonMessage]);
- 
   const { mutate: updateNotificationStatus } = useUpdateNotificationStatus();
 
+  const handleNavigate = ({ relatedEntityId, type }: NotificationDetail) => {
+    switch (type) {
+      case NotificationType.EdgeBoxInstallActivation:
+      case NotificationType.EdgeBoxUnhealthy:
+        navigate("/brand/shop");
+    }
+  };
 
   const [activeTab, setActiveTab] = useState<string | null>("gallery");
   return (
@@ -151,11 +158,15 @@ const Notification = () => {
           <Tabs.Tab value="gallery">
             <TabsHeader
               active={activeTab == "gallery"}
-              number={12}
-              text="All"
+              number={
+                notificationList.filter(
+                  (n) => n.status == NotificationStatus.Unread
+                ).length
+              }
+              text="All notification"
             />
           </Tabs.Tab>
-          <Tabs.Tab value="messages">
+          {/* <Tabs.Tab value="messages">
             <TabsHeader
               active={activeTab == "messages"}
               number={12}
@@ -168,15 +179,15 @@ const Notification = () => {
               number={12}
               text="sad"
             />
-          </Tabs.Tab>
+          </Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="gallery">
-          {isLoading ? (
+          {isNotificationListLoading ? (
             <Loader />
           ) : (
             <>
-              {data?.values?.map((item) => (
+              {notificationList?.map((item) => (
                 <Box
                   key={item?.id}
                   onClick={() => {
@@ -187,7 +198,7 @@ const Notification = () => {
                       },
                       {
                         onSuccess() {
-                          refetch();
+                          refetchNotification();
                         },
                       }
                     );
