@@ -47,11 +47,10 @@ const mockdata = [
   },
 ];
 
+const links = mockdata.map((item) => (
+  <SidebarLinksGroup {...item} key={item.label} />
+));
 export function ShopNavbar() {
-  const links = mockdata.map((item) => (
-    <SidebarLinksGroup {...item} key={item.label} />
-  ));
-
   return (
     <nav className={classes["navbar"]}>
       <ScrollArea className={classes["links"]}>

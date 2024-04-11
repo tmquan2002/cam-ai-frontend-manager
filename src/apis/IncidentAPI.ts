@@ -6,10 +6,7 @@ import {
 } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
 import { IncidentDetail } from "../models/Incident";
-import {
-  IncidentReportByTimeDataDetail,
-  IncidentReportByTimeDetail,
-} from "../models/Report";
+import { IncidentReportByTimeDetail } from "../models/Report";
 import http, { toQueryParams } from "../utils/http";
 
 export type GetIncidentParams = {

@@ -6,6 +6,10 @@ import dayjs from "dayjs";
 import _ from "lodash";
 import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
 import { useGetEmployeeList } from "../../../../hooks/useGetEmployeeList";
+import {
+  EmployeeIncidentCard,
+  EmployeeIncidentCardProps,
+} from "../../../../components/card/EmployeeIncidentCard";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
@@ -22,11 +26,11 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import {
-  EmployeeIncidentCard,
-  EmployeeIncidentCardProps,
-} from "../../../../components/card/EmployeeIncidentCard";
 import { IconCheck, IconEye, IconX } from "@tabler/icons-react";
+
+export type EmployeeIncidentReportTabProps = {
+  shopId: string | null;
+};
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -41,7 +45,9 @@ type SearchIncidentField = {
   pageIndex?: number;
 };
 
-const EmployeeIncidentReport = () => {
+const EmployeeIncidentReportTab = ({
+  shopId,
+}: EmployeeIncidentReportTabProps) => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
@@ -51,6 +57,7 @@ const EmployeeIncidentReport = () => {
       toTime: null,
       incidentType: null,
       size: 999,
+      shopId: shopId ?? undefined,
     },
     validate: (values) => ({
       toTime:
@@ -81,6 +88,7 @@ const EmployeeIncidentReport = () => {
         status: form.values.status,
         incidentType: form.values.incidentType,
         size: form?.values.size,
+        shopId: shopId,
       };
       sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
       return sb;
@@ -89,6 +97,7 @@ const EmployeeIncidentReport = () => {
         return {
           size: 999,
           incidentType: form.values.incidentType ?? undefined,
+          shopId: shopId,
         };
       }
       return {
@@ -101,6 +110,7 @@ const EmployeeIncidentReport = () => {
     form.values.incidentType,
     form.values.status,
     form.values.toTime,
+    shopId,
   ]);
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList(searchParams);
@@ -322,4 +332,4 @@ const EmployeeIncidentReport = () => {
   );
 };
 
-export default EmployeeIncidentReport;
+export default EmployeeIncidentReportTab;

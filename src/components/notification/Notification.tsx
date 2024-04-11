@@ -15,10 +15,9 @@ import {
 import classes from "./Notification.module.scss";
 import { useState } from "react";
 import dayjs from "dayjs";
-import { NotificationStatus, NotificationType } from "../../models/CamAIEnum";
+import { NotificationStatus } from "../../models/CamAIEnum";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
 import { NotificationDetail } from "../../models/Notification";
-import { useNavigate } from "react-router-dom";
 
 export const TabsHeader = ({
   active,
@@ -114,17 +113,15 @@ const Notification = ({
   refetchNotification,
   isNotificationListLoading,
 }: NotificationProps) => {
-  const navigate = useNavigate();
-
   const { mutate: updateNotificationStatus } = useUpdateNotificationStatus();
 
-  const handleNavigate = ({ relatedEntityId, type }: NotificationDetail) => {
-    switch (type) {
-      case NotificationType.EdgeBoxInstallActivation:
-      case NotificationType.EdgeBoxUnhealthy:
-        navigate("/brand/shop");
-    }
-  };
+  // const handleNavigate = ({ relatedEntityId, type }: NotificationDetail) => {
+  //   switch (type) {
+  //     case NotificationType.EdgeBoxInstallActivation:
+  //     case NotificationType.EdgeBoxUnhealthy:
+  //       navigate("/brand/shop");
+  //   }
+  // };
 
   const [activeTab, setActiveTab] = useState<string | null>("gallery");
   return (

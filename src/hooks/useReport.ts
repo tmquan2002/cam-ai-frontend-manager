@@ -9,6 +9,7 @@ import { UseQueryResult, useQuery } from "react-query";
 import { ChartReportData } from "../models/Report";
 import { CommonResponse } from "../models/Common";
 import { GetReportListParams, ReportApi } from "../apis/ReportAPI";
+import { IncidentDetail } from "../models/Incident";
 
 const webSocketUrl = process.env.REACT_APP_VITE_WEB_SOCKET_LINK;
 
@@ -134,4 +135,27 @@ export const useGetPastReportByShop = (params: GetReportListParams) => {
   });
 
   return { isError, isLoading, data, error, refetch };
+};
+
+export const useGetNewIncident = () => {
+  const { lastJsonMessage, readyState } = useWebSocket<IncidentDetail>(
+    webSocketUrl + `/api/incidents/new`,
+    {
+      protocols: ["Bearer", `${getAccessToken()}`],
+    },
+    !!getAccessToken()
+  );
+
+  const [data, setData] = useState<IncidentDetail | undefined>(undefined);
+
+  useEffect(() => {
+    if (lastJsonMessage) {
+      setData(lastJsonMessage);
+    }
+  }, [lastJsonMessage]);
+
+  return {
+    lastJsonMessage: data,
+    readyState,
+  };
 };

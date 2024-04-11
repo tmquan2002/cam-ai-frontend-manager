@@ -36,21 +36,27 @@ const mockdata = [
   {
     label: "EdgeBox",
     icon: IconCalendarStats,
-    path: "/brand/edgeBox"
+    path: "/brand/edgeBox",
+  },
+  {
+    label: "Incident",
+    icon: IconFileAnalytics,
+    path: "/brand/incident",
   },
   {
     label: "Report",
-    icon: IconFileAnalytics,
-    links: [{ label: "Incidents", link: "/brand/incident" }],
+    icon: IconCalendarStats,
+    links: [
+      { label: "Customer", link: "/brand/report/customer" },
+      { label: "Incident", link: "/brand/report/incident" },
+      { label: "Interaction", link: "/brand/report/interaction" },
+    ],
   },
 ];
 
 export function BrandNavbar() {
   const links = mockdata.map((item) => (
-    <SidebarLinksGroup
-      {...item}
-      key={item.label}
-    />
+    <SidebarLinksGroup {...item} key={item.label} />
   ));
 
   return (

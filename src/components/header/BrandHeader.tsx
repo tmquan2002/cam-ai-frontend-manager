@@ -12,7 +12,6 @@ import { IconUser } from "@tabler/icons-react";
 import { MdLogout, MdNotifications } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/AuthContext";
-import Notification from "../notification/Notification";
 import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
 
 interface BurgerProps {
@@ -26,77 +25,40 @@ const BrandHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
   const session = useSession();
   const navigate = useNavigate();
   return (
-    <Flex
-      justify="space-between"
-      px={rem(32)}
-      align={"center"}
-      h={"100%"}
-    >
+    <Flex justify="space-between" px={rem(32)} align={"center"} h={"100%"}>
       <Group>
-        <Burger
-          onClick={toggleMobile}
-          hiddenFrom="sm"
-          size="sm"
-        />
-        <Burger
-          onClick={toggleDesktop}
-          visibleFrom="sm"
-          size="sm"
-        />
+        <Burger onClick={toggleMobile} hiddenFrom="sm" size="sm" />
+        <Burger onClick={toggleDesktop} visibleFrom="sm" size="sm" />
         <b>CAMAI</b>
       </Group>
       <Group gap={5}>
         <LightDarkSwitch size="md" />
 
-        <Popover
-          position="bottom-end"
-          withArrow
-          shadow="md"
-        >
-          <Tooltip
-            label="Notification"
-            withArrow
-          >
+        <Popover position="bottom-end" withArrow shadow="md">
+          <Tooltip label="Notification" withArrow>
             <Popover.Target>
-              <Indicator
-                size={5}
-                color="pale-red.6"
-              >
-                <ActionIcon
-                  variant="default"
-                  aria-label="Notifications"
-                >
+              <Indicator size={5} color="pale-red.6">
+                <ActionIcon variant="default" aria-label="Notifications">
                   <MdNotifications style={{ width: 18, height: 18 }} />
                 </ActionIcon>
               </Indicator>
             </Popover.Target>
           </Tooltip>
 
-          <Popover.Dropdown p={0}>
-            <Notification />
-          </Popover.Dropdown>
+          <Popover.Dropdown p={0}>{/* <Notification  /> */}</Popover.Dropdown>
         </Popover>
 
-        <Tooltip
-          label="Profile"
-          withArrow
-        >
+        <Tooltip label="Profile" withArrow>
           <ActionIcon
             variant="default"
             aria-label="Profile"
             onClick={() => navigate("/brand/profile")}
           >
-            <IconUser
-              style={{ width: "70%", height: "70%" }}
-              stroke={1.5}
-            />
+            <IconUser style={{ width: "70%", height: "70%" }} stroke={1.5} />
           </ActionIcon>
         </Tooltip>
 
-        <Tooltip
-          label="Logout"
-          withArrow
-        >
+        <Tooltip label="Logout" withArrow>
           <ActionIcon
             variant="default"
             aria-label="Logout"

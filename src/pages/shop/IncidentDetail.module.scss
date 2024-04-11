@@ -1,14 +1,7 @@
-.title_container {
-  display: flex;
-  align-items: center;
+.clickable {
+  cursor: pointer;
 }
 
-.right_section_wrapper {
-}
-
-.right_section_desctiption {
-  padding: rem(20) 0;
-  font-size: rem(16);
-  font-weight: 500;
-  color: #867e7e;
+.clickable:hover {
+  text-decoration: underline !important;
 }

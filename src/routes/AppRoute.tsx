@@ -29,10 +29,12 @@ import BranddReportPage from "../pages/brand/BrandReportPage";
 import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 import CameraDetailPage from "../pages/brand/CameraDetailPage";
 import ShopStreamPage from "../pages/shop/ShopStreamPage";
-import ShopReportPage from "../pages/shop/report/common/ShopReportPage";
 import CustomerReportPage from "../pages/shop/report/customer/CustomerReportTab";
 import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
 import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
+import CustomerReportPageManager from "../pages/brand/report/customer/CustomerReportPageManager";
+import IncidentReportPageManager from "../pages/brand/report/incident/IncidentReportPageManager";
+import InteractionReportPageManager from "../pages/brand/report/interaction/InteractionReportPageManager";
 
 const AppRoute = () => {
   return useRoutes([
@@ -67,10 +69,7 @@ const AppRoute = () => {
           path: "stream",
           element: <ShopStreamPage />,
         },
-        {
-          path: "report",
-          element: <ShopReportPage />,
-        },
+
         {
           path: "brand/detail",
           element: <BrandShopDetailPage />,
@@ -168,6 +167,18 @@ const AppRoute = () => {
         {
           path: "camera/:id",
           element: <CameraDetailPage />,
+        },
+        {
+          path: "report/customer",
+          element: <CustomerReportPageManager />,
+        },
+        {
+          path: "report/incident",
+          element: <IncidentReportPageManager />,
+        },
+        {
+          path: "report/interaction",
+          element: <InteractionReportPageManager />,
         },
       ],
     },
