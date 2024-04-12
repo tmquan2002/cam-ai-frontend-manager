@@ -141,3 +141,8 @@ export enum ReportTimeRange {
   Week = "Week",
   Month = "Month",
 }
+
+export enum EventType {
+  NewIncident = "NewIncident",
+  MoreEvidence = "MoreEvidence",
+}
