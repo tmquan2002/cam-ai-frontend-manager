@@ -49,7 +49,7 @@ export function removeTime(date: string, separator?: string, format?: "dd/MM/yyy
 }
 
 export function getDateTime(date: string) {
-  return removeDate(date) + " " + removeTime(date);
+  return removeTime(date, "/") + " " + removeDate(date);
 }
 
 export function removeFirstUpdateLastArray<T>(arr: T[], newItem: T) {
