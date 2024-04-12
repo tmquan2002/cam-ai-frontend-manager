@@ -1,12 +1,13 @@
 import { UseQueryResult, useQuery } from "react-query";
-import { GetImageParams, ImageAPI } from "../apis/ImageAPI";
+import { ImageAPI } from "../apis/Image";
 
-export const useGetImageById = (params: GetImageParams) => {
+export const useGetImageById = (imageId: string) => {
   const { isLoading, data, isError, error }: UseQueryResult<any, Error> =
     useQuery({
-      queryKey: ["image", params.id],
+      queryKey: ["image", imageId],
+      enabled: !!imageId,
       queryFn: async () => {
-        return await ImageAPI._getImageById(params);
+        return await ImageAPI._getImageById(imageId);
       },
     });
 

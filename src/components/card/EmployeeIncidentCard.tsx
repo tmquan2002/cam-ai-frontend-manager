@@ -160,7 +160,7 @@ export const EmployeeIncidentCard = ({
                 }
                 pb={rem(12)}
                 className={classes["clickable-style"]}
-                onClick={() => navigate(`/shop/incident/${item?.id}`)}
+                onClick={() => navigate(`/brand/incident/${item?.id}`)}
               >
                 <Grid.Col span={4}>
                   <Group>

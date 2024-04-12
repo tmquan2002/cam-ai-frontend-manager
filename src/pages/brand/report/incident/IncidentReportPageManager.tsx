@@ -79,11 +79,23 @@ const IncidentReportPageManager = () => {
           </Tabs.List>
 
           <Tabs.Panel value="ByEmployee">
-            <EmployeeIncidentReportTab shopId={selectedShop} />
+            {selectedShop ? (
+              <EmployeeIncidentReportTab shopId={selectedShop} />
+            ) : (
+              <Text mt={rem(28)} size="xl" fw={700}>
+                Please select shop
+              </Text>
+            )}
           </Tabs.Panel>
 
           <Tabs.Panel value="ByTime">
-            <TimeIncidentReportTab shopId={selectedShop} />
+            {selectedShop ? (
+              <TimeIncidentReportTab shopId={selectedShop} />
+            ) : (
+              <Text size="xl" mt={rem(20)} fw={700}>
+                Please select shop
+              </Text>
+            )}
           </Tabs.Panel>
         </Tabs>
       </Card>

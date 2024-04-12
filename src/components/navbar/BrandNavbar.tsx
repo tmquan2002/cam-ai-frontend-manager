@@ -3,10 +3,13 @@ import {
   IconCalendarStats,
   IconGauge,
   IconFileAnalytics,
+  IconRouter,
+  IconUser,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
 import classes from "./Sidebar.module.scss";
+import { IconExclamationCircle } from "@tabler/icons-react";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/brand" },
@@ -18,7 +21,7 @@ const mockdata = [
   },
   {
     label: "Account",
-    icon: IconNotes,
+    icon: IconUser,
     links: [
       { label: "Shop manager ", link: "/brand/account" },
       { label: "Create manager ", link: "/brand/create/manager" },
@@ -35,17 +38,26 @@ const mockdata = [
   },
   {
     label: "EdgeBox",
-    icon: IconCalendarStats,
+    icon: IconRouter,
     path: "/brand/edgeBox",
   },
   {
-    label: "Incident",
-    icon: IconFileAnalytics,
-    path: "/brand/incident",
+    label: "Incident & Interaction",
+    icon: IconExclamationCircle,
+    links: [
+      {
+        label: "Incident list",
+        link: "/brand/incident",
+      },
+      {
+        label: "Interaction list",
+        link: "/brand/interaction",
+      },
+    ],
   },
   {
     label: "Report",
-    icon: IconCalendarStats,
+    icon: IconFileAnalytics,
     links: [
       { label: "Customer", link: "/brand/report/customer" },
       { label: "Incident", link: "/brand/report/incident" },

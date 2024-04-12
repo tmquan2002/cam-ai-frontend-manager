@@ -1,5 +1,5 @@
 import { Button, Group, Paper, Text, rem } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
@@ -16,6 +16,7 @@ import { notifications } from "@mantine/notifications";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
 import dayjs from "dayjs";
+import _ from "lodash";
 
 export type CreateEmployeeField = {
   name: string | null;
@@ -33,7 +34,10 @@ const CreateEmployeePage = () => {
   const createEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
+      email: (value) =>
+        value == "" || value == null || /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
+          ? null
+          : "Invalid email - ex: helloitsme@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -67,7 +71,6 @@ const CreateEmployeePage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
-          required: true,
         },
       },
       {
@@ -165,33 +168,28 @@ const CreateEmployeePage = () => {
     wards,
   ]);
   return (
-    <Paper
-      m={rem(32)}
-      p={rem(32)}
-      shadow="xs"
-    >
-      <Text
-        size="lg"
-        fw={"bold"}
-        fz={25}
-        c={"light-blue.4"}
-        pb={rem(28)}
-      >
+    <Paper m={rem(32)} p={rem(32)} shadow="xs">
+      <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} pb={rem(28)}>
         Add employee
       </Text>
       <form
         onSubmit={createEmployeeForm.onSubmit(
           ({ name, addressLine, birthday, email, gender, phone, wardId }) => {
             const createEmployeeParams: CreateEmployeeParams = {
-              email: email ?? "",
+              email: email ?? null,
               name: name ?? "",
               gender: gender,
               addressLine,
-              birthday: dayjs(birthday).format("YYYY-MM-DD"),
+              birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
               phone,
               wardId,
             };
-            craeteEmployee(createEmployeeParams, {
+
+            let sb: CreateEmployeeParams = _.omitBy(
+              createEmployeeParams,
+              _.isNil
+            ) as CreateEmployeeParams;
+            craeteEmployee(sb, {
               onSuccess() {
                 navigate(`/shop/employee`);
               },
@@ -208,10 +206,7 @@ const CreateEmployeePage = () => {
         )}
       >
         <EditAndUpdateForm fields={fields} />
-        <Group
-          justify="flex-end"
-          mt="md"
-        >
+        <Group justify="flex-end" mt="md">
           <Button
             type="submit"
             disabled={!createEmployeeForm.isDirty()}

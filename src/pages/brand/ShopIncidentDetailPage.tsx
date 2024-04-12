@@ -4,7 +4,6 @@ import {
   Divider,
   Flex,
   Group,
-  Image,
   Loader,
   Paper,
   Select,
@@ -22,6 +21,7 @@ import { useEffect } from "react";
 import { EvidenceDetail } from "../../models/Evidence";
 import NoImage from "../../components/image/NoImage";
 import _ from "lodash";
+import LoadingImage from "../../components/image/LoadingImage";
 
 type IncidentFormField = {
   employeeId: string | null;
@@ -51,11 +51,11 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
             </Group>
           </Group>
 
-          <Image
+          <LoadingImage
             radius={"md"}
             bg={"#000"}
             fit="contain"
-            src={evidence?.image?.hostingUri}
+            imageId={evidence?.imageId}
           />
         </Box>
       );
@@ -123,9 +123,26 @@ const ShopIncidentDetailPage = () => {
             px={rem(32)}
             py={rem(28)}
           >
-            <Text fw={500} size={rem(20)} mb={rem(28)}>
-              Evidence
-            </Text>
+            <Group justify="space-between" align="flex-end" mb={rem(20)}>
+              <Text fw={500} size={rem(20)}>
+                Evidence
+              </Text>
+              <Group align="flex-end">
+                <Text fw={500} size={rem(16)}>
+                  Total evidence:{" "}
+                  <Text span c={"blue"} inherit>
+                    {incidentData?.evidences.length}
+                  </Text>
+                </Text>
+                <>|</>
+                <Text fw={500} size={rem(16)}>
+                  AI identity :{" "}
+                  <Text span c={"blue"} inherit>
+                    {incidentData?.aiId}
+                  </Text>
+                </Text>
+              </Group>
+            </Group>
             <Divider color="#acacac" mb={rem(20)} />
             {_.isEmpty(incidentData?.evidences) ? (
               <NoImage />

@@ -56,9 +56,9 @@ const CreateShop = () => {
       phone: (value) =>
         value == "" ||
         value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "Invalid phone number - ex: 0379999999",
+          : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Province is required"),
@@ -80,12 +80,9 @@ const CreateShop = () => {
       phone: (value) =>
         value == "" ||
         value == null ||
-        /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "Invalid phone number - ex: 0379999999",
-      province: isNotEmpty("Provice is required"),
-      district: isNotEmpty("District is required"),
-      wardId: isNotEmpty("Ward is required"),
+          : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -343,8 +340,6 @@ const CreateShop = () => {
           }),
           form: createAccountForm,
           name: "province",
-          required: true,
-
           loading: isProvicesLoading,
         },
         spans: 4,
@@ -360,7 +355,6 @@ const CreateShop = () => {
           form: createAccountForm,
           name: "district",
           loading: isCreateAccountDistrictsLoading,
-          required: true,
 
           // disabled: true,
         },
@@ -377,7 +371,6 @@ const CreateShop = () => {
           form: createAccountForm,
           name: "wardId",
           loading: isCreateAccountWardsLoading,
-          required: true,
           // disabled: true,
         },
         spans: 4,
@@ -413,13 +406,23 @@ const CreateShop = () => {
         </Group>
         <form
           onSubmit={createShopForm.onSubmit(
-            ({ addressLine, name, phone, wardId, shopManagerId }) => {
+            ({
+              addressLine,
+              name,
+              phone,
+              wardId,
+              shopManagerId,
+              openTime,
+              closeTime,
+            }) => {
               const updateParams: CreateShopParams = {
                 addressLine,
                 name,
                 phone: phone == "" ? null : phone,
                 wardId: +(wardId ?? 0),
                 shopManagerId: shopManagerId ?? null,
+                openTime: openTime,
+                closeTime: closeTime,
               };
               createShop(updateParams, {
                 onSuccess(data) {
@@ -456,7 +459,7 @@ const CreateShop = () => {
       </Paper>
       <Collapse in={opened}>
         <Paper m={rem(32)} p={rem(32)}>
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={rem(20)}>
             Add shop manager account
           </Text>
           <form
@@ -474,7 +477,7 @@ const CreateShop = () => {
                 wardId,
               }) => {
                 const params: CreateAccountParams = {
-                  addressLine,
+                  addressLine: addressLine ?? null,
                   birthday: dayjs(birthday).format("YYYY-MM-DD"),
                   brandId: brandList?.values[0].id ?? "",
                   email,
@@ -483,7 +486,7 @@ const CreateShop = () => {
                   password,
                   phone,
                   role: Role.ShopManager,
-                  wardId: +wardId,
+                  wardId: wardId ? +wardId : null,
                 };
 
                 createAccount(params, {

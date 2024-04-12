@@ -27,4 +27,22 @@ export type IncidentReportByTimeDetail = {
 export type IncidentReportByTimeDataDetail = {
   time: string;
   count: number;
+  averageDuration: number | null;
+};
+
+export type HumanCountDetail = {
+  shopId: string;
+  startDate: string;
+  endDate: string;
+  interval: ReportInterval;
+  data: HumanCountDataDetail[];
+};
+
+export type HumanCountDataDetail = {
+  Time: string;
+  Low: number;
+  High: number;
+  Open: number;
+  Close: number;
+  Median: number;
 };

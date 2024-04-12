@@ -17,16 +17,14 @@ import {
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { IMAGE_CONSTANT } from "../../types/constant";
-import classes from "./IncidentListPage.module.scss";
+import classes from "./BrandInteractionList.module.scss";
 import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
 import { IconFilter } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
 import { useForm } from "@mantine/form";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { GetIncidentParams } from "../../apis/IncidentAPI";
 import dayjs from "dayjs";
 import _ from "lodash";
@@ -45,7 +43,7 @@ type SearchIncidentField = {
   pageIndex?: number;
 };
 
-const IncidentListPage = () => {
+const BrandInteractionList = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -57,7 +55,7 @@ const IncidentListPage = () => {
       fromTime: null,
       status: null,
       toTime: null,
-      incidentType: null,
+      incidentType: IncidentType.Interaction,
       size: 20,
       pageIndex: activePage - 1,
     },
@@ -84,34 +82,18 @@ const IncidentListPage = () => {
     return sb;
   }, [
     activePage,
-    form.values.employeeId,
     form.values.fromTime,
     form.values.incidentType,
-    form.values.status,
-    form.values.toTime,
     form.values.shopId,
   ]);
 
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList(searchParams);
 
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-
   const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
     enabled: true,
     size: 999,
   });
-
-  const removedInteractionIncident = useMemo(() => {
-    if (isGetEmployeeListLoading) {
-      return [];
-    } else {
-      return incidentList?.values?.filter(
-        (item) => item?.incidentType != IncidentType.Interaction
-      );
-    }
-  }, [incidentList, isGetIncidentListLoading]);
 
   const fields = useMemo(() => {
     return [
@@ -149,60 +131,8 @@ const IncidentListPage = () => {
         },
         spans: 4,
       },
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Employee",
-          placeholder: "Employee",
-          data: employeeList?.values?.map((item) => {
-            return { value: `${item.id}`, label: item.name };
-          }),
-          form,
-          name: "employeeId",
-          loading: isGetEmployeeListLoading,
-        },
-        spans: 4,
-      },
-
-      {
-        type: FIELD_TYPES.RADIO,
-        fieldProps: {
-          form,
-          name: "status",
-          placeholder: "Incident status",
-          label: "Incident status",
-          data: mapLookupToArray(IncidentStatus ?? {}),
-        },
-        spans: 3,
-      },
-      {
-        type: FIELD_TYPES.RADIO,
-        fieldProps: {
-          form,
-          name: "incidentType",
-          placeholder: "Incident type",
-          label: "Incident type",
-          data: [
-            {
-              key: IncidentType.Phone,
-              value: "Phone",
-            },
-            {
-              key: IncidentType.Uniform,
-              value: "Uniform",
-            },
-          ],
-        },
-        spans: 3,
-      },
     ];
-  }, [
-    employeeList?.values,
-    form,
-    isGetEmployeeListLoading,
-    shopList,
-    isGetShopListLoading,
-  ]);
+  }, [form, , shopList, isGetShopListLoading]);
 
   const renderIncidentStatusBadge = (status: IncidentStatus) => {
     switch (status) {
@@ -215,7 +145,7 @@ const IncidentListPage = () => {
     }
   };
 
-  const rows = removedInteractionIncident?.map((row, index) => {
+  const rows = incidentList?.values?.map((row, index) => {
     return (
       <Table.Tr
         key={index}
@@ -236,20 +166,16 @@ const IncidentListPage = () => {
           <Text>{row?.shop?.name}</Text>
         </Table.Td>
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
-        <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/brand/employee/${row?.employee?.id}`);
-            }}
-          >
-            {row?.employee?.name}
-          </Text>
-        </Table.Td>
 
-        <Table.Td>{renderIncidentStatusBadge(row?.status)}</Table.Td>
+        <Table.Td>
+          {" "}
+          {new Date(row?.startTime ?? "").getTime() - new Date().getTime() >
+          0 ? (
+            renderIncidentStatusBadge(IncidentStatus.New)
+          ) : (
+            <></>
+          )}
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -316,7 +242,6 @@ const IncidentListPage = () => {
                 <Table.Th>Incident type</Table.Th>
                 <Table.Th>Shop name</Table.Th>
                 <Table.Th>Time</Table.Th>
-                <Table.Th>Assigned to</Table.Th>
                 <Table.Th>Status</Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -337,4 +262,4 @@ const IncidentListPage = () => {
   );
 };
 
-export default IncidentListPage;
+export default BrandInteractionList;

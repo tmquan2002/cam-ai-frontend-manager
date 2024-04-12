@@ -59,6 +59,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { ShopStatus } from "../../models/CamAIEnum";
+import LoadingImage from "../../components/image/LoadingImage";
 
 type SearchShopField = {
   status: string | null;
@@ -179,14 +180,17 @@ const BrandDetailPageManager = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Table.Tr key={index} onClick={() => navigate(`shop/${row.id}`)}>
+      <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
         <Table.Td>
           <Text className={classes["pointer-style"]} c={"blue"}>
             {row.name}
           </Text>
         </Table.Td>
         <Table.Td>{row.addressLine}</Table.Td>
+        <Table.Td>{row.openTime}</Table.Td>
+        <Table.Td>{row.closeTime}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
+
         <Table.Td>
           {_.isEqual(row.shopStatus, "Active") ? (
             <Badge variant="light">Active</Badge>
@@ -299,12 +303,12 @@ const BrandDetailPageManager = () => {
                 }}
               >
                 {data?.values[0]?.banner ? (
-                  <Image
+                  <LoadingImage
                     radius={"md"}
                     bg={"#000"}
                     height={280}
                     fit="cover"
-                    src={data?.values[0]?.banner?.hostingUri}
+                    imageId={data?.values[0]?.banner?.id}
                   />
                 ) : (
                   <Group
@@ -514,6 +518,8 @@ const BrandDetailPageManager = () => {
                 <Table.Tr>
                   <Table.Th>Shop name</Table.Th>
                   <Table.Th>Address</Table.Th>
+                  <Table.Th>Open time</Table.Th>
+                  <Table.Th>Close time</Table.Th>
                   <Table.Th>Phone</Table.Th>
                   <Table.Th>Status</Table.Th>
                 </Table.Tr>

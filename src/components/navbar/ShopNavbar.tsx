@@ -19,9 +19,18 @@ const mockdata = [
     path: "/shop/detail",
   },
   {
-    label: "Incident",
+    label: "Incident & Interaction",
     icon: IconExclamationCircle,
-    path: "/shop/incident",
+    links: [
+      {
+        label: "Incident",
+        link: "/shop/incident",
+      },
+      {
+        label: "Interaction",
+        link: "/shop/interaction",
+      },
+    ],
   },
   {
     label: "Live",
@@ -32,7 +41,7 @@ const mockdata = [
     label: "Report",
     icon: IconFileAnalytics,
     links: [
-      { label: "Customer", link: "/shop/report/customer" },
+      { label: "Employee count", link: "/shop/report/count/employee" },
       { label: "Incident", link: "/shop/report/incident" },
       { label: "Interaction", link: "/shop/report/interaction" },
     ],

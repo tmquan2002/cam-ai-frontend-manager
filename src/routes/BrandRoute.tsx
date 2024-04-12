@@ -27,7 +27,7 @@ const BrandRoute = () => {
         <AppShell
           header={{ height: 60 }}
           navbar={{
-            width: 250,
+            width: 300,
             breakpoint: "sm",
             collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
           }}
@@ -58,12 +58,7 @@ const BrandRoute = () => {
     case Role.ShopManager:
       return <Navigate to={"/shop"} />;
     default:
-      return (
-        <Navigate
-          to={"/login"}
-          replace
-        />
-      );
+      return <Navigate to={"/login"} replace />;
   }
 };
 

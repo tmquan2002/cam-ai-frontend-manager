@@ -1,6 +1,6 @@
 import { BrowserRouter } from "react-router-dom";
 import "@mantine/core/styles.css";
-import "@mantine/charts/styles.css";
+// import "@mantine/charts/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "@mantine/dropzone/styles.css";
@@ -12,7 +12,6 @@ import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { MantineProvider, createTheme } from "@mantine/core";
 import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
-
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,16 +33,9 @@ const theme = createTheme({
   },
 });
 
-
 function App() {
-
-
-
   return (
-    <MantineProvider
-      theme={theme}
-      defaultColorScheme="light"
-    >
+    <MantineProvider theme={theme} defaultColorScheme="light">
       <ModalsProvider>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>

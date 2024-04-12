@@ -1,5 +1,5 @@
 import { useForm } from "@mantine/form";
-import { ReportInterval } from "../../../../models/CamAIEnum";
+import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useMemo } from "react";
 import dayjs from "dayjs";
@@ -9,8 +9,31 @@ import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
 import NoImage from "../../../../components/image/NoImage";
-import { LineChart } from "@mantine/charts";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
+
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+);
 
 export type TimeIncidentReportTabProps = {
   shopId: string | null;
@@ -26,7 +49,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
       interval: ReportInterval.HalfHour,
     },
@@ -48,6 +71,14 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
 
   const searchParams: GetIncidentReportByTimeParams & { enabled: boolean } =
     useMemo(() => {
+      if (!shopId)
+        return {
+          enabled: false,
+          interval: form.values.interval,
+          shopId: shopId ?? undefined,
+          type: IncidentType.Incident,
+        };
+
       if (form.isValid() && form.values.startDate && form.values.toDate) {
         let sb: GetIncidentReportByTimeParams & { enabled: boolean } = {
           startDate: form.values.startDate
@@ -59,6 +90,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           interval: form.values.interval,
           enabled: true,
           shopId: shopId ?? undefined,
+          type: IncidentType.Incident,
         };
         sb = _.omitBy(sb, _.isNil) as GetIncidentReportByTimeParams & {
           enabled: boolean;
@@ -69,6 +101,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           enabled: true,
           interval: form.values.interval,
           shopId: shopId ?? undefined,
+          type: IncidentType.Incident,
         };
       }
     }, [
@@ -122,24 +155,24 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           placeholder: "Interval",
           data: [
             {
-              key: ReportInterval.HalfHour,
               value: ReportInterval.HalfHour,
+              label: "30 minutes",
             },
             {
-              key: ReportInterval.Hour,
               value: ReportInterval.Hour,
+              label: "1 hour",
             },
             {
-              key: ReportInterval.HalfDay,
               value: ReportInterval.HalfDay,
+              label: "12 hours",
             },
             {
-              key: ReportInterval.Day,
               value: ReportInterval.Day,
+              label: "1 day",
             },
             {
-              key: ReportInterval.Week,
               value: ReportInterval.Week,
+              label: "1 week",
             },
           ],
         },
@@ -164,29 +197,63 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           </Group>
         </Card.Section>
 
-        {!incidentReportByTimeData ||
-        incidentReportByTimeData?.data?.length == 0 ? (
+        {!shopId ? (
+          <Text size="lg" fw={600}>
+            Please select shop
+          </Text>
+        ) : !incidentReportByTimeData ||
+          incidentReportByTimeData?.data?.length == 0 ? (
           <NoImage />
         ) : (
-          <LineChart
-            h={300}
-            w={"100%"}
-            data={
-              data
-                ? data.map((item) => {
-                    return {
-                      time: item.time,
-                      incidents: item.count,
-                    };
-                  })
-                : []
-            }
-            withLegend
-            legendProps={{ verticalAlign: "bottom" }}
-            dataKey="time"
-            series={[{ name: "incidents", color: "teal.6" }]}
-            curveType="linear"
-          />
+          <Box
+            style={{
+              width: "100%",
+              maxWidth: "100%",
+              height: "640px",
+              overflowX: "scroll",
+            }}
+          >
+            <Box
+              style={
+                data && data?.length > 7
+                  ? {
+                      width: `${1500 + (data?.length - 7) * 30}px`,
+                      height: "600px",
+                    }
+                  : {
+                      height: "600px",
+                    }
+              }
+            >
+              <Line
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                    },
+                  },
+                  plugins: {
+                    title: {
+                      display: true,
+                    },
+                  },
+                }}
+                data={{
+                  labels: data?.map((i) => i.time),
+                  datasets: [
+                    {
+                      label: "Total incidents",
+                      data: data?.map((i) => i.count),
+                      borderColor: "rgb(255, 99, 132)",
+                      backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    },
+                  ],
+                }}
+              ></Line>
+            </Box>
+          </Box>
         )}
       </Card>
     </Skeleton>
