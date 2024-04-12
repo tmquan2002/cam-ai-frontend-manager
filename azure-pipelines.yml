@@ -28,7 +28,7 @@ steps:
 
 - script: |
     echo "REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)" > .env
-    echo "REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)" > .env
+    echo "REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)" >> .env
   displayName: 'Write .env'
   
 - task: CopyFilesOverSSH@0
