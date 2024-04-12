@@ -7,6 +7,13 @@ export enum BrandStatus {
   Active = "Active",
   Inactive = "Inactive",
 }
+
+export enum EdgeBoxActivationStatus {
+  NotActivated = "NotActivated",
+  Activated = "Activated",
+  Pending = "Pending",
+  Failed = "Failed",
+}
 export enum EdgeboxInstallStatus {
   Working = "Working",
   Unhealthy = "Unhealthy",
@@ -45,6 +52,11 @@ export enum NotificationStatus {
 }
 
 export enum NotificationType {
+  EdgeBoxUnhealthy = "EdgeBoxUnhealthy",
+  EdgeBoxInstallActivation = "EdgeBoxInstallActivation",
+}
+
+export enum NotificationPriority {
   Normal = "Normal",
   Warning = "Warning",
   Urgent = "Urgent",
@@ -90,6 +102,7 @@ export enum Zone {
 export enum IncidentType {
   Phone = "Phone",
   Uniform = "Uniform",
+  Interaction = "Interaction",
 }
 
 export enum IncidentStatus {
@@ -106,4 +119,25 @@ export enum EvidenceStatus {
 
 export enum EvidenceType {
   Image = "Image",
+}
+
+export enum CameraStatus {
+  New = "New",
+  Connected = "Connected",
+  Disconnected = "Disconnected",
+  Disabled = "Disabled",
+}
+
+export enum ReportInterval {
+  HalfHour = "HalfHour",
+  Hour = "Hour",
+  HalfDay = "HalfDay",
+  Day = "Day",
+  Week = "Week",
+}
+
+export enum ReportTimeRange {
+  Day = "Day",
+  Week = "Week",
+  Month = "Month",
 }

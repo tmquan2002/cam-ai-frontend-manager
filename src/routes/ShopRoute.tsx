@@ -47,10 +47,14 @@ const ShopRoute = () => {
 
           <AppShell.Main
             style={{
+              display: 'flex',
+              flex: 1,
+              flexDirection: 'column',
               backgroundColor:
                 computedColorScheme === "light" ? "#f6f8fc" : "#1A1A1A",
             }}
           >
+
             <Outlet />
           </AppShell.Main>
         </AppShell>

@@ -31,6 +31,8 @@ export type CreateShopField = {
   addressLine: string;
   province: string;
   district: string;
+  openTime: string;
+  closeTime: string;
 };
 
 export type CreateAccountField = {
@@ -44,11 +46,13 @@ export type CreateAccountField = {
   addressLine: string;
   province: string;
   district: string;
+ 
 };
 
 const CreateShop = () => {
   const [opened, { toggle }] = useDisclosure(false);
   const createShopForm = useForm<CreateShopField>({
+    
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) =>
@@ -59,8 +63,10 @@ const CreateShop = () => {
           : "Invalid phone number - ex: 0379999999",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
-      province: isNotEmpty("Provice is required"),
+      province: isNotEmpty("Province is required"),
       district: isNotEmpty("District is required"),
+      openTime: isNotEmpty("Open time is required"),
+      closeTime: isNotEmpty("CLose time is required"),
     },
   });
 
@@ -166,6 +172,29 @@ const CreateShop = () => {
 
           // required: true,
         },
+      },
+      {
+        type: FIELD_TYPES.TIME,
+        fieldProps: {
+          form: createShopForm,
+          
+          name: "openTime",
+          placeholder: "Open Time",
+          label: "Open time",
+          required: true,
+        },
+        spans: 6,
+      },
+      {
+        type: FIELD_TYPES.TIME,
+        fieldProps: {
+          form: createShopForm,
+          name: "closeTime",
+          placeholder: "Close Time",
+          label: "Close time",
+          required: true,
+        },
+        spans: 6,
       },
       {
         type: FIELD_TYPES.SELECT,

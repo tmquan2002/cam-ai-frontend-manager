@@ -4,14 +4,12 @@ import LoginPage from "../pages/common/login/LoginPage";
 import ShopRoute from "./ShopRoute";
 import ShopHomePage from "../pages/shop/ShopHomePage";
 import ShopDetailPage from "../pages/shop/ShopDetailPage";
-import ShopReportPage from "../pages/shop/ShopReportPage";
 import BrandDetailPage from "../pages/brand/BrandDetailPage";
 import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
 import BrandRoute from "./BrandRoute";
 import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
 import CreateShop from "../pages/brand/CreateShop";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
-import CommonLandingPage from "../pages/common/Landing/CommonLandingPage";
 import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
@@ -28,6 +26,15 @@ import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
 import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
 import BranddReportPage from "../pages/brand/BrandReportPage";
+import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
+import CameraDetailPage from "../pages/brand/CameraDetailPage";
+import ShopStreamPage from "../pages/shop/ShopStreamPage";
+import CustomerReportPage from "../pages/shop/report/customer/CustomerReportTab";
+import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
+import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
+import CustomerReportPageManager from "../pages/brand/report/customer/CustomerReportPageManager";
+import IncidentReportPageManager from "../pages/brand/report/incident/IncidentReportPageManager";
+import InteractionReportPageManager from "../pages/brand/report/interaction/InteractionReportPageManager";
 
 const AppRoute = () => {
   return useRoutes([
@@ -35,11 +42,7 @@ const AppRoute = () => {
       element: <CommonRoute />,
       children: [
         {
-          path: "",
-          element: <CommonLandingPage />,
-        },
-        {
-          path: "/login",
+          path: "*",
           element: <LoginPage />,
           index: true,
         },
@@ -63,9 +66,10 @@ const AppRoute = () => {
           element: <ShopDetailPage />,
         },
         {
-          path: "report",
-          element: <ShopReportPage />,
+          path: "stream",
+          element: <ShopStreamPage />,
         },
+
         {
           path: "brand/detail",
           element: <BrandShopDetailPage />,
@@ -87,6 +91,22 @@ const AppRoute = () => {
         {
           path: "incident/:id",
           element: <IncidentDetail />,
+        },
+        {
+          path: "camera/:id",
+          element: <CameraDetailPage />,
+        },
+        {
+          path: "report/customer",
+          element: <CustomerReportPage />,
+        },
+        {
+          path: "report/incident",
+          element: <IncidentReportPage />,
+        },
+        {
+          path: "report/interaction",
+          element: <InteractionReportPage />,
         },
       ],
     },
@@ -137,8 +157,28 @@ const AppRoute = () => {
         { path: "incident", element: <IncidentListPage /> },
         { path: "incident/:id", element: <ShopIncidentDetailPage /> },
         {
+          path: "edgeBox",
+          element: <EdgeBoxListPage />,
+        },
+        {
           path: "report",
           element: <BranddReportPage />,
+        },
+        {
+          path: "camera/:id",
+          element: <CameraDetailPage />,
+        },
+        {
+          path: "report/customer",
+          element: <CustomerReportPageManager />,
+        },
+        {
+          path: "report/incident",
+          element: <IncidentReportPageManager />,
+        },
+        {
+          path: "report/interaction",
+          element: <InteractionReportPageManager />,
         },
       ],
     },

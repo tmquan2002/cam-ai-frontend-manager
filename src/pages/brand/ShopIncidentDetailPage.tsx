@@ -126,7 +126,7 @@ const ShopIncidentDetailPage = () => {
             fw={500}
           >
             {incidentData?.incidentType} Incident -{" "}
-            {dayjs(incidentData?.time).format("DD/MM/YYYY h:mm A")}
+            {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
           </Text>
           {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
         </Group>

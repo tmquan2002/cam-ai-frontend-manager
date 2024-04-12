@@ -1,54 +1,56 @@
 import {
-  IconNotes,
   IconGauge,
   IconPresentationAnalytics,
   IconFileAnalytics,
   IconLock,
+  IconExclamationCircle,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
 import classes from "./Sidebar.module.scss";
+import { IconVideo } from "@tabler/icons-react";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
-  {
-    label: "Statictis",
-    icon: IconNotes,
-    initiallyOpened: true,
-    links: [{ label: "Overview", link: "/shop/overview" }],
-  },
 
   {
     label: "Detail",
     icon: IconPresentationAnalytics,
-    links: [
-      { label: "Overview", link: "/shop/detail" },
-      { label: "Employee", link: "/shop/employee" },
-    ],
+    path: "/shop/detail",
+  },
+  {
+    label: "Incident",
+    icon: IconExclamationCircle,
+    path: "/shop/incident",
+  },
+  {
+    label: "Live",
+    icon: IconVideo,
+    path: "/shop/stream",
   },
   {
     label: "Report",
     icon: IconFileAnalytics,
     links: [
-      { label: "Incident", link: "/shop/incident" },
-      { label: "Live", link: "/shop/report" },
+      { label: "Customer", link: "/shop/report/customer" },
+      { label: "Incident", link: "/shop/report/incident" },
+      { label: "Interaction", link: "/shop/report/interaction" },
     ],
   },
   {
     label: "Employee",
     icon: IconLock,
-    links: [{ label: "Create", link: "/shop/employee/create" }],
+    links: [
+      { label: "Create", link: "/shop/employee/create" },
+      { label: "Employee", link: "/shop/employee" },
+    ],
   },
 ];
 
+const links = mockdata.map((item) => (
+  <SidebarLinksGroup {...item} key={item.label} />
+));
 export function ShopNavbar() {
-  const links = mockdata.map((item) => (
-    <SidebarLinksGroup
-      {...item}
-      key={item.label}
-    />
-  ));
-
   return (
     <nav className={classes["navbar"]}>
       <ScrollArea className={classes["links"]}>

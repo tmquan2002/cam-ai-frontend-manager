@@ -13,10 +13,10 @@ import { ModalsProvider } from "@mantine/modals";
 import { MantineProvider, createTheme } from "@mantine/core";
 import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      cacheTime: 0,
       refetchOnWindowFocus: false,
       retry: 2,
     },
@@ -34,7 +34,11 @@ const theme = createTheme({
   },
 });
 
+
 function App() {
+
+
+
   return (
     <MantineProvider
       theme={theme}

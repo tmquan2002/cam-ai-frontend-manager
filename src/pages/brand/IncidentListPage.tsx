@@ -58,7 +58,7 @@ const IncidentListPage = () => {
       status: null,
       toTime: null,
       incidentType: null,
-      size: 12,
+      size: 20,
       pageIndex: activePage - 1,
     },
   });
@@ -75,7 +75,7 @@ const IncidentListPage = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: 12,
+      size: form.values.size,
       pageIndex: activePage - 1,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
@@ -103,6 +103,20 @@ const IncidentListPage = () => {
 
   const fields = useMemo(() => {
     return [
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "Shop",
+          placeholder: "Shop",
+          data: shopList?.values?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form,
+          name: "shopId",
+          loading: isGetShopListLoading,
+        },
+        spans: 4,
+      },
       {
         type: FIELD_TYPES.DATE_TIME,
         fieldProps: {
@@ -137,20 +151,6 @@ const IncidentListPage = () => {
         },
         spans: 4,
       },
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Shop",
-          placeholder: "Shop",
-          data: shopList?.values?.map((item) => {
-            return { value: `${item.id}`, label: item.name };
-          }),
-          form,
-          name: "shopId",
-          loading: isGetShopListLoading,
-        },
-        spans: 4,
-      },
 
       {
         type: FIELD_TYPES.RADIO,
@@ -172,7 +172,7 @@ const IncidentListPage = () => {
           label: "Incident type",
           data: mapLookupToArray(IncidentType ?? {}),
         },
-        spans: 2,
+        spans: 3,
       },
     ];
   }, [
@@ -214,7 +214,7 @@ const IncidentListPage = () => {
         >
           <Text>{row?.shop?.name}</Text>
         </Table.Td>
-        <Table.Td>{dayjs(row?.time).format("DD/MM/YYYY h:mm A")}</Table.Td>
+        <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
           <Text
             className={classes["pointer-style"]}
@@ -234,31 +234,14 @@ const IncidentListPage = () => {
   });
 
   return (
-    <Paper
-      p={rem(32)}
-      m={rem(32)}
-      shadow="xs"
-    >
-      <Group
-        align="center"
-        justify="space-between"
-        mb={"lg"}
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+    <Paper p={rem(32)} m={rem(32)} shadow="xs">
+      <Group align="center" justify="space-between" mb={"lg"}>
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incident list
         </Text>
         <Group>
           {form.isDirty() ? (
-            <Button
-              variant="transparent"
-              ml={"auto"}
-              onClick={form.reset}
-            >
+            <Button variant="transparent" ml={"auto"} onClick={form.reset}>
               Clear all filter
             </Button>
           ) : (
@@ -275,17 +258,11 @@ const IncidentListPage = () => {
           </Button>
         </Group>
       </Group>
-      <Collapse
-        in={opened}
-        mb={"lg"}
-      >
+      <Collapse in={opened} mb={"lg"}>
         <EditAndUpdateForm fields={fields} />
       </Collapse>
 
-      <Box
-        pos={"relative"}
-        mb={"lg"}
-      >
+      <Box pos={"relative"} mb={"lg"}>
         <LoadingOverlay
           visible={isGetIncidentListLoading}
           zIndex={1000}
@@ -330,7 +307,9 @@ const IncidentListPage = () => {
         <Pagination
           value={activePage}
           onChange={setPage}
-          total={Math.ceil((incidentList?.totalCount ?? 0) / 12)}
+          total={Math.ceil(
+            (incidentList?.totalCount ?? 0) / (form.values.size ?? 20)
+          )}
         />
       </Group>
     </Paper>

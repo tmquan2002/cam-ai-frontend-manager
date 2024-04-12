@@ -16,4 +16,6 @@ export type ShopDetail = {
   brand: BrandDetail;
   shopStatus: ShopStatus;
   shopManager: AccountDetail;
+  openTime: string;
+  closeTime: string;
 };

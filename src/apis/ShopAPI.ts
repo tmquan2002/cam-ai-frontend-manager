@@ -22,6 +22,8 @@ export type UpdateShopParams = {
   wardId?: string;
   shopManagerId?: string;
   addressLine?: string;
+  openTime?: string;
+  closeTime?: string;
 };
 
 export type CreateShopParams = {

@@ -65,18 +65,8 @@ type SearchShopField = {
 };
 
 const SearchCategory = {
-  NAME: (
-    <IconAlignBoxCenterStretch
-      size={"1.2rem"}
-      stroke={1.5}
-    />
-  ),
-  PHONE: (
-    <IconPhoneCall
-      size={"1.2rem"}
-      stroke={1.5}
-    />
-  ),
+  NAME: <IconAlignBoxCenterStretch size={"1.2rem"} stroke={1.5} />,
+  PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
 };
 
 const BrandDetailPageManager = () => {
@@ -105,8 +95,8 @@ const BrandDetailPageManager = () => {
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
       size: 12,
-      enabled: !isEmpty(data?.values[0].id),
-      brandId: data?.values[0].id,
+      enabled: !isEmpty(data?.values?.[0]?.id),
+      brandId: data?.values[0]?.id,
       pageIndex: activePage - 1,
       status: form.values.status ?? null,
     };
@@ -142,7 +132,6 @@ const BrandDetailPageManager = () => {
     const { value } = event.currentTarget;
     setSearch(value);
   };
-
 
   const handleUploadBrandImage = async (
     files: FileWithPath[],
@@ -190,15 +179,9 @@ const BrandDetailPageManager = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Table.Tr
-        key={index}
-        onClick={() => navigate(`shop/${row.id}`)}
-      >
+      <Table.Tr key={index} onClick={() => navigate(`shop/${row.id}`)}>
         <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-          >
+          <Text className={classes["pointer-style"]} c={"blue"}>
             {row.name}
           </Text>
         </Table.Td>
@@ -208,10 +191,7 @@ const BrandDetailPageManager = () => {
           {_.isEqual(row.shopStatus, "Active") ? (
             <Badge variant="light">Active</Badge>
           ) : (
-            <Badge
-              color="gray"
-              variant="light"
-            >
+            <Badge color="gray" variant="light">
               Disabled
             </Badge>
           )}
@@ -225,12 +205,7 @@ const BrandDetailPageManager = () => {
       <Menu transitionProps={{ transition: "pop-top-right" }}>
         <Tooltip label="Search by">
           <Menu.Target>
-            <ActionIcon
-              size={36}
-              radius="xl"
-              color={"blue"}
-              variant="filled"
-            >
+            <ActionIcon size={36} radius="xl" color={"blue"} variant="filled">
               {searchCategory}
             </ActionIcon>
           </Menu.Target>
@@ -255,11 +230,7 @@ const BrandDetailPageManager = () => {
           </Menu.Item>
           <Menu.Item
             leftSection={
-              <IconPhoneCall
-                size={"1.3rem"}
-                stroke={1.5}
-                color={"#15aabf"}
-              />
+              <IconPhoneCall size={"1.3rem"} stroke={1.5} color={"#15aabf"} />
             }
             onClick={() => {
               setSearch("");
@@ -275,12 +246,7 @@ const BrandDetailPageManager = () => {
 
   if (isLoading) {
     return (
-      <Paper
-        p={rem(32)}
-        style={{ flex: 1 }}
-        pos={"relative"}
-        h={"100vh"}
-      >
+      <Paper p={rem(32)} style={{ flex: 1 }} pos={"relative"} h={"100vh"}>
         <LoadingOverlay visible={isLoading} />
       </Paper>
     );
@@ -288,30 +254,15 @@ const BrandDetailPageManager = () => {
 
   if (isError)
     return (
-      <Card
-        radius="md"
-        m={rem(32)}
-        className={classes.card}
-      >
-        <Overlay
-          className={classes.overlay}
-          opacity={0.55}
-          zIndex={0}
-        />
+      <Card radius="md" m={rem(32)} className={classes.card}>
+        <Overlay className={classes.overlay} opacity={0.55} zIndex={0} />
 
         <div className={classes.content}>
-          <Text
-            size="lg"
-            fw={700}
-            className={classes.title}
-          >
+          <Text size="lg" fw={700} className={classes.title}>
             Plan & save
           </Text>
 
-          <Text
-            size="sm"
-            className={classes.description}
-          >
+          <Text size="sm" className={classes.description}>
             Save up to 25% at Fifth Season Hotels in Europe, the Middle East,
             Africa and Asia Pacific
           </Text>
@@ -330,10 +281,7 @@ const BrandDetailPageManager = () => {
 
   return (
     <>
-      <Paper
-        p={rem(32)}
-        style={{ flex: 1 }}
-      >
+      <Paper p={rem(32)} style={{ flex: 1 }}>
         <Box mb={rem(16)}>
           {isUploadBrandBannerLoading ? (
             <Loader />
@@ -397,18 +345,10 @@ const BrandDetailPageManager = () => {
                     </Dropzone.Idle>
 
                     <div>
-                      <Text
-                        size="xl"
-                        inline
-                      >
+                      <Text size="xl" inline>
                         Upload brand banner
                       </Text>
-                      <Text
-                        size="sm"
-                        c="dimmed"
-                        inline
-                        mt={7}
-                      >
+                      <Text size="sm" c="dimmed" inline mt={7}>
                         Only accept .png - .jpeg - .svg+xml - .gif file that are
                         less than 10mb in size
                       </Text>
@@ -420,10 +360,7 @@ const BrandDetailPageManager = () => {
           )}
         </Box>
 
-        <Flex
-          align={"center"}
-          mb={rem(32)}
-        >
+        <Flex align={"center"} mb={rem(32)}>
           <Tooltip label="Brand logo">
             <Dropzone
               mr={rem(16)}
@@ -439,10 +376,7 @@ const BrandDetailPageManager = () => {
               }}
             >
               {isUploadBrandLogoLoading ? (
-                <Skeleton
-                  height={100}
-                  circle
-                />
+                <Skeleton height={100} circle />
               ) : (
                 <Avatar
                   h={100}
@@ -457,33 +391,26 @@ const BrandDetailPageManager = () => {
           </Tooltip>
 
           <Box>
-            <Text
-              size="xl"
-              fw={500}
-              mb={rem(8)}
-            >
-              {data?.values[0].name}
+            <Text size="xl" fw={500} mb={rem(8)}>
+              {data?.values[0]?.name}
             </Text>
 
             <Flex>
               <Box mr={rem(8)}>
                 <IconMail width={20} />
               </Box>
-              {data?.values[0].email}
+              {data?.values[0]?.email}
             </Flex>
             <Flex>
               <Box mr={rem(8)}>
                 <IconPhone width={20} />
               </Box>
-              {data?.values[0].phone}
+              {data?.values[0]?.phone}
             </Flex>
           </Box>
         </Flex>
 
-        <Flex
-          align={"center"}
-          my={"md"}
-        >
+        <Flex align={"center"} my={"md"}>
           {searchCategory == SearchCategory.NAME ? (
             <TextInput
               style={{ flex: 1 }}
@@ -543,11 +470,7 @@ const BrandDetailPageManager = () => {
         <Collapse in={opened}>
           <Group>
             <EditAndUpdateForm fields={fields} />
-            <Button
-              variant="transparent"
-              ml={"auto"}
-              onClick={form.reset}
-            >
+            <Button variant="transparent" ml={"auto"} onClick={form.reset}>
               Clear all filter
             </Button>
           </Group>
@@ -599,10 +522,7 @@ const BrandDetailPageManager = () => {
             </Table>
           )}
         </ScrollArea>
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}
