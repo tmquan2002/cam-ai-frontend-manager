@@ -5,6 +5,8 @@ services:
       context: ./
       dockerfile: Dockerfile
       args:
-        - REACT_APP_VITE_SERVER_LINK=${VITE_SERVER_LINK}
+        - REACT_APP_VITE_SERVER_LINK=${REACT_APP_VITE_SERVER_LINK}
+        - REACT_APP_VITE_WEB_SOCKET_LINK=${REACT_APP_VITE_WEB_SOCKET_LINK}
+    image: milease/camai-backend:camai-web-manager
     ports:
       - 3010:4174

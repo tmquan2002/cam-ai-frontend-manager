@@ -16,7 +16,7 @@ steps:
     repository: 'milease/camai-backend'
     command: 'build'
     tags: 'camai-web-manager'
-    arguments: '--build-arg REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)'
+    arguments: '--build-arg REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK) --build-arg REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)'
 
 - task: Docker@2
   displayName: 'Push image'
@@ -28,6 +28,7 @@ steps:
 
 - script: |
     echo "REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)" > .env
+    echo "REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)" > .env
   displayName: 'Write .env'
   
 - task: CopyFilesOverSSH@0
