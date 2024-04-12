@@ -7,7 +7,7 @@ import { DateInput } from "@mantine/dates";
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
 import axios from "axios";
 import { isEmpty } from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetShopListSelect } from "../../hooks/useGetShopList";
 import { useGetPastReportByShop, useReportByShop } from "../../hooks/useReport";
@@ -23,15 +23,23 @@ const BranddReportPage = () => {
   const [filterSearchId, setFilterSearchId] = useState<string | null>("");
   const [date, setDate] = useState<Date | null>(new Date(2000, 0))
 
-  const { data: shopListSelect, isLoading: isLoadingSelectShop
+  const { data: shopListSelect, isLoading: isLoadingSelectShop, refetch: refetchSelectShop
   } = useGetShopListSelect({ name: filterSearch || "", enabled: true });
 
   const { data, readyState, lastJsonMessage } = useReportByShop(filterSearchId || "");
-  const { data: pastReportList, isLoading: loadingPastReport, error }
+  const { data: pastReportList, isLoading: isLoadingPastReport, error, refetch: refetchPastReportList }
     = useGetPastReportByShop({
       shopId: filterSearchId || "",
       date: date ? removeTime(date.toString(), "-", "yyyy/MM/dd") : removeTime("01/01/2000", "-", "yyyy/MM/dd")
     });
+
+  useEffect(() => {
+    refetchSelectShop();
+  }, [setFilterSearchId])
+
+  useEffect(() => {
+    refetchPastReportList();
+  }, [setFilterSearchId, date])
 
   // Right data render
   const renderContent = ({ Time, Total }: ChartReportData, id: number) => {
@@ -93,7 +101,7 @@ const BranddReportPage = () => {
         REPORTS
       </Text>
       <Group m={20} ml={rem(40)} my={rem(20)}>
-        <Select data={shopListSelect || []} limit={5} size='sm' 
+        <Select data={shopListSelect || []} limit={5} size='sm'
           label="Shop" rightSection={isLoadingSelectShop ? <Loader size={16} /> : null}
           nothingFoundMessage={shopListSelect && "Not Found"}
           value={filterSearchId} placeholder="Pick value" clearable searchable
@@ -126,8 +134,8 @@ const BranddReportPage = () => {
             </Text>
             <Divider color="#acacac" mb={rem(20)} />
             <Box mb={rem(20)}>
-              <Text mt={20}>Connection status: {returnWebsocketConnection(readyState)}</Text>
-              <Text mt={10}>Last update: {lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}</Text>
+              <Text mt={20} size="sm"><b>Connection status: </b>{returnWebsocketConnection(readyState)}</Text>
+              <Text mt={10} size="sm"><b>Last update: </b>{lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}</Text>
               <LineChart
                 h={300}
                 data={data}
@@ -153,7 +161,7 @@ const BranddReportPage = () => {
             </Box>
           }
 
-          {loadingPastReport ?
+          {(isLoadingPastReport && !isEmpty(filterSearchId)) ?
             <Box className={classes.main_container} w={rem(400)} p="md">
               <Loader />
             </Box>
@@ -161,7 +169,7 @@ const BranddReportPage = () => {
             <Stack gap={"lg"}>{pastReportList?.values?.map((item, id) => renderContent(item, id))}</Stack>
           }
 
-          {error && <Stack>
+          {(error && !isLoadingPastReport && !isEmpty(filterSearchId)) && <Stack>
             <Card withBorder padding="lg" className={classes.main_container} w={rem(400)} p="md">
               <Group justify="center" align="center" >
                 <Text fw={500}>{axios.isAxiosError(error) ?
