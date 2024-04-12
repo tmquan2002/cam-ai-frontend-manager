@@ -46,13 +46,11 @@ export type CreateAccountField = {
   addressLine: string;
   province: string;
   district: string;
- 
 };
 
 const CreateShop = () => {
   const [opened, { toggle }] = useDisclosure(false);
   const createShopForm = useForm<CreateShopField>({
-    
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) =>
@@ -66,7 +64,7 @@ const CreateShop = () => {
       province: isNotEmpty("Province is required"),
       district: isNotEmpty("District is required"),
       openTime: isNotEmpty("Open time is required"),
-      closeTime: isNotEmpty("CLose time is required"),
+      closeTime: isNotEmpty("Close time is required"),
     },
   });
 
@@ -74,7 +72,9 @@ const CreateShop = () => {
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
+          ? null
+          : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
       password: isNotEmpty("Password must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
@@ -161,10 +161,7 @@ const CreateShop = () => {
           loading: isAccountListLoading,
           rightSectionWidth: 70,
           rightSection: (
-            <Button
-              variant="subtle"
-              onClick={toggle}
-            >
+            <Button variant="subtle" onClick={toggle}>
               New
             </Button>
           ),
@@ -177,7 +174,7 @@ const CreateShop = () => {
         type: FIELD_TYPES.TIME,
         fieldProps: {
           form: createShopForm,
-          
+
           name: "openTime",
           placeholder: "Open Time",
           label: "Open time",
@@ -407,23 +404,10 @@ const CreateShop = () => {
 
   return (
     <>
-      <Paper
-        m={rem(32)}
-        mb={0}
-        p={rem(32)}
-        shadow="xl"
-      >
-        <Group
-          pb={20}
-          align="center"
-        >
+      <Paper m={rem(32)} mb={0} p={rem(32)} shadow="xl">
+        <Group pb={20} align="center">
           <BackButton />
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Create shop
           </Text>
         </Group>
@@ -459,10 +443,7 @@ const CreateShop = () => {
         >
           <EditAndUpdateForm fields={fields} />
 
-          <Group
-            justify="flex-end"
-            mt="md"
-          >
+          <Group justify="flex-end" mt="md">
             <Button
               disabled={!createShopForm.isDirty()}
               type="submit"
@@ -474,16 +455,8 @@ const CreateShop = () => {
         </form>
       </Paper>
       <Collapse in={opened}>
-        <Paper
-          m={rem(32)}
-          p={rem(32)}
-        >
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+        <Paper m={rem(32)} p={rem(32)}>
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Add shop manager account
           </Text>
           <form
@@ -535,10 +508,7 @@ const CreateShop = () => {
             )}
           >
             <EditAndUpdateForm fields={addNewAccountfields} />
-            <Group
-              justify="flex-end"
-              mt="md"
-            >
+            <Group justify="flex-end" mt="md">
               <Button
                 type="submit"
                 disabled={!createAccountForm.isDirty()}

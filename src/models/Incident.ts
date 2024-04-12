@@ -1,4 +1,9 @@
-import { EdgeBoxStatus, IncidentStatus, IncidentType } from "./CamAIEnum";
+import {
+  EdgeBoxStatus,
+  EventType,
+  IncidentStatus,
+  IncidentType,
+} from "./CamAIEnum";
 import { EmployeeDetail } from "./Employee";
 import { EvidenceDetail } from "./Evidence";
 import { ShopDetail } from "./Shop";
@@ -17,4 +22,9 @@ export type IncidentDetail = {
   evidences: EvidenceDetail[];
   id: string;
   createdDate: string;
+};
+
+export type WebSocketIncident = {
+  EventType: EventType;
+  Incident: IncidentDetail;
 };
