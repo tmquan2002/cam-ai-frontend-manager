@@ -67,7 +67,7 @@ const ShopEmployeeDetailPage = () => {
         value == "" ||
         /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "A Phone number should have a length of 10-12 characters",
+          : "A phone number should have a length of 10-12 characters",
     },
   });
 

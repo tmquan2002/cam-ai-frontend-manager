@@ -58,7 +58,7 @@ const CreateShop = () => {
         value == null ||
         /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "A Phone number should have a length of 10-12 characters",
+          : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Province is required"),
@@ -82,7 +82,7 @@ const CreateShop = () => {
         value == null ||
         /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "A Phone number should have a length of 10-12 characters",
+          : "A phone number should have a length of 10-12 characters",
       province: isNotEmpty("Provice is required"),
       district: isNotEmpty("District is required"),
       wardId: isNotEmpty("Ward is required"),
