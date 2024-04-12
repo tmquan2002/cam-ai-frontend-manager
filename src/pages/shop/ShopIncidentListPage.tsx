@@ -258,7 +258,7 @@ const ShopIncidentListPage = () => {
           label: "Incident type",
           data: mapLookupToArray(IncidentType ?? {}),
         },
-        spans: 2,
+        spans: 3,
       },
     ];
   }, [employeeList?.values, form, isGetEmployeeListLoading]);
@@ -422,7 +422,11 @@ const ShopIncidentListPage = () => {
                 <Group justify="space-between" align="center">
                   <Group py={rem(32)} align="center">
                     <Text size={rem(20)} fw={500}>
-                      {incidentData?.incidentType} Incident -{" "}
+                      {incidentData?.incidentType} Incident
+                    </Text>
+                    <Text>|</Text>
+                    <Text size={rem(20)} fw={500} c={"dimmed"}>
+                      {" "}
                       {dayjs(incidentData?.startTime).format(
                         "DD/MM/YYYY h:mm A"
                       )}

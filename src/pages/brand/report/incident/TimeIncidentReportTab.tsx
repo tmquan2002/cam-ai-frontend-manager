@@ -1,16 +1,20 @@
-import { Box, Card, Group, Skeleton, Text, rem } from "@mantine/core";
-import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
+import { useForm } from "@mantine/form";
 import { ReportInterval } from "../../../../models/CamAIEnum";
-import { LineChart } from "@mantine/charts";
+import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useMemo } from "react";
 import dayjs from "dayjs";
+import _ from "lodash";
+import { Box, Card, Group, Skeleton, Text, rem } from "@mantine/core";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
-import { useForm } from "@mantine/form";
-import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
-import _ from "lodash";
 import NoImage from "../../../../components/image/NoImage";
+import { LineChart } from "@mantine/charts";
+import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
+
+export type TimeIncidentReportTabProps = {
+  shopId: string | null;
+};
 
 type SearchIncidentField = {
   startDate?: Date;
@@ -18,7 +22,7 @@ type SearchIncidentField = {
   interval: ReportInterval;
 };
 
-const TimeIncidentReport = () => {
+const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
@@ -54,6 +58,7 @@ const TimeIncidentReport = () => {
             : undefined,
           interval: form.values.interval,
           enabled: true,
+          shopId: shopId ?? undefined,
         };
         sb = _.omitBy(sb, _.isNil) as GetIncidentReportByTimeParams & {
           enabled: boolean;
@@ -63,10 +68,15 @@ const TimeIncidentReport = () => {
         return {
           enabled: true,
           interval: form.values.interval,
+          shopId: shopId ?? undefined,
         };
       }
-    }, [form.values.interval, form.values.startDate, form.values.toDate]);
-
+    }, [
+      form.values.interval,
+      form.values.startDate,
+      form.values.toDate,
+      shopId,
+    ]);
   const {
     data: incidentReportByTimeData,
     isLoading: isGetIncidentReportByTimeDataLoading,
@@ -161,9 +171,20 @@ const TimeIncidentReport = () => {
           <LineChart
             h={300}
             w={"100%"}
-            data={data ?? []}
+            data={
+              data
+                ? data.map((item) => {
+                    return {
+                      time: item.time,
+                      incidents: item.count,
+                    };
+                  })
+                : []
+            }
+            withLegend
+            legendProps={{ verticalAlign: "bottom" }}
             dataKey="time"
-            series={[{ name: "count", color: "teal.6" }]}
+            series={[{ name: "incidents", color: "teal.6" }]}
             curveType="linear"
           />
         )}
@@ -172,4 +193,4 @@ const TimeIncidentReport = () => {
   );
 };
 
-export default TimeIncidentReport;
+export default TimeIncidentReportTab;

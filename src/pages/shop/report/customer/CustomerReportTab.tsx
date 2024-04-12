@@ -1,5 +1,5 @@
 import { LineChart } from "@mantine/charts";
-import { Card, Group, Select, Text, rem } from "@mantine/core";
+import { Box, Card, Group, Select, Text, rem } from "@mantine/core";
 
 export const data = [
   {
@@ -36,34 +36,39 @@ export const data = [
 
 const CustomerReportPage = () => {
   return (
-    <Card shadow="xs" pb={rem(40)}>
-      <Card.Section withBorder inheritPadding mb={rem(32)}>
-        <Group justify="space-between" my={rem(20)}>
-          <Text size="lg" fw={500}>
-            Customer count indicators
-          </Text>
-          <Group>
-            <Text size="md" fw={500}>
-              Filter
+    <Box pb={rem(40)} mx={rem(20)} mt={rem(12)}>
+      <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"} my={rem(20)}>
+        CUSTOMER REPORT
+      </Text>
+      <Card shadow="xs" pb={rem(40)}>
+        <Card.Section withBorder inheritPadding mb={rem(32)}>
+          <Group justify="space-between" my={rem(20)}>
+            <Text size="lg" fw={500}>
+              Customer count indicators
             </Text>
+            <Group>
+              <Text size="md" fw={500}>
+                Filter
+              </Text>
 
-            <Select placeholder="Interval" data={["Day", "Week", "Month"]} />
+              <Select placeholder="Interval" data={["Day", "Week", "Month"]} />
+            </Group>
           </Group>
-        </Group>
-      </Card.Section>
+        </Card.Section>
 
-      <LineChart
-        h={300}
-        data={data}
-        dataKey="date"
-        series={[
-          { name: "Apples", color: "indigo.6" },
-          { name: "Oranges", color: "blue.6" },
-          { name: "Tomatoes", color: "teal.6" },
-        ]}
-        curveType="linear"
-      />
-    </Card>
+        <LineChart
+          h={300}
+          data={data}
+          dataKey="date"
+          series={[
+            { name: "Apples", color: "indigo.6" },
+            { name: "Oranges", color: "blue.6" },
+            { name: "Tomatoes", color: "teal.6" },
+          ]}
+          curveType="linear"
+        />
+      </Card>
+    </Box>
   );
 };
 

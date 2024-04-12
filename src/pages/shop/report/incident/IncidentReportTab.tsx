@@ -1,6 +1,6 @@
 import _ from "lodash";
 import EmployeeIncidentReport from "./EmployeeIncidentReport";
-import { Box, Card, Paper, Tabs, Text, rem } from "@mantine/core";
+import { Box, Card, Tabs, Text, rem } from "@mantine/core";
 import { IconClock, IconUser } from "@tabler/icons-react";
 import TimeIncidentReport from "./TimeIncidentReport";
 
