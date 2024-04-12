@@ -16,7 +16,7 @@ import {
 import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import classes from "./ShopStreamPage.module.scss";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 //@ts-ignore
 import JSMpeg from "@cycjimmy/jsmpeg-player";
 import { useGetNewIncident } from "../../hooks/useReport";
@@ -28,15 +28,16 @@ import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 import CameraCard from "../../components/card/CameraCard";
+import { notifications } from "@mantine/notifications";
+import { EventType } from "../../models/CamAIEnum";
 
 const ShopStreamPage = () => {
   const navigate = useNavigate();
-  const videoWrapperID = useId();
   const [incidentList, setIncidentList] = useState<IncidentDetail[]>([]);
   const { data: currentIncidentData, isLoading: isGetCurrentIncidentListData } =
     useGetIncidentList({
       size: 999,
-      fromTime: dayjs().format("YYYY-DD-MM"),
+      fromTime: dayjs().format("YYYY-MM-DD"),
     });
 
   const { data: shopData, isLoading: isShopdataLoading } = useGetShopList({
@@ -55,19 +56,20 @@ const ShopStreamPage = () => {
 
   useEffect(() => {
     if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
-      setIncidentList([...incidentList, lastJsonMessage]);
+      notifications.show({
+        title:
+          lastJsonMessage?.EventType == EventType.MoreEvidence
+            ? "More evidence found"
+            : "New incident",
+        message:
+          lastJsonMessage?.EventType == EventType.MoreEvidence
+            ? `Incident at ${lastJsonMessage?.Incident?.startTime} updated!`
+            : `${lastJsonMessage?.Incident.incidentType} incident founded!`,
+        autoClose: 2000,
+      });
+      setIncidentList([...incidentList, lastJsonMessage.Incident]);
     }
   }, [readyState, lastJsonMessage]);
-
-  useEffect(() => {
-    if (!isGetCameraListLoading && !cameraList?.isValuesEmpty) {
-    }
-    new JSMpeg.VideoElement(
-      `#${CSS.escape(videoWrapperID)}`,
-      "wss://stream.camai.io.vn/8001/N3ACW2LWT2SQETLQ6O8B",
-      { autoplay: true }
-    );
-  }, [cameraList, isGetCameraListLoading]);
 
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -90,7 +92,7 @@ const ShopStreamPage = () => {
         onClick={() => navigate(`/shop/incident/${id}`)}
       >
         <Group justify="space-between" align="center" mb={"md"}>
-          <Text fw={500}>{incidentType}</Text>
+          <Text fw={500}>{incidentType} incident</Text>
           <IconCaretRight
             style={{ width: "20px", height: "20px" }}
             color={computedColorScheme == "dark" ? "#5787db" : "#39588f"}
@@ -102,7 +104,7 @@ const ShopStreamPage = () => {
               Evidence
             </Text>
             <Text fw={500} size="sm">
-              {evidences.length}
+              {evidences ? evidences?.length : 0}
             </Text>
           </div>
           <div>

@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   Collapse,
   Divider,
   Flex,
@@ -19,7 +18,13 @@ import { useGetEdgeBoxInstallByBrandId } from "../../hooks/useGetEdgeBoxInstallB
 import { useDisclosure } from "@mantine/hooks";
 import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 import classes from "./EdgeBoxListPage.module.scss";
-import { IconChevronDown, IconHome2, IconHomeLink, IconPointFilled, IconRouter } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconHome2,
+  IconHomeLink,
+  IconPointFilled,
+  IconRouter,
+} from "@tabler/icons-react";
 import {
   EdgeBoxActivationStatus,
   EdgeBoxLocation,
@@ -239,9 +244,9 @@ const renderEdgeBoxDetail = (
 
 const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
   const [opened, { toggle }] = useDisclosure(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
-    <Box key={props?.edgeBoxId} mt={rem(12)}> 
+    <Box key={props?.edgeBoxId} mt={rem(12)}>
       <Group
         justify="space-between"
         align="center"
@@ -253,17 +258,20 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
         onClick={toggle}
       >
         <Stack gap={"xs"}>
-          <Group align="center"  >
-            <IconRouter style={{ width: rem(20) }} stroke={1.5}  />
-            <Text >{props?.edgeBox?.name}</Text>
+          <Group align="center">
+            <IconRouter style={{ width: rem(20) }} stroke={1.5} />
+            <Text>{props?.edgeBox?.name}</Text>
           </Group>
-          <Group align="center" className={classes["clickable-style"]} onClick={() => navigate(`/brand/shop/${props?.shopId}`)}>
+          <Group
+            align="center"
+            className={classes["clickable-style"]}
+            onClick={() => navigate(`/brand/shop/${props?.shopId}`)}
+          >
             <IconHome2 style={{ width: rem(20) }} stroke={1.5} />
-            <Text >{props?.shop?.name}</Text>
+            <Text>{props?.shop?.name}</Text>
             <IconPointFilled style={{ width: rem(16) }} stroke={1.5} />
             <IconHomeLink style={{ width: rem(20) }} stroke={1.5} />
-            <Text >{props?.shop?.addressLine}</Text>
-
+            <Text>{props?.shop?.addressLine}</Text>
           </Group>
         </Stack>
         <IconChevronDown style={{ width: rem(20) }} stroke={1.5} />
@@ -285,12 +293,14 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
 };
 
 const EdgeBoxListPage = () => {
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened] = useDisclosure(false);
   const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
     { size: 1 }
   );
   const { data: edgeBoxList, isLoading: isGetEdgeBoxListLoading } =
-    useGetEdgeBoxInstallByBrandId(brandList?.values?.[0].id ?? null);
+    useGetEdgeBoxInstallByBrandId(
+      brandList ? brandList?.values?.[0]?.id : null
+    );
 
   const items = edgeBoxList?.values?.map((item) => <EdgeBoxCard {...item} />);
 
@@ -312,9 +322,10 @@ const EdgeBoxListPage = () => {
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           EdgeBox List
         </Text>
-        <Button variant="outline" onClick={toggle}>Add an edge box</Button>
       </Group>
-      <Collapse in={opened}><form></form></Collapse>
+      <Collapse in={opened}>
+        <form></form>
+      </Collapse>
       {items}
     </Paper>
   );

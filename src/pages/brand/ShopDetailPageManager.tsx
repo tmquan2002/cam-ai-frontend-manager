@@ -71,6 +71,7 @@ import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 import { IconAlertCircle } from "@tabler/icons-react";
+import NoImage from "../../components/image/NoImage";
 
 export type FormFieldValue = {
   name: string;
@@ -376,7 +377,7 @@ const ShopDetailPageManager = () => {
       province: isNotEmpty("Provice is required"),
       district: isNotEmpty("District is required"),
       openTime: isNotEmpty("Open time is required"),
-      closeTime: isNotEmpty("CLose time is required"),
+      closeTime: isNotEmpty("Close time is required"),
     },
   });
   const activationForm = useForm<ActivationFormValue>();
@@ -813,6 +814,8 @@ const ShopDetailPageManager = () => {
         </Text>
         {isGetCameraListLoading ? (
           <Loader />
+        ) : cameraList?.isValuesEmpty ? (
+          <NoImage />
         ) : (
           cameraList?.values?.map((item) => (
             <Tooltip label="View camera" key={item?.id}>
