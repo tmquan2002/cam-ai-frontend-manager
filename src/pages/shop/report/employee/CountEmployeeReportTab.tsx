@@ -9,13 +9,19 @@ import {
   Legend,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { Box, Card, Group, Select, Text, rem } from "@mantine/core";
+import { Box, Card, Group, Text, rem } from "@mantine/core";
 import { useShopHumanCountReport } from "../../../../hooks/useGetHumanCountReport";
 import dayjs from "dayjs";
 import { ReportInterval } from "../../../../models/CamAIEnum";
 import { useMemo } from "react";
 import NoImage from "../../../../components/image/NoImage";
 import { Line } from "react-chartjs-2";
+import { useForm } from "@mantine/form";
+import { GetShopHumanCountReportParams } from "../../../../apis/ReportAPI";
+import _ from "lodash";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../../../components/form/EditAndUpdateForm";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,46 +33,52 @@ ChartJS.register(
   zoomPlugin
 );
 
-export const data = [
-  {
-    date: "Mar 22",
-    Apples: 2890,
-    Oranges: 2338,
-    Tomatoes: 2452,
-  },
-  {
-    date: "Mar 23",
-    Apples: 2756,
-    Oranges: 2103,
-    Tomatoes: 2402,
-  },
-  {
-    date: "Mar 24",
-    Apples: 3322,
-    Oranges: 986,
-    Tomatoes: 1821,
-  },
-  {
-    date: "Mar 25",
-    Apples: 3470,
-    Oranges: 2108,
-    Tomatoes: 2809,
-  },
-  {
-    date: "Mar 26",
-    Apples: 3129,
-    Oranges: 1726,
-    Tomatoes: 2290,
-  },
-];
+type SearchCountHumanField = {
+  startDate?: Date;
+  toDate?: Date;
+  interval: ReportInterval;
+};
 
 const CountEmployeeReportPage = () => {
+  const form = useForm<SearchCountHumanField>({
+    validateInputOnChange: true,
+    initialValues: {
+      startDate: new Date(Date.now()),
+      toDate: new Date(Date.now()),
+      interval: ReportInterval.Hour,
+    },
+    validate: (values) => ({
+      toDate:
+        values.startDate &&
+        values?.toDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
+          ? "End date must be after start date"
+          : null,
+      fromTime:
+        values.toDate &&
+        values?.startDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
+          ? "Start date must be before end date"
+          : null,
+    }),
+  });
+
+  const searchParams: GetShopHumanCountReportParams = useMemo(() => {
+    let sb: GetShopHumanCountReportParams = {
+      startDate: form.values.startDate
+        ? dayjs(form.values.startDate).format("YYYY-MM-DD")
+        : "",
+      endDate: form.values.toDate
+        ? dayjs(form.values.toDate).format("YYYY-MM-DD")
+        : "",
+      interval: form.values.interval,
+    };
+    sb = _.omitBy(sb, _.isNil) as GetShopHumanCountReportParams;
+    return sb;
+  }, [form.values.interval, form.values.startDate, form.values.toDate]);
+
   const { data: humanCountData, isLoading: isGetHumanCountDataLoading } =
-    useShopHumanCountReport({
-      startDate: dayjs().format("YYYY-MM-DD"),
-      endDate: dayjs().format("YYYY-MM-DD"),
-      interval: ReportInterval.HalfHour,
-    });
+    useShopHumanCountReport(searchParams);
 
   const data = useMemo(() => {
     if (isGetHumanCountDataLoading) {
@@ -74,11 +86,67 @@ const CountEmployeeReportPage = () => {
     }
     return humanCountData?.data.map((item) => {
       return {
-        time: dayjs(item.Time).format("HH:mm | DD-MM"),
-        average: item?.Median,
+        time: dayjs(item.time).format("HH:mm | DD-MM"),
+        average: item?.median,
+        low: item?.low,
+        high: item?.high,
       };
     });
   }, [humanCountData]);
+
+  const fields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.DATE,
+        fieldProps: {
+          form,
+          name: "startDate",
+          placeholder: "Start date",
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.DATE,
+        fieldProps: {
+          form,
+          name: "toDate",
+          placeholder: "End date",
+        },
+        spans: 4,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          form,
+          name: "interval",
+          placeholder: "Interval",
+          data: [
+            {
+              value: ReportInterval.HalfHour,
+              label: "30 minutes",
+            },
+            {
+              value: ReportInterval.Hour,
+              label: "1 hour",
+            },
+            {
+              value: ReportInterval.HalfDay,
+              label: "12 hours",
+            },
+            {
+              value: ReportInterval.Day,
+              label: "1 day",
+            },
+            // {
+            //   value: ReportInterval.Week,
+            //   label: "1 week",
+            // },
+          ],
+        },
+        spans: 4,
+      },
+    ];
+  }, [form]);
 
   return (
     <Box pb={rem(40)} mx={rem(20)} mt={rem(12)}>
@@ -91,12 +159,14 @@ const CountEmployeeReportPage = () => {
             <Text size="lg" fw={500}>
               Employee count indicators
             </Text>
-            <Group>
+            <Group justify="space-between">
               <Text size="md" fw={500}>
                 Filter
               </Text>
 
-              <Select placeholder="Interval" data={["Day", "Week", "Month"]} />
+              <Box miw={rem(360)}>
+                <EditAndUpdateForm fields={fields} />
+              </Box>
             </Group>
           </Group>
         </Card.Section>
@@ -128,6 +198,7 @@ const CountEmployeeReportPage = () => {
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
+
                   scales: {
                     y: {
                       beginAtZero: true,
@@ -147,6 +218,18 @@ const CountEmployeeReportPage = () => {
                       data: data?.map((i) => i.average),
                       borderColor: "rgb(255, 99, 132)",
                       backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    },
+                    {
+                      label: "Lowest interaction",
+                      data: data?.map((i) => i.low),
+                      borderColor: "rgb(236,177,109)",
+                      backgroundColor: "rgba(236,177,109,0.5)",
+                    },
+                    {
+                      label: "Highest interactions",
+                      data: data?.map((i) => i.high),
+                      borderColor: "rgb(37, 150, 190)",
+                      backgroundColor: "rgb(37, 150, 190, 0.5)",
                     },
                   ],
                 }}
