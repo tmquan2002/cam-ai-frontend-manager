@@ -6,10 +6,7 @@ import dayjs from "dayjs";
 import _ from "lodash";
 import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
 import { useGetEmployeeList } from "../../../../hooks/useGetEmployeeList";
-import {
-  EmployeeIncidentCard,
-  EmployeeIncidentCardProps,
-} from "../../../../components/card/EmployeeIncidentCard";
+import { EmployeeIncidentCardProps } from "../../../../components/card/EmployeeIncidentCard";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
@@ -27,6 +24,7 @@ import {
   rem,
 } from "@mantine/core";
 import { IconCheck, IconEye, IconX } from "@tabler/icons-react";
+import { EmployeeIncidentCardManager } from "../../../../components/card/EmployeeIncidentCardManager";
 
 export type EmployeeIncidentReportTabProps = {
   shopId: string | null;
@@ -260,7 +258,7 @@ const EmployeeIncidentReportTab = ({
 
         {newArray?.map((item, index) => (
           <Box key={index} pt={index == 0 ? 0 : rem(12)}>
-            <EmployeeIncidentCard
+            <EmployeeIncidentCardManager
               employee={item?.employee}
               incidentList={item?.incidentList}
             />
