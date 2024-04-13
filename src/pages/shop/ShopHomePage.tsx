@@ -5,6 +5,7 @@ import {
   Flex,
   Grid,
   Group,
+  Skeleton,
   Text,
   ThemeIcon,
   rem,
@@ -18,6 +19,7 @@ import {
   returnWebsocketConnection,
 } from "../../utils/helperFunction";
 import classes from "./ShopHomePage.module.scss";
+import { ReadyState } from "react-use-websocket";
 
 export type TitleAndNumberCard = {
   title: string;
@@ -74,7 +76,7 @@ const ShopHomePage = () => {
         <Card.Section withBorder inheritPadding>
           <Group justify="space-between" my={rem(20)}>
             <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
-              LIVE SHOP COUNT
+              LIVE SHOP EMPLOYEE COUNT
             </Text>
           </Group>
         </Card.Section>
@@ -85,13 +87,19 @@ const ShopHomePage = () => {
           Last update:{" "}
           {lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}
         </Text>
-        <LineChart
-          h={300}
-          data={data}
-          dataKey="Time"
-          py={rem(40)}
-          series={[{ name: "Total", color: "light-blue.6" }]}
-        />
+        {readyState == ReadyState.CONNECTING ? (
+          <Skeleton width={"100%"} height={300} />
+        ) : (
+          <LineChart
+            h={300}
+            data={data}
+            dataKey="Time"
+            py={rem(40)}
+            withYAxis
+            withLegend
+            series={[{ name: "Total", color: "light-blue.6" }]}
+          />
+        )}
       </Card>
     </Box>
   );

@@ -26,7 +26,7 @@ export const useReports = () => {
   );
 
   const [data, setData] = useState<ChartReportData[]>(
-    Array(...Array(5)).map(function () {
+    Array(...Array(4)).map(function () {
       return {
         Time: "00:00:00",
         Total: 0,

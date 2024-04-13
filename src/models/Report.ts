@@ -39,10 +39,10 @@ export type HumanCountDetail = {
 };
 
 export type HumanCountDataDetail = {
-  Time: string;
-  Low: number;
-  High: number;
-  Open: number;
-  Close: number;
-  Median: number;
+  time: string;
+  low: number;
+  high: number;
+  open: number;
+  close: number;
+  median: number;
 };
