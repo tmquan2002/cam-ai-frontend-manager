@@ -26,11 +26,11 @@ export type TitleAndNumberCard = {
   type: "blue" | "green" | "red" | "yellow";
 };
 
-const TitleAndNumberCard = () => {
+const TitleAndNumberCard = ({ name, count }: { name: string, count: number }) => {
   return (
     <Box className={classes["static-card"]}>
-      <p className={classes["static-card-title"]}>Revenue</p>
-      <p className={classes["static-card-number"]}>1000</p>
+      <p className={classes["static-card-title"]}>{name}</p>
+      <p className={classes["static-card-number"]}>{count}</p>
       <Flex justify={"space-between"} align={"flex-end"}>
         <p className={classes["static-card-link"]}>View detail</p>
         <ThemeIcon
@@ -58,11 +58,23 @@ const ShopHomePage = () => {
   return (
     <Box m={rem(32)}>
       <Grid justify="space-between" columns={24}>
-        {[1, 2, 3, 4].map((item) => (
+        {/* {[1, 2, 3, 4].map((item) => (
           <Grid.Col span={5} key={item}>
-            <TitleAndNumberCard />
+            <TitleAndNumberCard name={"Revenue"} count={1000} />
           </Grid.Col>
-        ))}
+        ))} */}
+        <Grid.Col span={5}>
+          <TitleAndNumberCard name={"Cashier Count"} count={3} />
+        </Grid.Col>
+        <Grid.Col span={5}>
+          <TitleAndNumberCard name={"Phone Incident"} count={3} />
+        </Grid.Col>
+        <Grid.Col span={5}>
+          <TitleAndNumberCard name={"Uniform Incident"} count={2} />
+        </Grid.Col>
+        <Grid.Col span={5}>
+          <TitleAndNumberCard name={"Customer Count"} count={5} />
+        </Grid.Col>
       </Grid>
       <Card
         my={rem(32)}
