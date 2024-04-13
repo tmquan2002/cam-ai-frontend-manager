@@ -66,9 +66,9 @@ const BrandManagerProfilePage = () => {
       phone: (value) =>
         value == "" ||
           value == null ||
-          /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "Invalid phone number - ex: 0379,999,999",
+          : "A phone number should have a length of 10-12 characters",
     },
   });
 

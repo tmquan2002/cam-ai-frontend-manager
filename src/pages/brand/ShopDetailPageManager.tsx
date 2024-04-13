@@ -352,9 +352,9 @@ const ShopDetailPageManager = () => {
         "Shop name must be 1- 50 characters long"
       ),
       phone: (value) =>
-        value == "" || /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/.test(value)
+        value == "" || /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
-          : "Invalid phone number - ex: 0379999999",
+          : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
