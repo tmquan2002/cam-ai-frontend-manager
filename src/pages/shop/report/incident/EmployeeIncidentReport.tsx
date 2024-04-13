@@ -108,10 +108,21 @@ const EmployeeIncidentReport = () => {
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({ size: 999 });
 
+  const removedInteractionIncident = useMemo(() => {
+    if (isGetEmployeeListLoading) {
+      return [];
+    } else {
+      return incidentList?.values?.filter(
+        (item) => item?.incidentType != IncidentType.Interaction
+      );
+    }
+  }, [incidentList, isGetIncidentListLoading]);
+
   const newArray = useMemo(() => {
-    if (!employeeList || !incidentList) return [];
+    if (!employeeList || !removedInteractionIncident) return [];
 
     // Initial employee incident array
+
     var incidentArray: EmployeeIncidentCardProps[] = employeeList?.values?.map(
       (e) => {
         return {
@@ -128,8 +139,8 @@ const EmployeeIncidentReport = () => {
 
     // Add incident to current array
 
-    if (!incidentList?.isValuesEmpty) {
-      incidentList?.values.forEach((item) => {
+    if (removedInteractionIncident.length != 0) {
+      removedInteractionIncident.forEach((item) => {
         const existingEmployeeIndex = _.findIndex(
           incidentArray,
           function (value) {
@@ -150,7 +161,7 @@ const EmployeeIncidentReport = () => {
       incidentArray.push(incidentArray.splice(unAssignedIncidentIndex, 1)[0]);
     }
     return incidentArray;
-  }, [incidentList, employeeList]);
+  }, [removedInteractionIncident, employeeList]);
 
   const fields = useMemo(() => {
     return [
@@ -256,7 +267,7 @@ const EmployeeIncidentReport = () => {
                   </Text>
                   <Text size={rem(22)} fw={700} c={"green"}>
                     {
-                      incidentList?.values?.filter(
+                      removedInteractionIncident?.filter(
                         (i) => i.status == IncidentStatus.Accepted
                       ).length
                     }
@@ -281,7 +292,7 @@ const EmployeeIncidentReport = () => {
                   </Text>
                   <Text size={rem(22)} fw={700} c={"blue"}>
                     {
-                      incidentList?.values?.filter(
+                      removedInteractionIncident?.filter(
                         (i) => i.status == IncidentStatus.New
                       ).length
                     }
@@ -307,7 +318,7 @@ const EmployeeIncidentReport = () => {
                   </Text>
                   <Text size={rem(22)} fw={700} c={"red"}>
                     {
-                      incidentList?.values?.filter(
+                      removedInteractionIncident?.filter(
                         (i) => i.status == IncidentStatus.Rejected
                       ).length
                     }

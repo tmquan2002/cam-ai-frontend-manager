@@ -18,8 +18,8 @@ export type CreateAccountParams = {
   gender: Gender | null;
   phone: string;
   birthday: string;
-  wardId: number;
-  addressLine: string;
+  wardId: number | null;
+  addressLine: string | null;
   brandId: string;
   role: Role;
 };

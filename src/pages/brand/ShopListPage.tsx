@@ -48,18 +48,8 @@ type SearchShopField = {
 };
 
 const SearchCategory = {
-  NAME: (
-    <IconAlignBoxCenterStretch
-      size={"1.2rem"}
-      stroke={1.5}
-    />
-  ),
-  PHONE: (
-    <IconPhoneCall
-      size={"1.2rem"}
-      stroke={1.5}
-    />
-  ),
+  NAME: <IconAlignBoxCenterStretch size={"1.2rem"} stroke={1.5} />,
+  PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
 };
 
 const ShopListPage = () => {
@@ -121,19 +111,15 @@ const ShopListPage = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Table.Tr
-        key={index}
-        onClick={() => navigate(`/brand/shop/${row.id}`)}
-      >
+      <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
         <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-          >
+          <Text className={classes["pointer-style"]} c={"blue"}>
             {row.name}
           </Text>
         </Table.Td>
         <Table.Td>{row.addressLine}</Table.Td>
+        <Table.Td>{row.openTime}</Table.Td>
+        <Table.Td>{row.closeTime}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
         <Table.Td>
           {row?.shopManager ? row.shopManager?.name : "No manager"}
@@ -142,10 +128,7 @@ const ShopListPage = () => {
           {_.isEqual(row.shopStatus, "Active") ? (
             <Badge variant="light">Active</Badge>
           ) : (
-            <Badge
-              color="gray"
-              variant="light"
-            >
+            <Badge color="gray" variant="light">
               Disabled
             </Badge>
           )}
@@ -159,12 +142,7 @@ const ShopListPage = () => {
       <Menu transitionProps={{ transition: "pop-top-right" }}>
         <Tooltip label="Search by">
           <Menu.Target>
-            <ActionIcon
-              size={36}
-              radius="xl"
-              color={"blue"}
-              variant="filled"
-            >
+            <ActionIcon size={36} radius="xl" color={"blue"} variant="filled">
               {searchCategory}
             </ActionIcon>
           </Menu.Target>
@@ -189,11 +167,7 @@ const ShopListPage = () => {
           </Menu.Item>
           <Menu.Item
             leftSection={
-              <IconPhoneCall
-                size={"1.3rem"}
-                stroke={1.5}
-                color={"#15aabf"}
-              />
+              <IconPhoneCall size={"1.3rem"} stroke={1.5} color={"#15aabf"} />
             }
             onClick={() => {
               setSearch("");
@@ -208,22 +182,11 @@ const ShopListPage = () => {
   };
 
   return (
-    <Paper
-      p={rem(32)}
-      shadow="xs"
-    >
-      <Text
-        size="lg"
-        fw={"bold"}
-        fz={25}
-        c={"light-blue.4"}
-      >
+    <Paper p={rem(32)} shadow="xs">
+      <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
         Shop list
       </Text>
-      <Flex
-        align={"center"}
-        my={"md"}
-      >
+      <Flex align={"center"} my={"md"}>
         {searchCategory == SearchCategory.NAME ? (
           <TextInput
             style={{ flex: 1 }}
@@ -283,20 +246,13 @@ const ShopListPage = () => {
       <Collapse in={opened}>
         <Group>
           <EditAndUpdateForm fields={fields} />
-          <Button
-            variant="transparent"
-            ml={"auto"}
-            onClick={form.reset}
-          >
+          <Button variant="transparent" ml={"auto"} onClick={form.reset}>
             Clear all filter
           </Button>
         </Group>
       </Collapse>
 
-      <Box
-        mt={"md"}
-        pos={"relative"}
-      >
+      <Box mt={"md"} pos={"relative"}>
         <LoadingOverlay
           visible={isShopListLoading}
           zIndex={1000}
@@ -327,6 +283,8 @@ const ShopListPage = () => {
               <Table.Tr>
                 <Table.Th>Shop name</Table.Th>
                 <Table.Th>Address</Table.Th>
+                <Table.Th>Open time</Table.Th>
+                <Table.Th>Close time</Table.Th>
                 <Table.Th>Phone</Table.Th>
                 <Table.Th>Shop manager</Table.Th>
                 <Table.Th>Status</Table.Th>
@@ -336,10 +294,7 @@ const ShopListPage = () => {
           </Table>
         )}
       </Box>
-      <Group
-        justify="flex-end"
-        mt="lg"
-      >
+      <Group justify="flex-end" mt="lg">
         <Pagination
           value={activePage}
           onChange={setPage}

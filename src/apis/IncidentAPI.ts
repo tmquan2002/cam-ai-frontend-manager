@@ -32,6 +32,7 @@ export type GetIncidentReportByTimeParams = {
   startDate?: string;
   endDate?: string;
   interval: ReportInterval;
+  type: IncidentType;
 };
 
 export const IncidentApi = {

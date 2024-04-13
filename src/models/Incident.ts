@@ -9,6 +9,7 @@ import { EvidenceDetail } from "./Evidence";
 import { ShopDetail } from "./Shop";
 
 export type IncidentDetail = {
+  aiId: number;
   incidentType: IncidentType;
   startTime: string;
   endTime: string;

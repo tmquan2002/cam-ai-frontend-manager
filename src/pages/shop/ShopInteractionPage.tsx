@@ -1,6 +1,5 @@
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
-  ActionIcon,
   Badge,
   Box,
   Button,
@@ -9,40 +8,30 @@ import {
   Divider,
   Flex,
   Group,
-  Loader,
   Paper,
   ScrollArea,
-  Select,
   Skeleton,
   Text,
-  Tooltip,
   rem,
 } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
-import classes from "./ShopIncidentListPage.module.scss";
+import classes from "./ShopInteractionPage.module.scss";
 import {
   EvidenceType,
   IncidentStatus,
   IncidentType,
 } from "../../models/CamAIEnum";
-import { IconFilter, IconIdOff, IconX } from "@tabler/icons-react";
+import { IconFilter } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
 import { useForm } from "@mantine/form";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { GetIncidentParams } from "../../apis/IncidentAPI";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useGetIncidentById } from "../../hooks/useGetIncidentById";
-import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { useAssignIncident } from "../../hooks/useAssignIncident";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
 import { EvidenceDetail } from "../../models/Evidence";
 import NoImage from "../../components/image/NoImage";
 import { useNavigate } from "react-router-dom";
@@ -65,7 +54,7 @@ type IncidentFormField = {
   employeeId: string | null;
 };
 
-const ShopIncidentListPage = () => {
+const ShopInteractionPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [selectedIncident, setSelectedIncident] = useState<{
@@ -74,41 +63,13 @@ const ShopIncidentListPage = () => {
 
   const assignIncidentForm = useForm<IncidentFormField>();
 
-  const onAssignIncident = (fieldValues: IncidentFormField) => {
-    assignIncident(
-      {
-        employeeId: fieldValues.employeeId ?? "",
-        incidentId: selectedIncident?.id ?? "",
-      },
-      {
-        onSuccess() {
-          notifications.show({
-            title: "Assign successfully",
-            message: "Incident assign success!",
-          });
-          refetchIncident();
-          refetchIncidentList();
-        },
-        onError(data) {
-          const error = data as AxiosError<ResponseErrorDetail>;
-          notifications.show({
-            color: "red",
-            icon: <IconX />,
-            title: "Assign failed",
-            message: error.response?.data?.message,
-          });
-        },
-      }
-    );
-  };
-
   const form = useForm<SearchIncidentField>({
     initialValues: {
       employeeId: null,
       fromTime: null,
       status: null,
       toTime: null,
-      incidentType: null,
+      incidentType: IncidentType.Interaction,
       size: 999,
     },
   });
@@ -136,25 +97,14 @@ const ShopIncidentListPage = () => {
     form.values.toTime,
   ]);
 
-  const {
-    data: incidentList,
-    isLoading: isGetIncidentListLoading,
-    refetch: refetchIncidentList,
-  } = useGetIncidentList(searchParams);
+  const { data: incidentList, isLoading: isGetIncidentListLoading } =
+    useGetIncidentList(searchParams);
 
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({});
 
-  const {
-    data: incidentData,
-    isLoading: isGetIncidentLoading,
-    refetch: refetchIncident,
-  } = useGetIncidentById(selectedIncident?.id ?? null);
-
-  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
-    useRejectIncidentById();
-  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
-    useAssignIncident();
+  const { data: incidentData, isLoading: isGetIncidentLoading } =
+    useGetIncidentById(selectedIncident?.id ?? null);
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -173,53 +123,8 @@ const ShopIncidentListPage = () => {
     assignIncidentForm.reset();
   }, [incidentData]);
 
-  const openModal = () =>
-    modals.openConfirmModal({
-      title: "Please confirm your action",
-      confirmProps: { color: "red" },
-      children: <Text size="sm">Confirm reject this incident?</Text>,
-      labels: { confirm: "Confirm", cancel: "Cancel" },
-      onCancel: () => console.log("Cancel"),
-      onConfirm: () => {
-        rejectIncident(selectedIncident?.id ?? "", {
-          onSuccess() {
-            notifications.show({
-              title: "Reject successfully",
-              message: "Reject assign success!",
-            });
-            refetchIncident();
-            refetchIncidentList();
-          },
-          onError(data) {
-            const error = data as AxiosError<ResponseErrorDetail>;
-            notifications.show({
-              color: "red",
-              icon: <IconX />,
-              title: "Reject failed",
-              message: error.response?.data?.message,
-            });
-          },
-        });
-      },
-    });
-
   const fields = useMemo(() => {
     return [
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Employee",
-          placeholder: "Employee",
-          data: employeeList?.values?.map((item) => {
-            return { value: `${item.id}`, label: item.name };
-          }),
-          form,
-          name: "employeeId",
-          loading: isGetEmployeeListLoading,
-        },
-        spans: 4,
-      },
-
       {
         type: FIELD_TYPES.DATE_TIME,
         fieldProps: {
@@ -239,37 +144,6 @@ const ShopIncidentListPage = () => {
           label: "End date",
         },
         spans: 4,
-      },
-      {
-        type: FIELD_TYPES.RADIO,
-        fieldProps: {
-          form,
-          name: "status",
-          placeholder: "Incident status",
-          label: "Incident status",
-          data: mapLookupToArray(IncidentStatus ?? {}),
-        },
-        spans: 3,
-      },
-      {
-        type: FIELD_TYPES.RADIO,
-        fieldProps: {
-          form,
-          name: "incidentType",
-          placeholder: "Incident type",
-          label: "Incident type",
-          data: [
-            {
-              key: IncidentType.Phone,
-              value: "Phone",
-            },
-            {
-              key: IncidentType.Uniform,
-              value: "Uniform",
-            },
-          ],
-        },
-        spans: 3,
       },
     ];
   }, [employeeList?.values, form, isGetEmployeeListLoading]);
@@ -300,11 +174,7 @@ const ShopIncidentListPage = () => {
   };
 
   const orderedIncidentList = useMemo(() => {
-    return _.orderBy(
-      incidentList?.values || [],
-      ["startTime"],
-      ["desc"]
-    ).filter((i) => i.incidentType != IncidentType.Interaction);
+    return _.orderBy(incidentList?.values || [], ["startTime"], ["desc"]);
   }, [incidentList]);
 
   const renderIncidentList = orderedIncidentList.map((row) => (
@@ -326,12 +196,16 @@ const ShopIncidentListPage = () => {
         <Text size="md">
           {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
         </Text>
-        {renderIncidentStatusBadge(row?.status)}
+
+        {new Date(row?.startTime).getTime() - new Date().getTime() > 0 ? (
+          renderIncidentStatusBadge(IncidentStatus.New)
+        ) : (
+          <></>
+        )}
       </Group>
       <Text c="dimmed" size="sm">
-        {row?.incidentType} incident
+        {row?.incidentType}
       </Text>
-      {/* <Text>{dayjs(row?.endTime).format("DD/MM/YYYY h:mm A")}</Text> */}
     </Box>
   ));
 
@@ -399,7 +273,7 @@ const ShopIncidentListPage = () => {
         justify="space-between"
       >
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Incident list
+          Interaction list
         </Text>
         <Group>
           {form.isDirty() ? (
@@ -458,22 +332,14 @@ const ShopIncidentListPage = () => {
                         "DD/MM/YYYY h:mm A"
                       )}
                     </Text>
-                    {renderIncidentStatusBadge(incidentData?.status)}
+                    {new Date(incidentData?.startTime ?? "").getTime() -
+                      new Date().getTime() >
+                    0 ? (
+                      renderIncidentStatusBadge(IncidentStatus.New)
+                    ) : (
+                      <></>
+                    )}
                   </Group>
-                  <Tooltip label="Reject incident">
-                    <ActionIcon
-                      variant="filled"
-                      aria-label="Settings"
-                      color={"red"}
-                      onClick={openModal}
-                      loading={isRejectIncidentLoading}
-                    >
-                      <IconIdOff
-                        style={{ width: "70%", height: "70%" }}
-                        stroke={1.5}
-                      />
-                    </ActionIcon>
-                  </Tooltip>
                 </Group>
                 <Group justify="space-between" mb={rem(12)}>
                   <Text fw={500} size={rem(20)}>
@@ -507,43 +373,6 @@ const ShopIncidentListPage = () => {
                     );
                   })
                 )}
-
-                <Box>
-                  <Text fw={500} size={rem(20)} my={rem(20)}>
-                    Assigned to
-                  </Text>
-                  <Divider color="#acacac" />
-
-                  <form
-                    onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}
-                  >
-                    <Group align="center" mt={rem(20)} pb={rem(20)}>
-                      {isGetEmployeeListLoading ? (
-                        <Loader mt={rem(30)} />
-                      ) : (
-                        <Select
-                          w={rem(600)}
-                          {...assignIncidentForm.getInputProps("employeeId")}
-                          placeholder="Assign incident to an employee"
-                          data={employeeList?.values?.map((item) => {
-                            return {
-                              value: item?.id,
-                              label: item?.name,
-                            };
-                          })}
-                          nothingFoundMessage="Nothing found..."
-                        />
-                      )}
-                      <Button
-                        type="submit"
-                        loading={isAssignIncidentLoading}
-                        disabled={!assignIncidentForm.isDirty()}
-                      >
-                        Confirm
-                      </Button>
-                    </Group>
-                  </form>
-                </Box>
               </Box>
             </Skeleton>
           </ScrollArea>
@@ -564,4 +393,4 @@ const ShopIncidentListPage = () => {
   );
 };
 
-export default ShopIncidentListPage;
+export default ShopInteractionPage;

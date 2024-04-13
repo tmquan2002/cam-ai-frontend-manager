@@ -2,7 +2,6 @@ import {
   Avatar,
   Box,
   Flex,
-  Image,
   LoadingOverlay,
   Paper,
   Text,
@@ -11,16 +10,14 @@ import {
 } from "@mantine/core";
 import { IconMail, IconPhone } from "@tabler/icons-react";
 import { useGetBrandList } from "../../hooks/useGetBrandList";
+import LoadingImage from "../../components/image/LoadingImage";
 
 const BrandShopDetailPage = () => {
   const { data, isLoading } = useGetBrandList({ size: 1 });
 
   if (isLoading)
     return (
-      <Paper
-        style={{ flex: 1, height: "100vh" }}
-        pos={"relative"}
-      >
+      <Paper style={{ flex: 1, height: "100vh" }} pos={"relative"}>
         <LoadingOverlay
           visible={isLoading}
           zIndex={1000}
@@ -30,15 +27,8 @@ const BrandShopDetailPage = () => {
     );
 
   return (
-    <Paper
-      p={rem(32)}
-      m={rem(32)}
-      style={{ flex: 1 }}
-    >
-      <Flex
-        align={"center"}
-        mb={rem(32)}
-      >
+    <Paper p={rem(32)} m={rem(32)} style={{ flex: 1 }}>
+      <Flex align={"center"} mb={rem(32)}>
         <Tooltip label="Brand logo">
           <Avatar
             mr={rem(32)}
@@ -48,11 +38,7 @@ const BrandShopDetailPage = () => {
           />
         </Tooltip>
         <Box>
-          <Text
-            size="xl"
-            fw={500}
-            mb={rem(8)}
-          >
+          <Text size="xl" fw={500} mb={rem(8)}>
             {data?.values[0].name}
           </Text>
 
@@ -72,12 +58,12 @@ const BrandShopDetailPage = () => {
       </Flex>
 
       <Tooltip label="Brand banner">
-        <Image
+        <LoadingImage
           radius={"md"}
           bg={"#000"}
           height={400}
           fit="contain"
-          src={data?.values[0].banner?.hostingUri}
+          imageId={data?.values?.[0]?.banner?.id ?? ""}
         />
       </Tooltip>
     </Paper>

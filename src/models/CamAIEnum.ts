@@ -103,6 +103,7 @@ export enum IncidentType {
   Phone = "Phone",
   Uniform = "Uniform",
   Interaction = "Interaction",
+  Incident = "Incident",
 }
 
 export enum IncidentStatus {

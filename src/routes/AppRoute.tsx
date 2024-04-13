@@ -29,12 +29,14 @@ import BranddReportPage from "../pages/brand/BrandReportPage";
 import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 import CameraDetailPage from "../pages/brand/CameraDetailPage";
 import ShopStreamPage from "../pages/shop/ShopStreamPage";
-import CustomerReportPage from "../pages/shop/report/customer/CustomerReportTab";
 import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
 import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
-import CustomerReportPageManager from "../pages/brand/report/customer/CustomerReportPageManager";
 import IncidentReportPageManager from "../pages/brand/report/incident/IncidentReportPageManager";
 import InteractionReportPageManager from "../pages/brand/report/interaction/InteractionReportPageManager";
+import CountEmployeeReportPage from "../pages/shop/report/employee/CountEmployeeReportTab";
+import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
+import ShopInteractionPage from "../pages/shop/ShopInteractionPage";
+import BrandInteractionList from "../pages/brand/BrandInteractionList";
 
 const AppRoute = () => {
   return useRoutes([
@@ -60,6 +62,10 @@ const AppRoute = () => {
         {
           path: "incident",
           element: <ShopIncidentListPage />,
+        },
+        {
+          path: "interaction",
+          element: <ShopInteractionPage />,
         },
         {
           path: "detail",
@@ -97,8 +103,8 @@ const AppRoute = () => {
           element: <CameraDetailPage />,
         },
         {
-          path: "report/customer",
-          element: <CustomerReportPage />,
+          path: "report/count/employee",
+          element: <CountEmployeeReportPage />,
         },
         {
           path: "report/incident",
@@ -155,6 +161,7 @@ const AppRoute = () => {
           element: <CreateManagerPage />,
         },
         { path: "incident", element: <IncidentListPage /> },
+        { path: "interaction", element: <BrandInteractionList /> },
         { path: "incident/:id", element: <ShopIncidentDetailPage /> },
         {
           path: "edgeBox",
@@ -169,8 +176,8 @@ const AppRoute = () => {
           element: <CameraDetailPage />,
         },
         {
-          path: "report/customer",
-          element: <CustomerReportPageManager />,
+          path: "report/count/employee",
+          element: <CountEmployeeReportPageManager />,
         },
         {
           path: "report/incident",

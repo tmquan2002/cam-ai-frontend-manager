@@ -15,7 +15,7 @@ export type GetEmployeeListParams = {
 
 export type CreateEmployeeParams = {
   name: string;
-  email: string;
+  email: string | null;
   gender: Gender;
   phone?: string | null;
   birthday?: string | null;

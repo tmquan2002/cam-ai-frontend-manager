@@ -1,6 +1,6 @@
 import styled from "./login.module.scss";
 import AuthImage from "../../../assets/images/login_signup_main.png";
-import { Button, Group, Modal, TextInput } from "@mantine/core";
+import { Box, Button, Group, Modal, Text, TextInput, rem } from "@mantine/core";
 import { useState } from "react";
 import { ChangePasswordForm } from "./ChangePasswordForm";
 import { useLogin } from "../../../hooks/useLogin";
@@ -32,8 +32,8 @@ const LoginPage = () => {
         value.trim().length === 0
           ? "Email is required"
           : /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
-            ? null
-            : "Invalid email",
+          ? null
+          : "Invalid email",
       password: (value) =>
         value.trim().length === 0 ? "Password is required" : null,
     },
@@ -81,11 +81,13 @@ const LoginPage = () => {
     <>
       <div className={styled["container-main"]}>
         <div className={styled["image-container"]}>
-          <div className={styled["title"]}>CAMAI</div>
-          <div className={styled["description"]}>
+          <Box className={styled["title"]} mb={rem(10)}>
+            CAMAI-MANAGER
+          </Box>
+          <Text className={styled["description"]}>
             Solution for coffee brands to detect customers and employee
             behaviors
-          </div>
+          </Text>
           <img
             src={AuthImage}
             alt="AuthImage"
@@ -122,10 +124,7 @@ const LoginPage = () => {
               {...form.getInputProps("password")}
             />
 
-            <Group
-              justify="flex-start"
-              mt="md"
-            >
+            <Group justify="flex-start" mt="md">
               <Button
                 type="submit"
                 variant="gradient"

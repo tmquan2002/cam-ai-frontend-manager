@@ -161,147 +161,10 @@ const renderEdgeboxList = (
   edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined
 ) => {
   if (edgeBoxInstallList && edgeBoxInstallList.length > 0) {
-    return (
-      <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Group align="center" pb={rem(28)} gap={"sm"}>
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mr={"sm"}>
-            Edge Box
-          </Text>
-        </Group>
-        <Flex>
-          <Image
-            radius={"md"}
-            src={
-              "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
-            }
-          />
-          <Box ml={rem(40)} style={{ flex: 1 }}>
-            <Group gap={rem(40)}>
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Name
-                </Text>
-                <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
-              </Box>
-
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Edgebox status
-                </Text>
-                {renderEdgeboxStatusBadge(
-                  edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxStatus
-                )}
-              </Box>
-
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Edgebox location
-                </Text>
-                {renderEdgeboxLocationBadge(
-                  edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
-                )}
-              </Box>
-
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Activation status
-                </Text>
-                {renderEdgeBoxActivationStatusBadge(
-                  edgeBoxInstallList?.[0].activationStatus
-                )}
-              </Box>
-
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Install status
-                </Text>
-                {renderEdgeboxInstallStatusBadge(
-                  edgeBoxInstallList?.[0].edgeBoxInstallStatus
-                )}
-              </Box>
-            </Group>
-            <Divider my={rem(20)} />
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Description :
-              </Text>
-              <Text>
-                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.description}
-              </Text>
-            </Group>
-            <Divider my={rem(20)} />
-            <SimpleGrid cols={2}>
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  Model name :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.name}
-                </Text>
-              </Group>
-
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  Model code :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.modelCode}
-                </Text>
-              </Group>
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  Manufacturer :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.manufacturer}
-                </Text>
-              </Group>
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  CPU :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.cpu}
-                </Text>
-              </Group>
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  RAM :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.ram}
-                </Text>
-              </Group>
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  Storage :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.storage}
-                </Text>
-              </Group>
-              <Group>
-                <Text miw={rem(120)} fw={600}>
-                  OS :
-                </Text>
-                <Text>
-                  {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.os}
-                </Text>
-              </Group>
-            </SimpleGrid>
-          </Box>
-        </Flex>
-      </Paper>
-    );
-  }
-
-  return (
-    <Paper p={rem(32)} m={rem(32)} shadow="xs">
-      <Group align="center" pb={rem(28)} gap={"sm"}>
-        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mr={"sm"}>
-          Edge Box
-        </Text>
-      </Group>
+    return edgeBoxInstallList?.[0]?.edgeBoxInstallStatus ==
+      EdgeboxInstallStatus.Disabled ? (
+      <></>
+    ) : (
       <Flex>
         <Image
           radius={"md"}
@@ -310,10 +173,130 @@ const renderEdgeboxList = (
           }
         />
         <Box ml={rem(40)} style={{ flex: 1 }}>
-          <Text>No edgebox available</Text>
+          <Group gap={rem(40)}>
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Name
+              </Text>
+              <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
+            </Box>
+
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Edgebox status
+              </Text>
+              {renderEdgeboxStatusBadge(
+                edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxStatus
+              )}
+            </Box>
+
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Edgebox location
+              </Text>
+              {renderEdgeboxLocationBadge(
+                edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
+              )}
+            </Box>
+
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Activation status
+              </Text>
+              {renderEdgeBoxActivationStatusBadge(
+                edgeBoxInstallList?.[0].activationStatus
+              )}
+            </Box>
+
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Install status
+              </Text>
+              {renderEdgeboxInstallStatusBadge(
+                edgeBoxInstallList?.[0].edgeBoxInstallStatus
+              )}
+            </Box>
+          </Group>
+          <Divider my={rem(20)} />
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              Description :
+            </Text>
+            <Text>
+              {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.description}
+            </Text>
+          </Group>
+          <Divider my={rem(20)} />
+          <SimpleGrid cols={2}>
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                Model name :
+              </Text>
+              <Text>
+                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.name}
+              </Text>
+            </Group>
+
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                Model code :
+              </Text>
+              <Text>
+                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.modelCode}
+              </Text>
+            </Group>
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                Manufacturer :
+              </Text>
+              <Text>
+                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.manufacturer}
+              </Text>
+            </Group>
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                CPU :
+              </Text>
+              <Text>{edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.cpu}</Text>
+            </Group>
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                RAM :
+              </Text>
+              <Text>{edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.ram}</Text>
+            </Group>
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                Storage :
+              </Text>
+              <Text>
+                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.storage}
+              </Text>
+            </Group>
+            <Group>
+              <Text miw={rem(120)} fw={600}>
+                OS :
+              </Text>
+              <Text>{edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.os}</Text>
+            </Group>
+          </SimpleGrid>
         </Box>
       </Flex>
-    </Paper>
+    );
+  }
+
+  return (
+    <Flex>
+      <Image
+        radius={"md"}
+        src={
+          "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
+        }
+      />
+      <Box ml={rem(40)} style={{ flex: 1 }}>
+        <Text>No edgebox available</Text>
+      </Box>
+    </Flex>
   );
 };
 
@@ -896,35 +879,33 @@ const ShopDetailPageManager = () => {
         )}
       </Paper>
       <Skeleton visible={isEdgeboxInstallListLoading}>
-        {edgeBoxInstallList?.isValuesEmpty ||
-        edgeBoxInstallList?.values?.[0].activationStatus ==
-          EdgeBoxActivationStatus.NotActivated ? (
-          <Paper p={rem(32)} m={rem(32)} shadow="xs">
-            <Group align="center" pb={rem(28)} gap={"sm"}>
-              <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-                Edge box
-              </Text>
-            </Group>
-            <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
+        <Paper p={rem(32)} m={rem(32)} shadow="xs">
+          <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+              Edge box
+            </Text>
+          </Group>
+          <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
+            <Group pb={rem(28)}>
               <Input
+                style={{
+                  flex: 1,
+                }}
                 {...activationForm.getInputProps("activationCode")}
                 placeholder="Enter an activation code here"
               />
+              <Button
+                type="submit"
+                loading={isActiveEdgeBoxLoading}
+                disabled={!activationForm.isDirty()}
+              >
+                Confirm
+              </Button>
+            </Group>
+          </form>
 
-              <Group justify="flex-end" mt="md" pb={rem(8)}>
-                <Button
-                  type="submit"
-                  loading={isActiveEdgeBoxLoading}
-                  disabled={!activationForm.isDirty()}
-                >
-                  Confirm
-                </Button>
-              </Group>
-            </form>
-          </Paper>
-        ) : (
-          renderEdgeboxList(edgeBoxInstallList?.values)
-        )}
+          {renderEdgeboxList(edgeBoxInstallList?.values)}
+        </Paper>
       </Skeleton>
     </Box>
   );

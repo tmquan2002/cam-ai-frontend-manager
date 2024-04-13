@@ -32,6 +32,8 @@ export type CreateShopParams = {
   wardId: number;
   shopManagerId: string | null;
   addressLine: string;
+  openTime: string;
+  closeTime: string;
 };
 
 export const ShopAPI = {

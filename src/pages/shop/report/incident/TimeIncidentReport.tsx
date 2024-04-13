@@ -1,7 +1,6 @@
 import { Box, Card, Group, Skeleton, Text, rem } from "@mantine/core";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
-import { ReportInterval } from "../../../../models/CamAIEnum";
-import { LineChart } from "@mantine/charts";
+import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import { useMemo } from "react";
 import dayjs from "dayjs";
 import EditAndUpdateForm, {
@@ -11,7 +10,30 @@ import { useForm } from "@mantine/form";
 import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import _ from "lodash";
 import NoImage from "../../../../components/image/NoImage";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
 
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+);
 type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;
@@ -22,7 +44,7 @@ const TimeIncidentReport = () => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
       interval: ReportInterval.HalfHour,
     },
@@ -54,6 +76,7 @@ const TimeIncidentReport = () => {
             : undefined,
           interval: form.values.interval,
           enabled: true,
+          type: IncidentType.Incident,
         };
         sb = _.omitBy(sb, _.isNil) as GetIncidentReportByTimeParams & {
           enabled: boolean;
@@ -63,6 +86,7 @@ const TimeIncidentReport = () => {
         return {
           enabled: true,
           interval: form.values.interval,
+          type: IncidentType.Incident,
         };
       }
     }, [form.values.interval, form.values.startDate, form.values.toDate]);
@@ -78,7 +102,7 @@ const TimeIncidentReport = () => {
     }
     return incidentReportByTimeData?.data.map((item) => {
       return {
-        time: dayjs(item.time).format("HH:mm DD-MM-YYYY"),
+        time: dayjs(item.time).format("HH:mm | DD-MM"),
         count: item.count,
       };
     });
@@ -112,24 +136,24 @@ const TimeIncidentReport = () => {
           placeholder: "Interval",
           data: [
             {
-              key: ReportInterval.HalfHour,
               value: ReportInterval.HalfHour,
+              label: "30 minutes",
             },
             {
-              key: ReportInterval.Hour,
               value: ReportInterval.Hour,
+              label: "1 hour",
             },
             {
-              key: ReportInterval.HalfDay,
               value: ReportInterval.HalfDay,
+              label: "12 hours",
             },
             {
-              key: ReportInterval.Day,
               value: ReportInterval.Day,
+              label: "1 day",
             },
             {
-              key: ReportInterval.Week,
               value: ReportInterval.Week,
+              label: "1 week",
             },
           ],
         },
@@ -137,6 +161,10 @@ const TimeIncidentReport = () => {
       },
     ];
   }, [form]);
+
+  // data?.map((i) => {
+  //   console.log(i.time);
+  // });
 
   return (
     <Skeleton visible={isGetIncidentReportByTimeDataLoading}>
@@ -158,14 +186,55 @@ const TimeIncidentReport = () => {
         incidentReportByTimeData?.data?.length == 0 ? (
           <NoImage />
         ) : (
-          <LineChart
-            h={300}
-            w={"100%"}
-            data={data ?? []}
-            dataKey="time"
-            series={[{ name: "count", color: "teal.6" }]}
-            curveType="linear"
-          />
+          <Box
+            style={{
+              width: "100%",
+              maxWidth: "100%",
+              height: "640px",
+              overflowX: "scroll",
+            }}
+          >
+            <Box
+              style={
+                data && data?.length > 7
+                  ? {
+                      width: `${1500 + (data?.length - 7) * 30}px`,
+                      height: "600px",
+                    }
+                  : {
+                      height: "600px",
+                    }
+              }
+            >
+              <Line
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                    },
+                  },
+                  plugins: {
+                    title: {
+                      display: true,
+                    },
+                  },
+                }}
+                data={{
+                  labels: data?.map((i) => i.time),
+                  datasets: [
+                    {
+                      label: "Total incidents",
+                      data: data?.map((i) => i.count),
+                      borderColor: "rgb(255, 99, 132)",
+                      backgroundColor: "rgba(255, 99, 132, 0.5)",
+                    },
+                  ],
+                }}
+              ></Line>
+            </Box>
+          </Box>
         )}
       </Card>
     </Skeleton>

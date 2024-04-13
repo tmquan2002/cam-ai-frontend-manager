@@ -1,0 +1,17 @@
+.pointer-style {
+  cursor: pointer;
+}
+.pointer-style:hover {
+  text-decoration: underline;
+}
+
+.filter_button {
+  border-radius: 20%/50%;
+  padding: 0 rem(20px);
+  height: rem(44px);
+  margin-left: rem(24px);
+}
+
+.clickable {
+  cursor: pointer;
+}
