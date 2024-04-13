@@ -25,7 +25,6 @@ const CustomTimeInput = (props: TimeInputProps) => {
   return (
     <TimeInput
       {...props}
-      withSeconds
       ref={ref}
       rightSection={pickerControl}
     />

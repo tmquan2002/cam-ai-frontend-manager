@@ -133,7 +133,7 @@ const renderDate = ({ fieldProps }: any) => {
 };
 
 const renderDateTime = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly } =
+  const { form, name, placeholder, label, required, disabled, readonly, withSeconds } =
     fieldProps;
   return (
     <DateTimePicker
@@ -143,17 +143,19 @@ const renderDateTime = ({ fieldProps }: any) => {
       label={label}
       readOnly={readonly}
       placeholder={placeholder}
+      withSeconds={withSeconds}
       {...form.getInputProps(name)}
     />
   );
 };
 
 const renderTime = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly } =
+  const { form, name, placeholder, label, required, disabled, readonly, withSeconds } =
     fieldProps;
   return (
     <CustomTimeInput
       // required={required}
+      withSeconds={withSeconds}
       disabled={disabled}
       withAsterisk={required}
       label={label}

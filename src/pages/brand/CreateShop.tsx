@@ -176,6 +176,7 @@ const CreateShop = () => {
           placeholder: "Open Time",
           label: "Open time",
           required: true,
+          withSeconds: false,
         },
         spans: 6,
       },
