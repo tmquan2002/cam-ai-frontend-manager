@@ -64,6 +64,7 @@ const CreateShop = () => {
       province: isNotEmpty("Province is required"),
       district: isNotEmpty("District is required"),
       openTime: isNotEmpty("Open time is required"),
+      shopManagerId: isNotEmpty("Shop manager is required"),
       closeTime: isNotEmpty("Close time is required"),
     },
   });
@@ -148,6 +149,7 @@ const CreateShop = () => {
           name: "shopManagerId",
           placeholder: "Shop manager",
           label: "Shop manager",
+          required: true,
           data: accountList?.values?.map((item) => {
             return {
               value: item.id,
