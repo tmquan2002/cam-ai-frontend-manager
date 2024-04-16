@@ -55,6 +55,7 @@ import _ from "lodash";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
 import {
+  CameraStatus,
   EdgeBoxActivationStatus,
   EdgeBoxLocation,
   EdgeBoxStatus,
@@ -90,7 +91,7 @@ export type ActivationFormValue = {
 };
 
 const renderEdgeBoxActivationStatusBadge = (
-  status: EdgeBoxActivationStatus | undefined
+  status: EdgeBoxActivationStatus | undefined,
 ) => {
   switch (status) {
     case EdgeBoxActivationStatus.Activated:
@@ -122,7 +123,7 @@ const renderEdgeboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
 };
 
 const renderEdgeboxInstallStatusBadge = (
-  status: EdgeboxInstallStatus | undefined
+  status: EdgeboxInstallStatus | undefined,
 ) => {
   switch (status) {
     case EdgeboxInstallStatus.Working:
@@ -158,7 +159,7 @@ const renderEdgeboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
 };
 
 const renderEdgeboxList = (
-  edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined
+  edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined,
 ) => {
   if (edgeBoxInstallList && edgeBoxInstallList.length > 0) {
     return edgeBoxInstallList?.[0]?.edgeBoxInstallStatus ==
@@ -186,7 +187,7 @@ const renderEdgeboxList = (
                 Edgebox status
               </Text>
               {renderEdgeboxStatusBadge(
-                edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxStatus
+                edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxStatus,
               )}
             </Box>
 
@@ -195,7 +196,7 @@ const renderEdgeboxList = (
                 Edgebox location
               </Text>
               {renderEdgeboxLocationBadge(
-                edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
+                edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation,
               )}
             </Box>
 
@@ -204,7 +205,7 @@ const renderEdgeboxList = (
                 Activation status
               </Text>
               {renderEdgeBoxActivationStatusBadge(
-                edgeBoxInstallList?.[0].activationStatus
+                edgeBoxInstallList?.[0].activationStatus,
               )}
             </Box>
 
@@ -213,7 +214,7 @@ const renderEdgeboxList = (
                 Install status
               </Text>
               {renderEdgeboxInstallStatusBadge(
-                edgeBoxInstallList?.[0].edgeBoxInstallStatus
+                edgeBoxInstallList?.[0].edgeBoxInstallStatus,
               )}
             </Box>
           </Group>
@@ -349,10 +350,11 @@ const ShopDetailPageManager = () => {
     validate: {
       name: hasLength(
         { min: 2, max: 50 },
-        "Shop name must be 1- 50 characters long"
+        "Shop name must be 1- 50 characters long",
       ),
       phone: (value) =>
-        value == "" || /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+        value == "" ||
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
@@ -376,10 +378,10 @@ const ShopDetailPageManager = () => {
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
+    +(form.values.province ?? 0),
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
+    +(form.values.district ?? 0),
   );
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
@@ -414,7 +416,7 @@ const ShopDetailPageManager = () => {
             message: error.response?.data?.message,
           });
         },
-      }
+      },
     );
   };
 
@@ -452,7 +454,7 @@ const ShopDetailPageManager = () => {
             message: error.response?.data?.message,
           });
         },
-      }
+      },
     );
   };
 
@@ -808,7 +810,18 @@ const ShopDetailPageManager = () => {
                 fullWidth
                 size={rem(52)}
                 justify="space-between"
-                onClick={() => navigate(`/brand/camera/${item?.id}`)}
+                onClick={() => {
+                  if (item?.status != CameraStatus.Connected) {
+                    notifications.show({
+                      color: "red",
+                      title: "Camera is disconnected",
+                      message:
+                        "Camera is disconnected, cannot view live stream",
+                    });
+                  } else {
+                    navigate(`/brand/camera/${item?.id}`);
+                  }
+                }}
                 rightSection={<IconCaretRight style={{ width: rem(24) }} />}
                 px={rem(16)}
               >

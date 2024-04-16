@@ -45,6 +45,7 @@ import { replaceIfNun } from "../../utils/helperFunction";
 import _ from "lodash";
 import { useNavigate } from "react-router-dom";
 import {
+  CameraStatus,
   EdgeBoxActivationStatus,
   EdgeBoxLocation,
   EdgeBoxStatus,
@@ -67,7 +68,7 @@ export type FormFieldValue = {
 };
 
 const renderEdgeBoxActivationStatusBadge = (
-  status: EdgeBoxActivationStatus | undefined
+  status: EdgeBoxActivationStatus | undefined,
 ) => {
   switch (status) {
     case EdgeBoxActivationStatus.Activated:
@@ -99,7 +100,7 @@ const renderEdboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
 };
 
 const renderEdgeboxInstallStatusBadge = (
-  status: EdgeboxInstallStatus | undefined
+  status: EdgeboxInstallStatus | undefined,
 ) => {
   switch (status) {
     case EdgeboxInstallStatus.Working:
@@ -135,7 +136,7 @@ const renderEdboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
 };
 
 const renderEdgeboxList = (
-  edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined
+  edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined,
 ) => {
   if (edgeBoxInstallList && edgeBoxInstallList.length > 0) {
     return (
@@ -165,7 +166,7 @@ const renderEdgeboxList = (
                   Active status
                 </Text>
                 {renderEdboxStatusBadge(
-                  edgeBoxInstallList?.[0].edgeBox.edgeBoxStatus
+                  edgeBoxInstallList?.[0].edgeBox.edgeBoxStatus,
                 )}
               </Box>
 
@@ -174,7 +175,7 @@ const renderEdgeboxList = (
                   EdgeBox location
                 </Text>
                 {renderEdboxLocationBadge(
-                  edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation
+                  edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation,
                 )}
               </Box>
               <Box>
@@ -182,7 +183,7 @@ const renderEdgeboxList = (
                   Activation status
                 </Text>
                 {renderEdgeBoxActivationStatusBadge(
-                  edgeBoxInstallList?.[0].activationStatus
+                  edgeBoxInstallList?.[0].activationStatus,
                 )}
               </Box>
               <Box>
@@ -190,7 +191,7 @@ const renderEdgeboxList = (
                   Install status
                 </Text>
                 {renderEdgeboxInstallStatusBadge(
-                  edgeBoxInstallList?.[0].edgeBoxInstallStatus
+                  edgeBoxInstallList?.[0].edgeBoxInstallStatus,
                 )}
               </Box>
             </Group>
@@ -299,7 +300,8 @@ const ShopDetailPage = () => {
     validate: {
       name: isNotEmpty("Name should not be empty"),
       phone: (value) =>
-        value == "" || /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+        value == "" ||
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
@@ -320,10 +322,10 @@ const ShopDetailPage = () => {
     useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
 
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
+    +(form.values.province ?? 0),
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
+    +(form.values.district ?? 0),
   );
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({});
@@ -581,7 +583,18 @@ const ShopDetailPage = () => {
                 fullWidth
                 size={rem(52)}
                 justify="space-between"
-                onClick={() => navigate(`/shop/camera/${item?.id}`)}
+                onClick={() => {
+                  if (item?.status != CameraStatus.Connected) {
+                    notifications.show({
+                      color: "red",
+                      title: "Camera is disconnected",
+                      message:
+                        "Camera is disconnected, cannot view live stream",
+                    });
+                  } else {
+                    navigate(`/shop/camera/${item?.id}`);
+                  }
+                }}
                 rightSection={<IconCaretRight style={{ width: rem(24) }} />}
                 px={rem(16)}
                 mb={rem(16)}

@@ -450,7 +450,7 @@ const EmployeeDetailPage = () => {
         onClose={close}
         title={
           <Text>
-            Confirm delete <Mark>{employeeData?.name}</Mark> account ?
+            Confirm delete <Mark>{employeeData?.name}</Mark> employee?
           </Text>
         }
         // centered

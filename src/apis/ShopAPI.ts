@@ -102,4 +102,15 @@ export const ShopAPI = {
 
     return res?.data;
   },
+  _deleteShopById: async (shopId: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.delete(`/api/shops/${shopId}`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
 };
