@@ -1,7 +1,10 @@
 import {
   Box,
+  ActionIcon,
   Button,
   Group,
+  Modal,
+  Mark,
   LoadingOverlay,
   Paper,
   Text,
@@ -11,11 +14,14 @@ import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
 import { useEffect, useMemo } from "react";
+import { useDeleteShopById } from "../../hooks/useDeleteShopById";
+import { useDisclosure } from "@mantine/hooks";
+import { IconTrash } from "@tabler/icons-react";
 import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender } from "../../models/CamAIEnum";
+import { Gender, AccountStatus } from "../../models/CamAIEnum";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
@@ -41,6 +47,7 @@ type ProfileFieldValue = {
 
 const AccountDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const form = useForm<ProfileFieldValue>({
     initialValues: {
       name: "",
@@ -56,12 +63,14 @@ const AccountDetailPage = () => {
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value) =>
-        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+        /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
+          ? null
+          : "Invalid email - ex: huy@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
-          value == null ||
-          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+        value == null ||
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
     },
@@ -69,16 +78,18 @@ const AccountDetailPage = () => {
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
+    +(form.values.province ?? 0),
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
+    +(form.values.district ?? 0),
   );
   const { data: accountData, isLoading: isAccountDataLoading } =
     useGetAccountById(id ?? "");
 
   const { mutate: updateAccount, isLoading: isUpdateAccountLoading } =
     useUpdateAccount();
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   useEffect(() => {
     if (accountData) {
@@ -219,26 +230,22 @@ const AccountDetailPage = () => {
     wards,
   ]);
 
+  const { mutate: deleteShop, isLoading: isDeleteShopLoading } =
+    useDeleteShopById();
+
   return (
-    <Paper
-      m={rem(32)}
-      p={rem(32)}
-      style={{ flex: 1 }}
-      shadow="xs"
-    >
-      <Group
-        mb={rem(20)}
-        align="center"
-      >
+    <Paper m={rem(32)} p={rem(32)} style={{ flex: 1 }} shadow="xs">
+      <Group mb={rem(20)} align="center">
         <BackButton />
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Manager profile - {accountData?.name}
         </Text>
+
+        {accountData?.accountStatus === AccountStatus.Active && (
+          <ActionIcon color="red" onClick={open} size={"lg"}>
+            <IconTrash style={{ width: rem(20), height: rem(20) }} />
+          </ActionIcon>
+        )}
       </Group>
       <Box pos={"relative"}>
         {isAccountDataLoading ? (
@@ -279,11 +286,7 @@ const AccountDetailPage = () => {
             })}
           >
             <EditAndUpdateForm fields={fields} />
-            <Group
-              justify="flex-end"
-              mt="md"
-              pb={rem(10)}
-            >
+            <Group justify="flex-end" mt="md" pb={rem(10)}>
               <Button
                 disabled={!form.isDirty()}
                 loading={isUpdateAccountLoading}
@@ -295,6 +298,49 @@ const AccountDetailPage = () => {
             </Group>
           </form>
         )}
+
+        <Modal
+          opened={opened}
+          onClose={close}
+          title={
+            <Text>
+              Confirm delete <Mark>{accountData?.name}</Mark> account?
+            </Text>
+          }
+          // centered
+        >
+          <Group justify="flex-end" mt="md">
+            <Button
+              loading={isDeleteShopLoading}
+              onClick={() => {
+                deleteShop(id ?? "", {
+                  onSuccess() {
+                    notifications.show({
+                      title: "Successfully",
+                      message: "Delete shop successfully!",
+                    });
+                    navigate("/shop/detail");
+                  },
+                  onError(data) {
+                    const error = data as AxiosError<ResponseErrorDetail>;
+                    notifications.show({
+                      color: "red",
+                      title: "Failed",
+                      message: error.response?.data?.message,
+                    });
+                  },
+                });
+              }}
+              variant="filled"
+              size="xs"
+            >
+              Yes
+            </Button>
+            <Button onClick={close} color={"red"} variant="outline" size="xs">
+              No
+            </Button>
+          </Group>
+        </Modal>
       </Box>
     </Paper>
   );

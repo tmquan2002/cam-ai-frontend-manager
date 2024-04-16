@@ -56,8 +56,8 @@ const BrandAccountPage = () => {
   };
 
   const rows = data?.values.map((row: AccountDetail) => (
-    <Table.Tr key={row?.id}>
-      <Table.Td onClick={() => navigate(`/brand/account/${row?.id}`)}>
+    <Table.Tr key={row?.id} onClick={() => navigate(`/brand/account/${row?.id}`)}>
+      <Table.Td>
         <Text
           size={rem(14)}
           className={classes.clickable_link}
