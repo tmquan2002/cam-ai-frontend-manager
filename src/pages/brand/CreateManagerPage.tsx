@@ -21,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 export type CreateAccountField = {
   email: string;
   password: string;
+  confirmPassword: string;
   name: string;
   gender: Gender;
   phone: string;
@@ -45,7 +46,17 @@ const CreateManagerPage = () => {
       name: isNotEmpty("Name is required"),
       email: (value) =>
         /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
-      password: isNotEmpty("Name must not be empty"),
+      password: (value) => {
+        if (value == "") {
+            return "Password must not be empty";
+        }
+        let confPass = createAccountForm.values.confirmPassword;
+        if (confPass != "" && confPass != value) {
+            return "Password and confirm password are not the same"
+        }
+        return null;
+      },
+      confirmPassword: isNotEmpty("Confirm password must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
@@ -78,7 +89,7 @@ const CreateManagerPage = () => {
           label: "Name",
           required: true,
         },
-        spans: 6,
+        spans: 12,
       },
       {
         type: FIELD_TYPES.TEXT,
@@ -95,6 +106,17 @@ const CreateManagerPage = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form: createAccountForm,
+          name: "phone",
+          placeholder: "Phone",
+          label: "Phone",
+        },
+        spans: 6,
+      },
+
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: createAccountForm,
           name: "password",
           placeholder: "Password",
           label: "Password",
@@ -107,13 +129,14 @@ const CreateManagerPage = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form: createAccountForm,
-          name: "phone",
-          placeholder: "Phone",
-          label: "Phone",
+          name: "confirmPassword",
+          placeholder: "Confirm password",
+          label: "Confirm password",
+          type: "password",
+          required: true,
         },
         spans: 6,
       },
-
       {
         type: FIELD_TYPES.SELECT,
         fieldProps: {

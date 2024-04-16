@@ -38,6 +38,7 @@ export type CreateShopField = {
 export type CreateAccountField = {
   email: string;
   password: string;
+  confirmPassword: string;
   name: string;
   gender: Gender;
   phone: string;
@@ -76,7 +77,17 @@ const CreateShop = () => {
         /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
           ? null
           : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
-      password: isNotEmpty("Password must not be empty"),
+      password: (value) => {
+        if (value == "") {
+            return "Password must not be empty";
+        }
+        let confPass = createAccountForm.values.confirmPassword;
+        if (confPass != "" && confPass != value) {
+            return "Password and confirm password are not the same"
+        }
+        return null;
+      },
+      confirmPassword: isNotEmpty("Confirm password must not be empty"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == "" ||
@@ -165,8 +176,6 @@ const CreateShop = () => {
             </Button>
           ),
           // searchable: true,
-
-          // required: true,
         },
       },
       {
@@ -267,10 +276,32 @@ const CreateShop = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form: createAccountForm,
+          name: "name",
+          placeholder: "Name",
+          label: "Name",
+          required: true,
+        },
+        spans: 12,
+      },
+
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: createAccountForm,
           name: "email",
           placeholder: "Email",
           label: "Email",
           required: true,
+        },
+        spans: 6,
+      },
+      {
+        type: FIELD_TYPES.TEXT,
+        fieldProps: {
+          form: createAccountForm,
+          name: "phone",
+          placeholder: "Phone",
+          label: "Phone"
         },
         spans: 6,
       },
@@ -290,25 +321,14 @@ const CreateShop = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form: createAccountForm,
-          name: "name",
-          placeholder: "Name",
-          label: "Name",
+          name: "confirmPassword",
+          placeholder: "Confirm password",
+          label: "Confirm password",
+          type: "password",
           required: true,
         },
         spans: 6,
       },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
-          name: "phone",
-          placeholder: "Phone",
-          label: "Phone",
-          required: true,
-        },
-        spans: 6,
-      },
-
       {
         type: FIELD_TYPES.SELECT,
         fieldProps: {
@@ -430,7 +450,7 @@ const CreateShop = () => {
                 onSuccess(data) {
                   notifications.show({
                     title: "Successfully",
-                    message: "Craete shop successfully!",
+                    message: "Create shop successfully!",
                   });
                   navigate(`/brand/shop/${data.id}`);
                 },
