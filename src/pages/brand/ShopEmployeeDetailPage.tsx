@@ -56,6 +56,7 @@ const ShopEmployeeDetailPage = () => {
     useGetIncidentList({
       size: 12,
       pageIndex: activePage - 1,
+      employeeId: params?.id
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
@@ -93,10 +94,10 @@ const ShopEmployeeDetailPage = () => {
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(updateEmployeeForm.values.province ?? 0)
+    +(updateEmployeeForm.values.province ?? 0),
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(updateEmployeeForm.values.district ?? 0)
+    +(updateEmployeeForm.values.district ?? 0),
   );
 
   const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
@@ -265,25 +266,12 @@ const ShopEmployeeDetailPage = () => {
 
   return (
     <Box pb={rem(40)}>
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        shadow="xs"
-      >
-        <Group
-          justify={"space-between"}
-          align="center"
-          pb={rem(28)}
-        >
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Group justify={"space-between"} align="center" pb={rem(28)}>
           <Group>
             <BackButton />
 
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={25}
-              c={"light-blue.4"}
-            >
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
               Employee - {employeeData?.name}
             </Text>
           </Group>
@@ -297,24 +285,12 @@ const ShopEmployeeDetailPage = () => {
         )}
       </Paper>
 
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        shadow="xs"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incidents
         </Text>
 
-        <Box
-          mt={"xl"}
-          pos={"relative"}
-        >
+        <Box mt={"xl"} pos={"relative"}>
           <LoadingOverlay
             visible={isGetIncidentListLoading}
             zIndex={1000}
@@ -353,10 +329,7 @@ const ShopEmployeeDetailPage = () => {
             </Table>
           )}
         </Box>
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}

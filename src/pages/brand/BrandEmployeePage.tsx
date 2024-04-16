@@ -51,12 +51,12 @@ const BrandEmployeePage = () => {
   };
 
   const rows = data?.values.map((row: EmployeeDetail) => (
-    <Table.Tr key={row?.id} onClick={() => navigate(`/brand/employee/${row?.id}`)}>
+    <Table.Tr
+      key={row?.id}
+      onClick={() => navigate(`/brand/employee/${row?.id}`)}
+    >
       <Table.Td>
-        <Text
-          size={rem(14)}
-          className={classes.clickable_link}
-        >
+        <Text size={rem(14)} className={classes.clickable_link}>
           {replaceIfNun(row?.name)}
         </Text>
       </Table.Td>
@@ -68,7 +68,10 @@ const BrandEmployeePage = () => {
       <Table.Td>{renderAccountStatusRow(row?.employeeStatus)}</Table.Td>
       <Table.Td>
         <Text
-          onClick={() => navigate(`/brand/shop/${row?.shop?.id}`)}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/brand/shop/${row?.shop?.id}`);
+          }}
           size={rem(14)}
           className={classes.clickable_link}
         >
@@ -79,31 +82,14 @@ const BrandEmployeePage = () => {
   ));
 
   return (
-    <Paper
-      m={rem(32)}
-      mb={0}
-      p={rem(32)}
-      pb={rem(48)}
-      shadow="xl"
-    >
-      <Group
-        pb={12}
-        justify="space-between"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+    <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
+      <Group pb={12} justify="space-between">
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Brand employee list
         </Text>
       </Group>
 
-      <Flex
-        align={"center"}
-        my={"md"}
-      >
+      <Flex align={"center"} my={"md"}>
         <TextInput
           style={{ flex: 1 }}
           placeholder="Search by anything"
@@ -173,10 +159,7 @@ const BrandEmployeePage = () => {
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         )}
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}
