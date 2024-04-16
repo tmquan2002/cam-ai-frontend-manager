@@ -1,4 +1,16 @@
-import { Box, Card, Group, Text, rem } from "@mantine/core";
+import {
+  Badge,
+  Box,
+  Card,
+  Center,
+  Flex,
+  Group,
+  Image,
+  ScrollArea,
+  Table,
+  Text,
+  rem,
+} from "@mantine/core";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,44 +20,63 @@ import {
   Title,
   Tooltip,
   Legend,
+  BarController,
+  BarElement,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
-
-import { Line } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import NoImage from "../../../../components/image/NoImage";
 import { useForm } from "@mantine/form";
 import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import dayjs from "dayjs";
 import _ from "lodash";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
+import LegendCard from "../../../../components/card/LegendCard";
+import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
+import { IncidentDetail } from "../../../../models/Incident";
+import classes from "./InteractionReportPage.module.scss";
+import cx from "clsx";
+import { useGetIncidentById } from "../../../../hooks/useGetIncidentById";
+import LoadingImage from "../../../../components/image/LoadingImage";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
-  zoomPlugin
+  zoomPlugin,
+  BarController
 );
 type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;
   interval: ReportInterval;
 };
+
 export const InteractionReportPage = () => {
+  const [scrolled, setScrolled] = useState(false);
+  const [scrolledInteractionDetail, setScrolledInteactionDetail] =
+    useState(false);
+
+  const [selectedInteractionItem, setSelectedInteractionItem] =
+    useState<IncidentDetail | null>(null);
+
+  // const {} = useGetIncidentById(selectedInteractionItem?.id ?? null)
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
       startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
-      interval: ReportInterval.HalfHour,
+      interval: ReportInterval.Hour,
     },
     validate: (values) => ({
       toDate:
@@ -95,15 +126,18 @@ export const InteractionReportPage = () => {
     isLoading: isGetIncidentReportByTimeDataLoading,
   } = useGetIncidentReportByTime(searchParams);
 
+  const { data: interactionList, isLoading: isGetInteractionListLoading } =
+    useGetIncidentList({});
+
   const data = useMemo(() => {
     if (isGetIncidentReportByTimeDataLoading) {
       return [];
     }
     return incidentReportByTimeData?.data.map((item) => {
       return {
-        time: dayjs(item.time).format("HH:mm | DD-MM"),
+        time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
-        avarageDuration: item?.averageDuration,
+        avarageDuration: item?.averageDuration ? item?.averageDuration / 60 : 0,
       };
     });
   }, [incidentReportByTimeData]);
@@ -116,6 +150,8 @@ export const InteractionReportPage = () => {
           form,
           name: "startDate",
           placeholder: "Start date",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -125,6 +161,8 @@ export const InteractionReportPage = () => {
           form,
           name: "toDate",
           placeholder: "End date",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -134,6 +172,9 @@ export const InteractionReportPage = () => {
           form,
           name: "interval",
           placeholder: "Interval",
+          fontWeight: 500,
+          radius: rem(8),
+
           data: [
             {
               value: ReportInterval.HalfHour,
@@ -162,22 +203,92 @@ export const InteractionReportPage = () => {
     ];
   }, [form]);
 
+  const rows = interactionList?.values.map((item, index) => (
+    <Table.Tr
+      key={item.startTime}
+      style={{
+        cursor: "pointer",
+      }}
+      onClick={() => setSelectedInteractionItem(item)}
+      className={
+        item?.id == selectedInteractionItem?.id
+          ? classes["selectedInteraction"]
+          : ""
+      }
+    >
+      <Table.Td>
+        <Center>
+          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            {index + 1}
+          </Text>
+        </Center>
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Center>
+          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            {item?.startTime
+              ? dayjs(item.startTime).format("HH:mm | DD-MM")
+              : "Empty"}
+          </Text>
+        </Center>
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Center>
+          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            {item?.endTime
+              ? dayjs(item.endTime).format("HH:mm | DD-MM")
+              : "Empty"}
+          </Text>
+        </Center>
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Center>
+          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            {item.evidences.length}
+          </Text>
+        </Center>
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Center>
+          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            {item.incidentType}
+          </Text>
+        </Center>
+      </Table.Td>
+    </Table.Tr>
+  ));
+
   return (
-    <Box pb={rem(40)} mx={rem(20)} mt={rem(12)}>
-      <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"} my={rem(20)}>
-        INTERACTION REPORT
+    <Flex px={rem(28)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
+      <Text
+        size={rem(26)}
+        fw={700}
+        my={rem(20)}
+        c={"light-blue.4"}
+        mb={rem(32)}
+      >
+        Interaction report
       </Text>
-      <Card shadow="xs" pb={rem(40)}>
-        <Card.Section withBorder inheritPadding mb={rem(32)}>
-          <Group justify="space-between" my={rem(20)}>
-            <Text size="lg" fw={500}>
-              Interaction count indicators
+      <Card
+        pb={rem(40)}
+        radius={8}
+        style={{
+          border: "1px solid rgb(229 231 235)",
+        }}
+      >
+        <Card.Section
+          style={{
+            borderBottom: "1px solid #ccc",
+          }}
+          bg={"#f9fafb"}
+          py={rem(16)}
+          px={rem(24)}
+        >
+          <Group justify="space-between">
+            <Text size="md" fw={600}>
+              Interaction chart
             </Text>
             <Group>
-              <Text size="md" fw={500}>
-                Filter
-              </Text>
-
               <Box miw={rem(360)}>
                 <EditAndUpdateForm fields={fields} />
               </Box>
@@ -185,67 +296,417 @@ export const InteractionReportPage = () => {
           </Group>
         </Card.Section>
 
-        {!incidentReportByTimeData ||
-        incidentReportByTimeData?.data?.length == 0 ? (
-          <NoImage />
-        ) : (
-          <Box
+        <Card.Section px={rem(12)}>
+          {!incidentReportByTimeData ||
+          incidentReportByTimeData?.data?.length == 0 ? (
+            <NoImage />
+          ) : (
+            <Box>
+              <Group justify="flex-end" mt={rem(20)} mb={rem(6)}>
+                <LegendCard
+                  type="bar"
+                  color="rgba(255, 99, 132, 1)"
+                  title="Total interaction"
+                />
+                <LegendCard
+                  type="line"
+                  color="rgb(37, 150, 190)"
+                  title="Average interaction time"
+                />
+              </Group>
+              <Flex>
+                <Box
+                  style={{
+                    width: "40px",
+                    zIndex: 999,
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <Chart
+                    type="bar"
+                    options={{
+                      maintainAspectRatio: false,
+                      responsive: true,
+                      layout: {
+                        padding: {
+                          bottom: 47,
+                        },
+                      },
+
+                      scales: {
+                        x: {
+                          ticks: {
+                            display: false,
+                          },
+                          grid: {
+                            display: false,
+                          },
+                        },
+                        y: {
+                          ticks: {
+                            padding: 10,
+                          },
+                          beginAtZero: true,
+                          afterFit: (ctx) => {
+                            ctx.width = 39;
+                          },
+                          grid: {
+                            drawTicks: false,
+                          },
+                          border: {
+                            color: "#000",
+                          },
+                        },
+                      },
+
+                      plugins: {
+                        title: {
+                          display: false,
+                        },
+                        legend: {
+                          display: false,
+                        },
+                      },
+                    }}
+                    data={{
+                      labels: data?.map((i) => i.time),
+                      datasets: [
+                        {
+                          label: "Total interactions",
+                          data: data?.map((i) => i.count),
+                          borderColor: "rgb(37, 150, 190)",
+                          backgroundColor: "rgb(37, 150, 190, 0.5)",
+                        },
+                      ],
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  style={{
+                    width: "100%",
+                    maxWidth: "100%",
+                    height: "620px",
+                    overflowX: "scroll",
+                    transform: "translateX(-9px)",
+                  }}
+                >
+                  <Box
+                    style={
+                      data && data?.length > 7
+                        ? {
+                            width: `${1500 + (data?.length - 7) * 70}px`,
+                            height: "600px",
+                          }
+                        : {
+                            height: "600px",
+                          }
+                    }
+                  >
+                    <Chart
+                      type="line"
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                          padding: {
+                            top: 17,
+                          },
+                        },
+                        scales: {
+                          y: {
+                            ticks: {
+                              display: false,
+                            },
+
+                            grid: {
+                              drawTicks: false,
+                              tickWidth: 0,
+                              tickLength: 0,
+                              tickColor: "#000",
+                            },
+
+                            border: {
+                              dash: [8, 4],
+                            },
+                          },
+                          x: {
+                            ticks: {
+                              padding: 10,
+                            },
+                            border: {
+                              color: "#000",
+                              dash: [8, 4],
+                            },
+                            beginAtZero: true,
+                            grid: {
+                              drawTicks: false,
+                            },
+                          },
+                        },
+                        plugins: {
+                          title: {
+                            display: false,
+                          },
+                          legend: {
+                            display: false,
+                          },
+                        },
+                        onClick(event, elements, chart) {
+                          if (elements.length > 0) {
+                            console.log(
+                              incidentReportByTimeData?.data?.[
+                                elements[0].index
+                              ]
+                            );
+                          }
+                        },
+                      }}
+                      data={{
+                        labels: data?.map((i) => i.time),
+
+                        datasets: [
+                          {
+                            type: "line" as const,
+                            label: "Average duration ",
+                            data: data?.map((i) => i.avarageDuration),
+                            borderColor: "rgb(37, 150, 190)",
+                            backgroundColor: "rgb(37, 150, 190, 0.5)",
+                            cubicInterpolationMode: "monotone",
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: "#fff",
+                            pointBackgroundColor: "rgb(37, 150, 190)",
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            fill: false,
+                            pointHitRadius: 7,
+                          },
+                          {
+                            type: "bar" as const,
+                            label: "Total interactions",
+                            data: data?.map((i) => i.count),
+                            borderColor: "rgb(255, 99, 132)",
+                            backgroundColor: "rgba(255, 99, 132, 0.5)",
+
+                            borderWidth: {
+                              bottom: 0,
+                              left: 2,
+                              right: 2,
+                              top: 2,
+                            },
+                            borderRadius: {
+                              topRight: 5,
+                              topLeft: 5,
+                            },
+
+                            borderSkipped: false,
+                          },
+                        ],
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Flex>
+            </Box>
+          )}
+        </Card.Section>
+      </Card>
+
+      <Group align="flex-start" mt={rem(40)}>
+        <Card
+          radius={8}
+          flex={1}
+          mb={rem(80)}
+          style={{
+            border: "1px solid rgb(229 231 235)",
+          }}
+        >
+          <Card.Section
             style={{
-              width: "100%",
-              maxWidth: "100%",
-              height: "640px",
-              overflowX: "scroll",
+              borderBottom: "1px solid #ccc",
             }}
+            bg={"#f9fafb"}
+            py={rem(16)}
+            px={rem(12)}
           >
-            <Box
-              style={
-                data && data?.length > 7
-                  ? {
-                      width: `${1500 + (data?.length - 7) * 30}px`,
-                      height: "600px",
-                    }
-                  : {
-                      height: "600px",
-                    }
+            <Group justify="space-between">
+              <Text size="md" fw={600}>
+                Interaction list
+              </Text>
+              <Group gap={rem(8)}>
+                <Text fw={500} size="sm">
+                  From
+                </Text>
+                <Badge radius={"sm"} color={"#ccc"} c={"#4b5264"} mr={rem(16)}>
+                  00:00 20-08
+                </Badge>
+                <Text fw={500} size="sm">
+                  to
+                </Text>
+                <Badge radius={"sm"} color={"#ccc"} c={"#4b5264"}>
+                  12:00 22-12
+                </Badge>
+              </Group>
+            </Group>
+          </Card.Section>
+          <Card.Section>
+            <ScrollArea.Autosize
+              mah={700}
+              onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+            >
+              <Table striped highlightOnHover withColumnBorders>
+                <Table.Thead
+                  className={cx(classes.header, {
+                    [classes.scrolled]: scrolled,
+                  })}
+                >
+                  <Table.Tr>
+                    <Table.Th py={rem(16)}>
+                      <Center>
+                        <Text
+                          size={rem(13)}
+                          lh={rem(24)}
+                          c={"rgb(55 65 81)"}
+                          fw={600}
+                        >
+                          Index
+                        </Text>
+                      </Center>
+                    </Table.Th>
+                    <Table.Th py={rem(16)}>
+                      <Center>
+                        <Text
+                          size={rem(13)}
+                          lh={rem(24)}
+                          c={"rgb(55 65 81)"}
+                          fw={600}
+                        >
+                          Start time
+                        </Text>
+                      </Center>
+                    </Table.Th>
+                    <Table.Th py={rem(16)}>
+                      <Center>
+                        <Text
+                          size={rem(13)}
+                          lh={rem(24)}
+                          c={"rgb(55 65 81)"}
+                          fw={600}
+                        >
+                          End time
+                        </Text>
+                      </Center>
+                    </Table.Th>
+                    <Table.Th py={rem(16)}>
+                      <Center>
+                        <Text
+                          size={rem(13)}
+                          lh={rem(24)}
+                          c={"rgb(55 65 81)"}
+                          fw={600}
+                        >
+                          Evidence count
+                        </Text>
+                      </Center>
+                    </Table.Th>
+                    <Table.Th py={rem(16)}>
+                      <Center>
+                        <Text
+                          size={rem(13)}
+                          lh={rem(24)}
+                          c={"rgb(55 65 81)"}
+                          fw={600}
+                        >
+                          Type
+                        </Text>
+                      </Center>
+                    </Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </ScrollArea.Autosize>
+          </Card.Section>
+        </Card>
+
+        <Card
+          h={rem(720)}
+          radius={8}
+          w={"70%"}
+          mb={rem(80)}
+          style={{
+            border: "1px solid rgb(229 231 235)",
+          }}
+        >
+          <Card.Section>
+            <ScrollArea.Autosize
+              type="scroll"
+              mah={720}
+              onScrollPositionChange={({ y }) =>
+                setScrolledInteactionDetail(y !== 0)
               }
             >
-              <Line
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                  plugins: {
-                    title: {
-                      display: true,
-                    },
-                  },
+              <Box
+                className={cx(classes.header, {
+                  [classes.scrolled]: scrolledInteractionDetail,
+                })}
+                style={{
+                  borderBottom: "1px solid #ccc",
                 }}
-                data={{
-                  labels: data?.map((i) => i.time),
-                  datasets: [
-                    {
-                      label: "Total interactions",
-                      data: data?.map((i) => i.count),
-                      borderColor: "rgb(255, 99, 132)",
-                      backgroundColor: "rgba(255, 99, 132, 0.5)",
-                    },
-                    {
-                      label: "Average duration ",
-                      data: data?.map((i) => i.avarageDuration),
-                      borderColor: "rgb(37, 150, 190)",
-                      backgroundColor: "rgb(37, 150, 190, 0.5)",
-                    },
-                  ],
-                }}
-              ></Line>
-            </Box>
-          </Box>
-        )}
-      </Card>
-    </Box>
+                bg={"#f9fafb"}
+                py={rem(16)}
+                px={rem(24)}
+              >
+                <Group justify="space-between">
+                  <Text size="md" fw={600}>
+                    Interaction detail
+                  </Text>
+                  <Group gap={rem(8)}>
+                    <Text fw={500} size="sm">
+                      Total time:
+                    </Text>
+                    <Badge radius={"sm"} color={"#ccc"} c={"#000"} mr={rem(16)}>
+                      {/* {selectedInteractionItem?.} */}1m 20s
+                    </Badge>
+                  </Group>
+                </Group>
+              </Box>
+              <Box px={rem(24)} pb={rem(40)}>
+                <Box>
+                  <Group
+                    justify="space-between"
+                    style={{
+                      borderBottom: "1px solid #e5e7eb",
+                    }}
+                    pt={rem(16)}
+                    pb={rem(8)}
+                    mb={rem(10)}
+                  >
+                    <Text
+                      c={"rgb(107 114 128"}
+                      size={rem(14)}
+                      lh={rem(24)}
+                      fw={500}
+                    >
+                      Fri, Jan 2024
+                    </Text>
+                    <Text c={"rgb(107 114 128"} size={rem(14)} lh={rem(24)}>
+                      2:30 AM - Empty
+                    </Text>
+                  </Group>
+                  <LoadingImage
+                    fit="contain"
+                    radius={"md"}
+                    imageId={
+                      selectedInteractionItem?.evidences[0].imageId ?? ""
+                    }
+                  />
+                </Box>
+              </Box>
+            </ScrollArea.Autosize>
+          </Card.Section>
+        </Card>
+      </Group>
+    </Flex>
   );
 };

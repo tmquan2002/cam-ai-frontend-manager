@@ -22,7 +22,7 @@ import JSMpeg from "@cycjimmy/jsmpeg-player";
 import { useGetNewIncident } from "../../hooks/useReport";
 import { ReadyState } from "react-use-websocket";
 import _ from "lodash";
-import { IncidentDetail } from "../../models/Incident";
+import { IncidentDetail, WebSocketIncident } from "../../models/Incident";
 import dayjs from "dayjs";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
@@ -30,6 +30,7 @@ import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 import CameraCard from "../../components/card/CameraCard";
 import { notifications } from "@mantine/notifications";
 import { EventType } from "../../models/CamAIEnum";
+import { NotificationColorPalette } from "../../types/constant";
 
 const ShopStreamPage = () => {
   const navigate = useNavigate();
@@ -46,6 +47,35 @@ const ShopStreamPage = () => {
   const { data: cameraList, isLoading: isGetCameraListLoading } =
     useGetCameraListByShopId(shopData?.values?.[0].id);
 
+  const handleUpdateNewIncident = (incident: WebSocketIncident) => {
+    switch (incident.EventType) {
+      case EventType.MoreEvidence:
+        notifications.show({
+          title: "More evidence found",
+          message: `Incident at ${dayjs(incident?.Incident.startTime).format(
+            "HH:ss"
+          )} updated`,
+          autoClose: 2000,
+          c: NotificationColorPalette.REPORT_EXPENSES,
+        });
+        const evidentIndex = _.findIndex(incidentList, (listTime) => {
+          return listTime?.id == incident?.Incident.id;
+        });
+        incidentList.splice(evidentIndex, 1, incident?.Incident);
+        break;
+      case EventType.NewIncident:
+        notifications.show({
+          title: "New incident",
+          message: `Incident at ${dayjs(incident?.Incident.startTime).format(
+            "HH:ss"
+          )} updated`,
+          autoClose: 2000,
+          c: NotificationColorPalette.UP_COMING,
+        });
+        setIncidentList([incident.Incident, ...incidentList]);
+    }
+  };
+
   useEffect(() => {
     if (!isGetCurrentIncidentListData && !currentIncidentData?.isValuesEmpty) {
       setIncidentList(currentIncidentData?.values ?? []);
@@ -56,18 +86,7 @@ const ShopStreamPage = () => {
 
   useEffect(() => {
     if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
-      notifications.show({
-        title:
-          lastJsonMessage?.EventType == EventType.MoreEvidence
-            ? "More evidence found"
-            : "New incident",
-        message:
-          lastJsonMessage?.EventType == EventType.MoreEvidence
-            ? `Incident at ${lastJsonMessage?.Incident?.startTime} updated!`
-            : `${lastJsonMessage?.Incident.incidentType} incident founded!`,
-        autoClose: 2000,
-      });
-      setIncidentList([...incidentList, lastJsonMessage.Incident]);
+      handleUpdateNewIncident(lastJsonMessage);
     }
   }, [readyState, lastJsonMessage]);
 

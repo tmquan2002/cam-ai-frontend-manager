@@ -25,7 +25,12 @@ const LoadingImage = (props: LoadingImageProps) => {
 
   if (isLoading) {
     return (
-      <Skeleton height={props?.height ?? 400} animate radius={8}></Skeleton>
+      <Skeleton
+        height={props?.height ?? 400}
+        w={props.w ?? "auto"}
+        animate
+        radius={8}
+      ></Skeleton>
     );
   }
   return (
