@@ -162,10 +162,6 @@ const TimeIncidentReport = () => {
     ];
   }, [form]);
 
-  // data?.map((i) => {
-  //   console.log(i.time);
-  // });
-
   return (
     <Skeleton visible={isGetIncidentReportByTimeDataLoading}>
       <Card shadow="md" pb={rem(40)}>

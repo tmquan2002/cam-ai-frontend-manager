@@ -58,6 +58,8 @@ const renderSelect = ({ fieldProps }: any) => {
     rightSection,
     readonly,
     rightSectionWidth,
+    fontWeight,
+    radius,
   } = fieldProps;
   if (loading) return <Loader />;
 
@@ -71,7 +73,11 @@ const renderSelect = ({ fieldProps }: any) => {
       rightSectionPointerEvents="all"
       placeholder={placeholder}
       data={data}
+      radius={radius ?? "sm"}
       rightSection={rightSection}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
       required={required}
       {...form.getInputProps(name)}
     />
@@ -117,8 +123,17 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    fontWeight,
+    radius,
+  } = fieldProps;
   return (
     <DateInput
       required={required}
@@ -126,7 +141,11 @@ const renderDate = ({ fieldProps }: any) => {
       withAsterisk={required}
       label={label}
       readOnly={readonly}
+      radius={radius ?? "sm"}
       placeholder={placeholder}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
       {...form.getInputProps(name)}
     />
   );

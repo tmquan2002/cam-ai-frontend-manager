@@ -66,3 +66,21 @@ export enum IMAGE_CONSTANT {
   NO_IMAGE = "https://cdn.dribbble.com/users/55871/screenshots/2158022/media/8f2a4a2c9126a9f265fb9e1023b1698a.jpg?resize=450x338&vertical=center",
   NO_DATA = "https://cdn.dribbble.com/users/256646/screenshots/17751098/media/768417cc4f382d6171053ad620bc3c3b.png?resize=1000x750&vertical=center",
 }
+
+export enum NotificationColorPalette {
+  IN_PROGRESS = "#9B59B6",
+  DRAFT = "#34495E",
+  REPORT_EXPENSES = "#54A0FF",
+  UP_COMING = "#30CB83",
+  UNAPPROVED = "#F1C40F",
+  SEND_BACK = "#B33771",
+  ALERT_MESSAGE = "#E74C3C",
+  WARNING = "#F39C12",
+  DEVIATIONS = "#D35400",
+}
+
+type RGB = `rgb(${number}, ${number}, ${number})`;
+type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
+type HEX = `#${string}`;
+
+export type Color = RGB | RGBA | HEX;
