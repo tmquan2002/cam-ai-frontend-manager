@@ -51,8 +51,8 @@ const BrandEmployeePage = () => {
   };
 
   const rows = data?.values.map((row: EmployeeDetail) => (
-    <Table.Tr key={row?.id}>
-      <Table.Td onClick={() => navigate(`/brand/employee/${row?.id}`)}>
+    <Table.Tr key={row?.id} onClick={() => navigate(`/brand/employee/${row?.id}`)}>
+      <Table.Td>
         <Text
           size={rem(14)}
           className={classes.clickable_link}
