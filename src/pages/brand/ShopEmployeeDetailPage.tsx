@@ -158,7 +158,6 @@ const ShopEmployeeDetailPage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
-          required: true,
           readonly: true,
         },
       },
