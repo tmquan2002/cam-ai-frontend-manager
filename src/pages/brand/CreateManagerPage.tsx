@@ -17,6 +17,7 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { useNavigate } from "react-router-dom";
+import BackButton from "../../components/button/BackButton";
 
 export type CreateAccountField = {
   email: string;
@@ -229,6 +230,7 @@ const CreateManagerPage = () => {
       m={rem(32)}
       p={rem(32)}
     >
+    <BackButton />
       <Text
         size="lg"
         fw={"bold"}

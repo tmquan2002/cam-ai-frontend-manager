@@ -35,7 +35,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
 import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
-import { mapLookupToArray } from "../../utils/helperFunction";
+import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
 import { Gender, IncidentStatus } from "../../models/CamAIEnum";
 import BackButton from "../../components/button/BackButton";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
@@ -214,6 +214,7 @@ const EmployeeDetailPage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
+          maxDate: getDateFromSetYear(18)
         },
       },
       {

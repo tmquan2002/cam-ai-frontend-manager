@@ -133,6 +133,7 @@ const renderDate = ({ fieldProps }: any) => {
     readonly,
     fontWeight,
     radius,
+    maxDate,
   } = fieldProps;
   return (
     <DateInput
@@ -143,6 +144,8 @@ const renderDate = ({ fieldProps }: any) => {
       readOnly={readonly}
       radius={radius ?? "sm"}
       placeholder={placeholder}
+      maxDate={maxDate}
+      defaultDate={new Date(2000, 0)}
       style={{
         fontWeight: fontWeight ?? 400,
       }}
