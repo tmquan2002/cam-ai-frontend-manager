@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Center,
   Flex,
@@ -56,7 +55,9 @@ const BrandEmployeePage = () => {
       <Table.Td>{replaceIfNun(row?.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.addressLine)}</Table.Td>
-      <Table.Td><EmployeeStatusBadge employeeStatus={row?.employeeStatus}/></Table.Td>
+      <Table.Td>
+        <EmployeeStatusBadge employeeStatus={row?.employeeStatus} />
+      </Table.Td>
       <Table.Td>
         <Text
           onClick={(e) => {
