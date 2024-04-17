@@ -13,7 +13,6 @@ import {
   TextInput,
   rem,
 } from "@mantine/core";
-import { EmployeeStatus } from "../../models/CamAIEnum";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useNavigate } from "react-router-dom";
 import { EmployeeDetail } from "../../models/Employee";
@@ -23,6 +22,7 @@ import { IMAGE_CONSTANT } from "../../types/constant";
 import { useState } from "react";
 import { IconSearch } from "@tabler/icons-react";
 import { useDebouncedValue } from "@mantine/hooks";
+import { EmployeeStatusBadge } from "../../components/badge/EmployeeStatusBadge";
 
 const BrandEmployeePage = () => {
   const navigate = useNavigate();
@@ -36,27 +36,18 @@ const BrandEmployeePage = () => {
     search: debounced,
   });
 
-  const renderAccountStatusRow = (status: EmployeeStatus) => {
-    switch (status) {
-      case EmployeeStatus.Active:
-        return <Badge>{status}</Badge>;
-      case EmployeeStatus.Inactive:
-        return <Badge color="gray">{status}</Badge>;
-    }
-  };
-
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
     setSearch(value);
   };
 
   const rows = data?.values.map((row: EmployeeDetail) => (
-    <Table.Tr key={row?.id}>
-      <Table.Td onClick={() => navigate(`/brand/employee/${row?.id}`)}>
-        <Text
-          size={rem(14)}
-          className={classes.clickable_link}
-        >
+    <Table.Tr
+      key={row?.id}
+      onClick={() => navigate(`/brand/employee/${row?.id}`)}
+    >
+      <Table.Td>
+        <Text size={rem(14)} className={classes.clickable_link}>
           {replaceIfNun(row?.name)}
         </Text>
       </Table.Td>
@@ -65,10 +56,13 @@ const BrandEmployeePage = () => {
       <Table.Td>{replaceIfNun(row?.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.addressLine)}</Table.Td>
-      <Table.Td>{renderAccountStatusRow(row?.employeeStatus)}</Table.Td>
+      <Table.Td><EmployeeStatusBadge employeeStatus={row?.employeeStatus}/></Table.Td>
       <Table.Td>
         <Text
-          onClick={() => navigate(`/brand/shop/${row?.shop?.id}`)}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/brand/shop/${row?.shop?.id}`);
+          }}
           size={rem(14)}
           className={classes.clickable_link}
         >
@@ -79,31 +73,14 @@ const BrandEmployeePage = () => {
   ));
 
   return (
-    <Paper
-      m={rem(32)}
-      mb={0}
-      p={rem(32)}
-      pb={rem(48)}
-      shadow="xl"
-    >
-      <Group
-        pb={12}
-        justify="space-between"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+    <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
+      <Group pb={12} justify="space-between">
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Brand employee list
         </Text>
       </Group>
 
-      <Flex
-        align={"center"}
-        my={"md"}
-      >
+      <Flex align={"center"} my={"md"}>
         <TextInput
           style={{ flex: 1 }}
           placeholder="Search by anything"
@@ -173,10 +150,7 @@ const BrandEmployeePage = () => {
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         )}
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}

@@ -2,8 +2,8 @@ import {
   IconGauge,
   IconPresentationAnalytics,
   IconFileAnalytics,
-  IconLock,
   IconExclamationCircle,
+  IconMan,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
@@ -14,12 +14,17 @@ const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
 
   {
-    label: "Detail",
+    label: "Your Shop",
     icon: IconPresentationAnalytics,
     path: "/shop/detail",
   },
   {
-    label: "Incident & Interaction",
+    label: "Employees",
+    icon: IconMan,
+    path: "/shop/employee" ,
+  },
+  {
+    label: "Incidents & Interactions",
     icon: IconExclamationCircle,
     links: [
       {
@@ -38,20 +43,12 @@ const mockdata = [
     path: "/shop/stream",
   },
   {
-    label: "Report",
+    label: "Reports",
     icon: IconFileAnalytics,
     links: [
       { label: "Employee count", link: "/shop/report/count/employee" },
       { label: "Incident", link: "/shop/report/incident" },
       { label: "Interaction", link: "/shop/report/interaction" },
-    ],
-  },
-  {
-    label: "Employee",
-    icon: IconLock,
-    links: [
-      { label: "Create", link: "/shop/employee/create" },
-      { label: "Employee", link: "/shop/employee" },
     ],
   },
 ];

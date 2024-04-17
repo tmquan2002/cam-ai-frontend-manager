@@ -56,12 +56,12 @@ const BrandAccountPage = () => {
   };
 
   const rows = data?.values.map((row: AccountDetail) => (
-    <Table.Tr key={row?.id}>
-      <Table.Td onClick={() => navigate(`/brand/account/${row?.id}`)}>
-        <Text
-          size={rem(14)}
-          className={classes.clickable_link}
-        >
+    <Table.Tr
+      key={row?.id}
+      onClick={() => navigate(`/brand/account/${row?.id}`)}
+    >
+      <Table.Td>
+        <Text size={rem(14)} className={classes.clickable_link}>
           {replaceIfNun(row?.name)}
         </Text>
       </Table.Td>
@@ -83,31 +83,14 @@ const BrandAccountPage = () => {
     </Table.Tr>
   ));
   return (
-    <Paper
-      m={rem(32)}
-      mb={0}
-      p={rem(32)}
-      pb={rem(48)}
-      shadow="xl"
-    >
-      <Group
-        pb={12}
-        justify="space-between"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+    <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
+      <Group pb={12} justify="space-between">
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Shop manager list
         </Text>
       </Group>
 
-      <Flex
-        align={"center"}
-        my={"md"}
-      >
+      <Flex align={"center"} my={"md"}>
         <TextInput
           style={{ flex: 1 }}
           placeholder="Search by name"
@@ -124,11 +107,9 @@ const BrandAccountPage = () => {
           onChange={handleSearchChange}
         />
         <Button
+          ml={rem(24)}
           leftSection={<IconPlus size={14} />}
-          ml={rem(12)}
-          radius={"xl"}
           onClick={() => navigate("/brand/create/manager")}
-          h={rem(48)}
         >
           Add manager
         </Button>
@@ -176,10 +157,7 @@ const BrandAccountPage = () => {
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         )}
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}

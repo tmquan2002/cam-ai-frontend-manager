@@ -66,7 +66,7 @@ const ShopListPage = () => {
   const [search, setSearch] = useState<string | number>("");
   const [debounced] = useDebouncedValue(search, 400);
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
-    SearchCategory.NAME
+    SearchCategory.NAME,
   );
 
   const searchParams: GetShopListHookParams = useMemo(() => {
@@ -182,7 +182,7 @@ const ShopListPage = () => {
   };
 
   return (
-    <Paper p={rem(32)} shadow="xs">
+    <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
         Shop list
       </Text>
@@ -232,13 +232,9 @@ const ShopListPage = () => {
         </Button>
         <Button
           leftSection={<IconPlus size={14} />}
-          variant="outline"
-          h={rem(48)}
           onClick={() => {
             navigate("/brand/create/shop");
           }}
-          ml={rem(12)}
-          radius={"20%/50%"}
         >
           Add shop
         </Button>
@@ -273,11 +269,11 @@ const ShopListPage = () => {
           </Center>
         ) : (
           <Table
-            striped
+            miw={1000}
             highlightOnHover
-            withTableBorder
-            withColumnBorders
             verticalSpacing={"md"}
+            striped
+            withTableBorder
           >
             <Table.Thead>
               <Table.Tr>
