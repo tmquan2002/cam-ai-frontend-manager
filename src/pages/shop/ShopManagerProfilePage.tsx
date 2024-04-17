@@ -159,7 +159,7 @@ const ShopManagerProfilePage = () => {
         shop: account?.managingShop?.name,
         district: account?.ward?.districtId.toString(),
         province: account?.ward?.district?.provinceId.toString(),
-        wardId: account?.wardId.toString(),
+        wardId: account?.wardId?.toString(),
       });
       form.reset();
     }

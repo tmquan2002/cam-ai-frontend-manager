@@ -235,13 +235,15 @@ const AccountDetailPage = () => {
 
   return (
     <Paper m={rem(32)} p={rem(32)} style={{ flex: 1 }} shadow="xs">
-      <Group mb={rem(20)} align="center">
-        <BackButton />
-        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Manager profile - {accountData?.name}
-        </Text>
+      <Group mb={rem(20)} align="center" justify={"space-between"}>
+        <Group>
+          <BackButton />
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+            Manager profile - {accountData?.name}
+          </Text>
+        </Group>
 
-        {accountData?.accountStatus === AccountStatus.Active && (
+        {accountData?.accountStatus != AccountStatus.Inactive && (
           <ActionIcon color="red" onClick={open} size={"lg"}>
             <IconTrash style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>

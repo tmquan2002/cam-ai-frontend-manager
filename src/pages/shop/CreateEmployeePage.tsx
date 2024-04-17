@@ -15,6 +15,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
+import { getDateFromSetYear } from "../../utils/helperFunction";
 import dayjs from "dayjs";
 import _ from "lodash";
 
@@ -104,6 +105,7 @@ const CreateEmployeePage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
+          maxDate: getDateFromSetYear(18)
         },
       },
       {

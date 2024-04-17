@@ -6,7 +6,6 @@ import {
   Button,
   Center,
   Collapse,
-  Divider,
   Flex,
   Group,
   Image,
@@ -15,7 +14,6 @@ import {
   LoadingOverlay,
   Paper,
   ScrollArea,
-  SimpleGrid,
   Skeleton,
   Stack,
   Table,
@@ -57,8 +55,6 @@ import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
 import {
   CameraStatus,
   EdgeBoxActivationStatus,
-  EdgeBoxLocation,
-  EdgeBoxStatus,
   EdgeboxInstallStatus,
   ShopStatus,
 } from "../../models/CamAIEnum";
@@ -68,11 +64,12 @@ import { useDisclosure } from "@mantine/hooks";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 import BackButton from "../../components/button/BackButton";
-import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 import { IconAlertCircle } from "@tabler/icons-react";
 import NoImage from "../../components/image/NoImage";
+import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
+import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 
 export type FormFieldValue = {
   name: string;
@@ -88,217 +85,6 @@ export type FormFieldValue = {
 
 export type ActivationFormValue = {
   activationCode: string;
-};
-
-const renderEdgeBoxActivationStatusBadge = (
-  status: EdgeBoxActivationStatus | undefined,
-) => {
-  switch (status) {
-    case EdgeBoxActivationStatus.Activated:
-      return <Badge color="green">{EdgeBoxActivationStatus.Activated}</Badge>;
-    case EdgeBoxActivationStatus.Pending:
-      return <Badge color={"orange"}>{EdgeBoxActivationStatus.Pending}</Badge>;
-    case EdgeBoxActivationStatus.NotActivated:
-      return <Badge color={"gray"}>INACTIVE</Badge>;
-    case EdgeBoxActivationStatus.Failed:
-      return <Badge color={"red"}>{EdgeBoxActivationStatus.Failed}</Badge>;
-    case undefined:
-      return <Badge>Empty</Badge>;
-  }
-};
-
-const renderEdgeboxStatusBadge = (status: EdgeBoxStatus | undefined) => {
-  switch (status) {
-    case EdgeBoxStatus.Active:
-      return <Badge color="green">{EdgeBoxStatus.Active}</Badge>;
-    case EdgeBoxStatus.Broken:
-      return <Badge color={"orange"}>{EdgeBoxStatus.Broken}</Badge>;
-    case EdgeBoxStatus.Inactive:
-      return <Badge color={"red"}>{EdgeBoxStatus.Inactive}</Badge>;
-    case EdgeBoxStatus.Disposed:
-      return <Badge color={"gray"}>{EdgeBoxStatus.Disposed}</Badge>;
-    case undefined:
-      return <Badge>Empty</Badge>;
-  }
-};
-
-const renderEdgeboxInstallStatusBadge = (
-  status: EdgeboxInstallStatus | undefined,
-) => {
-  switch (status) {
-    case EdgeboxInstallStatus.Working:
-      return <Badge color="green">{EdgeboxInstallStatus.Working}</Badge>;
-    case EdgeboxInstallStatus.Unhealthy:
-      return <Badge color={"yellow"}>{EdgeboxInstallStatus.Unhealthy}</Badge>;
-    case EdgeboxInstallStatus.Disabled:
-      return <Badge color={"gray"}>{EdgeboxInstallStatus.Disabled}</Badge>;
-    case EdgeboxInstallStatus.New:
-      return <Badge color={"blue"}>{EdgeboxInstallStatus.New}</Badge>;
-    case EdgeboxInstallStatus.Connected:
-      return <Badge color={"teal"}>{EdgeboxInstallStatus.Connected}</Badge>;
-    case undefined:
-      return <Badge>Empty</Badge>;
-  }
-};
-
-const renderEdgeboxLocationBadge = (location: EdgeBoxLocation | undefined) => {
-  switch (location) {
-    case EdgeBoxLocation.Disposed:
-      return <Badge color="teal">{EdgeBoxLocation.Disposed}</Badge>;
-    case EdgeBoxLocation.Idle:
-      return <Badge color={"blue"}>{EdgeBoxLocation.Idle}</Badge>;
-    case EdgeBoxLocation.Installing:
-      return <Badge color={"yellow"}>{EdgeBoxLocation.Installing}</Badge>;
-    case EdgeBoxLocation.Occupied:
-      return <Badge color={"green"}>{EdgeBoxLocation.Occupied}</Badge>;
-    case EdgeBoxLocation.Uninstalling:
-      return <Badge color={"orange"}>{EdgeBoxLocation.Uninstalling}</Badge>;
-    case undefined:
-      return <Badge>Empty</Badge>;
-  }
-};
-
-const renderEdgeboxList = (
-  edgeBoxInstallList: EdgeBoxInstallDetail[] | undefined,
-) => {
-  if (edgeBoxInstallList && edgeBoxInstallList.length > 0) {
-    return edgeBoxInstallList?.[0]?.edgeBoxInstallStatus ==
-      EdgeboxInstallStatus.Disabled ? (
-      <></>
-    ) : (
-      <Flex>
-        <Image
-          radius={"md"}
-          src={
-            "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
-          }
-        />
-        <Box ml={rem(40)} style={{ flex: 1 }}>
-          <Group gap={rem(40)}>
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Name
-              </Text>
-              <Text fw={500}>{edgeBoxInstallList?.[0].edgeBox.name}</Text>
-            </Box>
-
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Edgebox status
-              </Text>
-              {renderEdgeboxStatusBadge(
-                edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxStatus,
-              )}
-            </Box>
-
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Edgebox location
-              </Text>
-              {renderEdgeboxLocationBadge(
-                edgeBoxInstallList?.[0].edgeBox.edgeBoxLocation,
-              )}
-            </Box>
-
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Activation status
-              </Text>
-              {renderEdgeBoxActivationStatusBadge(
-                edgeBoxInstallList?.[0].activationStatus,
-              )}
-            </Box>
-
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Install status
-              </Text>
-              {renderEdgeboxInstallStatusBadge(
-                edgeBoxInstallList?.[0].edgeBoxInstallStatus,
-              )}
-            </Box>
-          </Group>
-          <Divider my={rem(20)} />
-          <Group>
-            <Text miw={rem(120)} fw={600}>
-              Description :
-            </Text>
-            <Text>
-              {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.description}
-            </Text>
-          </Group>
-          <Divider my={rem(20)} />
-          <SimpleGrid cols={2}>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Model name :
-              </Text>
-              <Text>
-                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.name}
-              </Text>
-            </Group>
-
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Model code :
-              </Text>
-              <Text>
-                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.modelCode}
-              </Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Manufacturer :
-              </Text>
-              <Text>
-                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.manufacturer}
-              </Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                CPU :
-              </Text>
-              <Text>{edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.cpu}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                RAM :
-              </Text>
-              <Text>{edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.ram}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Storage :
-              </Text>
-              <Text>
-                {edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.storage}
-              </Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                OS :
-              </Text>
-              <Text>{edgeBoxInstallList?.[0]?.edgeBox?.edgeBoxModel?.os}</Text>
-            </Group>
-          </SimpleGrid>
-        </Box>
-      </Flex>
-    );
-  }
-
-  return (
-    <Flex>
-      <Image
-        radius={"md"}
-        src={
-          "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
-        }
-      />
-      <Box ml={rem(40)} style={{ flex: 1 }}>
-        <Text>No edgebox available</Text>
-      </Box>
-    </Flex>
-  );
 };
 
 const ShopDetailPageManager = () => {
@@ -652,6 +438,10 @@ const ShopDetailPageManager = () => {
     isWardsLoading,
   ]);
 
+  let edgeBoxInstall = edgeBoxInstallList?.values.find(
+    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled,
+  );
+
   return (
     <Box pb={20}>
       <Paper p={rem(32)} m={rem(32)} shadow="xs" pos="relative">
@@ -898,26 +688,35 @@ const ShopDetailPageManager = () => {
               Edge box
             </Text>
           </Group>
-          <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
-            <Group pb={rem(28)}>
-              <Input
-                style={{
-                  flex: 1,
-                }}
-                {...activationForm.getInputProps("activationCode")}
-                placeholder="Enter an activation code here"
-              />
-              <Button
-                type="submit"
-                loading={isActiveEdgeBoxLoading}
-                disabled={!activationForm.isDirty()}
-              >
-                Confirm
-              </Button>
-            </Group>
-          </form>
 
-          {renderEdgeboxList(edgeBoxInstallList?.values)}
+          {edgeBoxInstall ? (
+            <>
+              {edgeBoxInstall.activationStatus !=
+                EdgeBoxActivationStatus.Activated && (
+                <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
+                  <Group pb={rem(28)}>
+                    <Input
+                      style={{
+                        flex: 1,
+                      }}
+                      {...activationForm.getInputProps("activationCode")}
+                      placeholder="Enter an activation code here"
+                    />
+                    <Button
+                      type="submit"
+                      loading={isActiveEdgeBoxLoading}
+                      disabled={!activationForm.isDirty()}
+                    >
+                      Confirm
+                    </Button>
+                  </Group>
+                </form>
+              )}
+              <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
+            </>
+          ) : (
+            <EdgeBoxInstallEmpty />
+          )}
         </Paper>
       </Skeleton>
     </Box>
