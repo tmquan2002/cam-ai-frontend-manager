@@ -3,7 +3,12 @@ import { CommonResponse } from "../models/Common";
 import { GetIncidentParams, IncidentApi } from "../apis/IncidentAPI";
 import { IncidentDetail } from "../models/Incident";
 
-export const useGetIncidentList = (params: GetIncidentParams) => {
+export const useGetIncidentList = ({
+  enabled,
+  ...rest
+}: GetIncidentParams & {
+  enabled?: boolean;
+}) => {
   const {
     isError,
     isLoading,
@@ -11,9 +16,10 @@ export const useGetIncidentList = (params: GetIncidentParams) => {
     error,
     refetch,
   }: UseQueryResult<CommonResponse<IncidentDetail>, Error> = useQuery({
-    queryKey: ["incidents", params],
+    queryKey: ["incidents", rest],
+    enabled: enabled ?? true,
     queryFn: async () => {
-      return await IncidentApi._getIncidentList(params);
+      return await IncidentApi._getIncidentList(rest);
     },
   });
 

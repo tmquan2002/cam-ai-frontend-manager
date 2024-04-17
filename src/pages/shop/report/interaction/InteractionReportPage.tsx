@@ -5,10 +5,11 @@ import {
   Center,
   Flex,
   Group,
-  Image,
   ScrollArea,
+  Skeleton,
   Table,
   Text,
+  Transition,
   rem,
 } from "@mantine/core";
 import {
@@ -29,8 +30,9 @@ import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import NoImage from "../../../../components/image/NoImage";
 import { useForm } from "@mantine/form";
 import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
+import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import _ from "lodash";
 import EditAndUpdateForm, {
   FIELD_TYPES,
@@ -41,8 +43,10 @@ import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
 import { IncidentDetail } from "../../../../models/Incident";
 import classes from "./InteractionReportPage.module.scss";
 import cx from "clsx";
-import { useGetIncidentById } from "../../../../hooks/useGetIncidentById";
 import LoadingImage from "../../../../components/image/LoadingImage";
+import { useScrollIntoView } from "@mantine/hooks";
+import { diffentDateReturnFormatedString } from "../../../../utils/helperFunction";
+dayjs.extend(LocalizedFormat);
 
 ChartJS.register(
   CategoryScale,
@@ -63,14 +67,20 @@ type SearchIncidentField = {
 };
 
 export const InteractionReportPage = () => {
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
+    offset: 60,
+  });
   const [scrolled, setScrolled] = useState(false);
   const [scrolledInteractionDetail, setScrolledInteactionDetail] =
     useState(false);
+  const [selectedDuration, setSelectedDuration] = useState<{
+    startTime: string;
+    endTime: string;
+  } | null>(null);
 
   const [selectedInteractionItem, setSelectedInteractionItem] =
     useState<IncidentDetail | null>(null);
 
-  // const {} = useGetIncidentById(selectedInteractionItem?.id ?? null)
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
@@ -127,7 +137,12 @@ export const InteractionReportPage = () => {
   } = useGetIncidentReportByTime(searchParams);
 
   const { data: interactionList, isLoading: isGetInteractionListLoading } =
-    useGetIncidentList({});
+    useGetIncidentList({
+      enabled: !!selectedDuration,
+      fromTime: selectedDuration?.startTime,
+      toTime: selectedDuration?.endTime,
+      incidentType: IncidentType.Interaction,
+    });
 
   const data = useMemo(() => {
     if (isGetIncidentReportByTimeDataLoading) {
@@ -203,60 +218,87 @@ export const InteractionReportPage = () => {
     ];
   }, [form]);
 
-  const rows = interactionList?.values.map((item, index) => (
-    <Table.Tr
-      key={item.startTime}
-      style={{
-        cursor: "pointer",
-      }}
-      onClick={() => setSelectedInteractionItem(item)}
-      className={
-        item?.id == selectedInteractionItem?.id
-          ? classes["selectedInteraction"]
-          : ""
-      }
-    >
+  const rows = isGetInteractionListLoading ? (
+    <Table.Tr>
       <Table.Td>
-        <Center>
-          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-            {index + 1}
-          </Text>
-        </Center>
+        <Skeleton w={"100%"} h={rem(40)} />
       </Table.Td>
       <Table.Td py={rem(18)}>
-        <Center>
-          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-            {item?.startTime
-              ? dayjs(item.startTime).format("HH:mm | DD-MM")
-              : "Empty"}
-          </Text>
-        </Center>
+        <Skeleton w={"100%"} h={rem(40)} />
       </Table.Td>
       <Table.Td py={rem(18)}>
-        <Center>
-          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-            {item?.endTime
-              ? dayjs(item.endTime).format("HH:mm | DD-MM")
-              : "Empty"}
-          </Text>
-        </Center>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
       </Table.Td>
       <Table.Td py={rem(18)}>
-        <Center>
-          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-            {item.evidences.length}
-          </Text>
-        </Center>
-      </Table.Td>
-      <Table.Td py={rem(18)}>
-        <Center>
-          <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-            {item.incidentType}
-          </Text>
-        </Center>
+        <Skeleton w={"100%"} h={rem(40)} />
       </Table.Td>
     </Table.Tr>
-  ));
+  ) : (
+    interactionList?.values.map((item, index) => (
+      <Table.Tr
+        key={item.startTime}
+        style={{
+          cursor: "pointer",
+        }}
+        onClick={() => setSelectedInteractionItem(item)}
+        className={
+          item?.id == selectedInteractionItem?.id
+            ? classes["selectedInteraction"]
+            : ""
+        }
+      >
+        <Table.Td>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {index + 1}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.startTime
+                ? dayjs(item.startTime).format("HH:mm | DD-MM")
+                : "Empty"}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.endTime
+                ? dayjs(item.endTime).format("HH:mm | DD-MM")
+                : "Empty"}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item.evidences.length}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item.incidentType}
+            </Text>
+          </Center>
+        </Table.Td>
+      </Table.Tr>
+    ))
+  );
+
+  useEffect(() => {
+    if (interactionList) {
+      scrollIntoView({});
+    }
+  }, [interactionList]);
 
   return (
     <Flex px={rem(28)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
@@ -452,13 +494,19 @@ export const InteractionReportPage = () => {
                             display: false,
                           },
                         },
-                        onClick(event, elements, chart) {
+                        onClick(_event, elements, _chart) {
                           if (elements.length > 0) {
-                            console.log(
+                            const selectedData =
                               incidentReportByTimeData?.data?.[
                                 elements[0].index
-                              ]
-                            );
+                              ];
+                            setSelectedInteractionItem(null);
+                            setSelectedDuration({
+                              startTime: selectedData?.time,
+                              endTime: dayjs(selectedData?.time)
+                                .add(1, "hour")
+                                .format("YYYY-MM-DDTHH:mm:ss"),
+                            });
                           }
                         },
                       }}
@@ -513,199 +561,233 @@ export const InteractionReportPage = () => {
       </Card>
 
       <Group align="flex-start" mt={rem(40)}>
-        <Card
-          radius={8}
-          flex={1}
-          mb={rem(80)}
-          style={{
-            border: "1px solid rgb(229 231 235)",
-          }}
-        >
-          <Card.Section
-            style={{
-              borderBottom: "1px solid #ccc",
-            }}
-            bg={"#f9fafb"}
-            py={rem(16)}
-            px={rem(12)}
+        {interactionList || isGetInteractionListLoading ? (
+          <Card
+            radius={8}
+            w={selectedInteractionItem ? "30%" : "100%"}
+            mb={rem(80)}
+            className={classes["transition"]}
+            ref={targetRef}
           >
-            <Group justify="space-between">
-              <Text size="md" fw={600}>
-                Interaction list
-              </Text>
-              <Group gap={rem(8)}>
-                <Text fw={500} size="sm">
-                  From
-                </Text>
-                <Badge radius={"sm"} color={"#ccc"} c={"#4b5264"} mr={rem(16)}>
-                  00:00 20-08
-                </Badge>
-                <Text fw={500} size="sm">
-                  to
-                </Text>
-                <Badge radius={"sm"} color={"#ccc"} c={"#4b5264"}>
-                  12:00 22-12
-                </Badge>
-              </Group>
-            </Group>
-          </Card.Section>
-          <Card.Section>
-            <ScrollArea.Autosize
-              mah={700}
-              onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+            <Card.Section
+              style={{
+                borderBottom: "1px solid #ccc",
+              }}
+              bg={"#f9fafb"}
+              py={rem(16)}
+              px={rem(12)}
             >
-              <Table striped highlightOnHover withColumnBorders>
-                <Table.Thead
-                  className={cx(classes.header, {
-                    [classes.scrolled]: scrolled,
-                  })}
-                >
-                  <Table.Tr>
-                    <Table.Th py={rem(16)}>
-                      <Center>
-                        <Text
-                          size={rem(13)}
-                          lh={rem(24)}
-                          c={"rgb(55 65 81)"}
-                          fw={600}
-                        >
-                          Index
-                        </Text>
-                      </Center>
-                    </Table.Th>
-                    <Table.Th py={rem(16)}>
-                      <Center>
-                        <Text
-                          size={rem(13)}
-                          lh={rem(24)}
-                          c={"rgb(55 65 81)"}
-                          fw={600}
-                        >
-                          Start time
-                        </Text>
-                      </Center>
-                    </Table.Th>
-                    <Table.Th py={rem(16)}>
-                      <Center>
-                        <Text
-                          size={rem(13)}
-                          lh={rem(24)}
-                          c={"rgb(55 65 81)"}
-                          fw={600}
-                        >
-                          End time
-                        </Text>
-                      </Center>
-                    </Table.Th>
-                    <Table.Th py={rem(16)}>
-                      <Center>
-                        <Text
-                          size={rem(13)}
-                          lh={rem(24)}
-                          c={"rgb(55 65 81)"}
-                          fw={600}
-                        >
-                          Evidence count
-                        </Text>
-                      </Center>
-                    </Table.Th>
-                    <Table.Th py={rem(16)}>
-                      <Center>
-                        <Text
-                          size={rem(13)}
-                          lh={rem(24)}
-                          c={"rgb(55 65 81)"}
-                          fw={600}
-                        >
-                          Type
-                        </Text>
-                      </Center>
-                    </Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            </ScrollArea.Autosize>
-          </Card.Section>
-        </Card>
-
-        <Card
-          h={rem(720)}
-          radius={8}
-          w={"70%"}
-          mb={rem(80)}
-          style={{
-            border: "1px solid rgb(229 231 235)",
-          }}
-        >
-          <Card.Section>
-            <ScrollArea.Autosize
-              type="scroll"
-              mah={720}
-              onScrollPositionChange={({ y }) =>
-                setScrolledInteactionDetail(y !== 0)
-              }
-            >
-              <Box
-                className={cx(classes.header, {
-                  [classes.scrolled]: scrolledInteractionDetail,
-                })}
-                style={{
-                  borderBottom: "1px solid #ccc",
-                }}
-                bg={"#f9fafb"}
-                py={rem(16)}
-                px={rem(24)}
-              >
-                <Group justify="space-between">
-                  <Text size="md" fw={600}>
-                    Interaction detail
+              <Group justify="space-between">
+                <Text size="md" fw={600}>
+                  Interaction list
+                </Text>
+                <Group gap={rem(8)}>
+                  <Text fw={500} size="sm">
+                    From
                   </Text>
-                  <Group gap={rem(8)}>
-                    <Text fw={500} size="sm">
-                      Total time:
-                    </Text>
-                    <Badge radius={"sm"} color={"#ccc"} c={"#000"} mr={rem(16)}>
-                      {/* {selectedInteractionItem?.} */}1m 20s
-                    </Badge>
-                  </Group>
-                </Group>
-              </Box>
-              <Box px={rem(24)} pb={rem(40)}>
-                <Box>
-                  <Group
-                    justify="space-between"
-                    style={{
-                      borderBottom: "1px solid #e5e7eb",
-                    }}
-                    pt={rem(16)}
-                    pb={rem(8)}
-                    mb={rem(10)}
+                  <Badge
+                    radius={"sm"}
+                    color={"#ccc"}
+                    c={"#4b5264"}
+                    mr={rem(16)}
                   >
-                    <Text
-                      c={"rgb(107 114 128"}
-                      size={rem(14)}
-                      lh={rem(24)}
-                      fw={500}
-                    >
-                      Fri, Jan 2024
-                    </Text>
-                    <Text c={"rgb(107 114 128"} size={rem(14)} lh={rem(24)}>
-                      2:30 AM - Empty
-                    </Text>
-                  </Group>
-                  <LoadingImage
-                    fit="contain"
-                    radius={"md"}
-                    imageId={
-                      selectedInteractionItem?.evidences[0].imageId ?? ""
-                    }
-                  />
-                </Box>
-              </Box>
-            </ScrollArea.Autosize>
-          </Card.Section>
-        </Card>
+                    {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
+                  </Badge>
+                  <Text fw={500} size="sm">
+                    to
+                  </Text>
+                  <Badge radius={"sm"} color={"#ccc"} c={"#4b5264"}>
+                    {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
+                  </Badge>
+                </Group>
+              </Group>
+            </Card.Section>
+            <Card.Section>
+              <ScrollArea.Autosize
+                mah={700}
+                onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
+              >
+                <Table striped highlightOnHover withColumnBorders>
+                  <Table.Thead
+                    className={cx(classes.header, {
+                      [classes.scrolled]: scrolled,
+                    })}
+                  >
+                    <Table.Tr>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Index
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Start time
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            End time
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Evidence count
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Type
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{rows}</Table.Tbody>
+                </Table>
+              </ScrollArea.Autosize>
+            </Card.Section>
+          </Card>
+        ) : (
+          <></>
+        )}
+
+        <Transition
+          mounted={!!selectedInteractionItem}
+          transition="slide-left"
+          duration={1200}
+          timingFunction="ease"
+          exitDuration={0}
+        >
+          {(styles) => (
+            <Card
+              h={rem(720)}
+              radius={8}
+              flex={1}
+              mb={rem(80)}
+              style={{
+                ...styles,
+                border: "1px solid rgb(229 231 235)",
+              }}
+            >
+              <Card.Section>
+                <ScrollArea.Autosize
+                  type="scroll"
+                  mah={720}
+                  onScrollPositionChange={({ y }) =>
+                    setScrolledInteactionDetail(y !== 0)
+                  }
+                >
+                  <Box
+                    className={cx(classes.header, {
+                      [classes.scrolled]: scrolledInteractionDetail,
+                    })}
+                    style={{
+                      borderBottom: "1px solid #ccc",
+                    }}
+                    bg={"#f9fafb"}
+                    py={rem(16)}
+                    px={rem(24)}
+                  >
+                    <Group justify="space-between">
+                      <Text size="md" fw={600}>
+                        Interaction detail
+                      </Text>
+                      <Group gap={rem(8)}>
+                        <Text fw={500} size="sm">
+                          Total time:
+                        </Text>
+                        <Badge
+                          radius={"sm"}
+                          color={"#ccc"}
+                          c={"#000"}
+                          mr={rem(16)}
+                        >
+                          {selectedInteractionItem?.startTime &&
+                          selectedInteractionItem.endTime
+                            ? diffentDateReturnFormatedString(
+                                selectedInteractionItem?.startTime,
+                                selectedInteractionItem?.endTime
+                              )
+                            : "undefined"}
+                        </Badge>
+                      </Group>
+                    </Group>
+                  </Box>
+                  <Box px={rem(24)} pb={rem(40)}>
+                    <Box>
+                      <Group
+                        justify="space-between"
+                        style={{
+                          borderBottom: "1px solid #e5e7eb",
+                        }}
+                        pt={rem(16)}
+                        pb={rem(8)}
+                        mb={rem(10)}
+                      >
+                        <Text
+                          c={"rgb(107 114 128"}
+                          size={rem(14)}
+                          lh={rem(24)}
+                          fw={500}
+                        >
+                          {dayjs(
+                            selectedInteractionItem?.evidences?.[0]?.createdDate
+                          ).format("LL")}
+                        </Text>
+                        <Text c={"rgb(107 114 128"} size={rem(14)} lh={rem(24)}>
+                          {dayjs(
+                            selectedInteractionItem?.evidences?.[0]?.createdDate
+                          ).format("HH:mm A")}
+                        </Text>
+                      </Group>
+                      <LoadingImage
+                        fit="contain"
+                        radius={"md"}
+                        imageId={
+                          selectedInteractionItem?.evidences?.[0]?.imageId ?? ""
+                        }
+                      />
+                    </Box>
+                  </Box>
+                </ScrollArea.Autosize>
+              </Card.Section>
+            </Card>
+          )}
+        </Transition>
       </Group>
     </Flex>
   );

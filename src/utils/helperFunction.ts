@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export function isEmpty(value: string | null | undefined) {
   return (
     value == null || (typeof value === "string" && value.trim().length === 0)
@@ -117,3 +119,25 @@ export function getDateFromSetYear(yearLength: number) {
     today.getDate()
   );
 }
+
+export const diffentDateReturnFormatedString = (
+  firstDate: string,
+  secondDate: string
+) => {
+  const date1 = dayjs(firstDate);
+  const date2 = dayjs(secondDate);
+  const diffInSeconds = date2.diff(date1, "seconds");
+  console.log({ date1 }, { date2 }, { diffInSeconds });
+
+  const hours = Math.floor(diffInSeconds / 3600);
+  const minutes = Math.floor((diffInSeconds / 60) % 60);
+  const seconds = Math.floor(diffInSeconds % 60);
+
+  const hourString = hours == 0 ? "" : `${hours} hour${hours > 1 ? "s" : ""} `;
+  const minuteString =
+    minutes == 0 ? "" : `${minutes} minute${minutes > 1 ? "s" : ""} `;
+  const secondString =
+    seconds == 0 ? "" : `${seconds} second${seconds > 1 ? "s" : ""}`;
+
+  return hourString + minuteString + secondString;
+};
