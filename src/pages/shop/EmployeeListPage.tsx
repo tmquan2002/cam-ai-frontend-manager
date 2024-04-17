@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Group,
   Loader,
@@ -14,6 +13,7 @@ import { replaceIfNun } from "../../utils/helperFunction";
 import { useNavigate } from "react-router-dom";
 import _ from "lodash";
 import { IconPlus } from "@tabler/icons-react";
+import { EmployeeStatusBadge } from "../../components/badge/EmployeeStatusBadge";
 
 const EmployeeListPage = () => {
   const navigate = useNavigate();
@@ -36,39 +36,15 @@ const EmployeeListPage = () => {
       <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
       <Table.Td>
-        {_.isEqual(row.employeeStatus, "Active") ? (
-          <Badge variant="light">Active</Badge>
-        ) : (
-          <Badge
-            color="gray"
-            variant="light"
-          >
-            Disabled
-          </Badge>
-        )}
+        <EmployeeStatusBadge employeeStatus={row.employeeStatus} />
       </Table.Td>
     </Table.Tr>
   ));
 
   return (
-    <Paper
-      shadow="xs"
-      p={"xs"}
-      m={rem(32)}
-      px={rem(32)}
-      py={rem(20)}
-    >
-      <Group
-        justify={"space-between"}
-        mt={rem(20)}
-        mb={rem(40)}
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+    <Paper shadow="xs" p={"xs"} m={rem(32)} px={rem(32)} py={rem(20)}>
+      <Group justify={"space-between"} mt={rem(20)} mb={rem(40)}>
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Employee list
         </Text>
         <Button

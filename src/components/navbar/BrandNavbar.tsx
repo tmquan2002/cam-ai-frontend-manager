@@ -27,17 +27,17 @@ const mockdata = [
       { label: "Shop Managers", link: "/brand/account" },
     ],
   }, {
-    label: "Employee",
+    label: "Employees",
     icon: IconMan,
     path: "/brand/employee" ,
   },
   {
-    label: "EdgeBox",
+    label: "Edge Boxes",
     icon: IconRouter,
     path: "/brand/edgeBox",
   },
   {
-    label: "Incident & Interaction",
+    label: "Incidents & Interactions",
     icon: IconExclamationCircle,
     links: [
       {
@@ -51,7 +51,7 @@ const mockdata = [
     ],
   },
   {
-    label: "Report",
+    label: "Reports",
     icon: IconFileAnalytics,
     links: [
       { label: "Customer", link: "/brand/report/customer" },

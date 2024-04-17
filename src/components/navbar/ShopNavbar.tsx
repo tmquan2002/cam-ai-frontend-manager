@@ -19,12 +19,12 @@ const mockdata = [
     path: "/shop/detail",
   },
   {
-    label: "Employee",
+    label: "Employees",
     icon: IconMan,
     path: "/shop/employee" ,
   },
   {
-    label: "Incident & Interaction",
+    label: "Incidents & Interactions",
     icon: IconExclamationCircle,
     links: [
       {
@@ -43,7 +43,7 @@ const mockdata = [
     path: "/shop/stream",
   },
   {
-    label: "Report",
+    label: "Reports",
     icon: IconFileAnalytics,
     links: [
       { label: "Employee count", link: "/shop/report/count/employee" },

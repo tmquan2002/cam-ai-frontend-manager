@@ -13,7 +13,6 @@ import {
   TextInput,
   rem,
 } from "@mantine/core";
-import { EmployeeStatus } from "../../models/CamAIEnum";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useNavigate } from "react-router-dom";
 import { EmployeeDetail } from "../../models/Employee";
@@ -23,6 +22,7 @@ import { IMAGE_CONSTANT } from "../../types/constant";
 import { useState } from "react";
 import { IconSearch } from "@tabler/icons-react";
 import { useDebouncedValue } from "@mantine/hooks";
+import { EmployeeStatusBadge } from "../../components/badge/EmployeeStatusBadge";
 
 const BrandEmployeePage = () => {
   const navigate = useNavigate();
@@ -35,15 +35,6 @@ const BrandEmployeePage = () => {
     pageIndex: activePage - 1,
     search: debounced,
   });
-
-  const renderAccountStatusRow = (status: EmployeeStatus) => {
-    switch (status) {
-      case EmployeeStatus.Active:
-        return <Badge>{status}</Badge>;
-      case EmployeeStatus.Inactive:
-        return <Badge color="gray">{status}</Badge>;
-    }
-  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -65,7 +56,7 @@ const BrandEmployeePage = () => {
       <Table.Td>{replaceIfNun(row?.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.addressLine)}</Table.Td>
-      <Table.Td>{renderAccountStatusRow(row?.employeeStatus)}</Table.Td>
+      <Table.Td><EmployeeStatusBadge employeeStatus={row?.employeeStatus}/></Table.Td>
       <Table.Td>
         <Text
           onClick={(e) => {

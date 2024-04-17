@@ -269,11 +269,11 @@ const ShopListPage = () => {
           </Center>
         ) : (
           <Table
-            striped
+            miw={1000}
             highlightOnHover
-            withTableBorder
-            withColumnBorders
             verticalSpacing={"md"}
+            striped
+            withTableBorder
           >
             <Table.Thead>
               <Table.Tr>
