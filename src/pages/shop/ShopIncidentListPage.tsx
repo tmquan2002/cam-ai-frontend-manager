@@ -1,52 +1,37 @@
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
-  ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Center,
-  Collapse,
-  Divider,
-  Flex,
-  Group,
-  Loader,
-  Paper,
-  ScrollArea,
-  Select,
-  Skeleton,
-  Text,
-  Tooltip,
-  rem,
+  ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem,
+  useComputedColorScheme,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDisclosure, useListState } from "@mantine/hooks";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { IconArrowMerge, IconFilter, IconIdOff, IconSelect, IconX } from "@tabler/icons-react";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
+import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
-import classes from "./ShopIncidentListPage.module.scss";
+import { useNavigate } from "react-router-dom";
+import { GetIncidentParams } from "../../apis/IncidentAPI";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import LoadingImage from "../../components/image/LoadingImage";
+import NoImage from "../../components/image/NoImage";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { IncidentDetailWithChecked, useGetOrderedIncidentListChecked } from "../../hooks/useGetIncidentList";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
 import {
   EvidenceType,
   IncidentStatus,
   IncidentType,
 } from "../../models/CamAIEnum";
-import { IconFilter, IconIdOff, IconX } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { useForm } from "@mantine/form";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { GetIncidentParams } from "../../apis/IncidentAPI";
-import dayjs from "dayjs";
-import _ from "lodash";
-import { useGetIncidentById } from "../../hooks/useGetIncidentById";
-import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { useAssignIncident } from "../../hooks/useAssignIncident";
-import { modals } from "@mantine/modals";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
 import { EvidenceDetail } from "../../models/Evidence";
-import NoImage from "../../components/image/NoImage";
-import { useNavigate } from "react-router-dom";
-import LoadingImage from "../../components/image/LoadingImage";
+import { ResponseErrorDetail } from "../../models/Response";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./ShopIncidentListPage.module.scss";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -68,6 +53,7 @@ type IncidentFormField = {
 const ShopIncidentListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
   } | null>(null);
@@ -135,12 +121,18 @@ const ShopIncidentListPage = () => {
     form.values.status,
     form.values.toTime,
   ]);
-
   const {
     data: incidentList,
     isLoading: isGetIncidentListLoading,
     refetch: refetchIncidentList,
-  } = useGetIncidentList(searchParams);
+  } = useGetOrderedIncidentListChecked(searchParams);
+
+  // For selection
+  const [openedSelect, { toggle: toggleSelect }] = useDisclosure(false);
+  const [checkBoxMode, setCheckBoxMode] = useState("Off");
+  const [incidentCheckBoxList, handlers] = useListState<IncidentDetailWithChecked>(incidentList)
+  const allChecked = incidentCheckBoxList.every((value) => value.checked);
+  const indeterminate = incidentCheckBoxList.some((value) => value.checked) && !allChecked;
 
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({});
@@ -299,23 +291,8 @@ const ShopIncidentListPage = () => {
     }
   };
 
-  const orderedIncidentList = useMemo(() => {
-    return _.orderBy(
-      incidentList?.values || [],
-      ["startTime"],
-      ["desc"]
-    ).filter((i) => i.incidentType != IncidentType.Interaction);
-  }, [incidentList]);
-
-  const renderIncidentList = orderedIncidentList.map((row) => (
-    <Box
-      w={rem(300)}
-      py={rem(14)}
-      px={rem(18)}
-      key={row?.id}
-      onClick={() => {
-        setSelectedIncident({ id: row?.id });
-      }}
+  const renderIncidentList = incidentCheckBoxList?.map((row, index) => (
+    <Box w={rem(350)} py={rem(14)} px={rem(18)} key={row?.id}
       className={
         row?.id == selectedIncident?.id
           ? classes["incident_card_active"]
@@ -323,14 +300,29 @@ const ShopIncidentListPage = () => {
       }
     >
       <Group justify="space-between">
-        <Text size="md">
-          {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
-        </Text>
-        {renderIncidentStatusBadge(row?.status)}
+        {openedSelect && checkBoxMode !== "None" &&
+          <Checkbox w={20}
+            checked={row.checked}
+            onChange={(event) => handlers.setItemProp(index, 'checked', event.currentTarget.checked)}
+          />
+        }
+        <Group justify="space-between" w={openedSelect && checkBoxMode !== "None" ? 260 : '100%'} onClick={() => {
+          setSelectedIncident({ id: row?.id });
+        }}>
+          <Box>
+            {/* Time */}
+            <Text size="md">
+              {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
+            </Text>
+            {/* Incident Name */}
+            <Text c={"dimmed"} size="sm">
+              {row?.incidentType} incident
+            </Text>
+          </Box>
+          {/* Badge */}
+          {renderIncidentStatusBadge(row?.status)}
+        </Group>
       </Group>
-      <Text c="dimmed" size="sm">
-        {row?.incidentType} incident
-      </Text>
       {/* <Text>{dayjs(row?.endTime).format("DD/MM/YYYY h:mm A")}</Text> */}
     </Box>
   ));
@@ -375,7 +367,7 @@ const ShopIncidentListPage = () => {
               bg={"#000"}
               fit="contain"
               imageId={evidence?.imageId}
-              // src={evidence?.image?.hostingUri}
+            // src={evidence?.image?.hostingUri}
             />
           </Box>
         );
@@ -383,24 +375,13 @@ const ShopIncidentListPage = () => {
   };
 
   return (
-    <Paper
-      m={rem(16)}
-      shadow="xs"
-      style={{
-        display: "flex",
-        flex: 1,
-        flexDirection: "column",
-      }}
-    >
-      <Group
-        p={rem(24)}
-        pb={!opened ? rem(24) : rem(0)}
-        align="center"
-        justify="space-between"
-      >
+    <Paper m={rem(16)} shadow="xs" style={{ display: "flex", flex: 1, flexDirection: "column", }}>
+      <Group p={rem(24)} pb={!opened ? rem(24) : rem(0)} align="center" justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incident list
         </Text>
+
+        {/* Top section */}
         <Group>
           {form.isDirty() ? (
             <Button variant="transparent" ml={"auto"} onClick={form.reset}>
@@ -409,21 +390,74 @@ const ShopIncidentListPage = () => {
           ) : (
             <></>
           )}
-
-          <Button
-            leftSection={<IconFilter size={14} />}
-            variant="default"
-            className={classes.filter_button}
-            onClick={toggle}
-          >
-            Filter
-          </Button>
+          <Tooltip label="Merge" withArrow>
+            <ActionIcon variant="subtle" onClick={() => { setCheckBoxMode("Merge") }} color={computedColorScheme == "dark" ? "white" : "black"}>
+              <IconArrowMerge size={20} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Select" withArrow>
+            <ActionIcon variant="subtle" onClick={() => {
+              toggleSelect();
+              setCheckBoxMode("Select");
+              if (opened) toggle()
+            }}
+              color={computedColorScheme == "dark" ? "white" : "black"}>
+              <IconSelect size={20} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Filter" withArrow>
+            <ActionIcon variant="subtle" onClick={() => {
+              toggle();
+              if (openedSelect) {
+                toggleSelect();
+                setCheckBoxMode("None")
+              }
+            }}
+              color={computedColorScheme == "dark" ? "white" : "black"}>
+              <IconFilter size={20} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
       </Group>
+
+      {/* Filter collapse section */}
       <Collapse px={rem(28)} in={opened} mb={"xl"} mt={"xs"}>
         <EditAndUpdateForm fields={fields} />
       </Collapse>
+
+      {/* Select collapse section */}
+      <Collapse px={rem(28)} in={openedSelect} mb={"xl"}>
+
+        <Group justify="space-between">
+          <Group gap={100}>
+            <Checkbox label="Check All" checked={allChecked} indeterminate={indeterminate}
+              onChange={() =>
+                handlers.setState((current) =>
+                  current.map((value) => ({ ...value, checked: !allChecked }))
+                )
+              } />
+          </Group>
+
+          <Group justify="flex-end">
+            <Button
+              variant="gradient" size="xs"
+              gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+            >
+              Assign Selected
+            </Button>
+            <Button
+              variant="gradient" size="xs"
+              gradient={{ from: "pale-red.5", to: "pale-red.7", deg: 90 }}
+            >
+              Reject Selected
+            </Button>
+          </Group>
+        </Group>
+      </Collapse>
+
+      {/* Main section */}
       <Flex flex={1} className={classes["body_container"]}>
+        {/* Left side scroll section */}
         <ScrollArea
           type="hover"
           mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
@@ -435,6 +469,7 @@ const ShopIncidentListPage = () => {
         <Divider mr={rem(4)} orientation="vertical" />
         <Divider mr={rem(8)} orientation="vertical" />
 
+        {/* View incident section */}
         {selectedIncident ? (
           <ScrollArea
             style={{
@@ -475,6 +510,7 @@ const ShopIncidentListPage = () => {
                     </ActionIcon>
                   </Tooltip>
                 </Group>
+
                 <Group justify="space-between" mb={rem(12)}>
                   <Text fw={500} size={rem(20)}>
                     Evidence
