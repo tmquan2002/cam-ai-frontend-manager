@@ -1,7 +1,4 @@
-import {
-  ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem,
-  useComputedColorScheme,
-} from "@mantine/core";
+import { ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem, useComputedColorScheme, } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure, useListState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -9,13 +6,11 @@ import { notifications } from "@mantine/notifications";
 import { IconArrowMerge, IconFilter, IconIdOff, IconSelect, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import _ from "lodash";
+import _, { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GetIncidentParams } from "../../apis/IncidentAPI";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
+import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
 import { useAssignIncident } from "../../hooks/useAssignIncident";
@@ -23,11 +18,7 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetIncidentById } from "../../hooks/useGetIncidentById";
 import { IncidentDetailWithChecked, useGetOrderedIncidentListChecked } from "../../hooks/useGetIncidentList";
 import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import {
-  EvidenceType,
-  IncidentStatus,
-  IncidentType,
-} from "../../models/CamAIEnum";
+import { EvidenceType, IncidentStatus, IncidentType, } from "../../models/CamAIEnum";
 import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import { mapLookupToArray } from "../../utils/helperFunction";
@@ -57,6 +48,17 @@ const ShopIncidentListPage = () => {
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
   } | null>(null);
+
+  // For selection
+  const [openedSelect, { toggle: toggleSelect }] = useDisclosure(false);
+  const [openedMerge, { toggle: toggleMerge }] = useDisclosure(false);
+  const [checkBoxMode, setCheckBoxMode] = useState("None");
+
+  //Check box list section
+  const [incidentCheckBoxList, handlers] = useListState<IncidentDetailWithChecked>([])
+  const allChecked = incidentCheckBoxList.every((value) => value.checked);
+  const indeterminate = incidentCheckBoxList.some((value) => value.checked) && !allChecked;
+  const [firstCheckId, setFirstCheckId] = useState("");
 
   const assignIncidentForm = useForm<IncidentFormField>();
 
@@ -121,32 +123,32 @@ const ShopIncidentListPage = () => {
     form.values.status,
     form.values.toTime,
   ]);
-  const {
-    data: incidentList,
-    isLoading: isGetIncidentListLoading,
-    refetch: refetchIncidentList,
-  } = useGetOrderedIncidentListChecked(searchParams);
+  const { data: incidentList, isLoading: isGetIncidentListLoading, refetch: refetchIncidentList, } = useGetOrderedIncidentListChecked(searchParams);
 
-  // For selection
-  const [openedSelect, { toggle: toggleSelect }] = useDisclosure(false);
-  const [checkBoxMode, setCheckBoxMode] = useState("Off");
-  const [incidentCheckBoxList, handlers] = useListState<IncidentDetailWithChecked>(incidentList)
-  const allChecked = incidentCheckBoxList.every((value) => value.checked);
-  const indeterminate = incidentCheckBoxList.some((value) => value.checked) && !allChecked;
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
+  const { data: incidentData, isLoading: isGetIncidentLoading, refetch: refetchIncident, } = useGetIncidentById(selectedIncident?.id ?? null);
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } = useRejectIncidentById();
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } = useAssignIncident();
 
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-
-  const {
-    data: incidentData,
-    isLoading: isGetIncidentLoading,
-    refetch: refetchIncident,
-  } = useGetIncidentById(selectedIncident?.id ?? null);
-
-  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
-    useRejectIncidentById();
-  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
-    useAssignIncident();
+  const onFirstCheck = () => {
+    if (!isEmpty(firstCheckId)) {
+      //TODO: Call API here, disabled test for now
+      const indexFirstCheck = incidentCheckBoxList.findIndex((item) => item.id == firstCheckId)
+      if (indexFirstCheck % 2 == 0) {
+        handlers.applyWhere(
+          (item, index) => index % 2 == 0 && item.id !== firstCheckId,
+          (item) => ({ ...item, disabled: true })
+        )
+      } else {
+        handlers.applyWhere(
+          (item, index) => index % 2 == 1 && item.id !== firstCheckId,
+          (item) => ({ ...item, disabled: true })
+        )
+      }
+    } else {
+      handlers.apply((item) => ({ ...item, disabled: false, checked: false }))
+    }
+  }
 
   useEffect(() => {
     if (form.isDirty()) {
@@ -164,6 +166,33 @@ const ShopIncidentListPage = () => {
     }
     assignIncidentForm.reset();
   }, [incidentData]);
+
+  useEffect(() => {
+    handlers.setState(incidentList || [])
+  }, [incidentList])
+
+  useEffect(() => {
+    if (checkBoxMode !== "Merge") {
+      //TODO: Replace with actual loading circle
+      console.log("Finish loading")
+    } else {
+      handlers.apply((item) => ({ ...item, disabled: false }))
+      onFirstCheck();
+    }
+  }, [firstCheckId])
+
+  useEffect(() => {
+    const incidentCheckedList = incidentCheckBoxList.filter((item) => item.checked)
+    if (incidentCheckedList.length == 0) {
+      setFirstCheckId("")
+    } else if (incidentCheckedList.length == 1) {
+      setFirstCheckId(incidentCheckedList[0].id)
+    } else if (!incidentCheckBoxList.find((item) => item.id === firstCheckId)?.checked) {
+      // console.log("Here Reached")
+      //Uncheck all if this first check id is not check but more than 2 other is checked
+      setFirstCheckId("")
+    }
+  }, [incidentCheckBoxList])
 
   const openModal = () =>
     modals.openConfirmModal({
@@ -291,6 +320,8 @@ const ShopIncidentListPage = () => {
     }
   };
 
+  // console.log(incidentCheckBoxList)
+
   const renderIncidentList = incidentCheckBoxList?.map((row, index) => (
     <Box w={rem(350)} py={rem(14)} px={rem(18)} key={row?.id}
       className={
@@ -300,13 +331,13 @@ const ShopIncidentListPage = () => {
       }
     >
       <Group justify="space-between">
-        {openedSelect && checkBoxMode !== "None" &&
+        {(openedSelect || openedMerge) && checkBoxMode !== "None" &&
           <Checkbox w={20}
-            checked={row.checked}
+            checked={row.checked} disabled={row.disabled}
             onChange={(event) => handlers.setItemProp(index, 'checked', event.currentTarget.checked)}
           />
         }
-        <Group justify="space-between" w={openedSelect && checkBoxMode !== "None" ? 260 : '100%'} onClick={() => {
+        <Group justify="space-between" w={(openedSelect || openedMerge) && checkBoxMode !== "None" ? 260 : '100%'} onClick={() => {
           setSelectedIncident({ id: row?.id });
         }}>
           <Box>
@@ -390,29 +421,65 @@ const ShopIncidentListPage = () => {
           ) : (
             <></>
           )}
+
           <Tooltip label="Merge" withArrow>
-            <ActionIcon variant="subtle" onClick={() => { setCheckBoxMode("Merge") }} color={computedColorScheme == "dark" ? "white" : "black"}>
+            <ActionIcon variant={checkBoxMode == "Merge" ? "filled" : "subtle"}
+              onClick={() => {
+                handlers.setState(incidentList || [])
+
+                if (openedMerge) {
+                  setCheckBoxMode("None")
+                  toggleMerge()
+                } else {
+                  setCheckBoxMode("Merge")
+                  toggleMerge()
+                }
+
+                if (opened) toggle()
+                if (openedSelect) toggleSelect()
+              }}
+              color={computedColorScheme == "dark" ? "white" : "black"}>
               <IconArrowMerge size={20} />
             </ActionIcon>
           </Tooltip>
+
           <Tooltip label="Select" withArrow>
-            <ActionIcon variant="subtle" onClick={() => {
-              toggleSelect();
-              setCheckBoxMode("Select");
-              if (opened) toggle()
-            }}
+            <ActionIcon variant={checkBoxMode == "Select" ? "filled" : "subtle"}
+              onClick={() => {
+                handlers.setState(incidentList || [])
+
+                if (openedSelect) {
+                  setCheckBoxMode("None")
+                  toggleSelect()
+                } else {
+                  setCheckBoxMode("Select")
+                  toggleSelect()
+                }
+
+                if (opened) toggle()
+                if (openedMerge) toggleMerge()
+              }}
               color={computedColorScheme == "dark" ? "white" : "black"}>
               <IconSelect size={20} />
             </ActionIcon>
           </Tooltip>
+
           <Tooltip label="Filter" withArrow>
-            <ActionIcon variant="subtle" onClick={() => {
-              toggle();
-              if (openedSelect) {
-                toggleSelect();
-                setCheckBoxMode("None")
-              }
-            }}
+            <ActionIcon variant={checkBoxMode == "Filter" ? "filled" : "subtle"}
+              onClick={() => {
+                handlers.setState(incidentList || [])
+
+                if (opened) {
+                  setCheckBoxMode("None")
+                  toggle()
+                } else {
+                  setCheckBoxMode("Filter")
+                  toggle()
+                }
+
+                if (openedSelect) toggleSelect()
+                if (openedMerge) toggleMerge()
+              }}
               color={computedColorScheme == "dark" ? "white" : "black"}>
               <IconFilter size={20} />
             </ActionIcon>
@@ -452,6 +519,18 @@ const ShopIncidentListPage = () => {
               Reject Selected
             </Button>
           </Group>
+        </Group>
+      </Collapse>
+
+      {/* Merge section */}
+      <Collapse px={rem(28)} in={openedMerge} mb={"xl"}>
+        <Group justify="flex-start">
+          <Button
+            variant="gradient" size="xs"
+            gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+          >
+            Merge Selected
+          </Button>
         </Group>
       </Collapse>
 

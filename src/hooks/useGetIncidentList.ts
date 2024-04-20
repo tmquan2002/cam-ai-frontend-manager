@@ -7,6 +7,7 @@ import _ from "lodash";
 
 export type IncidentDetailWithChecked = IncidentDetail & {
   checked: boolean;
+  disabled: boolean;
 }
 export const useGetIncidentList = (params: GetIncidentParams) => {
   const {
@@ -45,6 +46,7 @@ export const useGetOrderedIncidentListChecked = (params: GetIncidentParams) => {
         .map((item) => ({
           ...item,
           checked: false,
+          disabled: false,
         }))
       return orderedCheckedResponse
     },
