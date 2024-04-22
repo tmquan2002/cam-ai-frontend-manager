@@ -90,10 +90,10 @@ const ShopDetailPage = () => {
     useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
 
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0),
+    +(form.values.province ?? 0)
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0),
+    +(form.values.district ?? 0)
   );
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
     useGetEmployeeList({});
@@ -159,6 +159,7 @@ const ShopDetailPage = () => {
           placeholder: "Shop name",
           label: "Shop name",
           required: true,
+          radius: "md",
         },
       },
       {
@@ -169,6 +170,7 @@ const ShopDetailPage = () => {
           name: "phone",
           placeholder: "Shop phone",
           label: "Shop phone",
+          radius: "md",
         },
       },
 
@@ -181,6 +183,7 @@ const ShopDetailPage = () => {
           placeholder: "Brand",
           label: "Shop",
           disabled: true,
+          radius: "md",
         },
       },
       {
@@ -192,6 +195,7 @@ const ShopDetailPage = () => {
           placeholder: "Open Time",
           label: "Open time",
           required: true,
+          radius: "md",
         },
         spans: 6,
       },
@@ -204,6 +208,7 @@ const ShopDetailPage = () => {
           placeholder: "Close Time",
           label: "Close time",
           required: true,
+          radius: "md",
         },
         spans: 6,
       },
@@ -217,7 +222,7 @@ const ShopDetailPage = () => {
             return { value: `${item.id}`, label: item.name };
           }),
           form,
-
+          radius: "md",
           name: "province",
           loading: isProvicesLoading,
           required: true,
@@ -237,6 +242,7 @@ const ShopDetailPage = () => {
           name: "district",
           loading: isDistrictsLoading,
           required: true,
+          radius: "md",
         },
         spans: 4,
       },
@@ -253,6 +259,7 @@ const ShopDetailPage = () => {
           name: "wardId",
           loading: isWardsLoading,
           required: true,
+          radius: "md",
         },
         spans: 4,
       },
@@ -265,6 +272,7 @@ const ShopDetailPage = () => {
           placeholder: "Shop address",
           label: "Shop address",
           required: true,
+          radius: "md",
         },
       },
     ];
@@ -279,7 +287,7 @@ const ShopDetailPage = () => {
   ]);
 
   let edgeBoxInstall = edgeBoxInstallList?.values.find(
-    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled,
+    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled
   );
 
   return (
