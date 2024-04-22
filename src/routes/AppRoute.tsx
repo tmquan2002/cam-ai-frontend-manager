@@ -37,6 +37,8 @@ import CountEmployeeReportPage from "../pages/shop/report/employee/CountEmployee
 import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
 import ShopInteractionPage from "../pages/shop/ShopInteractionPage";
 import BrandInteractionList from "../pages/brand/BrandInteractionList";
+import ShopCalendar from "../pages/shop/ShopCalendar";
+import ShopCalendarSetting from "../pages/shop/ShopCalendarSetting";
 
 const AppRoute = () => {
   return useRoutes([
@@ -113,6 +115,14 @@ const AppRoute = () => {
         {
           path: "report/interaction",
           element: <InteractionReportPage />,
+        },
+        {
+          path: "calendar",
+          element: <ShopCalendar events={[]} />,
+        },
+        {
+          path: "calendar/setting",
+          element: <ShopCalendarSetting />,
         },
       ],
     },

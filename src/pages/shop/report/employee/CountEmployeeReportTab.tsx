@@ -176,21 +176,11 @@ const CountEmployeeReportPage = () => {
           <NoImage />
         ) : (
           <Box>
-            <Group justify="flex-end" mb={rem(10)}>
-              <LegendCard
-                type="bar"
-                color="rgb(255, 99, 132)"
-                title="Total interaction"
-              />
-              <LegendCard
-                type="bar"
-                color="rgb(236, 177, 109)"
-                title="Lowest interaction"
-              />
+            <Group justify="flex-end" mb={rem(10)} mr={rem(12)}>
               <LegendCard
                 type="bar"
                 color="rgb(37, 150, 190)"
-                title="Highest interaction"
+                title="Total count"
               />
             </Group>
             <Flex>
@@ -208,7 +198,7 @@ const CountEmployeeReportPage = () => {
                     maintainAspectRatio: false,
                     layout: {
                       padding: {
-                        bottom: 41,
+                        bottom: 47,
                       },
                     },
                     scales: {
@@ -221,17 +211,17 @@ const CountEmployeeReportPage = () => {
                         },
                       },
                       y: {
+                        ticks: {
+                          padding: 10,
+                          stepSize: 1,
+                        },
+                        suggestedMax: 5,
                         beginAtZero: true,
-                        max:
-                          Math.max(
-                            ...(data
-                              ? data?.map((i) => {
-                                  return i.high;
-                                })
-                              : [10])
-                          ) + 0.5,
                         afterFit: (ctx) => {
-                          ctx.width = 38;
+                          ctx.width = 39;
+                        },
+                        grid: {
+                          drawTicks: false,
                         },
                         border: {
                           color: "#000",
@@ -255,8 +245,6 @@ const CountEmployeeReportPage = () => {
                         data: data?.map((i) => i.high),
                         borderColor: "rgb(37, 150, 190)",
                         backgroundColor: "rgb(37, 150, 190, 0.5)",
-                        // tension: 0.8,
-                        // cubicInterpolationMode: "monotone",
                       },
                     ],
                   }}
@@ -267,14 +255,14 @@ const CountEmployeeReportPage = () => {
                   width: "100%",
                   maxWidth: "100%",
                   height: "620px",
-                  transform: "translateX(-2px)",
+                  transform: "translateX(-12px)",
                 }}
               >
                 <Box
                   style={
                     data && data?.length > 7
                       ? {
-                          width: `${1500 + (data?.length - 7) * 100}px`,
+                          width: `${1500 + (data?.length - 7) * 70}px`,
                           height: "600px",
                         }
                       : {
@@ -288,37 +276,40 @@ const CountEmployeeReportPage = () => {
                       maintainAspectRatio: false,
                       layout: {
                         padding: {
-                          top: 10,
+                          top: 17,
                         },
                       },
 
                       scales: {
                         y: {
-                          beginAtZero: true,
-                          border: {
-                            display: false,
-                            dash: [8, 4],
-                          },
                           ticks: {
                             display: false,
-                          },
-                          grid: {
-                            drawTicks: false,
+                            stepSize: 1,
                           },
 
-                          max:
-                            Math.max(
-                              ...(data
-                                ? data?.map((i) => {
-                                    return i.high;
-                                  })
-                                : [10])
-                            ) + 0.5,
+                          grid: {
+                            drawTicks: false,
+                            tickWidth: 0,
+                            tickLength: 0,
+                            tickColor: "#000",
+                          },
+                          suggestedMax: 5,
+
+                          border: {
+                            dash: [8, 4],
+                          },
                         },
                         x: {
+                          ticks: {
+                            padding: 10,
+                          },
                           border: {
                             color: "#000",
                             dash: [8, 4],
+                          },
+                          beginAtZero: true,
+                          grid: {
+                            drawTicks: false,
                           },
                         },
                       },
@@ -335,30 +326,21 @@ const CountEmployeeReportPage = () => {
                       labels: data?.map((i) => i.time),
                       datasets: [
                         {
-                          label: "Total interactions",
-                          data: data?.map((i) => i.average),
-                          borderColor: "rgb(255, 99, 132)",
-                          backgroundColor: "rgba(255, 99, 132, 0.5)",
-                          borderWidth: 2,
-                          borderRadius: 5,
-                          borderSkipped: false,
-                        },
-                        {
-                          label: "Lowest interaction",
-                          data: data?.map((i) => i.low),
-                          borderColor: "rgb(236,177,109)",
-                          backgroundColor: "rgba(236,177,109,0.5)",
-                          borderWidth: 2,
-                          borderRadius: 5,
-                          borderSkipped: false,
-                        },
-                        {
-                          label: "Highest interactions",
+                          label: "Total count",
                           data: data?.map((i) => i.high),
                           borderColor: "rgb(37, 150, 190)",
                           backgroundColor: "rgb(37, 150, 190, 0.5)",
-                          borderWidth: 2,
-                          borderRadius: 5,
+                          borderWidth: {
+                            bottom: 0,
+                            left: 2,
+                            right: 2,
+                            top: 2,
+                          },
+                          borderRadius: {
+                            topRight: 5,
+                            topLeft: 5,
+                          },
+
                           borderSkipped: false,
                         },
                       ],

@@ -38,14 +38,19 @@ import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
-import LegendCard from "../../../../components/card/LegendCard";
+import LegendCard, {
+  LEGEND_TYPES,
+} from "../../../../components/card/LegendCard";
 import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
 import { IncidentDetail } from "../../../../models/Incident";
 import classes from "./InteractionReportPage.module.scss";
 import cx from "clsx";
 import LoadingImage from "../../../../components/image/LoadingImage";
 import { useScrollIntoView } from "@mantine/hooks";
-import { diffentDateReturnFormatedString } from "../../../../utils/helperFunction";
+import {
+  addDaysBaseOnReportInterval,
+  differentDateReturnFormattedString,
+} from "../../../../utils/helperFunction";
 dayjs.extend(LocalizedFormat);
 
 ChartJS.register(
@@ -346,12 +351,12 @@ export const InteractionReportPage = () => {
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)}>
                 <LegendCard
-                  type="bar"
+                  type={LEGEND_TYPES.BAR}
                   color="rgba(255, 99, 132, 1)"
                   title="Total interaction"
                 />
                 <LegendCard
-                  type="line"
+                  type={LEGEND_TYPES.LINE}
                   color="rgb(37, 150, 190)"
                   title="Average interaction time"
                 />
@@ -503,9 +508,10 @@ export const InteractionReportPage = () => {
                             setSelectedInteractionItem(null);
                             setSelectedDuration({
                               startTime: selectedData?.time,
-                              endTime: dayjs(selectedData?.time)
-                                .add(1, "hour")
-                                .format("YYYY-MM-DDTHH:mm:ss"),
+                              endTime: addDaysBaseOnReportInterval(
+                                selectedData?.time,
+                                form.values.interval
+                              ),
                             });
                           }
                         },
@@ -581,22 +587,35 @@ export const InteractionReportPage = () => {
                 <Text size="md" fw={600}>
                   Interaction list
                 </Text>
-                <Group gap={rem(8)}>
+                <Group gap={rem(6)}>
                   <Text fw={500} size="sm">
                     From
                   </Text>
                   <Badge
                     radius={"sm"}
-                    color={"#ccc"}
-                    c={"#4b5264"}
-                    mr={rem(16)}
+                    color={"green"}
+                    style={{
+                      border: "1px solid green",
+                    }}
+                    variant="light"
+                    c={"#000"}
+                    mr={rem(10)}
                   >
                     {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
                   </Badge>
                   <Text fw={500} size="sm">
                     to
                   </Text>
-                  <Badge radius={"sm"} color={"#ccc"} c={"#4b5264"}>
+                  <Badge
+                    radius={"sm"}
+                    color={"green"}
+                    style={{
+                      border: "1px solid green",
+                    }}
+                    variant="light"
+                    c={"#000"}
+                    mr={rem(16)}
+                  >
                     {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
                   </Badge>
                 </Group>
@@ -732,13 +751,13 @@ export const InteractionReportPage = () => {
                         </Text>
                         <Badge
                           radius={"sm"}
-                          color={"#ccc"}
-                          c={"#000"}
+                          color={"green"}
+                          c={"#fff"}
                           mr={rem(16)}
                         >
                           {selectedInteractionItem?.startTime &&
                           selectedInteractionItem.endTime
-                            ? diffentDateReturnFormatedString(
+                            ? differentDateReturnFormattedString(
                                 selectedInteractionItem?.startTime,
                                 selectedInteractionItem?.endTime
                               )
@@ -768,19 +787,20 @@ export const InteractionReportPage = () => {
                             selectedInteractionItem?.evidences?.[0]?.createdDate
                           ).format("LL")}
                         </Text>
-                        <Text c={"rgb(107 114 128"} size={rem(14)} lh={rem(24)}>
-                          {dayjs(
-                            selectedInteractionItem?.evidences?.[0]?.createdDate
-                          ).format("HH:mm A")}
-                        </Text>
                       </Group>
-                      <LoadingImage
-                        fit="contain"
-                        radius={"md"}
-                        imageId={
-                          selectedInteractionItem?.evidences?.[0]?.imageId ?? ""
-                        }
-                      />
+                      {selectedInteractionItem?.evidences?.length == 0 ? (
+                        <NoImage />
+                      ) : (
+                        selectedInteractionItem?.evidences.map((i) => (
+                          <LoadingImage
+                            fit="contain"
+                            radius={"md"}
+                            mb={rem(12)}
+                            key={i.id}
+                            imageId={i?.imageId ?? ""}
+                          />
+                        ))
+                      )}
                     </Box>
                   </Box>
                 </ScrollArea.Autosize>

@@ -1,0 +1,80 @@
+.today {
+  background-color: #eff6ff;
+  color: green;
+}
+
+.activeCard {
+  border-bottom: 1px solid rgb(229, 231, 235);
+  border-left: 1px solid rgb(229, 231, 235);
+  cursor: pointer;
+}
+
+.activeCard:hover {
+  background-color: #d2e3fc;
+}
+
+.timelinePrimaryPoint {
+  border-radius: 999px;
+  border: 1px solid #228be6;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.innerTimelinePrimaryPoint {
+  width: rem(16);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  margin: rem(2);
+}
+
+.timelinePrimaryPoint:hover > .innerTimelinePrimaryPoint {
+  background-color: #228be6;
+  transition: background-color 400ms ease-in;
+}
+
+.divider {
+  border-color: #dbeafe !important;
+  border-width: rem(2) !important;
+}
+
+.timelineWrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+  cursor: pointer;
+}
+
+.timelineWrapper:hover > .divider {
+  border-color: #228be6 !important;
+  transition: border-color 400ms ease-in;
+}
+.timelineWrapper:hover .innerTimelinePrimaryPoint,
+.timelineWrapper:hover .timelineSecondaryPoint {
+  background-color: #228be6 !important;
+  transition: background-color 400ms ease-in;
+}
+
+.timelineSecondaryPoint {
+  width: rem(16);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 1px solid #228be6;
+  margin: 0 rem(2);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.timelineSecondaryPoint:hover {
+  background-color: #228be6;
+  transition: background-color 400ms ease-in;
+}
+
+.timeLineNumber {
+  position: absolute;
+  top: -24px;
+}

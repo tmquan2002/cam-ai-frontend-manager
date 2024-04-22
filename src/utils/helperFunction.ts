@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { ReportInterval } from "../models/CamAIEnum";
 
 export function isEmpty(value: string | null | undefined) {
   return (
@@ -120,14 +121,13 @@ export function getDateFromSetYear(yearLength: number) {
   );
 }
 
-export const diffentDateReturnFormatedString = (
+export const differentDateReturnFormattedString = (
   firstDate: string,
   secondDate: string
 ) => {
   const date1 = dayjs(firstDate);
   const date2 = dayjs(secondDate);
   const diffInSeconds = date2.diff(date1, "seconds");
-  console.log({ date1 }, { date2 }, { diffInSeconds });
 
   const hours = Math.floor(diffInSeconds / 3600);
   const minutes = Math.floor((diffInSeconds / 60) % 60);
@@ -140,4 +140,33 @@ export const diffentDateReturnFormatedString = (
     seconds == 0 ? "" : `${seconds} second${seconds > 1 ? "s" : ""}`;
 
   return hourString + minuteString + secondString;
+};
+
+export const addDaysBaseOnReportInterval = (
+  date: string | Date,
+  interval: ReportInterval,
+  formattedString?: string
+) => {
+  console.log(date);
+
+  var result = dayjs(date);
+  switch (interval) {
+    case ReportInterval.Day:
+      result = result.add(1, "day");
+      break;
+    case ReportInterval.HalfDay:
+      result = result.add(12, "hours");
+      break;
+    case ReportInterval.HalfHour:
+      result = result.add(30, "minutes");
+      break;
+    case ReportInterval.Hour:
+      result = result.add(1, "hour");
+      break;
+    case ReportInterval.Week:
+      result = result.add(7, "days");
+      break;
+  }
+
+  return result.format(formattedString ?? "YYYY-MM-DDTHH:mm:ss");
 };
