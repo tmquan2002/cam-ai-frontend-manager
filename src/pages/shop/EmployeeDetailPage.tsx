@@ -40,7 +40,8 @@ import { Gender, IncidentStatus } from "../../models/CamAIEnum";
 import BackButton from "../../components/button/BackButton";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import classes from "./EmployeeDetailPage.module.scss";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { isEmpty } from "lodash";
 
 export type CreateEmployeeField = {
   name: string;
@@ -70,19 +71,15 @@ const EmployeeDetailPage = () => {
     useGetIncidentList({
       size: 12,
       pageIndex: activePage - 1,
-      employeeId: params?.id?? undefined
+      employeeId: params?.id ?? undefined
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        value == undefined ||
-        value == "" ||
-        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
@@ -453,7 +450,7 @@ const EmployeeDetailPage = () => {
             Confirm delete <Mark>{employeeData?.name}</Mark> account ?
           </Text>
         }
-        // centered
+      // centered
       >
         <Group
           justify="flex-end"

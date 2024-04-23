@@ -1,48 +1,14 @@
-import {
-  Accordion,
-  ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Center,
-  Collapse,
-  Divider,
-  Flex,
-  Group,
-  Image,
-  Input,
-  Loader,
-  LoadingOverlay,
-  Paper,
-  ScrollArea,
-  SimpleGrid,
-  Skeleton,
-  Stack,
-  Table,
-  Text,
-  Tooltip,
-  rem,
-} from "@mantine/core";
+import { Accordion, ActionIcon, Badge, Box, Button, Center, Collapse, Divider, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, SimpleGrid, Skeleton, Stack, Table, Text, Tooltip, rem, } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useEffect, useMemo, useState } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
+import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import { notifications } from "@mantine/notifications";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { UpdateShopParams } from "../../apis/ShopAPI";
-import {
-  IconMail,
-  IconMapPin,
-  IconRepeat,
-  IconTrash,
-  IconUser,
-  IconVideo,
-  IconX,
-} from "@tabler/icons-react";
+import { IconMail, IconMapPin, IconRepeat, IconTrash, IconUser, IconVideo, IconX, } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
@@ -51,16 +17,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetShopById } from "../../hooks/useGetShopById";
 import { replaceIfNun } from "../../utils/helperFunction";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import _ from "lodash";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import _, { isEmpty } from "lodash";
+import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
 import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
-import {
-  EdgeBoxActivationStatus,
-  EdgeBoxLocation,
-  EdgeBoxStatus,
-  EdgeboxInstallStatus,
-  ShopStatus,
-} from "../../models/CamAIEnum";
+import { EdgeBoxActivationStatus, EdgeBoxLocation, EdgeBoxStatus, EdgeboxInstallStatus, ShopStatus, } from "../../models/CamAIEnum";
 import { modals } from "@mantine/modals";
 import { IconCaretRight } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
@@ -351,10 +311,8 @@ const ShopDetailPageManager = () => {
         { min: 2, max: 50 },
         "Shop name must be 1- 50 characters long"
       ),
-      phone: (value) =>
-        value == "" || /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -428,7 +386,7 @@ const ShopDetailPageManager = () => {
         </Text>
       ),
       labels: { confirm: "Confirm", cancel: "Cancel" },
-      onCancel: () => {},
+      onCancel: () => { },
       onConfirm: () => handleToggleShopStatus(currentStatus),
     });
 

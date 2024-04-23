@@ -1,27 +1,25 @@
-import { Button, Collapse, Group, Paper, Text, rem } from "@mantine/core";
+import { Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
+import { hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { CreateShopParams } from "../../apis/ShopAPI";
+import BackButton from "../../components/button/BackButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { hasLength, isNotEmpty, useForm } from "@mantine/form";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
-import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { useCreateShop } from "../../hooks/useCreateShop";
-import { CreateShopParams } from "../../apis/ShopAPI";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { useGetAccountList } from "../../hooks/useGetAccounts";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { useNavigate } from "react-router-dom";
-import { useDisclosure } from "@mantine/hooks";
-import { useCreateAccount } from "../../hooks/useCreateAccount";
-import { CreateAccountParams } from "../../apis/AccountAPI";
-import { useGetBrandList } from "../../hooks/useGetBrandList";
-import dayjs from "dayjs";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender, Role } from "../../models/CamAIEnum";
-import BackButton from "../../components/button/BackButton";
+import CreateShopManagerForm from "./manager/CreateShopManagerForm";
+import { isEmpty } from "lodash";
+import { phoneRegex } from "../../types/constant";
 
 export type CreateShopField = {
   name: string;
@@ -49,40 +47,18 @@ export type CreateAccountField = {
 };
 
 const CreateShop = () => {
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const createShopForm = useForm<CreateShopField>({
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
-      phone: (value) =>
-        value == "" ||
-        value == null ||
-        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Province is required"),
       district: isNotEmpty("District is required"),
       openTime: isNotEmpty("Open time is required"),
       closeTime: isNotEmpty("Close time is required"),
-    },
-  });
-
-  const createAccountForm = useForm<CreateAccountField>({
-    validate: {
-      name: isNotEmpty("Name is required"),
-      email: (value) =>
-        /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
-          ? null
-          : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
-      password: isNotEmpty("Password must not be empty"),
-      gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        value == "" ||
-        value == null ||
-        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -101,22 +77,9 @@ const CreateShop = () => {
     +(createShopForm.values.district ?? 0)
   );
 
-  const {
-    data: createAccountDistricts,
-    isLoading: isCreateAccountDistrictsLoading,
-  } = useGetDistrictList(+(createAccountForm.values.province ?? 0));
-
-  const { data: createAccountWards, isLoading: isCreateAccountWardsLoading } =
-    useGetWardList(+(createAccountForm.values.district ?? 0));
-
-  const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
-    { size: 1 }
-  );
-
   const { mutate: createShop, isLoading: isCreateShopLoading } =
     useCreateShop();
-  const { mutate: createAccount, isLoading: isCreateAccountLoading } =
-    useCreateAccount();
+
 
   const fields = useMemo(() => {
     return [
@@ -158,7 +121,7 @@ const CreateShop = () => {
           loading: isAccountListLoading,
           rightSectionWidth: 70,
           rightSection: (
-            <Button variant="subtle" onClick={toggle}>
+            <Button variant="subtle" onClick={open}>
               New
             </Button>
           ),
@@ -251,149 +214,13 @@ const CreateShop = () => {
     createShopForm,
     accountList?.values,
     isAccountListLoading,
-    toggle,
+    open, close,
     provinces,
     isProvicesLoading,
     districts,
     isDistrictsLoading,
     wards,
     isWardsLoading,
-  ]);
-
-  const addNewAccountfields = useMemo(() => {
-    return [
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
-          name: "email",
-          placeholder: "Email",
-          label: "Email",
-          required: true,
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
-          name: "password",
-          placeholder: "Password",
-          label: "Password",
-          type: "password",
-          required: true,
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
-          name: "name",
-          placeholder: "Name",
-          label: "Name",
-          required: true,
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
-          name: "phone",
-          placeholder: "Phone",
-          label: "Phone",
-          required: true,
-        },
-        spans: 6,
-      },
-
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Gender",
-          placeholder: "Gender",
-          data: mapLookupToArray(Gender ?? {}),
-          form: createAccountForm,
-          name: "gender",
-          required: true,
-        },
-        spans: 6,
-      },
-      {
-        type: FIELD_TYPES.DATE,
-        fieldProps: {
-          form: createAccountForm,
-          name: "birthday",
-          placeholder: "Birthday",
-          label: "Birthday",
-        },
-        spans: 6,
-      },
-
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Province",
-          placeholder: "Province",
-          data: provinces?.map((item) => {
-            return { value: `${item.id}`, label: item.name };
-          }),
-          form: createAccountForm,
-          name: "province",
-          loading: isProvicesLoading,
-        },
-        spans: 4,
-      },
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "District",
-          placeholder: "District",
-          data: createAccountDistricts?.map((item) => {
-            return { value: `${item.id}`, label: item.name };
-          }),
-          form: createAccountForm,
-          name: "district",
-          loading: isCreateAccountDistrictsLoading,
-
-          // disabled: true,
-        },
-        spans: 4,
-      },
-      {
-        type: FIELD_TYPES.SELECT,
-        fieldProps: {
-          label: "Ward",
-          placeholder: "Ward",
-          data: createAccountWards?.map((item) => {
-            return { value: `${item.id}`, label: item.name };
-          }),
-          form: createAccountForm,
-          name: "wardId",
-          loading: isCreateAccountWardsLoading,
-          // disabled: true,
-        },
-        spans: 4,
-      },
-      {
-        type: FIELD_TYPES.TEXT,
-        fieldProps: {
-          form: createAccountForm,
-          name: "addressLine",
-          placeholder: "Address",
-          label: "Address",
-        },
-      },
-    ];
-  }, [
-    createAccountForm,
-    provinces,
-    isProvicesLoading,
-    createAccountDistricts,
-    isCreateAccountDistrictsLoading,
-    createAccountWards,
-    isCreateAccountWardsLoading,
   ]);
 
   return (
@@ -407,25 +234,18 @@ const CreateShop = () => {
         </Group>
         <form
           onSubmit={createShopForm.onSubmit(
-            ({
-              addressLine,
-              name,
-              phone,
-              wardId,
-              shopManagerId,
-              openTime,
-              closeTime,
-            }) => {
-              const updateParams: CreateShopParams = {
+            ({ addressLine, name, phone, wardId, shopManagerId, openTime, closeTime, }) => {
+              const createShopParams: CreateShopParams = {
                 addressLine,
                 name,
-                phone: phone == "" ? null : phone,
+                phone: isEmpty(phone) ? null : phone,
                 wardId: +(wardId ?? 0),
                 shopManagerId: shopManagerId ?? null,
-                openTime: openTime,
-                closeTime: closeTime,
+                openTime: openTime + ":00",
+                closeTime: closeTime + ":00",
               };
-              createShop(updateParams, {
+              console.log(createShopParams)
+              createShop(createShopParams, {
                 onSuccess(data) {
                   notifications.show({
                     title: "Successfully",
@@ -458,72 +278,9 @@ const CreateShop = () => {
           </Group>
         </form>
       </Paper>
-      <Collapse in={opened}>
-        <Paper m={rem(32)} p={rem(32)}>
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={rem(20)}>
-            Add shop manager account
-          </Text>
-          <form
-            onReset={createAccountForm.onReset}
-            autoComplete="off"
-            onSubmit={createAccountForm.onSubmit(
-              ({
-                addressLine,
-                birthday,
-                email,
-                gender,
-                name,
-                password,
-                phone,
-                wardId,
-              }) => {
-                const params: CreateAccountParams = {
-                  addressLine: addressLine ?? null,
-                  birthday: dayjs(birthday).format("YYYY-MM-DD"),
-                  brandId: brandList?.values[0].id ?? "",
-                  email,
-                  gender,
-                  name,
-                  password,
-                  phone,
-                  role: Role.ShopManager,
-                  wardId: wardId ? +wardId : null,
-                };
-
-                createAccount(params, {
-                  onSuccess() {
-                    notifications.show({
-                      title: "Successfully",
-                      message: "Create account successfully!",
-                    });
-                    refetchAccountList(), toggle();
-                    createAccountForm.reset();
-                  },
-                  onError(data) {
-                    const error = data as AxiosError<ResponseErrorDetail>;
-                    notifications.show({
-                      color: "red",
-                      title: "Failed",
-                      message: error.response?.data?.message,
-                    });
-                  },
-                });
-              }
-            )}
-          >
-            <EditAndUpdateForm fields={addNewAccountfields} />
-            <Group justify="flex-end" mt="md">
-              <Button
-                type="submit"
-                disabled={!createAccountForm.isDirty()}
-                loading={isCreateAccountLoading || isGetBrandListLoading}
-              >
-                Create
-              </Button>
-            </Group>
-          </form>
-        </Paper>
-      </Collapse>
+      <Modal opened={opened} onClose={close} size="lg" title="New Shop Manager" centered closeOnClickOutside={false}>
+        <CreateShopManagerForm mode="shop" close={close} refetch={refetchAccountList} />
+      </Modal>
     </>
   );
 };

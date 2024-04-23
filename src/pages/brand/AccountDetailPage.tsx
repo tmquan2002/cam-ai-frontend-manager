@@ -13,7 +13,7 @@ import EditAndUpdateForm, {
 import { useEffect, useMemo } from "react";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { Gender } from "../../models/CamAIEnum";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
 import { useParams } from "react-router-dom";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
@@ -26,6 +26,8 @@ import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import dayjs from "dayjs";
 import BackButton from "../../components/button/BackButton";
+import { phoneRegex } from "../../types/constant";
+import { isEmpty } from "lodash";
 
 type ProfileFieldValue = {
   name: string;
@@ -55,30 +57,17 @@ const AccountDetailPage = () => {
     },
     validate: {
       name: isNotEmpty("Name is required"),
-      email: (value) =>
-        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: huy@gmail.com",
+      email: isEmail("Invalid email - ex: name@gmail.com"),
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        value == "" ||
-          value == null ||
-          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
-  );
-  const { data: accountData, isLoading: isAccountDataLoading } =
-    useGetAccountById(id ?? "");
-
-  const { mutate: updateAccount, isLoading: isUpdateAccountLoading } =
-    useUpdateAccount();
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
+  const { data: accountData, isLoading: isAccountDataLoading } = useGetAccountById(id ?? "");
+  const { mutate: updateAccount, isLoading: isUpdateAccountLoading } = useUpdateAccount();
 
   useEffect(() => {
     if (accountData) {

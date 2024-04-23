@@ -1,9 +1,9 @@
-import { ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem, useComputedColorScheme, } from "@mantine/core";
+import { ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Modal, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem, useComputedColorScheme } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure, useListState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconArrowMerge, IconFilter, IconIdOff, IconSelect, IconX } from "@tabler/icons-react";
+import { IconArrowMerge, IconFilter, IconIdOff, IconSelect, IconUserUp, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import _, { isEmpty } from "lodash";
@@ -44,6 +44,7 @@ type IncidentFormField = {
 const ShopIncidentListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
+  const [assignOpened, { open: openAssign, close: closeAssign }] = useDisclosure(false);
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
@@ -123,8 +124,9 @@ const ShopIncidentListPage = () => {
     form.values.status,
     form.values.toTime,
   ]);
-  const { data: incidentList, isLoading: isGetIncidentListLoading, refetch: refetchIncidentList, } = useGetOrderedIncidentListChecked(searchParams);
 
+  // API query section
+  const { data: incidentList, isLoading: isGetIncidentListLoading, refetch: refetchIncidentList, } = useGetOrderedIncidentListChecked(searchParams);
   const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
   const { data: incidentData, isLoading: isGetIncidentLoading, refetch: refetchIncident, } = useGetIncidentById(selectedIncident?.id ?? null);
   const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } = useRejectIncidentById();
@@ -224,7 +226,7 @@ const ShopIncidentListPage = () => {
       },
     });
 
-  const fields = useMemo(() => {
+  const filterFields = useMemo(() => {
     return [
       {
         type: FIELD_TYPES.SELECT,
@@ -443,7 +445,7 @@ const ShopIncidentListPage = () => {
             </ActionIcon>
           </Tooltip>
 
-          <Tooltip label="Select" withArrow>
+          <Tooltip label="Select Multiple" withArrow>
             <ActionIcon variant={checkBoxMode == "Select" ? "filled" : "subtle"}
               onClick={() => {
                 handlers.setState(incidentList || [])
@@ -489,7 +491,7 @@ const ShopIncidentListPage = () => {
 
       {/* Filter collapse section */}
       <Collapse px={rem(28)} in={opened} mb={"xl"} mt={"xs"}>
-        <EditAndUpdateForm fields={fields} />
+        <EditAndUpdateForm fields={filterFields} />
       </Collapse>
 
       {/* Select collapse section */}
@@ -502,16 +504,21 @@ const ShopIncidentListPage = () => {
                 handlers.setState((current) =>
                   current.map((value) => ({ ...value, checked: !allChecked }))
                 )
-              } />
+              }
+            />
+            <Text size="sm" fs="italic">{incidentCheckBoxList.filter((item) => item.checked).length} incident&#40;s&#41; selected</Text>
           </Group>
 
           <Group justify="flex-end">
-            <Button
-              variant="gradient" size="xs"
-              gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
-            >
-              Assign Selected
-            </Button>
+            <Group gap={0}>
+
+              <Button
+                variant="gradient" size="xs"
+                gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+              >
+                Assign Selected
+              </Button>
+            </Group>
             <Button
               variant="gradient" size="xs"
               gradient={{ from: "pale-red.5", to: "pale-red.7", deg: 90 }}
@@ -548,13 +555,9 @@ const ShopIncidentListPage = () => {
         <Divider mr={rem(4)} orientation="vertical" />
         <Divider mr={rem(8)} orientation="vertical" />
 
-        {/* View incident section */}
+        {/* Right side view incident section */}
         {selectedIncident ? (
-          <ScrollArea
-            style={{
-              display: "flex",
-              flex: 1,
-            }}
+          <ScrollArea style={{ display: "flex", flex: 1, }}
             type="hover"
             mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
           >
@@ -574,20 +577,34 @@ const ShopIncidentListPage = () => {
                     </Text>
                     {renderIncidentStatusBadge(incidentData?.status)}
                   </Group>
-                  <Tooltip label="Reject incident">
-                    <ActionIcon
-                      variant="filled"
-                      aria-label="Settings"
-                      color={"red"}
-                      onClick={openModal}
-                      loading={isRejectIncidentLoading}
-                    >
-                      <IconIdOff
-                        style={{ width: "70%", height: "70%" }}
-                        stroke={1.5}
-                      />
-                    </ActionIcon>
-                  </Tooltip>
+
+                  <Group>
+                    <Tooltip label="Assign incident">
+                      <ActionIcon
+                        variant="gradient"
+                        gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+                        onClick={openAssign}
+                      >
+                        <IconUserUp
+                          style={{ width: "70%", height: "70%" }}
+                          stroke={1.5}
+                        />
+                      </ActionIcon>
+                    </Tooltip>
+                    <Tooltip label="Reject incident">
+                      <ActionIcon
+                        variant="gradient"
+                        gradient={{ from: "pale-red.5", to: "pale-red.7", deg: 90 }}
+                        onClick={openModal}
+                        loading={isRejectIncidentLoading}
+                      >
+                        <IconIdOff
+                          style={{ width: "70%", height: "70%" }}
+                          stroke={1.5}
+                        />
+                      </ActionIcon>
+                    </Tooltip>
+                  </Group>
                 </Group>
 
                 <Group justify="space-between" mb={rem(12)}>
@@ -623,42 +640,40 @@ const ShopIncidentListPage = () => {
                   })
                 )}
 
-                <Box>
-                  <Text fw={500} size={rem(20)} my={rem(20)}>
-                    Assigned to
-                  </Text>
-                  <Divider color="#acacac" />
-
-                  <form
-                    onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}
-                  >
-                    <Group align="center" mt={rem(20)} pb={rem(20)}>
-                      {isGetEmployeeListLoading ? (
-                        <Loader mt={rem(30)} />
-                      ) : (
-                        <Select
-                          w={rem(600)}
-                          {...assignIncidentForm.getInputProps("employeeId")}
-                          placeholder="Assign incident to an employee"
-                          data={employeeList?.values?.map((item) => {
-                            return {
-                              value: item?.id,
-                              label: item?.name,
-                            };
-                          })}
-                          nothingFoundMessage="Nothing found..."
-                        />
-                      )}
-                      <Button
-                        type="submit"
-                        loading={isAssignIncidentLoading}
-                        disabled={!assignIncidentForm.isDirty()}
-                      >
-                        Confirm
-                      </Button>
-                    </Group>
-                  </form>
-                </Box>
+                {/* Assign single form section */}
+                <Modal opened={assignOpened} onClose={closeAssign} title="Assign to">
+                  <Box>
+                    <form
+                      onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}
+                    >
+                      <Group align="center" mt={rem(20)} pb={rem(20)}>
+                        {isGetEmployeeListLoading ? (
+                          <Loader mt={rem(30)} />
+                        ) : (
+                          <Select
+                            w={rem(600)}
+                            {...assignIncidentForm.getInputProps("employeeId")}
+                            placeholder="Assign incident to an employee"
+                            data={employeeList?.values?.map((item) => {
+                              return {
+                                value: item?.id,
+                                label: item?.name,
+                              };
+                            })}
+                            nothingFoundMessage="Nothing found..."
+                          />
+                        )}
+                        <Button
+                          type="submit"
+                          loading={isAssignIncidentLoading}
+                          disabled={!assignIncidentForm.isDirty()}
+                        >
+                          Confirm
+                        </Button>
+                      </Group>
+                    </form>
+                  </Box>
+                </Modal>
               </Box>
             </Skeleton>
           </ScrollArea>
