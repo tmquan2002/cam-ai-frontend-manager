@@ -2,5 +2,6 @@ version: '3.9'
 services:
   web:
     image: milease/camai-backend:camai-web-manager
+    pull_policy: "always"
     ports:
       - 3010:4174
