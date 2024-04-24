@@ -234,7 +234,7 @@ const InteractionReportPageManager = () => {
           </Text>
         ) : !incidentReportByTimeData ||
           incidentReportByTimeData?.data?.length == 0 ? (
-          <NoImage />
+          <NoImage type="NO_DATA" />
         ) : (
           <Box
             style={{

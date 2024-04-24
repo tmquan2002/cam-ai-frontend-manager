@@ -136,7 +136,7 @@ const ShopDetailPageManager = () => {
     validate: {
       name: hasLength(
         { min: 2, max: 50 },
-        "Shop name must be 1- 50 characters long",
+        "Shop name must be 1- 50 characters long"
       ),
       phone: (value) =>
         value == "" ||
@@ -164,10 +164,10 @@ const ShopDetailPageManager = () => {
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0),
+    +(form.values.province ?? 0)
   );
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0),
+    +(form.values.district ?? 0)
   );
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
@@ -202,7 +202,7 @@ const ShopDetailPageManager = () => {
             message: error.response?.data?.message,
           });
         },
-      },
+      }
     );
   };
 
@@ -240,7 +240,7 @@ const ShopDetailPageManager = () => {
             message: error.response?.data?.message,
           });
         },
-      },
+      }
     );
   };
 
@@ -439,7 +439,7 @@ const ShopDetailPageManager = () => {
   ]);
 
   let edgeBoxInstall = edgeBoxInstallList?.values.find(
-    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled,
+    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled
   );
 
   return (
@@ -590,7 +590,7 @@ const ShopDetailPageManager = () => {
         {isGetCameraListLoading ? (
           <Loader />
         ) : cameraList?.isValuesEmpty ? (
-          <NoImage />
+          <NoImage type="NO_DATA" />
         ) : (
           cameraList?.values?.map((item) => (
             <Tooltip label="View camera" key={item?.id}>

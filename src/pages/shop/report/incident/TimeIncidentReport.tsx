@@ -4,7 +4,6 @@ import {
   Card,
   Center,
   Flex,
-  Grid,
   Group,
   ScrollArea,
   SimpleGrid,
@@ -12,7 +11,6 @@ import {
   Stack,
   Table,
   Text,
-  Transition,
   rem,
 } from "@mantine/core";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
@@ -67,15 +65,18 @@ type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;
   interval: ReportInterval;
+  type: IncidentType;
 };
 
 const TimeIncidentReport = () => {
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
+  const {
+    scrollIntoView: scrollIntoIncidentDetail,
+    targetRef: incidentDetailRef,
+  } = useScrollIntoView<HTMLDivElement>();
   const [scrolled, setScrolled] = useState(false);
-  const [scrolledInteractionDetail, setScrolledInteractionDetail] =
-    useState(false);
   const [selectedIncidentItem, setSelectedIncidentItem] =
     useState<IncidentDetail | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<{
@@ -89,6 +90,7 @@ const TimeIncidentReport = () => {
       startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
       interval: ReportInterval.HalfDay,
+      type: IncidentType.Incident,
     },
     validate: (values) => ({
       toDate:
@@ -118,7 +120,7 @@ const TimeIncidentReport = () => {
             : undefined,
           interval: form.values.interval,
           enabled: true,
-          type: IncidentType.Incident,
+          type: form.values.type,
         };
         sb = _.omitBy(sb, _.isNil) as GetIncidentReportByTimeParams & {
           enabled: boolean;
@@ -128,10 +130,15 @@ const TimeIncidentReport = () => {
         return {
           enabled: true,
           interval: form.values.interval,
-          type: IncidentType.Incident,
+          type: form.values.type,
         };
       }
-    }, [form.values.interval, form.values.startDate, form.values.toDate]);
+    }, [
+      form.values.interval,
+      form.values.startDate,
+      form.values.toDate,
+      form.values.type,
+    ]);
 
   const {
     data: incidentReportByTimeData,
@@ -140,6 +147,7 @@ const TimeIncidentReport = () => {
 
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList({
+      enabled: !!selectedDuration?.startTime && !!selectedDuration?.endTime,
       fromTime: selectedDuration?.startTime,
       toTime: selectedDuration?.endTime,
     });
@@ -167,7 +175,7 @@ const TimeIncidentReport = () => {
           fontWeight: 500,
           radius: rem(8),
         },
-        spans: 4,
+        spans: 3,
       },
       {
         type: FIELD_TYPES.DATE,
@@ -178,7 +186,7 @@ const TimeIncidentReport = () => {
           fontWeight: 500,
           radius: rem(8),
         },
-        spans: 4,
+        spans: 3,
       },
       {
         type: FIELD_TYPES.SELECT,
@@ -211,15 +219,47 @@ const TimeIncidentReport = () => {
             },
           ],
         },
-        spans: 4,
+        spans: 3,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          form,
+          name: "type",
+          placeholder: "Incident type",
+          fontWeight: 500,
+          radius: rem(8),
+
+          data: [
+            {
+              value: IncidentType.Phone,
+              label: "Phone incident",
+            },
+            {
+              value: IncidentType.Uniform,
+              label: "Uniform incident",
+            },
+            {
+              value: IncidentType.Incident,
+              label: "All incident",
+            },
+          ],
+        },
+        spans: 3,
       },
     ];
   }, [form]);
+
   useEffect(() => {
     if (incidentList) {
-      scrollIntoView({});
+      scrollIntoView();
     }
   }, [incidentList]);
+  useEffect(() => {
+    if (selectedIncidentItem) {
+      scrollIntoIncidentDetail();
+    }
+  }, [selectedIncidentItem]);
 
   const rows = isGetIncidentListLoading ? (
     <Table.Tr>
@@ -247,7 +287,9 @@ const TimeIncidentReport = () => {
         style={{
           cursor: "pointer",
         }}
-        onClick={() => setSelectedIncidentItem(item)}
+        onClick={() => {
+          setSelectedIncidentItem(item);
+        }}
         className={
           item?.id == selectedIncidentItem?.id
             ? classes["selectedInteraction"]
@@ -282,6 +324,13 @@ const TimeIncidentReport = () => {
         <Table.Td py={rem(18)}>
           <Center>
             <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.evidences.length}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
               {item?.employee?.name ?? "Empty"}
             </Text>
           </Center>
@@ -298,7 +347,7 @@ const TimeIncidentReport = () => {
   );
 
   return (
-    <Box>
+    <Box pb={rem(40)}>
       <Skeleton visible={isGetIncidentReportByTimeDataLoading}>
         <Box
           style={{
@@ -317,17 +366,15 @@ const TimeIncidentReport = () => {
             }}
           >
             <Group justify="flex-end">
-              <Group>
-                <Box miw={rem(360)} mr={rem(12)}>
-                  <EditAndUpdateForm fields={fields} />
-                </Box>
-              </Group>
+              <Box miw={rem(360)} mr={rem(12)}>
+                <EditAndUpdateForm fields={fields} />
+              </Box>
             </Group>
           </Box>
 
           {!incidentReportByTimeData ||
           incidentReportByTimeData?.data?.length == 0 ? (
-            <NoImage />
+            <NoImage type="NO_DATA" />
           ) : (
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)} mr={rem(12)}>
@@ -623,13 +670,15 @@ const TimeIncidentReport = () => {
       </Skeleton>
 
       <Group align="flex-start" mt={rem(40)}>
-        {incidentList || isGetIncidentListLoading ? (
+        {incidentList ? (
           <Card
             radius={8}
-            w={selectedIncidentItem ? "30%" : "100%"}
-            mb={rem(80)}
-            className={classes["transition"]}
+            w={"100%"}
+            mb={rem(40)}
             ref={targetRef}
+            style={{
+              border: "1px solid #ccc",
+            }}
           >
             <Card.Section
               style={{
@@ -726,6 +775,18 @@ const TimeIncidentReport = () => {
                           </Text>
                         </Center>
                       </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Evidences
+                          </Text>
+                        </Center>
+                      </Table.Th>
 
                       <Table.Th py={rem(16)}>
                         <Center>
@@ -761,123 +822,105 @@ const TimeIncidentReport = () => {
         ) : (
           <></>
         )}
-        <Transition
-          mounted={!!selectedIncidentItem}
-          transition="slide-left"
-          duration={1200}
-          timingFunction="ease"
-          exitDuration={0}
-        >
-          {(styles) => (
-            <Card
-              h={rem(720)}
-              radius={8}
-              flex={1}
-              mb={rem(80)}
-              style={{
-                ...styles,
-                border: "1px solid rgb(229 231 235)",
-              }}
-            >
-              <Card.Section>
-                <ScrollArea.Autosize
-                  type="scroll"
-                  mah={720}
-                  onScrollPositionChange={({ y }) =>
-                    setScrolledInteractionDetail(y !== 0)
-                  }
-                >
-                  <Box
-                    className={cx(classes.header, {
-                      [classes.scrolled]: scrolledInteractionDetail,
-                    })}
-                    style={{
-                      borderBottom: "1px solid #ccc",
-                    }}
-                    bg={"#f9fafb"}
-                    py={rem(16)}
-                    px={rem(24)}
-                  >
-                    <Group justify="space-between">
-                      <Text size="md" fw={600}>
-                        Incident detail
-                      </Text>
-                      <Group gap={rem(8)}>
-                        <Text fw={500} size="sm">
-                          Total time:
-                        </Text>
-                        <Badge radius={"sm"} color={"green"} c={"#fff"}>
-                          {selectedIncidentItem?.startTime &&
-                          selectedIncidentItem.endTime
-                            ? differentDateReturnFormattedString(
-                                selectedIncidentItem?.startTime,
-                                selectedIncidentItem?.endTime
-                              )
-                            : "undefined"}
-                        </Badge>
-                      </Group>
-                    </Group>
-                  </Box>
-                  <Box px={rem(24)} pb={rem(40)}>
-                    <Box>
-                      <Group
-                        justify="space-between"
-                        style={{
-                          borderBottom: "1px solid #e5e7eb",
-                        }}
-                        pt={rem(16)}
-                        pb={rem(8)}
-                        mb={rem(10)}
+        {selectedIncidentItem ? (
+          <Card
+            radius={8}
+            w={"100%"}
+            ref={incidentDetailRef}
+            style={{
+              border: "1px solid rgb(229 231 235)",
+            }}
+          >
+            <Card.Section>
+              <Box
+                style={{
+                  borderBottom: "1px solid #ccc",
+                }}
+                bg={"#f9fafb"}
+                py={rem(16)}
+                px={rem(24)}
+              >
+                <Group justify="space-between">
+                  <Text size="md" fw={600}>
+                    Incident detail
+                  </Text>
+                  <Group gap={rem(8)}>
+                    <Text fw={500} size="sm">
+                      Total time:
+                    </Text>
+                    <Badge radius={"sm"} color={"green"} c={"#fff"}>
+                      {selectedIncidentItem?.startTime &&
+                      selectedIncidentItem.endTime
+                        ? differentDateReturnFormattedString(
+                            selectedIncidentItem?.startTime,
+                            selectedIncidentItem?.endTime
+                          )
+                        : "undefined"}
+                    </Badge>
+                  </Group>
+                </Group>
+              </Box>
+              <ScrollArea.Autosize mah={1000} my={rem(12)}>
+                <Box px={rem(24)}>
+                  <Box>
+                    <Group
+                      justify="space-between"
+                      style={{
+                        borderBottom: "1px solid #e5e7eb",
+                      }}
+                      pb={rem(8)}
+                      mb={rem(10)}
+                    >
+                      <Text
+                        c={"rgb(107 114 128"}
+                        size={rem(14)}
+                        lh={rem(24)}
+                        fw={500}
                       >
+                        {dayjs(
+                          selectedIncidentItem?.evidences?.[0]?.createdDate
+                        ).format("LL")}
+                      </Text>
+                      <Text
+                        c={"rgb(107 114 128"}
+                        size={rem(14)}
+                        lh={rem(24)}
+                        fw={500}
+                      >
+                        Assigned to :{" "}
                         <Text
-                          c={"rgb(107 114 128"}
-                          size={rem(14)}
-                          lh={rem(24)}
-                          fw={500}
+                          span
+                          c="blue"
+                          inherit
+                          style={{
+                            cursor: "pointer",
+                          }}
                         >
-                          {dayjs(
-                            selectedIncidentItem?.evidences?.[0]?.createdDate
-                          ).format("LL")}
+                          {selectedIncidentItem?.employee?.name ?? "Empty"}
                         </Text>
-                        <Text
-                          c={"rgb(107 114 128"}
-                          size={rem(14)}
-                          lh={rem(24)}
-                          fw={500}
-                        >
-                          Assigned to :{" "}
-                          <Text
-                            span
-                            c="blue"
-                            inherit
-                            style={{
-                              cursor: "pointer",
-                            }}
-                          >
-                            {selectedIncidentItem?.employee?.name ?? "Empty"}
-                          </Text>
-                        </Text>
-                      </Group>
-                      {selectedIncidentItem?.evidences?.length == 0 ? (
-                        <NoImage />
-                      ) : (
-                        selectedIncidentItem?.evidences.map((i) => (
-                          <LoadingImage
-                            mb={rem(12)}
-                            fit="contain"
-                            radius={"md"}
-                            key={i.id}
-                            imageId={i?.imageId ?? ""}
-                          />
-                        ))
-                      )}
-                    </Box>
+                      </Text>
+                    </Group>
+                    {selectedIncidentItem?.evidences?.length == 0 ? (
+                      <NoImage type="NO_DATA" />
+                    ) : (
+                      selectedIncidentItem?.evidences.map((i) => (
+                        <LoadingImage
+                          mb={rem(12)}
+                          fit="contain"
+                          radius={"md"}
+                          key={i.id}
+                          imageId={i?.imageId ?? ""}
+                        />
+                      ))
+                    )}
                   </Box>
-                </ScrollArea.Autosize>
-              </Card.Section>
-            </Card>
-          )}
-        </Transition>
+                </Box>
+              </ScrollArea.Autosize>
+            </Card.Section>
+          </Card>
+        ) : (
+          <></>
+        )}
       </Group>
     </Box>
   );

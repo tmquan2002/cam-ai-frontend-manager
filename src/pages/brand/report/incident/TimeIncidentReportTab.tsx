@@ -203,7 +203,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           </Text>
         ) : !incidentReportByTimeData ||
           incidentReportByTimeData?.data?.length == 0 ? (
-          <NoImage />
+          <NoImage type="NO_DATA" />
         ) : (
           <Box
             style={{
