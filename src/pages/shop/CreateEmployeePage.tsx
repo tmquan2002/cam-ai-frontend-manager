@@ -100,7 +100,7 @@ const CreateEmployeePage = () => {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
           form: createEmployeeForm,
-          name: "phone",
+          name: "phonee",
           type: "number",
           placeholder: "Phone",
           label: "Phone",
