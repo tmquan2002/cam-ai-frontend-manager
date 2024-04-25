@@ -57,7 +57,7 @@ const BrandShopDetailPage = () => {
         </Box>
       </Flex>
 
-      <Tooltip label="Brand banner">
+      <Tooltip label="Brand banner testing push right repo">
         <LoadingImage
           radius={"md"}
           bg={"#000"}
