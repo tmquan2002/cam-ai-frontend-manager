@@ -173,7 +173,7 @@ const CountEmployeeReportPage = () => {
         </Card.Section>
 
         {!humanCountData || humanCountData?.data?.length == 0 ? (
-          <NoImage />
+          <NoImage type="NO_DATA" />
         ) : (
           <Box>
             <Group justify="flex-end" mb={rem(10)} mr={rem(12)}>

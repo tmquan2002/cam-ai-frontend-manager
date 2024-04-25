@@ -76,8 +76,10 @@ export const InteractionReportPage = () => {
     offset: 60,
   });
   const [scrolled, setScrolled] = useState(false);
-  const [scrolledInteractionDetail, setScrolledInteactionDetail] =
-    useState(false);
+  const {
+    scrollIntoView: scrollIntoInteractionDetail,
+    targetRef: interactionDetailRef,
+  } = useScrollIntoView<HTMLDivElement>();
   const [selectedDuration, setSelectedDuration] = useState<{
     startTime: string;
     endTime: string;
@@ -91,7 +93,7 @@ export const InteractionReportPage = () => {
     initialValues: {
       startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
-      interval: ReportInterval.Hour,
+      interval: ReportInterval.HalfDay,
     },
     validate: (values) => ({
       toDate:
@@ -305,6 +307,12 @@ export const InteractionReportPage = () => {
     }
   }, [interactionList]);
 
+  useEffect(() => {
+    if (selectedInteractionItem) {
+      scrollIntoInteractionDetail();
+    }
+  }, [selectedInteractionItem]);
+
   return (
     <Flex px={rem(28)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
       <Text
@@ -346,7 +354,7 @@ export const InteractionReportPage = () => {
         <Card.Section px={rem(12)}>
           {!incidentReportByTimeData ||
           incidentReportByTimeData?.data?.length == 0 ? (
-            <NoImage />
+            <NoImage type="NO_DATA" />
           ) : (
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)}>
@@ -567,13 +575,15 @@ export const InteractionReportPage = () => {
       </Card>
 
       <Group align="flex-start" mt={rem(40)}>
-        {interactionList || isGetInteractionListLoading ? (
+        {interactionList ? (
           <Card
             radius={8}
-            w={selectedInteractionItem ? "30%" : "100%"}
+            w={"100%"}
             mb={rem(80)}
-            className={classes["transition"]}
             ref={targetRef}
+            style={{
+              border: "1px solid #ccc",
+            }}
           >
             <Card.Section
               style={{
@@ -677,7 +687,7 @@ export const InteractionReportPage = () => {
                             c={"rgb(55 65 81)"}
                             fw={600}
                           >
-                            Evidence count
+                            Evidences
                           </Text>
                         </Center>
                       </Table.Th>
@@ -704,110 +714,93 @@ export const InteractionReportPage = () => {
           <></>
         )}
 
-        <Transition
-          mounted={!!selectedInteractionItem}
-          transition="slide-left"
-          duration={1200}
-          timingFunction="ease"
-          exitDuration={0}
-        >
-          {(styles) => (
-            <Card
-              h={rem(720)}
-              radius={8}
-              flex={1}
-              mb={rem(80)}
-              style={{
-                ...styles,
-                border: "1px solid rgb(229 231 235)",
-              }}
-            >
-              <Card.Section>
-                <ScrollArea.Autosize
-                  type="scroll"
-                  mah={720}
-                  onScrollPositionChange={({ y }) =>
-                    setScrolledInteactionDetail(y !== 0)
-                  }
-                >
-                  <Box
-                    className={cx(classes.header, {
-                      [classes.scrolled]: scrolledInteractionDetail,
-                    })}
-                    style={{
-                      borderBottom: "1px solid #ccc",
-                    }}
-                    bg={"#f9fafb"}
-                    py={rem(16)}
-                    px={rem(24)}
-                  >
-                    <Group justify="space-between">
-                      <Text size="md" fw={600}>
-                        Interaction detail
-                      </Text>
-                      <Group gap={rem(8)}>
-                        <Text fw={500} size="sm">
-                          Total time:
-                        </Text>
-                        <Badge
-                          radius={"sm"}
-                          color={"green"}
-                          c={"#fff"}
-                          mr={rem(16)}
-                        >
-                          {selectedInteractionItem?.startTime &&
-                          selectedInteractionItem.endTime
-                            ? differentDateReturnFormattedString(
-                                selectedInteractionItem?.startTime,
-                                selectedInteractionItem?.endTime
-                              )
-                            : "undefined"}
-                        </Badge>
-                      </Group>
-                    </Group>
-                  </Box>
-                  <Box px={rem(24)} pb={rem(40)}>
-                    <Box>
-                      <Group
-                        justify="space-between"
-                        style={{
-                          borderBottom: "1px solid #e5e7eb",
-                        }}
-                        pt={rem(16)}
-                        pb={rem(8)}
-                        mb={rem(10)}
+        {selectedInteractionItem ? (
+          <Card
+            radius={8}
+            w={"100%"}
+            ref={interactionDetailRef}
+            style={{
+              border: "1px solid rgb(229 231 235)",
+            }}
+          >
+            <Card.Section>
+              <Box
+                style={{
+                  borderBottom: "1px solid #ccc",
+                }}
+                bg={"#f9fafb"}
+                py={rem(16)}
+                px={rem(24)}
+              >
+                <Group justify="space-between">
+                  <Text size="md" fw={600}>
+                    Interaction detail
+                  </Text>
+                  <Group gap={rem(8)}>
+                    <Text fw={500} size="sm">
+                      Total time:
+                    </Text>
+                    <Badge
+                      radius={"sm"}
+                      color={"green"}
+                      c={"#fff"}
+                      mr={rem(16)}
+                    >
+                      {selectedInteractionItem?.startTime &&
+                      selectedInteractionItem.endTime
+                        ? differentDateReturnFormattedString(
+                            selectedInteractionItem?.startTime,
+                            selectedInteractionItem?.endTime
+                          )
+                        : "undefined"}
+                    </Badge>
+                  </Group>
+                </Group>
+              </Box>
+
+              <ScrollArea.Autosize mah={1000} my={rem(12)}>
+                <Box px={rem(24)}>
+                  <Box>
+                    <Group
+                      justify="space-between"
+                      style={{
+                        borderBottom: "1px solid #e5e7eb",
+                      }}
+                      pb={rem(8)}
+                      mb={rem(10)}
+                    >
+                      <Text
+                        c={"rgb(107 114 128"}
+                        size={rem(14)}
+                        lh={rem(24)}
+                        fw={500}
                       >
-                        <Text
-                          c={"rgb(107 114 128"}
-                          size={rem(14)}
-                          lh={rem(24)}
-                          fw={500}
-                        >
-                          {dayjs(
-                            selectedInteractionItem?.evidences?.[0]?.createdDate
-                          ).format("LL")}
-                        </Text>
-                      </Group>
-                      {selectedInteractionItem?.evidences?.length == 0 ? (
-                        <NoImage />
-                      ) : (
-                        selectedInteractionItem?.evidences.map((i) => (
-                          <LoadingImage
-                            fit="contain"
-                            radius={"md"}
-                            mb={rem(12)}
-                            key={i.id}
-                            imageId={i?.imageId ?? ""}
-                          />
-                        ))
-                      )}
-                    </Box>
+                        {dayjs(
+                          selectedInteractionItem?.evidences?.[0]?.createdDate
+                        ).format("LL")}
+                      </Text>
+                    </Group>
+                    {selectedInteractionItem?.evidences?.length == 0 ? (
+                      <NoImage type="NO_DATA" />
+                    ) : (
+                      selectedInteractionItem?.evidences.map((i) => (
+                        <LoadingImage
+                          fit="contain"
+                          radius={"md"}
+                          mb={rem(12)}
+                          key={i.id}
+                          imageId={i?.imageId ?? ""}
+                        />
+                      ))
+                    )}
                   </Box>
-                </ScrollArea.Autosize>
-              </Card.Section>
-            </Card>
-          )}
-        </Transition>
+                </Box>
+              </ScrollArea.Autosize>
+            </Card.Section>
+          </Card>
+        ) : (
+          <></>
+        )}
       </Group>
     </Flex>
   );

@@ -1,6 +1,8 @@
-import { Image, ImageProps, Skeleton } from "@mantine/core";
+import { Box, Center, Image, ImageProps, Skeleton, rem } from "@mantine/core";
 import { useGetImageById } from "../../hooks/useGetImageById";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import NoImage from "./NoImage";
 
 interface LoadingImageProps extends ImageProps {
   imageId: string;
@@ -10,6 +12,7 @@ interface LoadingImageProps extends ImageProps {
 const LoadingImage = (props: LoadingImageProps) => {
   const { imageId, ...rest } = props;
   const { data, isLoading } = useGetImageById(imageId);
+  const [isLoadFailed, setIsLoadFailed] = useState<boolean>(false);
 
   const imageSrc = useMemo(() => {
     if (!data) return "";
@@ -33,11 +36,20 @@ const LoadingImage = (props: LoadingImageProps) => {
       ></Skeleton>
     );
   }
+
+  if (isLoadFailed) {
+    return (
+      <Box mb={0}>
+        <NoImage type="CANNOT_LOAD" />;
+      </Box>
+    );
+  }
+
   return (
     <Image
       {...rest}
       src={`data:;base64,${imageSrc}`}
-      fallbackSrc="https://placehold.co/600x400?text=Placeholder"
+      onError={() => setIsLoadFailed(true)}
     />
   );
 };
