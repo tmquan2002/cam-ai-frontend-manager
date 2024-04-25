@@ -1,7 +1,6 @@
-import { Box, Center, Image, ImageProps, Skeleton, rem } from "@mantine/core";
+import { Box, Image, ImageProps, Skeleton } from "@mantine/core";
 import { useGetImageById } from "../../hooks/useGetImageById";
 import { useMemo, useState } from "react";
-import { IMAGE_CONSTANT } from "../../types/constant";
 import NoImage from "./NoImage";
 
 interface LoadingImageProps extends ImageProps {

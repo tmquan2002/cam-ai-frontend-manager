@@ -45,6 +45,8 @@ const renderShiftDetailCard = (
   employeeName: string,
   employeeEmail: string
 ) => {
+  console.log(startTime, endTime, employeeName, employeeEmail);
+
   return (
     <>
       <Group gap={"sm"} mb={rem(4)}>
