@@ -242,7 +242,7 @@ const IncidentDetail = () => {
             </Group>
             <Divider color="#acacac" mb={rem(20)} />
             {_.isEmpty(incidentData?.evidences) ? (
-              <NoImage />
+              <NoImage type="NO_DATA" />
             ) : (
               incidentData?.evidences?.map((item) => {
                 return (

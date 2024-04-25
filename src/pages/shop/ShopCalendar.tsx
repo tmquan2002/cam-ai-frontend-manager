@@ -4,6 +4,7 @@ import {
   Card,
   Divider,
   Flex,
+  Grid,
   Group,
   HoverCard,
   SimpleGrid,
@@ -37,6 +38,44 @@ interface Event {
 interface ShopCalendarProps {
   events: Event[];
 }
+
+const renderShiftDetailCard = (
+  startTime: string,
+  endTime: string,
+  employeeName: string,
+  employeeEmail: string
+) => {
+  console.log(startTime, endTime, employeeName, employeeEmail);
+
+  return (
+    <>
+      <Group gap={"sm"} mb={rem(4)}>
+        <IconClock
+          style={{
+            width: rem(18),
+            height: rem(18),
+            color: "rgb(29 78 216)",
+          }}
+        />
+        <Text c={"rgb(59, 130, 246)"} size={rem(14)} lh={rem(20)}>
+          6.00 AM - 7.00 AM
+        </Text>
+      </Group>
+      <Group gap={"sm"}>
+        <IconUser
+          style={{
+            width: rem(18),
+            height: rem(18),
+            color: "rgb(29 78 216)",
+          }}
+        />
+        <Text c={"rgb(29, 78, 216)"} size={rem(15)} lh={rem(24)} fw={600}>
+          Paper is the - nqhuy.toan.cr@email.com
+        </Text>
+      </Group>
+    </>
+  );
+};
 
 const ShopCalendar = ({ events }: ShopCalendarProps) => {
   const navigate = useNavigate();
@@ -242,77 +281,87 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         </Card.Section>
 
         <Card.Section px={rem(20)} pt={rem(100)} pb={rem(20)}>
-          <Group gap={0} align="center" justify="space-between">
-            <HoverCard shadow="md" radius={"md"}>
-              <HoverCard.Target>
-                <Box className={classes["timelineWrapper"]}>
-                  <Box className={classes["timelinePrimaryPoint"]} mr={rem(4)}>
-                    <Text
-                      className={classes["timeLineNumber"]}
-                      size={rem(12)}
-                      fw={500}
-                    >
-                      11:11
-                    </Text>
-                    <Box className={classes["innerTimelinePrimaryPoint"]} />
-                  </Box>
-                  <Divider
-                    className={classes["divider"]}
-                    display={"flex"}
-                    flex={1}
-                  />
-                </Box>
-              </HoverCard.Target>
-              <HoverCard.Dropdown py={rem(18)}>
-                <Group gap={"sm"} mb={rem(4)}>
-                  <IconClock
-                    style={{
-                      width: rem(18),
-                      height: rem(18),
-                      color: "rgb(29 78 216)",
-                    }}
-                  />
-                  <Text c={"rgb(59, 130, 246)"} size={rem(14)} lh={rem(20)}>
-                    6.00 AM - 7.00 AM
-                  </Text>
-                </Group>
-                <Group gap={"sm"}>
-                  <IconUser
-                    style={{
-                      width: rem(18),
-                      height: rem(18),
-                      color: "rgb(29 78 216)",
-                    }}
-                  />
-                  <Text
-                    c={"rgb(29, 78, 216)"}
-                    size={rem(15)}
-                    lh={rem(24)}
-                    fw={600}
-                  >
-                    Paper is the - nqhuy.toan.cr@email.com
-                  </Text>
-                </Group>
-              </HoverCard.Dropdown>
-            </HoverCard>
+          <Group gap={0}>
+            <Grid gutter={0} align="center" columns={24} flex={1}>
+              <Grid.Col span={4}>
+                <HoverCard shadow="md" radius={"md"}>
+                  <HoverCard.Target>
+                    <Box className={classes["timelineWrapper"]}>
+                      <Box className={classes["timelinePrimaryPoint"]}>
+                        <Text
+                          className={classes["timeLineNumber"]}
+                          size={rem(12)}
+                          fw={500}
+                        >
+                          11:11
+                        </Text>
+                        <Box className={classes["innerTimelinePrimaryPoint"]} />
+                      </Box>
+                      <Divider
+                        className={classes["divider"]}
+                        display={"flex"}
+                        flex={1}
+                      />
+                    </Box>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown py={rem(18)}>
+                    {renderShiftDetailCard("", "", "", "")}
+                  </HoverCard.Dropdown>
+                </HoverCard>
+              </Grid.Col>
 
-            <Box className={classes["timelineWrapper"]}>
-              <Box className={classes["timelineSecondaryPoint"]}>
-                <Text
-                  className={classes["timeLineNumber"]}
-                  size={rem(12)}
-                  fw={500}
-                >
-                  11:11
-                </Text>
-              </Box>
-              <Divider
-                className={classes["divider"]}
-                display={"flex"}
-                flex={1}
-              />
-            </Box>
+              <Grid.Col span={8}>
+                <HoverCard shadow="md" radius={"md"}>
+                  <HoverCard.Target>
+                    <Box className={classes["timelineWrapper"]}>
+                      <Box className={classes["timelineSecondaryPoint"]}>
+                        <Text
+                          className={classes["timeLineNumber"]}
+                          size={rem(12)}
+                          fw={500}
+                        >
+                          11:11
+                        </Text>
+                      </Box>
+                      <Divider
+                        className={classes["divider"]}
+                        display={"flex"}
+                        flex={1}
+                      />
+                    </Box>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown py={rem(18)}>
+                    {renderShiftDetailCard("", "", "", "")}
+                  </HoverCard.Dropdown>
+                </HoverCard>
+              </Grid.Col>
 
+              <Grid.Col span={12}>
+                <HoverCard shadow="md" radius={"md"}>
+                  <HoverCard.Target>
+                    <Box className={classes["timelineWrapper"]}>
+                      <Box className={classes["timelineSecondaryPoint"]}>
+                        <Text
+                          className={classes["timeLineNumber"]}
+                          size={rem(12)}
+                          fw={500}
+                        >
+                          11:11
+                        </Text>
+                      </Box>
+                      <Divider
+                        className={classes["divider"]}
+                        display={"flex"}
+                        flex={1}
+                      />
+                    </Box>
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown py={rem(18)}>
+                    {renderShiftDetailCard("", "", "", "")}
+                  </HoverCard.Dropdown>
+                </HoverCard>
+              </Grid.Col>
+            </Grid>
             <Box className={classes["timelinePrimaryPoint"]} ml={rem(4)}>
               <Text
                 className={classes["timeLineNumber"]}
