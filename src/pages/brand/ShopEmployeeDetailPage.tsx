@@ -61,7 +61,7 @@ const ShopEmployeeDetailPage = () => {
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
+      email: isEmail("Invalid email - ex: name@gmail.com"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == undefined ||

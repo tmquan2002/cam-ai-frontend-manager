@@ -1,27 +1,27 @@
 import { Button, Group, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
+import _, { isEmpty } from "lodash";
+import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useMemo } from "react";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
 import { useCreateEmployee } from "../../hooks/useCreateEmployee";
-import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
-import { useNavigate } from "react-router-dom";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
-import { notifications } from "@mantine/notifications";
-import { mapLookupToArray } from "../../utils/helperFunction";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
-import { getDateFromSetYear } from "../../utils/helperFunction";
-import dayjs from "dayjs";
-import _ from "lodash";
+import { ResponseErrorDetail } from "../../models/Response";
+import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
+import { emailRegex } from "../../types/constant";
 
 export type CreateEmployeeField = {
   name: string | null;
-  email: string | null;
+  email: string;
   gender: Gender;
   phone: string | null;
   birthday: Date | null;
@@ -33,12 +33,21 @@ export type CreateEmployeeField = {
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
   const createEmployeeForm = useForm<CreateEmployeeField>({
+    initialValues: {
+      name: "",
+      email: "",
+      gender: Gender.Male,
+      phone: "",
+      birthday: new Date("01/01/2000"),
+      addressLine: "",
+      wardId: null,
+      province: "",
+      district: "",
+    },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: (value) =>
-        value == "" || value == null || /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
-          ? null
-          : "Invalid email - ex: helloitsme@gmail.com",
+      email: (value) => isEmpty(value) ? null
+        : emailRegex.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });

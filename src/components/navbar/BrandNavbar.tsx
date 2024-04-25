@@ -1,15 +1,7 @@
-import {
-  IconNotes,
-  IconGauge,
-  IconFileAnalytics,
-  IconRouter,
-  IconUser,
-  IconMan,
-} from "@tabler/icons-react";
-import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
+import { IconExclamationCircle, IconFileAnalytics, IconGauge, IconMan, IconNotes, IconRouter, IconUser } from "@tabler/icons-react";
+import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import classes from "./Sidebar.module.scss";
-import { IconExclamationCircle } from "@tabler/icons-react";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/brand" },
