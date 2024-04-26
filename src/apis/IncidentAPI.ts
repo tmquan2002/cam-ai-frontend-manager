@@ -35,6 +35,15 @@ export type GetIncidentReportByTimeParams = {
   type: IncidentType;
 };
 
+export type MassRejectIncidentParams = {
+  incidentIds: string[];
+}
+
+export type MassAssignIncidentParams = {
+  incidentIds: string[];
+  employeeId: string;
+}
+
 export const IncidentApi = {
   _getIncidentById: async (incidentId: string) => {
     const access_token = getAccessToken();
@@ -76,6 +85,18 @@ export const IncidentApi = {
 
     return res?.data;
   },
+  _massRejectIncident: async (params: MassRejectIncidentParams) => {
+    const access_token = getAccessToken();
+
+    const res = await http.post(`/api/incidents/reject`, params, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }
+    );
+
+    return res?.data;
+  },
   _assignIncident: async ({ employeeId, incidentId }: AssignIncidentParams) => {
     const access_token = getAccessToken();
 
@@ -87,6 +108,18 @@ export const IncidentApi = {
           Authorization: `Bearer ${access_token}`,
         },
       }
+    );
+
+    return res?.data;
+  },
+  _massAssignIncident: async (params: MassAssignIncidentParams) => {
+    const access_token = getAccessToken();
+
+    const res = await http.post(`/api/incidents/accept`, params, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    }
     );
 
     return res?.data;

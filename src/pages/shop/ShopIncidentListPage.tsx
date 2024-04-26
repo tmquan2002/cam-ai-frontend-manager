@@ -1,5 +1,5 @@
 import { ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Modal, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem, useComputedColorScheme } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure, useListState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 import _, { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GetIncidentParams } from "../../apis/IncidentAPI";
+import { GetIncidentParams, MassRejectIncidentParams } from "../../apis/IncidentAPI";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
@@ -23,6 +23,8 @@ import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopIncidentListPage.module.scss";
+import { useMassRejectIncidents } from "../../hooks/useMassRejectIncidents";
+import { useMassAssignIncidents } from "../../hooks/useMassAssignIncidents";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -43,7 +45,7 @@ type IncidentFormField = {
 
 const ShopIncidentListPage = () => {
   const navigate = useNavigate();
-  const [opened, { toggle }] = useDisclosure(false);
+  const [openedFilter, { toggle: toggleFilter }] = useDisclosure(false);
   const [assignOpened, { open: openAssign, close: closeAssign }] = useDisclosure(false);
   const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [selectedIncident, setSelectedIncident] = useState<{
@@ -61,7 +63,17 @@ const ShopIncidentListPage = () => {
   const indeterminate = incidentCheckBoxList.some((value) => value.checked) && !allChecked;
   const [firstCheckId, setFirstCheckId] = useState("");
 
-  const assignIncidentForm = useForm<IncidentFormField>();
+  const assignIncidentForm = useForm<IncidentFormField>({
+    validate: {
+      employeeId: isNotEmpty("Please select an employee to assign"),
+    }
+  });
+
+  const massAssignIncidentForm = useForm<IncidentFormField>({
+    validate: {
+      employeeId: isNotEmpty("Please select an employee to assign"),
+    }
+  });
 
   const onAssignIncident = (fieldValues: IncidentFormField) => {
     assignIncident(
@@ -74,6 +86,48 @@ const ShopIncidentListPage = () => {
           notifications.show({
             title: "Assign successfully",
             message: "Incident assign success!",
+          });
+          refetchIncident();
+          refetchIncidentList();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            icon: <IconX />,
+            title: "Assign failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
+  };
+
+  const onMassAssignIncident = (fieldValues: IncidentFormField) => {
+
+    if (incidentCheckBoxList.filter((item) => item.checked).length == 0) {
+      notifications.show({
+        color: "yellow",
+        title: "Note",
+        message: "No incident selected",
+      });
+      return;
+    }
+
+    massAssignIncident({
+      employeeId: fieldValues.employeeId ?? "",
+      incidentIds: incidentCheckBoxList ? incidentCheckBoxList?.reduce(function (filtered: string[], incident) {
+        if (incident.checked) {
+          filtered.push(incident.id);
+        }
+        return filtered;
+      }, []) : [],
+    },
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Assign successfully",
+            message: "Incidents assign success!",
           });
           refetchIncident();
           refetchIncidentList();
@@ -130,6 +184,8 @@ const ShopIncidentListPage = () => {
   const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
   const { data: incidentData, isLoading: isGetIncidentLoading, refetch: refetchIncident, } = useGetIncidentById(selectedIncident?.id ?? null);
   const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } = useRejectIncidentById();
+  const { mutate: massRejectIncident, isLoading: isMassRejectIncidentLoading } = useMassRejectIncidents();
+  const { mutate: massAssignIncident, isLoading: isMassAssignIncidentLoading } = useMassAssignIncidents();
   const { mutate: assignIncident, isLoading: isAssignIncidentLoading } = useAssignIncident();
 
   const onFirstCheck = () => {
@@ -196,19 +252,20 @@ const ShopIncidentListPage = () => {
     }
   }, [incidentCheckBoxList])
 
-  const openModal = () =>
+  const openRejectModal = () => {
     modals.openConfirmModal({
-      title: "Please confirm your action",
+      title: "Reject Incident",
       confirmProps: { color: "red" },
-      children: <Text size="sm">Confirm reject this incident?</Text>,
+      children: <Text size="sm">Reject this incident?</Text>,
       labels: { confirm: "Confirm", cancel: "Cancel" },
+      centered: true,
       onCancel: () => console.log("Cancel"),
       onConfirm: () => {
         rejectIncident(selectedIncident?.id ?? "", {
           onSuccess() {
             notifications.show({
-              title: "Reject successfully",
-              message: "Reject assign success!",
+              title: "Successful",
+              message: "Reject successfully!",
             });
             refetchIncident();
             refetchIncidentList();
@@ -220,11 +277,54 @@ const ShopIncidentListPage = () => {
               icon: <IconX />,
               title: "Reject failed",
               message: error.response?.data?.message,
+            })
+          }
+        })
+      }
+    })
+  }
+
+  const openMassRejectModal = () => {
+    modals.openConfirmModal({
+      title: "Reject Incidents",
+      confirmProps: { color: "red" },
+      children: <Text size="sm">Reject {incidentCheckBoxList.filter((item) => item.checked).length} selected incident&#40;s&#41;?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      centered: true,
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        const params: MassRejectIncidentParams = {
+          incidentIds: incidentCheckBoxList ? incidentCheckBoxList?.reduce(function (filtered: string[], incident) {
+            if (incident.checked) {
+              filtered.push(incident.id);
+            }
+            return filtered;
+          }, []) : [],
+        }
+        console.log(params)
+
+        massRejectIncident(params, {
+          onSuccess() {
+            notifications.show({
+              title: "Successful",
+              message: "Reject successfully!",
             });
+            refetchIncident();
+            refetchIncidentList();
           },
-        });
-      },
-    });
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              icon: <IconX />,
+              title: "Reject failed",
+              message: error.response?.data?.message,
+            })
+          }
+        })
+      }
+    })
+  }
 
   const filterFields = useMemo(() => {
     return [
@@ -322,8 +422,6 @@ const ShopIncidentListPage = () => {
     }
   };
 
-  // console.log(incidentCheckBoxList)
-
   const renderIncidentList = incidentCheckBoxList?.map((row, index) => (
     <Box w={rem(350)} py={rem(14)} px={rem(18)} key={row?.id}
       className={
@@ -409,7 +507,7 @@ const ShopIncidentListPage = () => {
 
   return (
     <Paper m={rem(16)} shadow="xs" style={{ display: "flex", flex: 1, flexDirection: "column", }}>
-      <Group p={rem(24)} pb={!opened ? rem(24) : rem(0)} align="center" justify="space-between">
+      <Group p={rem(24)} pb={!openedFilter ? rem(24) : rem(0)} align="center" justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incident list
         </Text>
@@ -437,7 +535,7 @@ const ShopIncidentListPage = () => {
                   toggleMerge()
                 }
 
-                if (opened) toggle()
+                if (openedFilter) toggleFilter()
                 if (openedSelect) toggleSelect()
               }}
               color={computedColorScheme == "dark" ? "white" : "black"}>
@@ -458,7 +556,7 @@ const ShopIncidentListPage = () => {
                   toggleSelect()
                 }
 
-                if (opened) toggle()
+                if (openedFilter) toggleFilter()
                 if (openedMerge) toggleMerge()
               }}
               color={computedColorScheme == "dark" ? "white" : "black"}>
@@ -471,12 +569,12 @@ const ShopIncidentListPage = () => {
               onClick={() => {
                 handlers.setState(incidentList || [])
 
-                if (opened) {
+                if (openedFilter) {
                   setCheckBoxMode("None")
-                  toggle()
+                  toggleFilter()
                 } else {
                   setCheckBoxMode("Filter")
-                  toggle()
+                  toggleFilter()
                 }
 
                 if (openedSelect) toggleSelect()
@@ -490,15 +588,15 @@ const ShopIncidentListPage = () => {
       </Group>
 
       {/* Filter collapse section */}
-      <Collapse px={rem(28)} in={opened} mb={"xl"} mt={"xs"}>
+      <Collapse px={rem(28)} in={openedFilter} mb={"xl"} mt={"xs"}>
         <EditAndUpdateForm fields={filterFields} />
       </Collapse>
 
       {/* Select collapse section */}
       <Collapse px={rem(28)} in={openedSelect} mb={"xl"}>
 
-        <Group justify="space-between">
-          <Group gap={100}>
+        <Group justify="space-between" align="baseline">
+          <Group gap={100} align="baseline">
             <Checkbox label="Check All" checked={allChecked} indeterminate={indeterminate}
               onChange={() =>
                 handlers.setState((current) =>
@@ -509,18 +607,47 @@ const ShopIncidentListPage = () => {
             <Text size="sm" fs="italic">{incidentCheckBoxList.filter((item) => item.checked).length} incident&#40;s&#41; selected</Text>
           </Group>
 
-          <Group justify="flex-end">
-            <Group gap={0}>
+          <Group justify="flex-end" align="baseline">
 
-              <Button
-                variant="gradient" size="xs"
-                gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
-              >
-                Assign Selected
-              </Button>
-            </Group>
+            <form onSubmit={massAssignIncidentForm.onSubmit(onMassAssignIncident)}>
+              <Group gap={5} align="baseline">
+                {isGetEmployeeListLoading ? (
+                  <Loader mt={rem(30)} />
+                ) : (
+                  <Select w={rem(200)} size="xs"
+                    {...massAssignIncidentForm.getInputProps("employeeId")}
+                    placeholder="Assign incident to an employee"
+                    data={employeeList?.values?.map((item) => {
+                      return {
+                        value: item?.id,
+                        label: item?.name,
+                      };
+                    })}
+                    nothingFoundMessage="Nothing found..."
+                  />
+                )}
+                <Button
+                  variant="gradient" size="xs" type="submit" loading={isMassAssignIncidentLoading}
+                  gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
+                >
+                  Assign Selected
+                </Button>
+              </Group>
+            </form>
+
             <Button
-              variant="gradient" size="xs"
+              variant="gradient" size="xs" onClick={() => {
+                if (incidentCheckBoxList.filter((item) => item.checked).length == 0) {
+                  notifications.show({
+                    color: "yellow",
+                    title: "Note",
+                    message: "No incident selected",
+                  });
+                } else {
+                  openMassRejectModal();
+                }
+              }}
+              loading={isMassRejectIncidentLoading}
               gradient={{ from: "pale-red.5", to: "pale-red.7", deg: 90 }}
             >
               Reject Selected
@@ -579,6 +706,7 @@ const ShopIncidentListPage = () => {
                   </Group>
 
                   <Group>
+
                     <Tooltip label="Assign incident">
                       <ActionIcon
                         variant="gradient"
@@ -591,11 +719,12 @@ const ShopIncidentListPage = () => {
                         />
                       </ActionIcon>
                     </Tooltip>
+
                     <Tooltip label="Reject incident">
                       <ActionIcon
                         variant="gradient"
                         gradient={{ from: "pale-red.5", to: "pale-red.7", deg: 90 }}
-                        onClick={openModal}
+                        onClick={openRejectModal}
                         loading={isRejectIncidentLoading}
                       >
                         <IconIdOff
@@ -604,6 +733,7 @@ const ShopIncidentListPage = () => {
                         />
                       </ActionIcon>
                     </Tooltip>
+
                   </Group>
                 </Group>
 
@@ -641,11 +771,9 @@ const ShopIncidentListPage = () => {
                 )}
 
                 {/* Assign single form section */}
-                <Modal opened={assignOpened} onClose={closeAssign} title="Assign to">
+                <Modal opened={assignOpened} onClose={closeAssign} title="Assign to" centered>
                   <Box>
-                    <form
-                      onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}
-                    >
+                    <form onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}>
                       <Group align="center" mt={rem(20)} pb={rem(20)}>
                         {isGetEmployeeListLoading ? (
                           <Loader mt={rem(30)} />
