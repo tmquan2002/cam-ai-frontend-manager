@@ -16,7 +16,7 @@ import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
 import EmployeeListPage from "../pages/shop/EmployeeListPage";
 import BrandAccountPage from "../pages/brand/BrandAccountPage";
-import CreateManagerPage from "../pages/brand/CreateManagerPage";
+import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import AccountDetailPage from "../pages/brand/AccountDetailPage";
 import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
 import ShopListPage from "../pages/brand/ShopListPage";

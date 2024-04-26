@@ -8,7 +8,7 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import { useEffect, useMemo } from "react";
@@ -32,6 +32,8 @@ import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateProfile } from "../../hooks/useUpdateProfile";
 import dayjs from "dayjs";
+import { isEmpty } from "lodash";
+import { phoneRegex } from "../../types/constant";
 
 type ProfileFieldValue = {
   name: string;
@@ -72,15 +74,10 @@ const ShopManagerProfilePage = () => {
 
     validate: {
       name: isNotEmpty("Name is required"),
-      email: (value) =>
-        /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "An email should have a name, @ sign, a server name and domain in order and no whitespace. Valid example abc@email.com",
+      email: isEmail("Invalid email - ex: name@gmail.com"),
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        value == "" ||
-          value == null ||
-          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
 

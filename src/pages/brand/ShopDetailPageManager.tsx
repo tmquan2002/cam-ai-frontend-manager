@@ -1,75 +1,36 @@
-import {
-  Accordion,
-  ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Center,
-  Collapse,
-  Flex,
-  Group,
-  Image,
-  Input,
-  Loader,
-  LoadingOverlay,
-  Paper,
-  ScrollArea,
-  Skeleton,
-  Stack,
-  Table,
-  Text,
-  Tooltip,
-  rem,
-} from "@mantine/core";
+import { Accordion, ActionIcon, Badge, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Text, Tooltip, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
-import { useEffect, useMemo, useState } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { notifications } from "@mantine/notifications";
-import { useUpdateShopById } from "../../hooks/useUpdateShopById";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
-import { UpdateShopParams } from "../../apis/ShopAPI";
-import {
-  IconMail,
-  IconMapPin,
-  IconRepeat,
-  IconTrash,
-  IconUser,
-  IconVideo,
-  IconX,
-} from "@tabler/icons-react";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
-import clsx from "clsx";
-import classes from "./ShopDetailPageManager.module.scss";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetShopById } from "../../hooks/useGetShopById";
-import { replaceIfNun } from "../../utils/helperFunction";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import _ from "lodash";
-import { IMAGE_CONSTANT } from "../../types/constant";
-import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
-import {
-  CameraStatus,
-  EdgeBoxActivationStatus,
-  EdgeboxInstallStatus,
-  ShopStatus,
-} from "../../models/CamAIEnum";
-import { modals } from "@mantine/modals";
-import { IconCaretRight } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import { useGetAccountList } from "../../hooks/useGetAccounts";
-import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
+import { modals } from "@mantine/modals";
+import { notifications } from "@mantine/notifications";
+import { IconAlertCircle, IconCaretRight, IconMail, IconMapPin, IconRepeat, IconTrash, IconUser, IconVideo, IconX, } from "@tabler/icons-react";
+import { AxiosError } from "axios";
+import clsx from "clsx";
+import _, { isEmpty } from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { UpdateShopParams } from "../../apis/ShopAPI";
 import BackButton from "../../components/button/BackButton";
-import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
-import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
-import { IconAlertCircle } from "@tabler/icons-react";
-import NoImage from "../../components/image/NoImage";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
+import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
+import NoImage from "../../components/image/NoImage";
+import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
+import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
+import { useGetAccountList } from "../../hooks/useGetAccounts";
+import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetShopById } from "../../hooks/useGetShopById";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateShopById } from "../../hooks/useUpdateShopById";
+import { CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, ShopStatus } from "../../models/CamAIEnum";
+import { ResponseErrorDetail } from "../../models/Response";
+import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { replaceIfNun } from "../../utils/helperFunction";
+import classes from "./ShopDetailPageManager.module.scss";
 
 export type FormFieldValue = {
   name: string;
@@ -138,11 +99,8 @@ const ShopDetailPageManager = () => {
         { min: 2, max: 50 },
         "Shop name must be 1- 50 characters long"
       ),
-      phone: (value) =>
-        value == "" ||
-        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -216,7 +174,7 @@ const ShopDetailPageManager = () => {
         </Text>
       ),
       labels: { confirm: "Confirm", cancel: "Cancel" },
-      onCancel: () => {},
+      onCancel: () => { },
       onConfirm: () => handleToggleShopStatus(currentStatus),
     });
 

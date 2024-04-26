@@ -1,5 +1,5 @@
 import { Button, Group, TextInput, rem } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
@@ -22,30 +22,29 @@ export const ChangePasswordForm = (data: AuthToken) => {
     },
 
     validate: {
-      oldPassword: (value) =>
-        value.trim().length === 0 ? "This field is required" : null,
-      newPassword: (value) =>
-        value.trim().length === 0 ? "This field is required" : null,
-      confirmPassword: (value) =>
-        value.trim().length === 0 ? "This field is required" : null,
+      oldPassword: isNotEmpty("Old Password is required"),
+      newPassword: isNotEmpty("New Password is required"),
+      confirmPassword: isNotEmpty("Confirm Password is required"),
     },
   });
 
-  const onSubmitForm = ({
-    confirmPassword,
-    newPassword,
-    oldPassword,
-  }: {
-    oldPassword: string;
-    newPassword: string;
-    confirmPassword: string;
-  }) => {
+  const onSubmitForm = ({ confirmPassword, newPassword, oldPassword, }: { oldPassword: string; newPassword: string; confirmPassword: string; }) => {
     const params: ChangePasswordParams = {
       accessToken: data.accessToken,
       oldPassword,
       newPassword,
       newPasswordRetype: confirmPassword,
     };
+
+    if (newPassword !== confirmPassword) {
+      notifications.show({
+        color: "red",
+        title: "Failed",
+        message: "New Passwords are not matched",
+      });
+      return;
+    }
+
     changePassword(params, {
       onSuccess() {
         sessionHook?.signIn(data);
