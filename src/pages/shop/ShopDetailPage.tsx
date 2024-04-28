@@ -13,6 +13,7 @@ import {
   Text,
   Tooltip,
   rem,
+  Tabs,
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useEffect, useMemo, useState } from "react";
@@ -28,9 +29,12 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { UpdateShopParams } from "../../apis/ShopAPI";
 import {
   IconAlertCircle,
+  IconCamera,
   IconCaretRight,
+  IconFileAnalytics,
   IconMapPin,
   IconPlus,
+  IconRouter,
   IconVideo,
   IconX,
 } from "@tabler/icons-react";
@@ -48,6 +52,7 @@ import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 import { phoneRegex } from "../../types/constant";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
+import { MdAccountCircle } from "react-icons/md";
 
 export type FormFieldValue = {
   name: string;
@@ -291,165 +296,192 @@ const ShopDetailPage = () => {
   return (
     <Box pb={20}>
       <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Box pos="relative">
-          <LoadingOverlay
-            visible={isLoading || updateShopLoading}
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 2 }}
-          />
+        <Tabs defaultValue="general">
+          <Tabs.List>
+            <Tabs.Tab value="general" leftSection={<IconFileAnalytics />}>
+              General
+            </Tabs.Tab>
+            <Tabs.Tab value="camera" leftSection={<IconCamera />}>
+              Camera
+            </Tabs.Tab>
+            <Tabs.Tab value="employee" leftSection={<MdAccountCircle />}>
+              Employee
+            </Tabs.Tab>
+            <Tabs.Tab value="edgebox" leftSection={<IconRouter />}>
+              Edge Box
+            </Tabs.Tab>
+          </Tabs.List>
 
-          <form
-            onSubmit={form.onSubmit((values) => {
-              const updateShopParams: UpdateShopParams = {
-                shopId: data?.values[0].id ?? "0",
-                addressLine: values.addressLine,
-                wardId: values.wardId ?? "0",
-                name: values.name,
-                phone: values.phone,
-                openTime: values?.openTime,
-                closeTime: values?.closeTime,
-              };
+          <Tabs.Panel value="general">
+            <Paper p={rem(32)} m={rem(32)}>
+              <Box pos="relative">
+                <LoadingOverlay
+                  visible={isLoading || updateShopLoading}
+                  zIndex={1000}
+                  overlayProps={{ radius: "sm", blur: 2 }}
+                />
 
-              updateShop(updateShopParams, {
-                onSuccess() {
-                  // onSuccess(data) {
-                  notifications.show({
-                    title: "Update successfully",
-                    message: "Shop detail updated!",
-                  });
-                },
-                onError(data) {
-                  const error = data as AxiosError<ResponseErrorDetail>;
-                  notifications.show({
-                    color: "red",
-                    icon: <IconX />,
-                    title: "Update failed",
-                    message: error.response?.data?.message,
-                  });
-                },
-              });
-            })}
-          >
-            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={20}>
-              SHOP DETAIL
-            </Text>
-            <EditAndUpdateForm fields={fields} />
+                <form
+                  onSubmit={form.onSubmit((values) => {
+                    const updateShopParams: UpdateShopParams = {
+                      shopId: data?.values[0].id ?? "0",
+                      addressLine: values.addressLine,
+                      wardId: values.wardId ?? "0",
+                      name: values.name,
+                      phone: values.phone,
+                      openTime: values?.openTime,
+                      closeTime: values?.closeTime,
+                    };
 
-            <Group justify="flex-end" mt="md">
-              {/* <Button
+                    updateShop(updateShopParams, {
+                      onSuccess() {
+                        // onSuccess(data) {
+                        notifications.show({
+                          title: "Update successfully",
+                          message: "Shop detail updated!",
+                        });
+                      },
+                      onError(data) {
+                        const error = data as AxiosError<ResponseErrorDetail>;
+                        notifications.show({
+                          color: "red",
+                          icon: <IconX />,
+                          title: "Update failed",
+                          message: error.response?.data?.message,
+                        });
+                      },
+                    });
+                  })}
+                >
+                  <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={20}>
+                    Shop Detail
+                  </Text>
+                  <EditAndUpdateForm fields={fields} />
+
+                  <Group justify="flex-end" mt="md">
+                    {/* <Button
                 type="submit"
                 disabled={!form.isDirty()}
               >
                 Submit
               </Button> */}
-            </Group>
-          </form>
-        </Box>
-      </Paper>
+                  </Group>
+                </form>
+              </Box>
+            </Paper>
+          </Tabs.Panel>
 
-      <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
-          Camera list
-        </Text>
-        {isGetCameraListLoading ? (
-          <Loader />
-        ) : (
-          cameraList?.values?.map((item) => (
-            <Tooltip label="View camera" key={item?.id}>
-              <Button
-                variant="outline"
-                fullWidth
-                size={rem(52)}
-                justify="space-between"
-                onClick={() => {
-                  if (item?.status != CameraStatus.Connected) {
-                    notifications.show({
-                      color: "red",
-                      title: "Camera is disconnected",
-                      message:
-                        "Camera is disconnected, cannot view live stream",
-                    });
-                  } else {
-                    navigate(`/shop/camera/${item?.id}`);
-                  }
-                }}
-                rightSection={<IconCaretRight style={{ width: rem(24) }} />}
-                px={rem(16)}
-                mb={rem(16)}
-              >
-                <Group>
-                  <Group mr={rem(20)}>
-                    <IconVideo style={{ width: rem(20) }} />
-                    <Text key={item?.id}> {item?.name}</Text>
-                  </Group>
-                  <Group mr={rem(20)}>
-                    <IconMapPin style={{ width: rem(20) }} />
-                    <Text key={item?.id}> {item?.zone}</Text>
-                  </Group>
-                  <Group>
-                    <IconAlertCircle style={{ width: rem(20) }} />
-                    <Text key={item?.id}> {item?.status}</Text>
-                  </Group>
+          <Tabs.Panel value="camera">
+            <Paper p={rem(32)} m={rem(32)}>
+              <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
+                Camera list
+              </Text>
+              {isGetCameraListLoading ? (
+                <Loader />
+              ) : (
+                cameraList?.values?.map((item) => (
+                  <Tooltip label="View camera" key={item?.id}>
+                    <Button
+                      variant="outline"
+                      fullWidth
+                      size={rem(52)}
+                      justify="space-between"
+                      onClick={() => {
+                        if (item?.status != CameraStatus.Connected) {
+                          notifications.show({
+                            color: "red",
+                            title: "Camera is disconnected",
+                            message:
+                              "Camera is disconnected, cannot view live stream",
+                          });
+                        } else {
+                          navigate(`/shop/camera/${item?.id}`);
+                        }
+                      }}
+                      rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                      px={rem(16)}
+                      mb={rem(16)}
+                    >
+                      <Group>
+                        <Group mr={rem(20)}>
+                          <IconVideo style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.name}</Text>
+                        </Group>
+                        <Group mr={rem(20)}>
+                          <IconMapPin style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.zone}</Text>
+                        </Group>
+                        <Group>
+                          <IconAlertCircle style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.status}</Text>
+                        </Group>
+                      </Group>
+                    </Button>
+                  </Tooltip>
+                ))
+              )}
+            </Paper>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="employee">
+            <Paper p={rem(32)} m={rem(32)}>
+              <Flex pb={rem(28)} justify={"space-between "}>
+                <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                  Employee
+                </Text>
+                <Button
+                  onClick={() => navigate("/shop/employee/create")}
+                  leftSection={<IconPlus size={14} />}
+                >
+                  Add Employee
+                </Button>
+              </Flex>
+              {isGetEmployeeListLoading ? (
+                <Loader />
+              ) : (
+                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+                  <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
+                    <Table.Thead
+                      className={clsx(classes.header, {
+                        [classes.scrolled]: scrolled,
+                      })}
+                    >
+                      <Table.Tr>
+                        <Table.Th>Name</Table.Th>
+                        <Table.Th>Email</Table.Th>
+                        <Table.Th>Phone</Table.Th>
+                        <Table.Th>Birthday</Table.Th>
+                        <Table.Th>Gender</Table.Th>
+                        <Table.Th>Address</Table.Th>
+                        <Table.Th>Status</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>{rows}</Table.Tbody>
+                  </Table>
+                </ScrollArea>
+              )}
+            </Paper>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="edgebox">
+            <Skeleton visible={isEdgeboxInstallListLoading}>
+              <Paper p={rem(32)} m={rem(32)}>
+                <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
+                  <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                    Edge box
+                  </Text>
                 </Group>
-              </Button>
-            </Tooltip>
-          ))
-        )}
+
+                {edgeBoxInstall ? (
+                  <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
+                ) : (
+                  <EdgeBoxInstallEmpty />
+                )}
+              </Paper>
+            </Skeleton>
+          </Tabs.Panel>
+        </Tabs>
       </Paper>
-
-      <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Flex pb={rem(28)} justify={"space-between "}>
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-            Employee
-          </Text>
-          <Button
-            onClick={() => navigate("/shop/employee/create")}
-            leftSection={<IconPlus size={14} />}
-          >
-            Add Employee
-          </Button>
-        </Flex>
-        {isGetEmployeeListLoading ? (
-          <Loader />
-        ) : (
-          <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-            <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
-              <Table.Thead
-                className={clsx(classes.header, {
-                  [classes.scrolled]: scrolled,
-                })}
-              >
-                <Table.Tr>
-                  <Table.Th>Name</Table.Th>
-                  <Table.Th>Email</Table.Th>
-                  <Table.Th>Phone</Table.Th>
-                  <Table.Th>Birthday</Table.Th>
-                  <Table.Th>Gender</Table.Th>
-                  <Table.Th>Address</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
-          </ScrollArea>
-        )}
-      </Paper>
-
-      <Skeleton visible={isEdgeboxInstallListLoading}>
-        <Paper p={rem(32)} m={rem(32)} shadow="xs">
-          <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
-            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-              Edge box
-            </Text>
-          </Group>
-
-          {edgeBoxInstall ? (
-            <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
-          ) : (
-            <EdgeBoxInstallEmpty />
-          )}
-        </Paper>
-      </Skeleton>
     </Box>
   );
 };
