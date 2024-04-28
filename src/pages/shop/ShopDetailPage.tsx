@@ -379,46 +379,50 @@ const ShopDetailPage = () => {
               {isGetCameraListLoading ? (
                 <Loader />
               ) : (
-                cameraList?.values?.map((item) => (
-                  <Tooltip label="View camera" key={item?.id}>
-                    <Button
-                      variant="outline"
-                      fullWidth
-                      size={rem(52)}
-                      justify="space-between"
-                      onClick={() => {
-                        if (item?.status != CameraStatus.Connected) {
-                          notifications.show({
-                            color: "red",
-                            title: "Camera is disconnected",
-                            message:
-                              "Camera is disconnected, cannot view live stream",
-                          });
-                        } else {
-                          navigate(`/shop/camera/${item?.id}`);
-                        }
-                      }}
-                      rightSection={<IconCaretRight style={{ width: rem(24) }} />}
-                      px={rem(16)}
-                      mb={rem(16)}
-                    >
-                      <Group>
-                        <Group mr={rem(20)}>
-                          <IconVideo style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.name}</Text>
-                        </Group>
-                        <Group mr={rem(20)}>
-                          <IconMapPin style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.zone}</Text>
-                        </Group>
+                <>
+                  {cameraList?.values?.length == 0 && <Text c="dimmed" w={'100%'} ta={"center"} mt={20} fs="italic">No Camera found</Text>}
+                  {cameraList?.values?.map((item) => (
+                    <Tooltip label="View camera" key={item?.id}>
+                      <Button
+                        variant="outline"
+                        fullWidth
+                        size={rem(52)}
+                        justify="space-between"
+                        onClick={() => {
+                          if (item?.status != CameraStatus.Connected) {
+                            notifications.show({
+                              color: "red",
+                              title: "Camera is disconnected",
+                              message:
+                                "Camera is disconnected, cannot view live stream",
+                            });
+                          } else {
+                            navigate(`/shop/camera/${item?.id}`);
+                          }
+                        }}
+                        rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                        px={rem(16)}
+                        mb={rem(16)}
+                      >
                         <Group>
-                          <IconAlertCircle style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.status}</Text>
+                          <Group mr={rem(20)}>
+                            <IconVideo style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.name}</Text>
+                          </Group>
+                          <Group mr={rem(20)}>
+                            <IconMapPin style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.zone}</Text>
+                          </Group>
+                          <Group>
+                            <IconAlertCircle style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.status}</Text>
+                          </Group>
                         </Group>
-                      </Group>
-                    </Button>
-                  </Tooltip>
-                ))
+                      </Button>
+                    </Tooltip>
+                  ))
+                  }
+                </>
               )}
             </Paper>
           </Tabs.Panel>
@@ -457,6 +461,7 @@ const ShopDetailPage = () => {
                       </Table.Tr>
                     </Table.Thead>
                     <Table.Tbody>{rows}</Table.Tbody>
+                    {employeeList?.totalCount == 0 && <Table.Caption>Nothing Found</Table.Caption>}
                   </Table>
                 </ScrollArea>
               )}
