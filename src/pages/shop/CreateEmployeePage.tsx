@@ -1,4 +1,4 @@
-import { Button, Group, Paper, Text, rem } from "@mantine/core";
+import { Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
@@ -18,6 +18,8 @@ import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
 import { emailRegex } from "../../types/constant";
+import { useDisclosure } from "@mantine/hooks";
+import BackButton from "../../components/button/BackButton";
 
 export type CreateEmployeeField = {
   name: string | null;
@@ -32,6 +34,8 @@ export type CreateEmployeeField = {
 };
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
       name: "",
@@ -51,18 +55,19 @@ const CreateEmployeePage = () => {
       gender: isNotEmpty("Please select gender"),
     },
   });
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(createEmployeeForm.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(createEmployeeForm.values.district ?? 0)
-  );
-  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
-    useCreateEmployee();
 
-  const fields = useMemo(() => {
+  const massImportForm = useForm<{ file: File }>({
+    validate: {
+      file: isNotEmpty("Please choose a file"),
+    }
+  });
+
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createEmployeeForm.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createEmployeeForm.values.district ?? 0));
+  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } = useCreateEmployee();
+
+  const createEmployeeFields = useMemo(() => {
     return [
       {
         type: FIELD_TYPES.TEXT,
@@ -178,56 +183,98 @@ const CreateEmployeePage = () => {
     provinces,
     wards,
   ]);
-  return (
-    <Paper m={rem(32)} p={rem(32)} shadow="xs">
-      <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} pb={rem(28)}>
-        Add employee
-      </Text>
-      <form
-        onSubmit={createEmployeeForm.onSubmit(
-          ({ name, addressLine, birthday, email, gender, phone, wardId }) => {
-            const createEmployeeParams: CreateEmployeeParams = {
-              email: email ?? null,
-              name: name ?? "",
-              gender: gender,
-              addressLine,
-              birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
-              phone,
-              wardId,
-            };
 
-            let sb: CreateEmployeeParams = _.omitBy(
-              createEmployeeParams,
-              _.isNil
-            ) as CreateEmployeeParams;
-            craeteEmployee(sb, {
-              onSuccess() {
-                navigate(`/shop/employee`);
-              },
-              onError(data) {
-                const error = data as AxiosError<ResponseErrorDetail>;
-                notifications.show({
-                  color: "red",
-                  title: "Failed",
-                  message: error.response?.data?.message,
-                });
-              },
-            });
-          }
-        )}
-      >
-        <EditAndUpdateForm fields={fields} />
-        <Group justify="flex-end" mt="md">
-          <Button
-            type="submit"
-            disabled={!createEmployeeForm.isDirty()}
-            loading={isCreateEmployeeLoading}
-          >
-            Create
-          </Button>
+  const massImportFields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.FILE,
+        fieldProps: {
+          description: "Choose your file to import multiple employess for your shop at once",
+          form: massImportForm,
+          name: "file",
+          placeholder: "Choose a file",
+          label: "Import File",
+          required: true,
+        },
+      }
+    ];
+  }, [massImportForm])
+
+  return (
+    <>
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Group pb={20} align="center" justify="space-between">
+          <Group>
+            <BackButton />
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+              Add employee
+            </Text>
+          </Group>
+          <Button onClick={openMassImport}>Import File</Button>
         </Group>
-      </form>
-    </Paper>
+
+        <form
+          onSubmit={createEmployeeForm.onSubmit(
+            ({ name, addressLine, birthday, email, gender, phone, wardId }) => {
+              const createEmployeeParams: CreateEmployeeParams = {
+                email: email ?? null,
+                name: name ?? "",
+                gender: gender,
+                addressLine,
+                birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
+                phone,
+                wardId,
+              };
+
+              let sb: CreateEmployeeParams = _.omitBy(
+                createEmployeeParams,
+                _.isNil
+              ) as CreateEmployeeParams;
+              craeteEmployee(sb, {
+                onSuccess() {
+                  navigate(`/shop/employee`);
+                },
+                onError(data) {
+                  const error = data as AxiosError<ResponseErrorDetail>;
+                  notifications.show({
+                    color: "red",
+                    title: "Failed",
+                    message: error.response?.data?.message,
+                  });
+                },
+              });
+            }
+          )}
+        >
+          <EditAndUpdateForm fields={createEmployeeFields} />
+          <Group justify="flex-end" mt="md">
+            <Button
+              type="submit"
+              disabled={!createEmployeeForm.isDirty()}
+              loading={isCreateEmployeeLoading}
+            >
+              Create
+            </Button>
+          </Group>
+        </form>
+      </Paper>
+
+      {/* Mass import modal section */}
+      <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Multiple Employees" centered closeOnClickOutside={false}>
+        {/* TODO: Add API Import here */}
+        <form autoComplete="off" onSubmit={massImportForm.onSubmit(() => { })}>
+          <EditAndUpdateForm fields={massImportFields} />
+          <Group mt="md">
+            <Button type="submit">
+              Import
+            </Button>
+            <Button type="submit" variant="outline" onClick={closeMassImport}>
+              Cancel
+            </Button>
+          </Group>
+        </form>
+      </Modal>
+    </>
   );
 };
 
