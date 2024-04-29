@@ -1,15 +1,14 @@
 import { ScrollArea } from "@mantine/core";
-import { IconExclamationCircle, IconFileAnalytics, IconGauge, IconMan, IconNotes, IconRouter, IconUser } from "@tabler/icons-react";
+import { IconExclamationCircle, IconFileAnalytics, IconMan, IconNotes, IconRouter, IconUser } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import classes from "./Sidebar.module.scss";
 
 const mockdata = [
-  { label: "Dashboard", icon: IconGauge, path: "/brand" },
+  // { label: "Dashboard", icon: IconGauge, path: "/brand" },
   {
     label: "Your Brand",
     icon: IconNotes,
-    initiallyOpened: true,
-    links: [{ label: "Overview", link: "/" }],
+    path: "/brand"
   },
   {
     label: "Shops and Managers",
@@ -21,7 +20,7 @@ const mockdata = [
   }, {
     label: "Employees",
     icon: IconMan,
-    path: "/brand/employee" ,
+    path: "/brand/employee",
   },
   {
     label: "Edge Boxes",

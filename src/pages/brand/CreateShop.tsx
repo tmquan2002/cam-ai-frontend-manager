@@ -3,6 +3,7 @@ import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
+import { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateShopParams } from "../../apis/ShopAPI";
@@ -15,11 +16,9 @@ import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
-import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import CreateShopManagerForm from "./manager/CreateShopManagerForm";
-import { isEmpty } from "lodash";
 import { phoneRegex } from "../../types/constant";
+import CreateShopManagerForm from "./manager/CreateShopManagerForm";
 
 export type CreateShopField = {
   name: string;
@@ -33,22 +32,10 @@ export type CreateShopField = {
   closeTime: string;
 };
 
-export type CreateAccountField = {
-  email: string;
-  password: string;
-  confirmPassword: string;
-  name: string;
-  gender: Gender;
-  phone: string;
-  birthday: Date | null;
-  wardId: string;
-  addressLine: string;
-  province: string;
-  district: string;
-};
-
 const CreateShop = () => {
-  const [opened, { open, close }] = useDisclosure(false);
+  const [openedCreateManager, { open: openCreateManager, close: closeCreateManager }] = useDisclosure(false);
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+
   const createShopForm = useForm<CreateShopField>({
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
@@ -64,26 +51,23 @@ const CreateShop = () => {
     },
   });
 
+  const massImportForm = useForm<{ file: File }>({
+    validate: {
+      file: isNotEmpty("Please choose a file"),
+    }
+  });
+
   const navigate = useNavigate();
-  const {
-    data: accountList,
-    isLoading: isAccountListLoading,
-    refetch: refetchAccountList,
-  } = useGetAccountList({});
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(createShopForm.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(createShopForm.values.district ?? 0)
-  );
+  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({});
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createShopForm.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createShopForm.values.district ?? 0));
 
   const { mutate: createShop, isLoading: isCreateShopLoading } =
     useCreateShop();
 
 
-  const fields = useMemo(() => {
+  const createShopFields = useMemo(() => {
     return [
       {
         type: FIELD_TYPES.TEXT,
@@ -124,7 +108,7 @@ const CreateShop = () => {
           loading: isAccountListLoading,
           rightSectionWidth: 70,
           rightSection: (
-            <Button variant="subtle" onClick={open}>
+            <Button variant="subtle" onClick={openCreateManager}>
               New
             </Button>
           ),
@@ -215,7 +199,7 @@ const CreateShop = () => {
     createShopForm,
     accountList?.values,
     isAccountListLoading,
-    open, close,
+    openCreateManager, closeCreateManager,
     provinces,
     isProvicesLoading,
     districts,
@@ -224,14 +208,33 @@ const CreateShop = () => {
     isWardsLoading,
   ]);
 
+  const massImportFields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.FILE,
+        fieldProps: {
+          description: "Choose your file to import multiple shops and managers at once",
+          form: massImportForm,
+          name: "file",
+          placeholder: "Choose a file",
+          label: "Import File",
+          required: true,
+        },
+      }
+    ];
+  }, [massImportForm])
+
   return (
     <>
       <Paper m={rem(32)} mb={0} p={rem(32)} shadow="xl">
-        <Group pb={20} align="center">
-          <BackButton />
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-            Create shop
-          </Text>
+        <Group pb={20} align="center" justify="space-between">
+          <Group>
+            <BackButton />
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+              Create shop
+            </Text>
+          </Group>
+          <Button onClick={openMassImport}>Import File</Button>
         </Group>
         <form
           onSubmit={createShopForm.onSubmit(
@@ -266,7 +269,7 @@ const CreateShop = () => {
             }
           )}
         >
-          <EditAndUpdateForm fields={fields} />
+          <EditAndUpdateForm fields={createShopFields} />
 
           <Group justify="flex-end" mt="md">
             <Button
@@ -279,8 +282,26 @@ const CreateShop = () => {
           </Group>
         </form>
       </Paper>
-      <Modal opened={opened} onClose={close} size="lg" title="New Shop Manager" centered closeOnClickOutside={false}>
-        <CreateShopManagerForm mode="shop" close={close} refetch={refetchAccountList} />
+
+      {/* Create shop manager modal section */}
+      <Modal opened={openedCreateManager} onClose={closeCreateManager} size="lg" title="New Shop Manager" centered closeOnClickOutside={false}>
+        <CreateShopManagerForm mode="shop" close={closeCreateManager} refetch={refetchAccountList} />
+      </Modal>
+
+      {/* Mass import modal section */}
+      <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Shops and Managers" centered closeOnClickOutside={false}>
+        {/* TODO: Add API Import here */}
+        <form autoComplete="off" onSubmit={massImportForm.onSubmit(() => { })}>
+          <EditAndUpdateForm fields={massImportFields} />
+          <Group mt="md">
+            <Button type="submit">
+              Import
+            </Button>
+            <Button type="submit" variant="outline" onClick={closeMassImport}>
+              Cancel
+            </Button>
+          </Group>
+        </form>
       </Modal>
     </>
   );
