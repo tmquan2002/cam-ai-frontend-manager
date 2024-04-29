@@ -5,12 +5,12 @@ import { IconClock, IconUser } from "@tabler/icons-react";
 import TimeIncidentReport from "./TimeIncidentReport";
 
 const IncidentReportPage = () => {
-  const iconStyle = { width: rem(20), height: rem(20) };
+  const iconStyle = { width: rem(18), height: rem(18) };
 
   return (
-    <Flex px={rem(28)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
+    <Flex px={rem(40)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
       <Text
-        size={rem(26)}
+        size={rem(24)}
         fw={700}
         my={rem(20)}
         c={"light-blue.4"}
@@ -33,8 +33,8 @@ const IncidentReportPage = () => {
               value="ByEmployee"
               leftSection={<IconUser style={iconStyle} />}
             >
-              <Text size="md" fw={600}>
-                Employee report
+              <Text size={rem(16)} fw={600}>
+                By employee
               </Text>
             </Tabs.Tab>
             <Tabs.Tab
@@ -42,8 +42,8 @@ const IncidentReportPage = () => {
               value="ByTime"
               leftSection={<IconClock style={iconStyle} />}
             >
-              <Text size="md" fw={600}>
-                Time report
+              <Text size={rem(16)} fw={600}>
+                By time
               </Text>
             </Tabs.Tab>
           </Tabs.List>

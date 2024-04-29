@@ -5,7 +5,7 @@ import {
   ReportInterval,
 } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
-import { IncidentDetail } from "../models/Incident";
+import { IncidentDetail, IncidentPercentDetail } from "../models/Incident";
 import { IncidentReportByTimeDetail } from "../models/Report";
 import http, { toQueryParams } from "../utils/http";
 
@@ -33,6 +33,12 @@ export type GetIncidentReportByTimeParams = {
   endDate?: string;
   interval: ReportInterval;
   type: IncidentType;
+};
+
+export type GetIncidentPercentParams = {
+  shopId?: string;
+  startDate: string;
+  endDate: string;
 };
 
 export const IncidentApi = {
@@ -96,6 +102,20 @@ export const IncidentApi = {
 
     const res = await http.get<IncidentReportByTimeDetail>(
       `/api/incidents/count?${toQueryParams(params)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    return res?.data;
+  },
+  _getIncidentPercent: async (params: GetIncidentPercentParams) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<IncidentPercentDetail>(
+      `/api/incidents/percent?${toQueryParams(params)}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`,

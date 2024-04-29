@@ -14,7 +14,11 @@ import {
   rem,
 } from "@mantine/core";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
-import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
+import {
+  IncidentStatus,
+  IncidentType,
+  ReportInterval,
+} from "../../../../models/CamAIEnum";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import EditAndUpdateForm, {
@@ -46,10 +50,15 @@ import {
   addDaysBaseOnReportInterval,
   differentDateReturnFormattedString,
 } from "../../../../utils/helperFunction";
-import { IncidentDetail } from "../../../../models/Incident";
+import {
+  IncidentDetail,
+  IncidentPercentStatusDetail,
+  IncidentPercentTypeDetail,
+} from "../../../../models/Incident";
 import { useScrollIntoView } from "@mantine/hooks";
 import LoadingImage from "../../../../components/image/LoadingImage";
 import { DonutChart } from "@mantine/charts";
+import { useGetIncidentPercent } from "../../../../hooks/useGetIncidentPercent";
 
 ChartJS.register(
   CategoryScale,
@@ -66,6 +75,30 @@ type SearchIncidentField = {
   toDate?: Date;
   interval: ReportInterval;
   type: IncidentType;
+};
+
+const renderIncidentStatusLegendTitle = (
+  details: IncidentPercentStatusDetail[],
+  status: IncidentStatus
+) => {
+  const detail = details.find((i) => i.status == status);
+
+  return `${status} incident (${detail?.total}) - ${(detail?.percent
+    ? detail.percent * 100
+    : 0
+  ).toFixed(2)}%`;
+};
+
+const renderIncidentTypeLegendTitle = (
+  details: IncidentPercentTypeDetail[],
+  type: IncidentType
+) => {
+  const detail = details.find((i) => i.type == type);
+
+  return `${type} incident (${detail?.total}) - ${(detail?.percent
+    ? detail.percent * 100
+    : 0
+  ).toFixed(2)}%`;
 };
 
 const TimeIncidentReport = () => {
@@ -150,6 +183,17 @@ const TimeIncidentReport = () => {
       enabled: !!selectedDuration?.startTime && !!selectedDuration?.endTime,
       fromTime: selectedDuration?.startTime,
       toTime: selectedDuration?.endTime,
+    });
+
+  const { data: incidentPercent, isLoading: isGetIncidentPercentLoading } =
+    useGetIncidentPercent({
+      startDate: form.values.startDate
+        ? dayjs(form.values.startDate).format("YYYY-MM-DD")
+        : dayjs().format("YYYY-MM-DD"),
+      endDate: form.values.startDate
+        ? dayjs(form.values.toDate).format("YYYY-MM-DD")
+        : dayjs().format("YYYY-MM-DD"),
+      enabled: true,
     });
 
   const data = useMemo(() => {
@@ -380,13 +424,13 @@ const TimeIncidentReport = () => {
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)} mr={rem(12)}>
                 <LegendCard
                   type="line"
-                  color="rgba(255, 99, 132, 1)"
-                  title="Total interaction"
+                  color="rgb(37, 150, 190)"
+                  title="Total incident"
                 />
                 <LegendCard
-                  type="line"
-                  color="rgb(37, 150, 190)"
-                  title="Average interaction time"
+                  type="bar"
+                  color="rgba(255, 99, 132, 1)"
+                  title="Average incident time"
                 />
               </Group>
 
@@ -551,8 +595,8 @@ const TimeIncidentReport = () => {
                         labels: data?.map((i) => i.time),
                         datasets: [
                           {
-                            type: "line" as const,
-                            label: "Average duration ",
+                            type: "line",
+                            label: "Total incident ",
                             data: data?.map((i) => i.count),
                             borderColor: "rgb(37, 150, 190)",
                             backgroundColor: "rgb(37, 150, 190, 0.5)",
@@ -562,7 +606,7 @@ const TimeIncidentReport = () => {
                             pointBackgroundColor: "rgb(37, 150, 190)",
                             borderWidth: 2,
                             pointRadius: 3,
-                            fill: false,
+                            fill: true,
                             pointHitRadius: 7,
                           },
                           {
@@ -591,32 +635,36 @@ const TimeIncidentReport = () => {
                     withLabelsLine
                     withLabels
                     thickness={30}
-                    data={[
-                      { name: "India", value: 20, color: "yellow.6" },
-                      { name: "Japan", value: 10, color: "teal.6" },
-                      { name: "USA", value: 30, color: "indigo.6" },
-                      { name: "Other", value: 20, color: "gray.6" },
-                    ]}
+                    data={
+                      incidentPercent
+                        ? incidentPercent?.types?.map((i) => {
+                            return {
+                              name: i.type + " incident",
+                              color:
+                                i.type == IncidentType.Phone
+                                  ? "indigo.6"
+                                  : "yellow.6",
+                              value: i.total,
+                            };
+                          })
+                        : []
+                    }
                   />
-                  <Stack mt={rem(40)} ml={rem(20)} gap={rem(16)}>
+                  <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
                     <LegendCard
-                      color="#ccc"
-                      title="Some thing"
+                      color="#4c6ef5"
+                      title={renderIncidentTypeLegendTitle(
+                        incidentPercent?.types ?? [],
+                        IncidentType.Phone
+                      )}
                       type={LEGEND_TYPES.CIRCLE}
                     />
                     <LegendCard
-                      color="#ccc"
-                      title="Some thing"
-                      type={LEGEND_TYPES.CIRCLE}
-                    />
-                    <LegendCard
-                      color="#ccc"
-                      title="Some thing"
-                      type={LEGEND_TYPES.CIRCLE}
-                    />
-                    <LegendCard
-                      color="#ccc"
-                      title="Some thing"
+                      color="#fab005"
+                      title={renderIncidentTypeLegendTitle(
+                        incidentPercent?.types ?? [],
+                        IncidentType.Uniform
+                      )}
                       type={LEGEND_TYPES.CIRCLE}
                     />
                   </Stack>
@@ -633,32 +681,46 @@ const TimeIncidentReport = () => {
                     withLabelsLine
                     withLabels
                     thickness={30}
-                    data={[
-                      { name: "India", value: 20, color: "yellow.6" },
-                      { name: "Japan", value: 10, color: "teal.6" },
-                      { name: "USA", value: 30, color: "indigo.6" },
-                      { name: "Other", value: 20, color: "gray.6" },
-                    ]}
+                    data={
+                      incidentPercent
+                        ? incidentPercent?.statuses.map((i) => {
+                            return {
+                              color:
+                                i.status == IncidentStatus.Accepted
+                                  ? "#12b886"
+                                  : i.status == IncidentStatus.New
+                                  ? "#4c6ef5"
+                                  : "#fa5252",
+                              name: i.status,
+                              value: i.total,
+                            };
+                          })
+                        : []
+                    }
                   />
-                  <Stack mt={rem(40)} ml={rem(20)} gap={rem(16)}>
+                  <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
                     <LegendCard
-                      color="#ccc"
-                      title="Some thing"
+                      color="#4c6ef5"
+                      title={renderIncidentStatusLegendTitle(
+                        incidentPercent?.statuses ?? [],
+                        IncidentStatus.New
+                      )}
                       type={LEGEND_TYPES.CIRCLE}
                     />
                     <LegendCard
-                      color="#ccc"
-                      title="Some thing"
+                      color="#12b886"
+                      title={renderIncidentStatusLegendTitle(
+                        incidentPercent?.statuses ?? [],
+                        IncidentStatus.Accepted
+                      )}
                       type={LEGEND_TYPES.CIRCLE}
                     />
                     <LegendCard
-                      color="#ccc"
-                      title="Some thing"
-                      type={LEGEND_TYPES.CIRCLE}
-                    />
-                    <LegendCard
-                      color="#ccc"
-                      title="Some thing"
+                      color="#fa5252"
+                      title={renderIncidentStatusLegendTitle(
+                        incidentPercent?.statuses ?? [],
+                        IncidentStatus.Rejected
+                      )}
                       type={LEGEND_TYPES.CIRCLE}
                     />
                   </Stack>

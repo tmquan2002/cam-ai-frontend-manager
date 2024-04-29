@@ -103,25 +103,25 @@ export const EmployeeIncidentCard = ({
           )}
 
           {_.isEmpty(employee) ? (
-            <Text fw={500} py={rem(20)} ml={rem(20)}>
+            <Text c={"#000"} fw={500} py={rem(20)} ml={rem(20)}>
               Unassigned incident
             </Text>
           ) : (
             <Stack py={rem(12)} gap={rem(3)} ml={rem(20)}>
               <Group align="center">
-                <IconUser style={{ width: rem(20) }} stroke={1.5} />
-                <Text size={"md"} fw={500}>
+                <IconUser style={{ width: rem(18), color: "#000" }} />
+                <Text c={"#000"} size={"md"} fw={500}>
                   {employee?.name ?? "Empty"}
                 </Text>
               </Group>
               <Group align="center">
-                <IconMail style={{ width: rem(20) }} stroke={1.5} />
-                <Text fw={500} c={"dimmed"}>
+                <IconMail style={{ width: rem(18), color: "#000" }} />
+                <Text fw={400} c={"dimmed"}>
                   {employee?.email ?? "Empty"}
                 </Text>
-                <IconPointFilled style={{ width: rem(16) }} stroke={1.5} />
-                <IconPhone style={{ width: rem(20) }} stroke={1.5} />
-                <Text fw={500} c={"dimmed"}>
+                <IconPointFilled style={{ width: rem(16), color: "#000" }} />
+                <IconPhone style={{ width: rem(18), color: "#000" }} />
+                <Text fw={400} c={"dimmed"}>
                   {employee?.phone ?? "Empty"}
                 </Text>
               </Group>
