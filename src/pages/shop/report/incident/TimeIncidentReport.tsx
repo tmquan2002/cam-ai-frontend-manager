@@ -5,6 +5,7 @@ import {
   Center,
   Flex,
   Group,
+  Loader,
   ScrollArea,
   SimpleGrid,
   Skeleton,
@@ -621,111 +622,114 @@ const TimeIncidentReport = () => {
                   </Box>
                 </Box>
               </Flex>
-
-              <SimpleGrid cols={2} px={rem(32)} mb={rem(32)} spacing={"xl"}>
-                <Flex
-                  justify={"center"}
-                  flex={1}
-                  style={{
-                    borderRadius: rem(12),
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <DonutChart
-                    withLabelsLine
-                    withLabels
-                    thickness={30}
-                    data={
-                      incidentPercent
-                        ? incidentPercent?.types?.map((i) => {
-                            return {
-                              name: i.type + " incident",
-                              color:
-                                i.type == IncidentType.Phone
-                                  ? "indigo.6"
-                                  : "yellow.6",
-                              value: i.total,
-                            };
-                          })
-                        : []
-                    }
-                  />
-                  <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
-                    <LegendCard
-                      color="#4c6ef5"
-                      title={renderIncidentTypeLegendTitle(
-                        incidentPercent?.types ?? [],
-                        IncidentType.Phone
-                      )}
-                      type={LEGEND_TYPES.CIRCLE}
+              {isGetIncidentPercentLoading ? (
+                <Loader></Loader>
+              ) : (
+                <SimpleGrid cols={2} px={rem(32)} mb={rem(32)} spacing={"xl"}>
+                  <Flex
+                    justify={"center"}
+                    flex={1}
+                    style={{
+                      borderRadius: rem(12),
+                      border: "1px solid #ccc",
+                    }}
+                  >
+                    <DonutChart
+                      withLabelsLine
+                      withLabels
+                      thickness={30}
+                      data={
+                        incidentPercent
+                          ? incidentPercent?.types?.map((i) => {
+                              return {
+                                name: i.type + " incident",
+                                color:
+                                  i.type == IncidentType.Phone
+                                    ? "indigo.6"
+                                    : "yellow.6",
+                                value: i.total,
+                              };
+                            })
+                          : []
+                      }
                     />
-                    <LegendCard
-                      color="#fab005"
-                      title={renderIncidentTypeLegendTitle(
-                        incidentPercent?.types ?? [],
-                        IncidentType.Uniform
-                      )}
-                      type={LEGEND_TYPES.CIRCLE}
+                    <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
+                      <LegendCard
+                        color="#4c6ef5"
+                        title={renderIncidentTypeLegendTitle(
+                          incidentPercent?.types ?? [],
+                          IncidentType.Phone
+                        )}
+                        type={LEGEND_TYPES.CIRCLE}
+                      />
+                      <LegendCard
+                        color="#fab005"
+                        title={renderIncidentTypeLegendTitle(
+                          incidentPercent?.types ?? [],
+                          IncidentType.Uniform
+                        )}
+                        type={LEGEND_TYPES.CIRCLE}
+                      />
+                    </Stack>
+                  </Flex>
+                  <Flex
+                    flex={1}
+                    justify={"center"}
+                    style={{
+                      border: "1px solid #ccc",
+                      borderRadius: rem(12),
+                    }}
+                  >
+                    <DonutChart
+                      withLabelsLine
+                      withLabels
+                      thickness={30}
+                      data={
+                        incidentPercent
+                          ? incidentPercent?.statuses.map((i) => {
+                              return {
+                                color:
+                                  i.status == IncidentStatus.Accepted
+                                    ? "#12b886"
+                                    : i.status == IncidentStatus.New
+                                    ? "#4c6ef5"
+                                    : "#fa5252",
+                                name: i.status,
+                                value: i.total,
+                              };
+                            })
+                          : []
+                      }
                     />
-                  </Stack>
-                </Flex>
-                <Flex
-                  flex={1}
-                  justify={"center"}
-                  style={{
-                    border: "1px solid #ccc",
-                    borderRadius: rem(12),
-                  }}
-                >
-                  <DonutChart
-                    withLabelsLine
-                    withLabels
-                    thickness={30}
-                    data={
-                      incidentPercent
-                        ? incidentPercent?.statuses.map((i) => {
-                            return {
-                              color:
-                                i.status == IncidentStatus.Accepted
-                                  ? "#12b886"
-                                  : i.status == IncidentStatus.New
-                                  ? "#4c6ef5"
-                                  : "#fa5252",
-                              name: i.status,
-                              value: i.total,
-                            };
-                          })
-                        : []
-                    }
-                  />
-                  <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
-                    <LegendCard
-                      color="#4c6ef5"
-                      title={renderIncidentStatusLegendTitle(
-                        incidentPercent?.statuses ?? [],
-                        IncidentStatus.New
-                      )}
-                      type={LEGEND_TYPES.CIRCLE}
-                    />
-                    <LegendCard
-                      color="#12b886"
-                      title={renderIncidentStatusLegendTitle(
-                        incidentPercent?.statuses ?? [],
-                        IncidentStatus.Accepted
-                      )}
-                      type={LEGEND_TYPES.CIRCLE}
-                    />
-                    <LegendCard
-                      color="#fa5252"
-                      title={renderIncidentStatusLegendTitle(
-                        incidentPercent?.statuses ?? [],
-                        IncidentStatus.Rejected
-                      )}
-                      type={LEGEND_TYPES.CIRCLE}
-                    />
-                  </Stack>
-                </Flex>
-              </SimpleGrid>
+                    <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
+                      <LegendCard
+                        color="#4c6ef5"
+                        title={renderIncidentStatusLegendTitle(
+                          incidentPercent?.statuses ?? [],
+                          IncidentStatus.New
+                        )}
+                        type={LEGEND_TYPES.CIRCLE}
+                      />
+                      <LegendCard
+                        color="#12b886"
+                        title={renderIncidentStatusLegendTitle(
+                          incidentPercent?.statuses ?? [],
+                          IncidentStatus.Accepted
+                        )}
+                        type={LEGEND_TYPES.CIRCLE}
+                      />
+                      <LegendCard
+                        color="#fa5252"
+                        title={renderIncidentStatusLegendTitle(
+                          incidentPercent?.statuses ?? [],
+                          IncidentStatus.Rejected
+                        )}
+                        type={LEGEND_TYPES.CIRCLE}
+                      />
+                    </Stack>
+                  </Flex>
+                </SimpleGrid>
+              )}
             </Box>
           )}
         </Box>

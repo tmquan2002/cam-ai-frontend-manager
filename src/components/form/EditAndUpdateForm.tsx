@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  FileInput,
   Grid,
   Group,
   Loader,
@@ -202,28 +203,18 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const {
-    form,
-    name,
-    placeholder,
-    label,
-    required,
-    disabled,
-    readonly,
-    fontWeight,
-    radius,
-    maxDate,
-  } = fieldProps;
+  const { form, name, placeholder, label, required, disabled, readonly, maxDate, radius, fontWeight } =
+    fieldProps;
   return (
     <DateInput
       required={required}
       disabled={disabled}
       withAsterisk={required}
       label={label}
+      maxDate={maxDate}
       readOnly={readonly}
       radius={radius ?? "sm"}
       placeholder={placeholder}
-      maxDate={maxDate}
       defaultDate={new Date(2000, 0)}
       style={{
         fontWeight: fontWeight ?? 400,
@@ -248,7 +239,7 @@ const renderDateTime = ({ fieldProps }: any) => {
     label,
     required,
     disabled,
-    readonly,
+    readonly, withSeconds,
     radius,
     fontWeight,
   } = fieldProps;
@@ -271,26 +262,19 @@ const renderDateTime = ({ fieldProps }: any) => {
         },
       }}
       placeholder={placeholder}
+      withSeconds={withSeconds}
       {...form.getInputProps(name)}
     />
   );
 };
 
 const renderTime = ({ fieldProps }: any) => {
-  const {
-    form,
-    name,
-    placeholder,
-    label,
-    required,
-    disabled,
-    readonly,
-    radius,
-    fontWeight,
-  } = fieldProps;
+  const { form, name, placeholder, label, required, disabled, readonly, withSeconds, radius, fontWeight } =
+    fieldProps;
   return (
     <CustomTimeInput
       // required={required}
+      withSeconds={withSeconds}
       disabled={disabled}
       withAsterisk={required}
       radius={radius ?? "sm"}
@@ -312,6 +296,23 @@ const renderTime = ({ fieldProps }: any) => {
   );
 };
 
+const renderFile = ({ fieldProps }: any) => {
+  const { form, name, placeholder, label, required, disabled, readonly, multiple } =
+    fieldProps;
+  return (
+    <FileInput
+      // required={required}
+      disabled={disabled}
+      withAsterisk={required}
+      label={label}
+      readOnly={readonly}
+      placeholder={placeholder}
+      multiple={multiple}
+      {...form.getInputProps(name)}
+    />
+  );
+};
+
 export const FIELD_TYPES = {
   TEXT: "text",
   SELECT: "select",
@@ -327,6 +328,7 @@ export const FIELD_TYPES = {
   DATE_TIME: "date_time",
   PASSWORD_INPUT: "password_input",
   TIME: "time",
+  FILE: "file",
 };
 
 const FORM_MAPPING = {
@@ -344,6 +346,7 @@ const FORM_MAPPING = {
   //   [FIELD_TYPES.IMAGE_PICKER]: renderImagePicker,
   [FIELD_TYPES.PASSWORD_INPUT]: renderPasswordInput,
   [FIELD_TYPES.TIME]: renderTime,
+  [FIELD_TYPES.FILE]: renderFile,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -13,7 +13,6 @@ export type UpdateAccountParams = {
 };
 export type CreateAccountParams = {
   email: string;
-  password: string;
   name: string;
   gender: Gender | null;
   phone: string;

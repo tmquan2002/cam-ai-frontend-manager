@@ -4,7 +4,7 @@ import { Box, Button, Group, Modal, Text, TextInput, rem } from "@mantine/core";
 import { useState } from "react";
 import { ChangePasswordForm } from "./ChangePasswordForm";
 import { useLogin } from "../../../hooks/useLogin";
-import { useForm } from "@mantine/form";
+import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { LoginParams } from "../../../apis/LoginAPI";
 import { getStatusFromToken } from "../../../utils/jwt";
 import { MdEmail, MdLockOutline } from "react-icons/md";
@@ -28,14 +28,8 @@ const LoginPage = () => {
     },
 
     validate: {
-      email: (value) =>
-        value.trim().length === 0
-          ? "Email is required"
-          : /^\S+@(\S+\.)+\S{2,4}$/g.test(value)
-          ? null
-          : "Invalid email",
-      password: (value) =>
-        value.trim().length === 0 ? "Password is required" : null,
+      email: isEmail("Invalid email - ex: name@gmail.com"),
+      password: isNotEmpty("Password is required"),
     },
   });
 
@@ -82,7 +76,7 @@ const LoginPage = () => {
       <div className={styled["container-main"]}>
         <div className={styled["image-container"]}>
           <Box className={styled["title"]} mb={rem(10)}>
-            CAMAI-MANAGER
+            CAMAI - MANAGER
           </Box>
           <Text className={styled["description"]}>
             Solution for coffee brands to detect customers and employee

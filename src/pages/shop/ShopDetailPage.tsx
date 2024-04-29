@@ -40,13 +40,14 @@ import clsx from "clsx";
 import classes from "./ShopDetailPage.module.scss";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { replaceIfNun } from "../../utils/helperFunction";
-import _ from "lodash";
+import _, { isEmpty } from "lodash";
 import { useNavigate } from "react-router-dom";
 import { CameraStatus, EdgeboxInstallStatus } from "../../models/CamAIEnum";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
-import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
+import { phoneRegex } from "../../types/constant";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
+import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 
 export type FormFieldValue = {
   name: string;
@@ -67,11 +68,8 @@ const ShopDetailPage = () => {
   const form = useForm<FormFieldValue>({
     validate: {
       name: isNotEmpty("Name should not be empty"),
-      phone: (value) =>
-        value == "" ||
-        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) ? null :
+        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -195,7 +193,7 @@ const ShopDetailPage = () => {
           placeholder: "Open Time",
           label: "Open time",
           required: true,
-          radius: "md",
+          withSeconds: false,
         },
         spans: 6,
       },
