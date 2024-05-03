@@ -237,7 +237,7 @@ const CreateShop = () => {
           </Group>
           <Button onClick={openMassImport}>Import File</Button>
         </Group>
-        
+
         <form
           onSubmit={createShopForm.onSubmit(
             ({ addressLine, name, phone, wardId, shopManagerId, openTime, closeTime, }) => {
@@ -293,7 +293,9 @@ const CreateShop = () => {
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Shops and Managers" centered closeOnClickOutside={false}>
         {/* TODO: Add API Import here */}
-        <form autoComplete="off" onSubmit={massImportForm.onSubmit(() => { })}>
+        <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
+          console.log(file)
+        })}>
           <EditAndUpdateForm fields={massImportFields} />
           <Group mt="md">
             <Button type="submit">

@@ -8,12 +8,11 @@ import {
   Text,
   rem,
 } from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
+import { useNavigate } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { replaceIfNun } from "../../utils/helperFunction";
-import { useNavigate } from "react-router-dom";
-import _ from "lodash";
-import { IconPlus } from "@tabler/icons-react";
-import { EmployeeStatusBadge } from "../../components/badge/EmployeeStatusBadge";
 
 const EmployeeListPage = () => {
   const navigate = useNavigate();
@@ -34,9 +33,8 @@ const EmployeeListPage = () => {
       <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
       <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
-      <Table.Td>
-        <EmployeeStatusBadge employeeStatus={row.employeeStatus} />
+      <Table.Td ta={"center"}>
+        <StatusBadge statusName={row.employeeStatus} />
       </Table.Td>
     </Table.Tr>
   ));
@@ -73,8 +71,7 @@ const EmployeeListPage = () => {
                 <Table.Th>Phone</Table.Th>
                 <Table.Th>Birthday</Table.Th>
                 <Table.Th>Gender</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Status</Table.Th>
+                <Table.Th ta={"center"}>Status</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>

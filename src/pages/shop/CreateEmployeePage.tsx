@@ -263,7 +263,9 @@ const CreateEmployeePage = () => {
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Multiple Employees" centered closeOnClickOutside={false}>
         {/* TODO: Add API Import here */}
-        <form autoComplete="off" onSubmit={massImportForm.onSubmit(() => { })}>
+        <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
+          console.log(file)
+        })}>
           <EditAndUpdateForm fields={massImportFields} />
           <Group mt="md">
             <Button type="submit">

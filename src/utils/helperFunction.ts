@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { ReportInterval } from "../models/CamAIEnum";
+import { ActiveStatusGroup, IdleStatusGroup, InactiveStatusGroup, MiddleStatusGroup, ReportInterval, StatusColor, StatusColorLight } from "../models/CamAIEnum";
 
 export function isEmpty(value: string | null | undefined) {
   return (
@@ -21,7 +21,7 @@ export function mapLookupToArray<T extends { [key: string]: string | number }>(
 
 export const replaceIfNun = (
   originalString: string | null | undefined,
-  replaceString: string = "empty"
+  replaceString: string = "No Data"
 ): string => {
   if (!originalString || originalString == "") {
     return replaceString;
@@ -170,3 +170,39 @@ export const addDaysBaseOnReportInterval = (
 
   return result.format(formattedString ?? "YYYY-MM-DDTHH:mm:ss");
 };
+
+export function formatTime(inputTime: string, withSeconds?: boolean, use24HourFormat?: boolean) {
+  let [hours, minutes, seconds] = inputTime.split(':');
+
+  if (!withSeconds) {
+    seconds = '';
+  }
+
+  if (!use24HourFormat) {
+    let suffix = 'AM';
+    if (Number(hours) >= 12) {
+      suffix = 'PM';
+      hours = (parseFloat(hours) % 12).toString();
+      if (Number(hours) === 0) {
+        hours = "12";
+      }
+    }
+    return `${hours}:${minutes}${withSeconds ? `:${seconds}` : ''} ${suffix}`;
+  }
+
+  return `${hours}:${minutes}${withSeconds ? `:${seconds}` : ''}`;
+}
+
+export function getColorFromStatusName(statusName: string, light?: boolean) {
+
+  if (light)
+    return Object.values(ActiveStatusGroup).includes(statusName as ActiveStatusGroup) ? StatusColorLight.ACTIVE :
+      Object.values(InactiveStatusGroup).includes(statusName as InactiveStatusGroup) ? StatusColorLight.INACTIVE :
+        Object.values(IdleStatusGroup).includes(statusName as IdleStatusGroup) ? StatusColorLight.IDLE :
+          Object.values(MiddleStatusGroup).includes(statusName as MiddleStatusGroup) ? StatusColorLight.MIDDLE : StatusColorLight.NONE
+
+  return Object.values(ActiveStatusGroup).includes(statusName as ActiveStatusGroup) ? StatusColor.ACTIVE :
+    Object.values(InactiveStatusGroup).includes(statusName as InactiveStatusGroup) ? StatusColor.INACTIVE :
+      Object.values(IdleStatusGroup).includes(statusName as IdleStatusGroup) ? StatusColor.IDLE :
+        Object.values(MiddleStatusGroup).includes(statusName as MiddleStatusGroup) ? StatusColor.MIDDLE : StatusColor.NONE
+}

@@ -1,6 +1,5 @@
 import {
   Badge,
-  Skeleton,
   Box,
   Button,
   Flex,
@@ -9,24 +8,15 @@ import {
   LoadingOverlay,
   Paper,
   ScrollArea,
+  Skeleton,
   Table,
+  Tabs,
   Text,
   Tooltip,
   rem,
-  Tabs,
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
-import { useEffect, useMemo, useState } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { useGetShopList } from "../../hooks/useGetShopList";
 import { notifications } from "@mantine/notifications";
-import { useUpdateShopById } from "../../hooks/useUpdateShopById";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
-import { UpdateShopParams } from "../../apis/ShopAPI";
 import {
   IconAlertCircle,
   IconCamera,
@@ -35,24 +25,34 @@ import {
   IconMapPin,
   IconPlus,
   IconRouter,
+  IconUsers,
   IconVideo,
-  IconX,
+  IconX
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
 import clsx from "clsx";
-import classes from "./ShopDetailPage.module.scss";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { replaceIfNun } from "../../utils/helperFunction";
 import _, { isEmpty } from "lodash";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CameraStatus, EdgeboxInstallStatus } from "../../models/CamAIEnum";
-import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
-import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
-import { phoneRegex } from "../../types/constant";
-import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
+import { UpdateShopParams } from "../../apis/ShopAPI";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
-import { MdAccountCircle } from "react-icons/md";
+import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetShopList } from "../../hooks/useGetShopList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateShopById } from "../../hooks/useUpdateShopById";
+import { CameraStatus, EdgeboxInstallStatus } from "../../models/CamAIEnum";
+import { ResponseErrorDetail } from "../../models/Response";
+import { phoneRegex } from "../../types/constant";
+import { replaceIfNun } from "../../utils/helperFunction";
+import classes from "./ShopDetailPage.module.scss";
 
 export type FormFieldValue = {
   name: string;
@@ -304,8 +304,8 @@ const ShopDetailPage = () => {
             <Tabs.Tab value="camera" leftSection={<IconCamera />}>
               Camera
             </Tabs.Tab>
-            <Tabs.Tab value="employee" leftSection={<MdAccountCircle />}>
-              Employee
+            <Tabs.Tab value="employees" leftSection={<IconUsers />}>
+              Employees
             </Tabs.Tab>
             <Tabs.Tab value="edgebox" leftSection={<IconRouter />}>
               Edge Box
@@ -313,7 +313,7 @@ const ShopDetailPage = () => {
           </Tabs.List>
 
           <Tabs.Panel value="general">
-            <Paper p={rem(32)} m={rem(32)}>
+            <Box p={rem(32)}>
               <Box pos="relative">
                 <LoadingOverlay
                   visible={isLoading || updateShopLoading}
@@ -368,11 +368,11 @@ const ShopDetailPage = () => {
                   </Group>
                 </form>
               </Box>
-            </Paper>
+            </Box>
           </Tabs.Panel>
 
           <Tabs.Panel value="camera">
-            <Paper p={rem(32)} m={rem(32)}>
+            <Box p={rem(32)}>
               <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
                 Camera list
               </Text>
@@ -424,11 +424,11 @@ const ShopDetailPage = () => {
                   }
                 </>
               )}
-            </Paper>
+            </Box>
           </Tabs.Panel>
 
-          <Tabs.Panel value="employee">
-            <Paper p={rem(32)} m={rem(32)}>
+          <Tabs.Panel value="employees">
+            <Box p={rem(32)}>
               <Flex pb={rem(28)} justify={"space-between "}>
                 <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                   Employee
@@ -465,12 +465,12 @@ const ShopDetailPage = () => {
                   </Table>
                 </ScrollArea>
               )}
-            </Paper>
+            </Box>
           </Tabs.Panel>
 
           <Tabs.Panel value="edgebox">
             <Skeleton visible={isEdgeboxInstallListLoading}>
-              <Paper p={rem(32)} m={rem(32)}>
+              <Box p={rem(32)}>
                 <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
                   <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                     Edge box
@@ -482,7 +482,7 @@ const ShopDetailPage = () => {
                 ) : (
                   <EdgeBoxInstallEmpty />
                 )}
-              </Paper>
+              </Box>
             </Skeleton>
           </Tabs.Panel>
         </Tabs>

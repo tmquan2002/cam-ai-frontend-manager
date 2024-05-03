@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
   Badge,
   Box,
@@ -13,24 +11,26 @@ import {
   Paper,
   Table,
   Text,
-  rem,
+  rem
 } from "@mantine/core";
-import { useMemo, useState } from "react";
-import { IMAGE_CONSTANT } from "../../types/constant";
-import classes from "./IncidentListPage.module.scss";
-import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IconFilter } from "@tabler/icons-react";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { IconFilter } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GetIncidentParams } from "../../apis/IncidentAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { useForm } from "@mantine/form";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { GetIncidentParams } from "../../apis/IncidentAPI";
-import dayjs from "dayjs";
-import _ from "lodash";
+import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
+import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./IncidentListPage.module.scss";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;

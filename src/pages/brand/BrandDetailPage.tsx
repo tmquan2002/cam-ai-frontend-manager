@@ -48,7 +48,7 @@ import {
   GetShopListHookParams,
   useGetShopList,
 } from "../../hooks/useGetShopList";
-import { isEmpty, mapLookupToArray } from "../../utils/helperFunction";
+import { formatTime, isEmpty, mapLookupToArray } from "../../utils/helperFunction";
 import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import classes from "./BrandDetailPage.module.scss";
@@ -181,14 +181,11 @@ const BrandDetailPageManager = () => {
   const rows = shopList?.values.map((row, index) => {
     return (
       <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
-        <Table.Td>
-          <Text className={classes["pointer-style"]} c={"blue"}>
-            {row.name}
-          </Text>
-        </Table.Td>
+        <Table.Td>{index + 1}</Table.Td>
+        <Table.Td>{row.name}</Table.Td>
         <Table.Td>{row.addressLine}</Table.Td>
-        <Table.Td>{row.openTime}</Table.Td>
-        <Table.Td>{row.closeTime}</Table.Td>
+        <Table.Td>{formatTime(row.openTime)}</Table.Td>
+        <Table.Td>{formatTime(row.closeTime)}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
 
         <Table.Td>
@@ -508,14 +505,13 @@ const BrandDetailPageManager = () => {
             <Table
               striped
               highlightOnHover
-              withTableBorder
-              withColumnBorders
               verticalSpacing={"md"}
             >
               <Table.Thead
                 className={cx(classes.header, { [classes.scrolled]: scrolled })}
               >
                 <Table.Tr>
+                  <Table.Th>#</Table.Th>
                   <Table.Th>Shop name</Table.Th>
                   <Table.Th>Address</Table.Th>
                   <Table.Th>Open time</Table.Th>

@@ -12,16 +12,16 @@ import {
   TextInput,
   rem,
 } from "@mantine/core";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { useNavigate } from "react-router-dom";
-import { EmployeeDetail } from "../../models/Employee";
-import classes from "./BrandEmployeePage.module.scss";
-import { replaceIfNun } from "../../utils/helperFunction";
-import { IMAGE_CONSTANT } from "../../types/constant";
-import { useState } from "react";
-import { IconSearch } from "@tabler/icons-react";
 import { useDebouncedValue } from "@mantine/hooks";
-import { EmployeeStatusBadge } from "../../components/badge/EmployeeStatusBadge";
+import { IconSearch } from "@tabler/icons-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { EmployeeDetail } from "../../models/Employee";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import { replaceIfNun } from "../../utils/helperFunction";
+import classes from "./BrandEmployeePage.module.scss";
 
 const BrandEmployeePage = () => {
   const navigate = useNavigate();
@@ -54,9 +54,8 @@ const BrandEmployeePage = () => {
       <Table.Td>{replaceIfNun(row?.phone)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.gender)}</Table.Td>
-      <Table.Td>{replaceIfNun(row?.addressLine)}</Table.Td>
-      <Table.Td>
-        <EmployeeStatusBadge employeeStatus={row?.employeeStatus} />
+      <Table.Td ta={"center"}>
+        <StatusBadge statusName={row.employeeStatus} />
       </Table.Td>
       <Table.Td>
         <Text
@@ -77,14 +76,14 @@ const BrandEmployeePage = () => {
     <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Group pb={12} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Brand employee list
+          Employee List
         </Text>
       </Group>
 
       <Flex align={"center"} my={"md"}>
         <TextInput
           style={{ flex: 1 }}
-          placeholder="Search by anything"
+          placeholder="Search..."
           classNames={{ input: classes.search_input }}
           rightSectionWidth={52}
           leftSectionWidth={52}
@@ -134,7 +133,6 @@ const BrandEmployeePage = () => {
             highlightOnHover
             verticalSpacing={"md"}
             striped
-            withTableBorder
           >
             <Table.Thead>
               <Table.Tr>
@@ -143,8 +141,7 @@ const BrandEmployeePage = () => {
                 <Table.Th>Phone</Table.Th>
                 <Table.Th>Birthday</Table.Th>
                 <Table.Th>Gender</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Status</Table.Th>
+                <Table.Th ta={"center"}>Status</Table.Th>
                 <Table.Th>Shop</Table.Th>
               </Table.Tr>
             </Table.Thead>
