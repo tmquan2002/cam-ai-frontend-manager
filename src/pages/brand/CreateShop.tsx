@@ -213,11 +213,12 @@ const CreateShop = () => {
       {
         type: FIELD_TYPES.FILE,
         fieldProps: {
-          description: "Choose your file to import multiple shops and managers at once",
+          description: "Choose your file to import multiple shops and managers at once, accept .json and .csv file",
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
           label: "Import File",
+          accept: ".json, .csv",
           required: true,
         },
       }
