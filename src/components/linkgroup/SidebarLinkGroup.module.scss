@@ -1,5 +1,6 @@
 .control,
-.activeControl {
+.activeControl,
+.activeControlLink {
   font-weight: 500;
   display: block;
   width: 100%;
@@ -21,7 +22,8 @@
 }
 
 .control:hover,
-.activeControl {
+.activeControl,
+.activeControlLink {
   background-color: var(--mantine-color-light-blue-2);
 
   @include light {
@@ -33,6 +35,10 @@
   }
 }
 
+.activeControlLink {
+  cursor: default;
+}
+
 .link {
   font-weight: 500;
   display: block;
@@ -41,6 +47,7 @@
   padding-left: 1rem;
   margin-left: 1rem;
   font-size: 0.9rem;
+  cursor: pointer;
 
   @include light {
     color: #495057;

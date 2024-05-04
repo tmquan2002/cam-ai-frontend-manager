@@ -1,47 +1,21 @@
-import { useMemo, useState } from "react";
-import {
-  GetShopListHookParams,
-  useGetShopList,
-} from "../../hooks/useGetShopList";
-import { useForm } from "@mantine/form";
-import {
-  IconAlignBoxCenterStretch,
-  IconFilter,
-  IconPhoneCall,
-  IconPlus,
-  IconSearch,
-} from "@tabler/icons-react";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { ShopStatus } from "../../models/CamAIEnum";
 import {
   ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Center,
-  Collapse,
-  Flex,
-  Group,
-  Image,
-  LoadingOverlay,
-  Menu,
-  NumberInput,
-  Pagination,
-  Paper,
-  Table,
-  Text,
-  TextInput,
-  Tooltip,
-  rem,
+  Box, Button, Center, Collapse, Flex, Group, Image,
+  LoadingOverlay, Menu, NumberInput, Pagination, Paper, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import classes from "./ShopListPage.module.scss";
+import { useForm } from "@mantine/form";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { IconAlignBoxCenterStretch, IconFilter, IconPhoneCall, IconPlus, IconSearch, } from "@tabler/icons-react";
 import _ from "lodash";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
+import { GetShopListHookParams, useGetShopList, } from "../../hooks/useGetShopList";
+import { ShopStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT } from "../../types/constant";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./ShopListPage.module.scss";
 
 type SearchShopField = {
   status: string | null;
@@ -71,7 +45,7 @@ const ShopListPage = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: 12,
+      size: 6,
       pageIndex: activePage - 1,
       status: form.values.status ?? null,
       enabled: true,
@@ -111,29 +85,21 @@ const ShopListPage = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
-        <Table.Td>
-          <Text className={classes["pointer-style"]} c={"blue"}>
-            {row.name}
-          </Text>
-        </Table.Td>
-        <Table.Td>{row.addressLine}</Table.Td>
-        <Table.Td>{row.openTime}</Table.Td>
-        <Table.Td>{row.closeTime}</Table.Td>
-        <Table.Td>{row.phone}</Table.Td>
-        <Table.Td>
-          {row?.shopManager ? row.shopManager?.name : "No manager"}
-        </Table.Td>
-        <Table.Td>
-          {_.isEqual(row.shopStatus, "Active") ? (
-            <Badge variant="light">Active</Badge>
-          ) : (
-            <Badge color="gray" variant="light">
-              Disabled
-            </Badge>
-          )}
-        </Table.Td>
-      </Table.Tr>
+      <Tooltip label="View shop detail" withArrow openDelay={300}>
+        <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
+          <Table.Td>{row.name}</Table.Td>
+          <Table.Td>{row.addressLine}</Table.Td>
+          <Table.Td>{row.openTime}</Table.Td>
+          <Table.Td>{row.closeTime}</Table.Td>
+          <Table.Td>{row.phone}</Table.Td>
+          <Table.Td>
+            {row?.shopManager ? row.shopManager?.name : "No manager"}
+          </Table.Td>
+          <Table.Td ta={"center"}>
+            <StatusBadge statusName={row.shopStatus} size="sm" padding={10} />
+          </Table.Td>
+        </Table.Tr>
+      </Tooltip>
     );
   });
 
@@ -142,7 +108,7 @@ const ShopListPage = () => {
       <Menu transitionProps={{ transition: "pop-top-right" }}>
         <Tooltip label="Search by">
           <Menu.Target>
-            <ActionIcon size={36} radius="xl" color={"blue"} variant="filled">
+            <ActionIcon size={30} color={"blue"} variant="filled">
               {searchCategory}
             </ActionIcon>
           </Menu.Target>
@@ -248,7 +214,7 @@ const ShopListPage = () => {
         </Group>
       </Collapse>
 
-      <Box mt={"md"} pos={"relative"}>
+      <Box mt={"md"} pos={"relative"} pl={20} pr={20}>
         <LoadingOverlay
           visible={isShopListLoading}
           zIndex={1000}
@@ -273,7 +239,6 @@ const ShopListPage = () => {
             highlightOnHover
             verticalSpacing={"md"}
             striped
-            withTableBorder
           >
             <Table.Thead>
               <Table.Tr>
@@ -283,7 +248,7 @@ const ShopListPage = () => {
                 <Table.Th>Close time</Table.Th>
                 <Table.Th>Phone</Table.Th>
                 <Table.Th>Shop manager</Table.Th>
-                <Table.Th>Status</Table.Th>
+                <Table.Th ta={"center"}>Status</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>

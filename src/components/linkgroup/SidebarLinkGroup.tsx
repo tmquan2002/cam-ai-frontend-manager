@@ -50,7 +50,8 @@ export function SidebarLinksGroup({
     <Box>
       <UnstyledButton
         onClick={() => setOpened((o) => !o)}
-        className={(hasLinks && links.some(e => location.pathname === e.link)) || location.pathname === path! ? `${classes["activeControl"]}` : `${classes["control"]}`}
+        className={(hasLinks && links.some(e => location.pathname === e.link)) ? `${classes["activeControl"]}` :
+          location.pathname === path! ? `${classes["activeControlLink"]}` : `${classes["control"]}`}
       >
         <Group
           onClick={() => {

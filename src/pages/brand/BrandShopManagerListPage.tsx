@@ -1,31 +1,17 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Group,
-  Image,
-  LoadingOverlay,
-  Pagination,
-  Paper,
-  Table,
-  Text,
-  TextInput,
-  rem,
-} from "@mantine/core";
-import { useGetAccountList } from "../../hooks/useGetAccounts";
-import { replaceIfNun } from "../../utils/helperFunction";
-import { AccountStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT } from "../../types/constant";
-import { IconPlus, IconSearch } from "@tabler/icons-react";
-import classes from "./BrandAccountPage.module.scss";
-import { useNavigate } from "react-router-dom";
-import { AccountDetail } from "../../models/Account";
-import { useState } from "react";
+import { Box, Button, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import { useGetAccountList } from "../../hooks/useGetAccounts";
+import { AccountDetail } from "../../models/Account";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import { replaceIfNun } from "../../utils/helperFunction";
+import classes from "./BrandShopManagerListPage.module.scss";
 
-const BrandAccountPage = () => {
+
+const BrandShopManagerListPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState<string>("");
 
@@ -34,21 +20,10 @@ const BrandAccountPage = () => {
   const [activePage, setPage] = useState(1);
 
   const { data, isLoading } = useGetAccountList({
-    size: 12,
+    size: 6,
     pageIndex: activePage - 1,
     name: debounced,
   });
-
-  const renderAccountStatusRow = (status: AccountStatus) => {
-    switch (status) {
-      case AccountStatus.Active:
-        return <Badge>{status}</Badge>;
-      case AccountStatus.New:
-        return <Badge color="orange">{status}</Badge>;
-      case AccountStatus.Inactive:
-        return <Badge color="gray">{status}</Badge>;
-    }
-  };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -61,24 +36,37 @@ const BrandAccountPage = () => {
       onClick={() => navigate(`/brand/account/${row?.id}`)}
     >
       <Table.Td>
-        <Text size={rem(14)} className={classes.clickable_link}>
-          {replaceIfNun(row?.name)}
-        </Text>
+        <Tooltip label="View Account" withArrow position="top-start">
+          <Text
+            onClick={() => navigate(`/brand/shop/${row?.managingShop?.id}`)}
+            size={rem(14)} c="blue"
+            className={classes.clickable_link}
+          >
+            {replaceIfNun(row?.name)}
+          </Text>
+        </Tooltip>
       </Table.Td>
       <Table.Td>{replaceIfNun(row?.email)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.phone)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.gender)}</Table.Td>
-      <Table.Td>{replaceIfNun(row?.addressLine)}</Table.Td>
-      <Table.Td>{renderAccountStatusRow(row?.accountStatus)}</Table.Td>
-      <Table.Td>
-        <Text
-          onClick={() => navigate(`/brand/shop/${row?.managingShop?.id}`)}
-          size={rem(14)}
-          className={classes.clickable_link}
-        >
-          {row?.managingShop?.name}
-        </Text>
+      <Table.Td ta="center">
+        <StatusBadge statusName={row?.accountStatus} size="sm" padding={10} />
+      </Table.Td>
+      <Table.Td ta="right">
+        {row?.managingShop ?
+          <Tooltip label="View Shop" withArrow position="top-end">
+            <Text
+              onClick={() => navigate(`/brand/shop/${row?.managingShop?.id}`)}
+              size={rem(14)} c="blue"
+              className={classes.clickable_link}
+            >
+              {row?.managingShop?.name}
+            </Text>
+          </Tooltip>
+          :
+          <>None</>
+        }
       </Table.Td>
     </Table.Tr>
   ));
@@ -86,7 +74,7 @@ const BrandAccountPage = () => {
     <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Group pb={12} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Shop manager list
+          Shop Manager list
         </Text>
       </Group>
 
@@ -114,7 +102,7 @@ const BrandAccountPage = () => {
           Add manager
         </Button>
       </Flex>
-      <Box pos={"relative"}>
+      <Box pos={"relative"} pl={20} pr={20}>
         <LoadingOverlay
           visible={isLoading}
           zIndex={1000}
@@ -140,7 +128,6 @@ const BrandAccountPage = () => {
             highlightOnHover
             verticalSpacing={"md"}
             striped
-            withTableBorder
           >
             <Table.Thead>
               <Table.Tr>
@@ -149,9 +136,8 @@ const BrandAccountPage = () => {
                 <Table.Th>Phone</Table.Th>
                 <Table.Th>Birthday</Table.Th>
                 <Table.Th>Gender</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Status</Table.Th>
-                <Table.Th>Managing shop</Table.Th>
+                <Table.Th ta="center">Status</Table.Th>
+                <Table.Th ta="right">Managing shop</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{rows}</Table.Tbody>
@@ -169,4 +155,4 @@ const BrandAccountPage = () => {
   );
 };
 
-export default BrandAccountPage;
+export default BrandShopManagerListPage;

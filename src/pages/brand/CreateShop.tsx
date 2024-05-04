@@ -1,4 +1,4 @@
-import { Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
+import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -7,7 +7,7 @@ import { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateShopParams } from "../../apis/ShopAPI";
-import BackButton from "../../components/button/BackButton";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
@@ -20,6 +20,15 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { phoneRegex } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Shop",
+    link: "/brand/shop"
+  },
+  {
+    title: "Add"
+  }
+]
 export type CreateShopField = {
   name: string;
   phone: string;
@@ -227,10 +236,12 @@ const CreateShop = () => {
 
   return (
     <>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
       <Paper m={rem(32)} mb={0} p={rem(32)} shadow="xl">
         <Group pb={20} align="center" justify="space-between">
           <Group>
-            <BackButton />
             <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
               Create shop
             </Text>

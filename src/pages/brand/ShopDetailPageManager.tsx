@@ -34,8 +34,8 @@ import classes from "./ShopDetailPageManager.module.scss";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
-    title: "Incident",
-    link: "/brand/incident"
+    title: "Shop",
+    link: "/brand/shop"
   },
   {
     title: "Detail"

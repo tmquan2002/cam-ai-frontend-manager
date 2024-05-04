@@ -1,17 +1,4 @@
-import {
-  Box,
-  Center,
-  Flex,
-  Group,
-  Image,
-  LoadingOverlay,
-  Pagination,
-  Paper,
-  Table,
-  Text,
-  TextInput,
-  rem,
-} from "@mantine/core";
+import { Box, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Table, Text, TextInput, rem, } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";

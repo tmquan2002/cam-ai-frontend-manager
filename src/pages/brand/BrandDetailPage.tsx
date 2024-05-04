@@ -1,65 +1,34 @@
 import {
-  ActionIcon,
-  Avatar,
-  Badge,
-  Box,
-  Button,
-  Card,
-  Center,
-  Collapse,
-  Flex,
-  Group,
-  Image,
-  Loader,
-  LoadingOverlay,
-  Menu,
-  NumberInput,
-  Overlay,
-  Pagination,
-  Paper,
-  ScrollArea,
-  Skeleton,
-  Table,
-  Text,
-  TextInput,
-  Tooltip,
-  rem,
+  ActionIcon, Avatar, Box, Button, Card, Center, Collapse, Flex, Group, Image, Loader, LoadingOverlay, Menu, NumberInput, Overlay, Pagination,
+  Paper, ScrollArea, Skeleton, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
+import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import {
-  IconAlignBoxCenterStretch,
-  IconFilter,
-  IconMail,
-  IconPhone,
-  IconPhoneCall,
-  IconPlus,
-  IconSearch,
-} from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
+import { IconAlignBoxCenterStretch, IconFilter, IconMail, IconPhone, IconPhoneCall, IconPhoto, IconPlus, IconSearch, IconUpload, IconX, } from "@tabler/icons-react";
+import { AxiosError } from "axios";
 import cx from "clsx";
 import * as _ from "lodash";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UploadBrandImageType } from "../../apis/BrandAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
+import LoadingImage from "../../components/image/LoadingImage";
 import { useGetBrandList } from "../../hooks/useGetBrandList";
 import {
   GetShopListHookParams,
   useGetShopList,
 } from "../../hooks/useGetShopList";
-import { formatTime, isEmpty, mapLookupToArray } from "../../utils/helperFunction";
-import { IconUpload, IconPhoto, IconX } from "@tabler/icons-react";
-import { Dropzone, FileWithPath } from "@mantine/dropzone";
-import classes from "./BrandDetailPage.module.scss";
 import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
-import { UploadBrandImageType } from "../../apis/BrandAPI";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
-import { notifications } from "@mantine/notifications";
-import { IMAGE_CONSTANT } from "../../types/constant";
 import { ShopStatus } from "../../models/CamAIEnum";
-import LoadingImage from "../../components/image/LoadingImage";
+import { ResponseErrorDetail } from "../../models/Response";
+import { IMAGE_CONSTANT } from "../../types/constant";
+import { formatTime, isEmpty, mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./BrandDetailPage.module.scss";
 
 type SearchShopField = {
   status: string | null;
@@ -95,7 +64,7 @@ const BrandDetailPageManager = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: 12,
+      size: 8,
       enabled: !isEmpty(data?.values?.[0]?.id),
       brandId: data?.values[0]?.id,
       pageIndex: activePage - 1,
@@ -111,8 +80,7 @@ const BrandDetailPageManager = () => {
     return sb;
   }, [activePage, data?.values, debounced, form.values.status, searchCategory]);
 
-  const { data: shopList, isLoading: isShopListLoading } =
-    useGetShopList(searchParams);
+  const { data: shopList, isLoading: isShopListLoading } = useGetShopList(searchParams);
 
   const fields = useMemo(() => {
     return [
@@ -188,14 +156,8 @@ const BrandDetailPageManager = () => {
         <Table.Td>{formatTime(row.closeTime)}</Table.Td>
         <Table.Td>{row.phone}</Table.Td>
 
-        <Table.Td>
-          {_.isEqual(row.shopStatus, "Active") ? (
-            <Badge variant="light">Active</Badge>
-          ) : (
-            <Badge color="gray" variant="light">
-              Disabled
-            </Badge>
-          )}
+        <Table.Td ta="center">
+          <StatusBadge statusName={row.shopStatus} size="sm" padding={10} />
         </Table.Td>
       </Table.Tr>
     );
@@ -206,7 +168,7 @@ const BrandDetailPageManager = () => {
       <Menu transitionProps={{ transition: "pop-top-right" }}>
         <Tooltip label="Search by">
           <Menu.Target>
-            <ActionIcon size={36} radius="xl" color={"blue"} variant="filled">
+            <ActionIcon size={30} color={"blue"} variant="filled">
               {searchCategory}
             </ActionIcon>
           </Menu.Target>
@@ -478,7 +440,7 @@ const BrandDetailPageManager = () => {
         </Collapse>
 
         <ScrollArea
-          h={600}
+          pl={20} pr={20} h={400}
           onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
           mt={"md"}
           pos={"relative"}
@@ -517,7 +479,7 @@ const BrandDetailPageManager = () => {
                   <Table.Th>Open time</Table.Th>
                   <Table.Th>Close time</Table.Th>
                   <Table.Th>Phone</Table.Th>
-                  <Table.Th>Status</Table.Th>
+                  <Table.Th ta={"center"}>Status</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
