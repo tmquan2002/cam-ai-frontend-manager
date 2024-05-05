@@ -14,7 +14,7 @@ import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUp
 import { GetShopListHookParams, useGetShopList, } from "../../hooks/useGetShopList";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT } from "../../types/constant";
-import { mapLookupToArray } from "../../utils/helperFunction";
+import { formatTime, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopListPage.module.scss";
 
 type SearchShopField = {
@@ -85,12 +85,13 @@ const ShopListPage = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Tooltip label="View shop detail" withArrow openDelay={300}>
-        <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
+      <Tooltip label="View shop detail" withArrow openDelay={300} key={index}>
+        <Table.Tr onClick={() => navigate(`/brand/shop/${row.id}`)}>
+          <Table.Td>{index + 1}</Table.Td>
           <Table.Td>{row.name}</Table.Td>
           <Table.Td>{row.addressLine}</Table.Td>
-          <Table.Td>{row.openTime}</Table.Td>
-          <Table.Td>{row.closeTime}</Table.Td>
+          <Table.Td>{formatTime(row.openTime, false, false)}</Table.Td>
+          <Table.Td>{formatTime(row.closeTime, false, false)}</Table.Td>
           <Table.Td>{row.phone}</Table.Td>
           <Table.Td>
             {row?.shopManager ? row.shopManager?.name : "No manager"}
@@ -242,6 +243,7 @@ const ShopListPage = () => {
           >
             <Table.Thead>
               <Table.Tr>
+                <Table.Th>#</Table.Th>
                 <Table.Th>Shop name</Table.Th>
                 <Table.Th>Address</Table.Th>
                 <Table.Th>Open time</Table.Th>

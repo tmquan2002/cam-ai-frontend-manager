@@ -8,10 +8,12 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateShopParams } from "../../apis/ShopAPI";
 import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
+import DownloadButton from "../../components/button/DownloadButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
 import { useCreateShop } from "../../hooks/useCreateShop";
+import { useUploadShopFile } from "../../hooks/useFiles";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
@@ -19,7 +21,6 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { ResponseErrorDetail } from "../../models/Response";
 import { phoneRegex } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
-import DownloadButton from "../../components/button/DownloadButton";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -72,9 +73,8 @@ const CreateShop = () => {
   const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createShopForm.values.province ?? 0));
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createShopForm.values.district ?? 0));
-
-  const { mutate: createShop, isLoading: isCreateShopLoading } =
-    useCreateShop();
+  const { mutate: createShop, isLoading: isCreateShopLoading } = useCreateShop();
+  const { mutate: uploadShop, isLoading: isUploadShopLoading } = useUploadShopFile();
 
 
   const createShopFields = useMemo(() => {
@@ -305,19 +305,34 @@ const CreateShop = () => {
 
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Shops and Managers" centered closeOnClickOutside={false}>
-        {/* TODO: Add API Import here */}
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
           console.log(file)
+          uploadShop({ file }, {
+            onSuccess() {
+              notifications.show({
+                title: "Successfully",
+                message: "Import successful!",
+              });
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                color: "red",
+                title: "Failed",
+                message: error.response?.data?.message,
+              });
+            },
+          })
         })}>
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
             <DownloadButton />
           </Group>
           <Group mt="md">
-            <Button type="submit">
+            <Button type="submit" loading={isUploadShopLoading}>
               Import
             </Button>
-            <Button type="submit" variant="outline" onClick={closeMassImport}>
+            <Button type="submit" variant="outline" onClick={closeMassImport} loading={isUploadShopLoading}>
               Cancel
             </Button>
           </Group>
