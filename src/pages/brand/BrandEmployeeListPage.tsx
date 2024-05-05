@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Table, Text, TextInput, rem, } from "@mantine/core";
+import { Box, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Table, Text, TextInput, Tooltip, rem, } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
@@ -8,16 +8,16 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { EmployeeDetail } from "../../models/Employee";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
-import classes from "./BrandEmployeePage.module.scss";
+import classes from "./BrandEmployeeListPage.module.scss";
 
-const BrandEmployeePage = () => {
+const BrandEmployeeListPage = () => {
   const navigate = useNavigate();
   const [activePage, setPage] = useState(1);
   const [search, setSearch] = useState<string>("");
   const [debounced] = useDebouncedValue(search, 400);
 
   const { data, isLoading } = useGetEmployeeList({
-    size: 12,
+    size: 8,
     pageIndex: activePage - 1,
     search: debounced,
   });
@@ -27,15 +27,18 @@ const BrandEmployeePage = () => {
     setSearch(value);
   };
 
-  const rows = data?.values.map((row: EmployeeDetail) => (
+  const rows = data?.values.map((row: EmployeeDetail, index) => (
     <Table.Tr
       key={row?.id}
       onClick={() => navigate(`/brand/employee/${row?.id}`)}
     >
+      <Table.Td>{index + 1}</Table.Td>
       <Table.Td>
-        <Text size={rem(14)} className={classes.clickable_link}>
-          {replaceIfNun(row?.name)}
-        </Text>
+        <Tooltip label="View Employee" withArrow position="top-start">
+          <Text size={rem(14)} className={classes.clickable_link} c="blue">
+            {replaceIfNun(row?.name)}
+          </Text>
+        </Tooltip>
       </Table.Td>
       <Table.Td>{replaceIfNun(row?.email)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.phone)}</Table.Td>
@@ -45,16 +48,18 @@ const BrandEmployeePage = () => {
         <StatusBadge statusName={row.employeeStatus} />
       </Table.Td>
       <Table.Td>
-        <Text
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/brand/shop/${row?.shop?.id}`);
-          }}
-          size={rem(14)}
-          className={classes.clickable_link}
-        >
-          {row?.shop?.name}
-        </Text>
+        <Tooltip label="View Shop" withArrow position="top-start">
+          <Text c="blue"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/brand/shop/${row?.shop?.id}`);
+            }}
+            size={rem(14)}
+            className={classes.clickable_link}
+          >
+            {row?.shop?.name}
+          </Text>
+        </Tooltip>
       </Table.Td>
     </Table.Tr>
   ));
@@ -94,7 +99,7 @@ const BrandEmployeePage = () => {
         </Button> */}
       </Flex>
 
-      <Box pos={"relative"}>
+      <Box pos={"relative"} pl={20} pr={20}>
         <LoadingOverlay
           visible={isLoading}
           zIndex={1000}
@@ -123,6 +128,7 @@ const BrandEmployeePage = () => {
           >
             <Table.Thead>
               <Table.Tr>
+                <Table.Th>#</Table.Th>
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Email</Table.Th>
                 <Table.Th>Phone</Table.Th>
@@ -147,4 +153,4 @@ const BrandEmployeePage = () => {
   );
 };
 
-export default BrandEmployeePage;
+export default BrandEmployeeListPage;

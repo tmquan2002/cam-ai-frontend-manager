@@ -19,6 +19,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { ResponseErrorDetail } from "../../models/Response";
 import { phoneRegex } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
+import DownloadButton from "../../components/button/DownloadButton";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -222,12 +223,13 @@ const CreateShop = () => {
       {
         type: FIELD_TYPES.FILE,
         fieldProps: {
-          description: "Choose your file to import multiple shops and managers at once, accept .json and .csv file",
+          description: "Choose your file to import multiple shops and managers at once, accept .csv file",
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
           label: "Import File",
-          accept: ".json, .csv",
+          accept: ".csv",
+          width: 300,
           required: true,
         },
       }
@@ -307,7 +309,10 @@ const CreateShop = () => {
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
           console.log(file)
         })}>
-          <EditAndUpdateForm fields={massImportFields} />
+          <Group align="end">
+            <EditAndUpdateForm fields={massImportFields} />
+            <DownloadButton />
+          </Group>
           <Group mt="md">
             <Button type="submit">
               Import

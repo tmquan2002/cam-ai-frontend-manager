@@ -297,7 +297,7 @@ const renderTime = ({ fieldProps }: any) => {
 };
 
 const renderFile = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, accept, multiple, readOnly, description } =
+  const { form, name, placeholder, label, required, disabled, accept, multiple, readOnly, description, width } =
     fieldProps;
   return (
     <FileInput
@@ -309,6 +309,7 @@ const renderFile = ({ fieldProps }: any) => {
       label={label}
       placeholder={placeholder}
       multiple={multiple}
+      w={width}
       {...form.getInputProps(name)}
     />
   );

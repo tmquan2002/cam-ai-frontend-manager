@@ -18,7 +18,7 @@ import EmployeeListPage from "../pages/shop/EmployeeListPage";
 import BrandShopManagerListPage from "../pages/brand/BrandShopManagerListPage";
 import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import AccountDetailPage from "../pages/brand/AccountDetailPage";
-import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
+import BrandEmployeeListPage from "../pages/brand/BrandEmployeeListPage";
 import ShopListPage from "../pages/brand/ShopListPage";
 import ShopIncidentListPage from "../pages/shop/ShopIncidentListPage";
 import IncidentListPage from "../pages/brand/IncidentListPage";
@@ -144,7 +144,7 @@ const AppRoute = () => {
         },
         {
           path: "employee",
-          element: <BrandEmployeePage />,
+          element: <BrandEmployeeListPage />,
         },
         {
           path: "employee/:id",

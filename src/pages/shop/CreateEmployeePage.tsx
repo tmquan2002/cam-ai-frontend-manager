@@ -189,12 +189,12 @@ const CreateEmployeePage = () => {
       {
         type: FIELD_TYPES.FILE,
         fieldProps: {
-          description: "Choose your file to import multiple employess for your shop at once, accept .json and .csv file",
+          description: "Choose your file to import multiple employess for your shop at once, accept .csv file",
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
           label: "Import File",
-          accept: ".json, .csv",
+          accept: ".csv",
           required: true,
         },
       }

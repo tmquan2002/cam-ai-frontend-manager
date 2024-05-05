@@ -98,4 +98,48 @@ export const EmployeeApi = {
 
     return res?.data;
   },
+
+  _uploadEmployeeFile: async (params: { file: File }) => {
+    const access_token = getAccessToken();
+    const form = new FormData();
+    form.append("file", params.file);
+
+    const res = await http.post<{ taskId: string, message: string }>(`/api/employees/upsert`, form, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getEmployeeUpsertTask: async () => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<string[]>(`/api/employees/upsert/task`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getEmployeeUpsertTaskResult: async (taskId: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<{
+      inserted: number;
+      updated: number;
+      failed: number;
+      metadata: string[];
+    }>(`/api/employees/upsert/task/${taskId}/result`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
 };

@@ -1,8 +1,8 @@
-import { ActionIcon, ActionIconProps, rem } from "@mantine/core";
+import { ActionIcon, rem } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 
-const BackButton = (props: ActionIconProps) => {
+const BackButton = () => {
   const navigate = useNavigate();
   return (
     <ActionIcon
@@ -11,7 +11,6 @@ const BackButton = (props: ActionIconProps) => {
       color="gray"
       w={rem(36)}
       h={rem(36)}
-      {...props}
       onClick={() => navigate(-1)}
     >
       <IconArrowLeft

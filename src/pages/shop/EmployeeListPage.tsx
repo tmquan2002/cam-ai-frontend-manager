@@ -56,13 +56,12 @@ const EmployeeListPage = () => {
       {isGetEmployeeListLoading ? (
         <Loader />
       ) : (
-        <ScrollArea h={600}>
+        <ScrollArea h={500}>
           <Table
             miw={1000}
             highlightOnHover
             verticalSpacing={"md"}
             striped
-            withTableBorder
           >
             <Table.Thead>
               <Table.Tr>
