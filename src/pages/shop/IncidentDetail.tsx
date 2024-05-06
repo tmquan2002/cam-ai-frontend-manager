@@ -8,31 +8,32 @@ import {
   Group,
   Loader,
   Paper,
+  ScrollArea,
   Select,
   Text,
   Tooltip,
   rem,
 } from "@mantine/core";
-import BackButton from "../../components/button/BackButton";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
-import { useGetIncidentById } from "../../hooks/useGetIncidentById";
-import { useNavigate, useParams } from "react-router-dom";
-import dayjs from "dayjs";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
-import { EvidenceDetail } from "../../models/Evidence";
-import { IconIdOff, IconX } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
-import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { useAssignIncident } from "../../hooks/useAssignIncident";
 import { notifications } from "@mantine/notifications";
-import { ResponseErrorDetail } from "../../models/Response";
+import { IconIdOff, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
-import NoImage from "../../components/image/NoImage";
+import dayjs from "dayjs";
 import _ from "lodash";
-import classes from "./IncidentDetail.module.scss";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import BackButton from "../../components/button/BackButton";
 import LoadingImage from "../../components/image/LoadingImage";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
+import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
+import { EvidenceDetail } from "../../models/Evidence";
+import { ResponseErrorDetail } from "../../models/Response";
+import classes from "./IncidentDetail.module.scss";
+import NoImage from "../../components/image/NoImage";
 
 type IncidentFormField = {
   employeeId: string | null;
@@ -53,22 +54,12 @@ const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
 
 const IncidentDetail = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const form = useForm<IncidentFormField>();
-
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-
-  const {
-    data: incidentData,
-    isLoading: isGetIncidentLoading,
-    refetch: refetchIncident,
-  } = useGetIncidentById(id ?? "");
-
-  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
-    useRejectIncidentById();
-  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
-    useAssignIncident();
+  const { id } = useParams<{ id: string }>()
+  const form = useForm<IncidentFormField>()
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({})
+  const { data: incidentData, isLoading: isGetIncidentLoading, refetch: refetchIncident, } = useGetIncidentById(id ?? "")
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } = useRejectIncidentById()
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } = useAssignIncident()
 
   const onAssignIncident = (fieldValues: IncidentFormField) => {
     assignIncident(
@@ -78,8 +69,8 @@ const IncidentDetail = () => {
           notifications.show({
             title: "Assign successfully",
             message: "Incident assign success!",
-          });
-          refetchIncident();
+          })
+          refetchIncident()
         },
         onError(data) {
           const error = data as AxiosError<ResponseErrorDetail>;
@@ -208,18 +199,9 @@ const IncidentDetail = () => {
       </Group>
       <Divider />
       <Flex>
-        <Box
-          style={{
-            flex: 1,
-          }}
-        >
-          <Paper
-            shadow="xs"
-            mx={rem(64)}
-            my={rem(40)}
-            px={rem(32)}
-            py={rem(28)}
-          >
+        <Box style={{ flex: 1, }}>
+          <Paper shadow="xs" mx={rem(64)} my={rem(40)} px={rem(32)} py={rem(28)}>
+
             <Group mb={rem(20)} justify="space-between" align="flex-end">
               <Text fw={500} size={rem(20)}>
                 Evidence
@@ -241,17 +223,20 @@ const IncidentDetail = () => {
               </Group>
             </Group>
             <Divider color="#acacac" mb={rem(20)} />
-            {_.isEmpty(incidentData?.evidences) ? (
-              <NoImage type="NO_DATA" />
-            ) : (
-              incidentData?.evidences?.map((item) => {
-                return (
-                  <Box key={item.id} mb={rem(20)}>
-                    {renderIncidentFootage(item)}
-                  </Box>
-                );
-              })
-            )}
+            <ScrollArea h={470}>
+              {_.isEmpty(incidentData?.evidences) ? (
+                <NoImage type="NO_DATA" />
+              ) : (
+                incidentData?.evidences?.map((item) => {
+                  return (
+                    <Box key={item.id} mb={rem(20)}>
+                      {renderIncidentFootage(item)}
+                      <Divider mt={20} />
+                    </Box>
+                  )
+                })
+              )}
+            </ScrollArea>
           </Paper>
         </Box>
         <Box w={rem(500)}>
@@ -274,7 +259,7 @@ const IncidentDetail = () => {
                       return {
                         value: item?.id,
                         label: item?.name,
-                      };
+                      }
                     })}
                     nothingFoundMessage="Nothing found..."
                   />

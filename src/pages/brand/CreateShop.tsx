@@ -326,7 +326,7 @@ const CreateShop = () => {
         })}>
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
-            <DownloadButton />
+            <DownloadButton type="shop"/>
           </Group>
           <Group mt="md">
             <Button type="submit" loading={isUploadShopLoading}>

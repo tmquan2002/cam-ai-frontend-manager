@@ -39,7 +39,7 @@ const LoadingImage = (props: LoadingImageProps) => {
   if (isLoadFailed) {
     return (
       <Box mb={0}>
-        <NoImage type="CANNOT_LOAD" />;
+        <NoImage type="CANNOT_LOAD" />
       </Box>
     );
   }

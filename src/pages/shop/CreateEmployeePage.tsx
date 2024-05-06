@@ -21,6 +21,7 @@ import { emailRegex } from "../../types/constant";
 import { useDisclosure } from "@mantine/hooks";
 import BackButton from "../../components/button/BackButton";
 import { useUploadEmployeeFile } from "../../hooks/useFiles";
+import DownloadButton from "../../components/button/DownloadButton";
 
 export type CreateEmployeeField = {
   name: string | null;
@@ -197,6 +198,7 @@ const CreateEmployeePage = () => {
           placeholder: "Choose a file",
           label: "Import File",
           accept: ".csv",
+          width: 300,
           required: true,
         },
       }
@@ -283,7 +285,10 @@ const CreateEmployeePage = () => {
             },
           })
         })}>
-          <EditAndUpdateForm fields={massImportFields} />
+          <Group align="end">
+            <EditAndUpdateForm fields={massImportFields} />
+            <DownloadButton type="employee"/>
+          </Group>
           <Group mt="md">
             <Button type="submit" loading={isUploadEmployeeLoading}>
               Import
