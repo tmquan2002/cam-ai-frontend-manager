@@ -1,26 +1,103 @@
-import { Box, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Table, Text, TextInput, Tooltip, rem, } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconSearch } from "@tabler/icons-react";
-import { useState } from "react";
+import { ActionIcon, Box, Button, Center, Collapse, Group, Image, LoadingOverlay, Menu, Pagination, Paper, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { IconAlignBoxCenterStretch, IconFilter, IconMail, IconPhoneCall, IconSearch } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GetEmployeeListParams } from "../../apis/EmployeeAPI";
 import StatusBadge from "../../components/badge/StatusBadge";
+import EditAndUpdateForm, { FIELD_TYPES } from "../../components/form/EditAndUpdateForm";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetShopList } from "../../hooks/useGetShopList";
+import { EmployeeStatus } from "../../models/CamAIEnum";
 import { EmployeeDetail } from "../../models/Employee";
 import { IMAGE_CONSTANT } from "../../types/constant";
-import { replaceIfNun } from "../../utils/helperFunction";
+import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandEmployeeListPage.module.scss";
+import * as _ from "lodash";
+
+type SearchShopField = {
+  employeeStatus: string | null;
+  shopId: string;
+};
+
+const SearchCategory = {
+  NAME: <IconAlignBoxCenterStretch size={"1.2rem"} stroke={1.5} />,
+  EMAIL: <IconMail size={"1.2rem"} stroke={1.5} />,
+  PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
+};
 
 const BrandEmployeeListPage = () => {
+  const form = useForm<SearchShopField>({
+    initialValues: {
+      employeeStatus: EmployeeStatus.Active,
+      shopId: "",
+    },
+  });
+
+  const pageSize = 6;
   const navigate = useNavigate();
+  const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
   const [search, setSearch] = useState<string>("");
-  const [debounced] = useDebouncedValue(search, 400);
+  const [searchShop, setSearchShop] = useState<string>("");
+  const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
+  const { data: shopList, isLoading: isLoadingShop } = useGetShopList({ enabled: true, size: 999 });
+  const [debounced] = useDebouncedValue(search, 500);
 
-  const { data, isLoading } = useGetEmployeeList({
-    size: 8,
-    pageIndex: activePage - 1,
-    search: debounced,
-  });
+  const fields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.RADIO,
+        fieldProps: {
+          form,
+          name: "employeeStatus",
+          placeholder: "Employee Status",
+          label: "Employee status",
+          data: mapLookupToArray(EmployeeStatus ?? {}),
+        },
+        spans: 6,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          label: "Shop",
+          placeholder: "Shop",
+          data: shopList?.values?.map((item) => {
+            return { value: `${item.id}`, label: item.name };
+          }),
+          form,
+          name: "shopId",
+          loading: isLoadingShop,
+          searchable: true,
+          searchValue: searchShop,
+          onSearchChange: setSearchShop,
+        },
+        spans: 6,
+      },
+    ];
+  }, [form]);
+
+  const searchParams: GetEmployeeListParams = useMemo(() => {
+    let sb: GetEmployeeListParams = {
+      size: pageSize,
+      shopId: form.values.shopId,
+      pageIndex: activePage - 1,
+      employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
+    };
+    // if (searchCategory == SearchCategory.NAME) {
+    sb.search = debounced.toString();
+    // } else if (searchCategory == SearchCategory.EMAIL) {
+    //   sb.email = debounced.toString();
+    // } else {
+    //   sb.phone = debounced.toString();
+    // }
+    sb = _.omitBy(sb, _.isNil) as GetEmployeeListParams;
+    sb = _.omitBy(sb, _.isNaN) as GetEmployeeListParams;
+    return sb;
+  }, [activePage, shopList?.values, debounced, searchCategory, form]);
+
+  const { data, isLoading } = useGetEmployeeList(searchParams);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -64,40 +141,94 @@ const BrandEmployeeListPage = () => {
     </Table.Tr>
   ));
 
+  const renderDropdownFilter = () => {
+    return (
+      <Menu>
+        <Tooltip label="Search by">
+          <Menu.Target>
+            <ActionIcon size={30} color={"blue"} variant="filled">
+              {searchCategory}
+            </ActionIcon>
+          </Menu.Target>
+        </Tooltip>
+
+        <Menu.Dropdown>
+          <Menu.Label>Search by</Menu.Label>
+          <Menu.Item leftSection={<IconAlignBoxCenterStretch size={"1.3rem"} stroke={1.5} color="#228be6" />}
+            onClick={() => { setSearch(""); setSearchCategory(SearchCategory.NAME); }}
+          >
+            Name
+          </Menu.Item>
+          <Menu.Item leftSection={<IconMail size={"1.3rem"} stroke={1.5} color="#E78C8C" />}
+            onClick={() => { setSearch(""); setSearchCategory(SearchCategory.EMAIL); }}
+          >
+            Email
+          </Menu.Item>
+          <Menu.Item leftSection={<IconPhoneCall size={"1.3rem"} stroke={1.5} color={"#15aabf"} />}
+            onClick={() => { setSearch(""); setSearchCategory(SearchCategory.PHONE); }}
+          >
+            Phone
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    );
+  };
+
+  if (isLoadingShop) {
+    return (
+      <Paper p={rem(32)} style={{ flex: 1 }} pos={"relative"} h={"100vh"}>
+        <LoadingOverlay visible={isLoadingShop} />
+      </Paper>
+    );
+  }
+
   return (
-    <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
+    <Paper m={rem(32)} p={rem(32)} shadow="xl">
       <Group pb={12} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Employee List
         </Text>
       </Group>
 
-      <Flex align={"center"} my={"md"}>
+      <Group align={"center"} mb={10}>
         <TextInput
-          style={{ flex: 1 }}
+          flex={1}
           placeholder="Search..."
           classNames={{ input: classes.search_input }}
-          rightSectionWidth={52}
-          leftSectionWidth={52}
+          rightSectionWidth={54}
+          leftSectionWidth={54}
           leftSection={
             <IconSearch
-              style={{ width: rem(16), height: rem(16) }}
+              style={{ width: rem(20), height: rem(20) }}
               stroke={1.5}
             />
           }
+          rightSection={renderDropdownFilter()}
           value={search}
           onChange={handleSearchChange}
         />
-        {/* <Button
-          leftSection={<IconPlus size={14} />}
-          ml={rem(12)}
-          radius={"xl"}
-          onClick={() => navigate("/brand/create/employee")}
-          h={rem(48)}
+        <Button
+          leftSection={<IconFilter size={14} />}
+          variant="default"
+          className={classes.filter_button}
+          onClick={toggle}
         >
-          Add employee
-        </Button> */}
-      </Flex>
+          Filter
+        </Button>
+      </Group>
+
+      <Collapse in={opened} mb={20} ml={20} mr={20}>
+        <Group justify="space-between">
+          <EditAndUpdateForm fields={fields} />
+          <Button variant="transparent" ml={"auto"}
+            onClick={() => {
+              form.reset;
+              setSearchShop("");
+            }}>
+            Clear all filter
+          </Button>
+        </Group>
+      </Collapse>
 
       <Box pos={"relative"} pl={20} pr={20}>
         <LoadingOverlay
@@ -120,32 +251,29 @@ const BrandEmployeeListPage = () => {
             />
           </Center>
         ) : (
-          <Table
-            miw={1000}
-            highlightOnHover
-            verticalSpacing={"md"}
-            striped
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>#</Table.Th>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Phone</Table.Th>
-                <Table.Th>Birthday</Table.Th>
-                <Table.Th>Gender</Table.Th>
-                <Table.Th ta={"center"}>Status</Table.Th>
-                <Table.Th>Shop</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <Table.ScrollContainer minWidth={1000}>
+            <Table highlightOnHover verticalSpacing={"sm"} striped>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Birthday</Table.Th>
+                  <Table.Th>Gender</Table.Th>
+                  <Table.Th ta={"center"}>Status</Table.Th>
+                  <Table.Th>Shop</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
         <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((data?.totalCount ?? 0) / 12)}
+            total={Math.ceil((data?.totalCount ?? 0) / pageSize)}
           />
         </Group>
       </Box>

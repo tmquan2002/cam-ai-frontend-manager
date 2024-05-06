@@ -1,5 +1,7 @@
 import {
-  ActionIcon, Avatar, Box, Button, Card, Center, Collapse, Flex, Group, Image, Loader, LoadingOverlay, Menu, NumberInput, Overlay, Pagination,
+  ActionIcon, Avatar, Box, Button,
+  Center, Collapse, Flex, Group, Image, Loader, LoadingOverlay, Menu, NumberInput,
+  Pagination,
   Paper, ScrollArea, Skeleton, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
@@ -28,7 +30,7 @@ import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT } from "../../types/constant";
 import { formatTime, isEmpty, mapLookupToArray } from "../../utils/helperFunction";
-import classes from "./BrandDetailPage.module.scss";
+import classes from "./BrandMainPage.module.scss";
 
 type SearchShopField = {
   status: string | null;
@@ -39,7 +41,9 @@ const SearchCategory = {
   PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
 };
 
-const BrandDetailPageManager = () => {
+const pageSize = 8;
+
+const BrandMainPage = () => {
   const form = useForm<SearchShopField>({
     initialValues: {
       status: null,
@@ -52,19 +56,14 @@ const BrandDetailPageManager = () => {
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
   const [scrolled, setScrolled] = useState(false);
-  const [searchCategory, setSearchCategory] = useState<JSX.Element>(
-    SearchCategory.NAME
-  );
-  const { data, isLoading, isError, refetch } = useGetBrandList({ size: 1 });
-  const { mutate: uploadBrandBanner, isLoading: isUploadBrandBannerLoading } =
-    useUploadBrandImage();
-
-  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } =
-    useUploadBrandImage();
+  const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
+  const { data, isLoading, refetch } = useGetBrandList({ size: 1 });
+  const { mutate: uploadBrandBanner, isLoading: isUploadBrandBannerLoading } = useUploadBrandImage();
+  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } = useUploadBrandImage();
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: 8,
+      size: pageSize,
       enabled: !isEmpty(data?.values?.[0]?.id),
       brandId: data?.values[0]?.id,
       pageIndex: activePage - 1,
@@ -215,33 +214,6 @@ const BrandDetailPageManager = () => {
     );
   }
 
-  if (isError)
-    return (
-      <Card radius="md" m={rem(32)} className={classes.card}>
-        <Overlay className={classes.overlay} opacity={0.55} zIndex={0} />
-
-        <div className={classes.content}>
-          <Text size="lg" fw={700} className={classes.title}>
-            Plan & save
-          </Text>
-
-          <Text size="sm" className={classes.description}>
-            Save up to 25% at Fifth Season Hotels in Europe, the Middle East,
-            Africa and Asia Pacific
-          </Text>
-
-          <Button
-            className={classes.action}
-            variant="white"
-            color="dark"
-            size="xs"
-          >
-            Book now
-          </Button>
-        </div>
-      </Card>
-    );
-
   return (
     <>
       <Paper p={rem(32)} style={{ flex: 1 }}>
@@ -377,7 +349,7 @@ const BrandDetailPageManager = () => {
           {searchCategory == SearchCategory.NAME ? (
             <TextInput
               style={{ flex: 1 }}
-              placeholder="Search by any field"
+              placeholder="Search..."
               classNames={{ input: classes.search_input }}
               rightSectionWidth={52}
               leftSectionWidth={52}
@@ -394,7 +366,7 @@ const BrandDetailPageManager = () => {
           ) : (
             <NumberInput
               style={{ flex: 1 }}
-              placeholder="Search by any field"
+              placeholder="Search..."
               classNames={{ input: classes.search_input }}
               rightSectionWidth={52}
               leftSectionWidth={52}
@@ -490,7 +462,7 @@ const BrandDetailPageManager = () => {
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((shopList?.totalCount ?? 0) / 12)}
+            total={Math.ceil((shopList?.totalCount ?? 0) / pageSize)}
           />
         </Group>
       </Paper>
@@ -498,4 +470,4 @@ const BrandDetailPageManager = () => {
   );
 };
 
-export default BrandDetailPageManager;
+export default BrandMainPage;

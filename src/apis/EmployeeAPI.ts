@@ -6,11 +6,13 @@ import http, { toQueryParams } from "../utils/http";
 
 export type GetEmployeeListParams = {
   search?: string;
-  employeeStatusId?: number;
+  employeeStatus?: string | null;
   brandId?: string;
   shopId?: string;
   size?: number;
   pageIndex?: number;
+  email?: string
+  phone?: string
 };
 
 export type CreateEmployeeParams = {

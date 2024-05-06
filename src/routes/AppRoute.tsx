@@ -4,7 +4,7 @@ import LoginPage from "../pages/common/login/LoginPage";
 import ShopRoute from "./ShopRoute";
 import ShopHomePage from "../pages/shop/ShopHomePage";
 import ShopDetailPage from "../pages/shop/ShopDetailPage";
-import BrandDetailPage from "../pages/brand/BrandDetailPage";
+import BrandDetailPage from "../pages/brand/BrandMainPage";
 import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
 import BrandRoute from "./BrandRoute";
 import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
