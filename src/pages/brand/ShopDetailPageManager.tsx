@@ -31,6 +31,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
+import StatusBadge from "../../components/badge/StatusBadge";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -63,47 +64,49 @@ const ShopDetailPageManager = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [opened, { toggle }] = useDisclosure(false);
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({ shopId: id });
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({ shopId: id });
+  const { data: cameraList, isLoading: isGetCameraListLoading } = useGetCameraListByShopId(id);
+  const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } = useChangeShopStatus();
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading, refetch: refetchEdgeBoxInstallList, } = useGetEdgeBoxInstallByShopId(id ?? "");
 
-  const { data: cameraList, isLoading: isGetCameraListLoading } =
-    useGetCameraListByShopId(id);
-
-  const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } =
-    useChangeShopStatus();
-
-  const {
-    data: edgeBoxInstallList,
-    isLoading: isEdgeboxInstallListLoading,
-    refetch: refetchEdgeBoxInstallList,
-  } = useGetEdgeBoxInstallByShopId(id ?? "");
-
-  const rows = employeeList?.values?.map((row) => (
-    <Table.Tr
-      style={{
-        cursor: "pointer",
-      }}
-      key={row.id}
-      onClick={() => navigate(`/brand/employee/${row.id}`)}
-    >
-      <Table.Td>{replaceIfNun(row.name)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.email)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
-      <Table.Td>
-        {_.isEqual(row.employeeStatus, "Active") ? (
-          <Badge variant="light">Active</Badge>
-        ) : (
-          <Badge color="gray" variant="light">
-            Disabled
-          </Badge>
-        )}
-      </Table.Td>
-    </Table.Tr>
+  const rows = employeeList?.values?.map((row, index) => (
+    <Tooltip label="View Employee" key={row.id}>
+      <Table.Tr
+        style={{
+          cursor: "pointer",
+        }}
+        onClick={() => navigate(`/brand/employee/${row.id}`)}
+      >
+        <Table.Td>{index + 1}</Table.Td>
+        <Table.Td>{replaceIfNun(row.name)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.email)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
+        <Table.Td ta="center">
+          <StatusBadge statusName={row.employeeStatus} size="sm" padding={10} />
+        </Table.Td>
+      </Table.Tr>
+    </Tooltip>
   ));
+
+  const activationForm = useForm<ActivationFormValue>();
+
+  const { data, isLoading, refetch } = useGetShopById(id ?? "0");
+
   const form = useForm<FormFieldValue>({
+    initialValues: {
+      name: data?.name ?? "",
+      phone: data?.phone ?? "",
+      wardId: `${data?.wardId}`,
+      addressLine: data?.addressLine ?? "",
+      brandName: data?.brand?.name ?? "",
+      province: `${data?.ward?.district?.province?.id}`,
+      district: `${data?.ward?.district?.id}`,
+      openTime: data?.openTime ?? "00:00:00",
+      closeTime: data?.closeTime ?? "00:00:00",
+    },
     validate: {
       name: hasLength(
         { min: 2, max: 50 },
@@ -119,31 +122,14 @@ const ShopDetailPageManager = () => {
       closeTime: isNotEmpty("Close time is required"),
     },
   });
-  const activationForm = useForm<ActivationFormValue>();
 
-  const { data, isLoading, refetch } = useGetShopById(id ?? "0");
-  const {
-    data: accountList,
-    isLoading: isAccountListLoading,
-    refetch: refetchAccountList,
-  } = useGetAccountList({
-    size: 999,
-  });
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
-  );
-  const { mutate: updateShop, isLoading: updateShopLoading } =
-    useUpdateShopById();
-  const { mutate: updateShopManager, isLoading: updateShopManagerLoading } =
-    useUpdateShopById();
-
-  const { mutate: activeEdgeBox, isLoading: isActiveEdgeBoxLoading } =
-    useActiveEdgeBoxByShopId();
+  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({ size: 999, });
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
+  const { mutate: updateShop, isLoading: updateShopLoading } = useUpdateShopById();
+  const { mutate: updateShopManager, isLoading: updateShopManagerLoading } = useUpdateShopById();
+  const { mutate: activeEdgeBox, isLoading: isActiveEdgeBoxLoading } = useActiveEdgeBoxByShopId();
 
   const handleToggleShopStatus = (currentStatus: ShopStatus) => {
     changeShopStatus(
@@ -270,18 +256,17 @@ const ShopDetailPageManager = () => {
   useEffect(() => {
     if (data) {
       const initialData: FormFieldValue = {
-        name: data.name,
+        name: data?.name,
         phone: data?.phone ?? "",
-        wardId: `${data.wardId}`,
-        addressLine: data.addressLine,
-        brandName: data.brand.name,
-        province: `${data.ward.district.province.id}`,
-        district: `${data.ward.district.id}`,
+        wardId: `${data?.wardId}`,
+        addressLine: data?.addressLine,
+        brandName: data?.brand?.name,
+        province: `${data?.ward?.district?.province?.id}`,
+        district: `${data?.ward?.district?.id}`,
         openTime: data?.openTime,
         closeTime: data?.closeTime,
       };
-      form.setInitialValues(initialData);
-      form.reset();
+      form.setValues(initialData);
     }
   }, [data]);
 
@@ -337,6 +322,7 @@ const ShopDetailPageManager = () => {
           placeholder: "Brand",
           label: "Brand",
           readonly: true,
+          disabled: true,
         },
       },
       {
@@ -485,6 +471,8 @@ const ShopDetailPageManager = () => {
                       closeTime: values?.closeTime,
                     };
 
+                    console.log(updateShopParams)
+
                     updateShop(updateShopParams, {
                       onSuccess() {
                         notifications.show({
@@ -507,11 +495,11 @@ const ShopDetailPageManager = () => {
                 >
                   <EditAndUpdateForm fields={fields} />
 
-                  <Group justify="flex-end" mt="md">
+                  {/* <Group justify="flex-end" mt="md">
                     <Button disabled={!form.isDirty()} type="submit">
                       Submit
                     </Button>
-                  </Group>
+                  </Group> */}
                 </form>
               </Box>
             </Box>
@@ -641,7 +629,7 @@ const ShopDetailPageManager = () => {
               {isGetEmployeeListLoading ? (
                 <Loader />
               ) : (
-                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)} pl={20} pr={20}>
                   {employeeList?.isValuesEmpty ? (
                     <Center>
                       <Image
@@ -663,13 +651,14 @@ const ShopDetailPageManager = () => {
                         })}
                       >
                         <Table.Tr>
+                          <Table.Th>#</Table.Th>
                           <Table.Th>Name</Table.Th>
                           <Table.Th>Email</Table.Th>
                           <Table.Th>Phone</Table.Th>
                           <Table.Th>Birthday</Table.Th>
                           <Table.Th>Gender</Table.Th>
                           <Table.Th>Address</Table.Th>
-                          <Table.Th>Status</Table.Th>
+                          <Table.Th ta="center">Status</Table.Th>
                         </Table.Tr>
                       </Table.Thead>
                       <Table.Tbody>{rows}</Table.Tbody>

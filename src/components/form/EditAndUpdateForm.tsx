@@ -88,7 +88,7 @@ const renderPasswordInput = ({ fieldProps }: any) => {
 const renderSelect = ({ fieldProps }: any) => {
   const {
     label, placeholder, data, form, name, disabled, searchable, loading, required, rightSection,
-    readonly, rightSectionWidth, fontWeight, radius, clearable, onSearchChange, searchValue
+    readonly, rightSectionWidth, fontWeight, radius, clearable
   } = fieldProps;
   if (loading) return <Loader />;
 
@@ -103,8 +103,6 @@ const renderSelect = ({ fieldProps }: any) => {
       placeholder={placeholder}
       clearable={clearable}
       data={data}
-      searchValue={searchValue}
-      onSearchChange={onSearchChange}
       radius={radius ?? "sm"}
       styles={{
         label: {

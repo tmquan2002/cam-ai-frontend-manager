@@ -33,6 +33,18 @@ const theme = createTheme({
   },
 });
 
+// TODO: Check all table UI
+//1. Table design and padding (left, right)
+//2. Table pageSize with accurate index
+//3. Status field
+//4. Add tooltip and blue color to clickable links or add tooltip for entire row
+//5. Breadcrumb
+
+//TODO: Fix form don't have managerId
+//TODO: Brand Update Employee page
+//TODO: Merge edge box and camera and shop detail page
+//TODO: View Shop Manager info and add assign button
+//TODO: Check and redesign status badges using reusable badge components
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">

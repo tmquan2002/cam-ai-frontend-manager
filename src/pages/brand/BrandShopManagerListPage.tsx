@@ -1,4 +1,4 @@
-import { Box, Button, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
+import { Box, Button, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/badge/StatusBadge";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { AccountDetail } from "../../models/Account";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
 
@@ -14,13 +14,12 @@ import classes from "./BrandShopManagerListPage.module.scss";
 const BrandShopManagerListPage = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState<string>("");
-
   const [debounced] = useDebouncedValue(search, 400);
-
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>("5");
 
   const { data, isLoading } = useGetAccountList({
-    size: 6,
+    size: Number(pageSize),
     pageIndex: activePage - 1,
     name: debounced,
   });
@@ -30,11 +29,12 @@ const BrandShopManagerListPage = () => {
     setSearch(value);
   };
 
-  const rows = data?.values.map((row: AccountDetail) => (
+  const rows = data?.values.map((row: AccountDetail, index) => (
     <Table.Tr
       key={row?.id}
       onClick={() => navigate(`/brand/account/${row?.id}`)}
     >
+      <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
       <Table.Td>
         <Tooltip label="View Account" withArrow position="top-start">
           <Text
@@ -131,6 +131,7 @@ const BrandShopManagerListPage = () => {
           >
             <Table.Thead>
               <Table.Tr>
+                <Table.Th>#</Table.Th>
                 <Table.Th>Name</Table.Th>
                 <Table.Th>Email</Table.Th>
                 <Table.Th>Phone</Table.Th>
@@ -143,11 +144,22 @@ const BrandShopManagerListPage = () => {
             <Table.Tbody>{rows}</Table.Tbody>
           </Table>
         )}
-        <Group justify="flex-end" mt="lg">
+        <Group justify="space-between" align="end">
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((data?.totalCount ?? 0) / 12)}
+            total={Math.ceil((data?.totalCount ?? 0) / Number(pageSize))}
+          />
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={pageSizeSelect} defaultValue={"5"}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
           />
         </Group>
       </Box>

@@ -1,7 +1,7 @@
 import {
   ActionIcon,
   Box, Button, Center, Collapse, Flex, Group, Image,
-  LoadingOverlay, Menu, NumberInput, Pagination, Paper, Table, Text, TextInput, Tooltip, rem
+  LoadingOverlay, Menu, NumberInput, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -13,7 +13,7 @@ import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import { GetShopListHookParams, useGetShopList, } from "../../hooks/useGetShopList";
 import { ShopStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
 import { formatTime, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopListPage.module.scss";
 
@@ -22,8 +22,8 @@ type SearchShopField = {
 };
 
 const SearchCategory = {
-  NAME: <IconAlignBoxCenterStretch size={"1.2rem"} stroke={1.5} />,
-  PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
+  NAME: <IconAlignBoxCenterStretch size={"1rem"} stroke={1.5} />,
+  PHONE: <IconPhoneCall size={"1rem"} stroke={1.5} />,
 };
 
 const ShopListPage = () => {
@@ -31,6 +31,7 @@ const ShopListPage = () => {
   const [opened, { toggle }] = useDisclosure(false);
 
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>("5");
   const form = useForm<SearchShopField>({
     initialValues: {
       status: null,
@@ -45,7 +46,7 @@ const ShopListPage = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: 6,
+      size: Number(pageSize),
       pageIndex: activePage - 1,
       status: form.values.status ?? null,
       enabled: true,
@@ -87,7 +88,7 @@ const ShopListPage = () => {
     return (
       <Tooltip label="View shop detail" withArrow openDelay={300} key={index}>
         <Table.Tr onClick={() => navigate(`/brand/shop/${row.id}`)}>
-          <Table.Td>{index + 1}</Table.Td>
+          <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
           <Table.Td>{row.name}</Table.Td>
           <Table.Td>{row.addressLine}</Table.Td>
           <Table.Td>{formatTime(row.openTime, false, false)}</Table.Td>
@@ -109,7 +110,7 @@ const ShopListPage = () => {
       <Menu transitionProps={{ transition: "pop-top-right" }}>
         <Tooltip label="Search by">
           <Menu.Target>
-            <ActionIcon size={30} color={"blue"} variant="filled">
+            <ActionIcon size={25} color={"blue"} variant="filled">
               {searchCategory}
             </ActionIcon>
           </Menu.Target>
@@ -158,7 +159,6 @@ const ShopListPage = () => {
           <TextInput
             style={{ flex: 1 }}
             placeholder="Search by any field"
-            classNames={{ input: classes.search_input }}
             rightSectionWidth={52}
             leftSectionWidth={52}
             leftSection={
@@ -175,7 +175,6 @@ const ShopListPage = () => {
           <NumberInput
             style={{ flex: 1 }}
             placeholder="Search by any field"
-            classNames={{ input: classes.search_input }}
             rightSectionWidth={52}
             leftSectionWidth={52}
             leftSection={
@@ -257,11 +256,22 @@ const ShopListPage = () => {
           </Table>
         )}
       </Box>
-      <Group justify="flex-end" mt="lg">
+      <Group justify="space-between" align="end">
         <Pagination
           value={activePage}
           onChange={setPage}
-          total={Math.ceil((shopList?.totalCount ?? 0) / 12)}
+          total={Math.ceil((shopList?.totalCount ?? 0) / Number(pageSize))}
+        />
+        <Select
+          label="Page Size"
+          allowDeselect={false}
+          placeholder="0"
+          data={pageSizeSelect} defaultValue={"5"}
+          value={pageSize}
+          onChange={(value) => {
+            setPageSize(value)
+            setPage(1)
+          }}
         />
       </Group>
     </Paper>

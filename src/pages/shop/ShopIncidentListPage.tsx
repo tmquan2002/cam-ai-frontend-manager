@@ -189,26 +189,6 @@ const ShopIncidentListPage = () => {
   const { mutate: massAssignIncident, isLoading: isMassAssignIncidentLoading } = useMassAssignIncidents();
   const { mutate: assignIncident, isLoading: isAssignIncidentLoading } = useAssignIncident();
 
-  // const onFirstCheck = () => {
-  //   if (!isEmpty(firstCheckId)) {
-  //     //TODO: Call API here, disabled test for now
-  //     const indexFirstCheck = incidentCheckBoxList.findIndex((item) => item.id == firstCheckId)
-  //     if (indexFirstCheck % 2 == 0) {
-  //       handlers.applyWhere(
-  //         (item, index) => index % 2 == 0 && item.id !== firstCheckId,
-  //         (item) => ({ ...item, disabled: true })
-  //       )
-  //     } else {
-  //       handlers.applyWhere(
-  //         (item, index) => index % 2 == 1 && item.id !== firstCheckId,
-  //         (item) => ({ ...item, disabled: true })
-  //       )
-  //     }
-  //   } else {
-  //     handlers.apply((item) => ({ ...item, disabled: false, checked: false }))
-  //   }
-  // }
-
   useEffect(() => {
     if (form.isDirty()) {
       setSelectedIncident(null);
@@ -229,29 +209,6 @@ const ShopIncidentListPage = () => {
   useEffect(() => {
     handlers.setState(incidentList || [])
   }, [incidentList])
-
-  // useEffect(() => {
-  //   if (checkBoxMode !== "Merge") {
-  //     //TODO: Replace with actual loading circle
-  //     console.log("Finish loading")
-  //   } else {
-  //     handlers.apply((item) => ({ ...item, disabled: false }))
-  //     onFirstCheck();
-  //   }
-  // }, [firstCheckId])
-
-  // useEffect(() => {
-  //   const incidentCheckedList = incidentCheckBoxList.filter((item) => item.checked)
-  //   if (incidentCheckedList.length == 0) {
-  //     setFirstCheckId("")
-  //   } else if (incidentCheckedList.length == 1) {
-  //     setFirstCheckId(incidentCheckedList[0].id)
-  //   } else if (!incidentCheckBoxList.find((item) => item.id === firstCheckId)?.checked) {
-  //     // console.log("Here Reached")
-  //     //Uncheck all if this first check id is not check but more than 2 other is checked
-  //     setFirstCheckId("")
-  //   }
-  // }, [incidentCheckBoxList])
 
   const openRejectModal = () => {
     modals.openConfirmModal({
@@ -523,27 +480,6 @@ const ShopIncidentListPage = () => {
             <></>
           )}
 
-          {/* <Tooltip label="Merge" withArrow>
-            <ActionIcon variant={checkBoxMode == "Merge" ? "filled" : "subtle"}
-              onClick={() => {
-                handlers.setState(incidentList || [])
-
-                if (openedMerge) {
-                  setCheckBoxMode("None")
-                  toggleMerge()
-                } else {
-                  setCheckBoxMode("Merge")
-                  toggleMerge()
-                }
-
-                if (openedFilter) toggleFilter()
-                if (openedSelect) toggleSelect()
-              }}
-              color={computedColorScheme == "dark" ? "white" : "black"}>
-              <IconArrowMerge size={20} />
-            </ActionIcon>
-          </Tooltip> */}
-
           <Tooltip label="Select Multiple" withArrow>
             <ActionIcon variant={checkBoxMode == "Select" ? "filled" : "subtle"}
               onClick={() => {
@@ -656,18 +592,6 @@ const ShopIncidentListPage = () => {
           </Group>
         </Group>
       </Collapse>
-
-      {/* Merge section */}
-      {/* <Collapse px={rem(28)} in={openedMerge} mb={"xl"}>
-        <Group justify="flex-start">
-          <Button
-            variant="gradient" size="xs"
-            gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
-          >
-            Merge Selected
-          </Button>
-        </Group>
-      </Collapse> */}
 
       {/* Main section */}
       <Flex flex={1} className={classes["body_container"]}>

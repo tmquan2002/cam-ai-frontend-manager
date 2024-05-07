@@ -2,7 +2,7 @@ import {
   ActionIcon, Avatar, Box, Button,
   Center, Collapse, Flex, Group, Image, Loader, LoadingOverlay, Menu, NumberInput,
   Pagination,
-  Paper, ScrollArea, Skeleton, Table, Text, TextInput, Tooltip, rem
+  Paper, ScrollArea, Select, Skeleton, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
@@ -28,7 +28,7 @@ import {
 import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
 import { formatTime, isEmpty, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./BrandMainPage.module.scss";
 
@@ -41,8 +41,6 @@ const SearchCategory = {
   PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
 };
 
-const pageSize = 8;
-
 const BrandMainPage = () => {
   const form = useForm<SearchShopField>({
     initialValues: {
@@ -53,6 +51,7 @@ const BrandMainPage = () => {
   const [search, setSearch] = useState<string | number>("");
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>("5");
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
   const [scrolled, setScrolled] = useState(false);
@@ -63,7 +62,7 @@ const BrandMainPage = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: pageSize,
+      size: Number(pageSize),
       enabled: !isEmpty(data?.values?.[0]?.id),
       brandId: data?.values[0]?.id,
       pageIndex: activePage - 1,
@@ -77,7 +76,7 @@ const BrandMainPage = () => {
     sb = _.omitBy(sb, _.isNil) as GetShopListHookParams;
     sb = _.omitBy(sb, _.isNaN) as GetShopListHookParams;
     return sb;
-  }, [activePage, data?.values, debounced, form.values.status, searchCategory]);
+  }, [activePage, pageSize, data?.values, debounced, form.values.status, searchCategory]);
 
   const { data: shopList, isLoading: isShopListLoading } = useGetShopList(searchParams);
 
@@ -147,18 +146,20 @@ const BrandMainPage = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
-        <Table.Td>{index + 1}</Table.Td>
-        <Table.Td>{row.name}</Table.Td>
-        <Table.Td>{row.addressLine}</Table.Td>
-        <Table.Td>{formatTime(row.openTime)}</Table.Td>
-        <Table.Td>{formatTime(row.closeTime)}</Table.Td>
-        <Table.Td>{row.phone}</Table.Td>
+      <Tooltip label="View Shop" withArrow openDelay={300} key={index}>
+        <Table.Tr onClick={() => navigate(`/brand/shop/${row.id}`)}>
+          <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
+          <Table.Td>{row.name}</Table.Td>
+          <Table.Td>{row.addressLine}</Table.Td>
+          <Table.Td>{formatTime(row.openTime)}</Table.Td>
+          <Table.Td>{formatTime(row.closeTime)}</Table.Td>
+          <Table.Td>{row.phone}</Table.Td>
 
-        <Table.Td ta="center">
-          <StatusBadge statusName={row.shopStatus} size="sm" padding={10} />
-        </Table.Td>
-      </Table.Tr>
+          <Table.Td ta="center">
+            <StatusBadge statusName={row.shopStatus} size="sm" padding={10} />
+          </Table.Td>
+        </Table.Tr>
+      </Tooltip>
     );
   });
 
@@ -411,8 +412,8 @@ const BrandMainPage = () => {
           </Group>
         </Collapse>
 
-        <ScrollArea
-          pl={20} pr={20} h={400}
+        <ScrollArea.Autosize
+          pl={20} pr={20} mah={400}
           onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
           mt={"md"}
           pos={"relative"}
@@ -457,12 +458,23 @@ const BrandMainPage = () => {
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
           )}
-        </ScrollArea>
-        <Group justify="flex-end" mt="lg">
+        </ScrollArea.Autosize>
+        <Group justify="space-between" align="end">
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((shopList?.totalCount ?? 0) / pageSize)}
+            total={Math.ceil((shopList?.totalCount ?? 0) / Number(pageSize))}
+          />
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={pageSizeSelect} defaultValue={"5"}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
           />
         </Group>
       </Paper>

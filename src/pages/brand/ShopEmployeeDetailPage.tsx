@@ -1,14 +1,4 @@
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
-import { useEffect, useMemo, useState } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
 import {
-  Badge,
   Box,
   Center,
   Group,
@@ -19,17 +9,37 @@ import {
   Paper,
   Table,
   Text,
-  rem,
+  Tooltip,
+  rem
 } from "@mantine/core";
-import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
+import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import dayjs from "dayjs";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender, IncidentStatus } from "../../models/CamAIEnum";
-import BackButton from "../../components/button/BackButton";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
-import classes from "./ShopEmployeeDetailPage.module.scss";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { Gender } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT } from "../../types/constant";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./ShopEmployeeDetailPage.module.scss";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Employee",
+    link: "/brand/employee"
+  },
+  {
+    title: "Detail"
+  }
+]
 export type CreateEmployeeField = {
   name: string;
   email: string;
@@ -65,8 +75,8 @@ const ShopEmployeeDetailPage = () => {
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == undefined ||
-        value == "" ||
-        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+          value == "" ||
+          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
     },
@@ -91,51 +101,35 @@ const ShopEmployeeDetailPage = () => {
     }
   }, [employeeData, isFetching]);
 
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(updateEmployeeForm.values.province ?? 0),
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(updateEmployeeForm.values.district ?? 0),
-  );
-
-  const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-      case IncidentStatus.Accepted:
-        return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-      case IncidentStatus.Rejected:
-        return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-      case undefined:
-        <></>;
-    }
-  };
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(updateEmployeeForm.values.province ?? 0),);
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(updateEmployeeForm.values.district ?? 0),);
 
   const rows = incidentList?.values.map((row, index) => {
     return (
-      <Table.Tr
-        key={index}
-        className={classes["clickable"]}
-        onClick={() => navigate(`/brand/incident/${row.id}`)}
-      >
-        <Table.Td>
-          <Text>{row.incidentType}</Text>
-        </Table.Td>
-        <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
-        <Table.Td>
-          <Text
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {row?.employee?.name}
-          </Text>
-        </Table.Td>
+      <Tooltip label="View Incident" openDelay={300} key={index}>
+        <Table.Tr
+          className={classes["clickable"]}
+          onClick={() => navigate(`/brand/incident/${row.id}`)}
+        >
+          <Table.Td>{index + 1 + Number(12) * (activePage - 1)}</Table.Td>
+          <Table.Td><Text>{row.incidentType}</Text></Table.Td>
+          <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
+          <Table.Td>
+            <Text
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {row?.employee?.name}
+            </Text>
+          </Table.Td>
 
-        <Table.Td>{renderIncidentStatusBadge(row?.status)}</Table.Td>
-      </Table.Tr>
+          <Table.Td ta="center">
+            <StatusBadge statusName={row.status} size="sm" padding={10} />
+          </Table.Td>
+        </Table.Tr>
+      </Tooltip>
     );
   });
 
@@ -266,15 +260,14 @@ const ShopEmployeeDetailPage = () => {
 
   return (
     <Box pb={rem(40)}>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
       <Paper m={rem(32)} p={rem(32)} shadow="xs">
         <Group justify={"space-between"} align="center" pb={rem(28)}>
-          <Group>
-            <BackButton />
-
-            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-              Employee - {employeeData?.name}
-            </Text>
-          </Group>
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+            General Information
+          </Text>
         </Group>
         {isEmployeeDataLoading ? (
           <Loader />
@@ -290,7 +283,7 @@ const ShopEmployeeDetailPage = () => {
           Incidents
         </Text>
 
-        <Box mt={"xl"} pos={"relative"}>
+        <Box mt={"xl"} pos={"relative"} pl={20} pr={20}>
           <LoadingOverlay
             visible={isGetIncidentListLoading}
             zIndex={1000}
@@ -313,12 +306,11 @@ const ShopEmployeeDetailPage = () => {
             <Table
               striped
               highlightOnHover
-              withTableBorder
-              withColumnBorders
               verticalSpacing={"md"}
             >
               <Table.Thead>
                 <Table.Tr>
+                  <Table.Th>#</Table.Th>
                   <Table.Th>Incident type</Table.Th>
                   <Table.Th>Time</Table.Th>
                   <Table.Th>Assigned to</Table.Th>

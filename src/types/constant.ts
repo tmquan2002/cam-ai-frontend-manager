@@ -83,6 +83,7 @@ type RGB = `rgb(${number}, ${number}, ${number})`;
 type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
 type HEX = `#${string}`;
 
+export const pageSizeSelect = ['5', '6', '8', '10', '12', '15', '17', '20']
 export type Color = RGB | RGBA | HEX;
 export const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g;
 export const emailRegex = /^\S+@(\S+\.)+\S{2,4}$/g;

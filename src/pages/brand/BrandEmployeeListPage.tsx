@@ -1,7 +1,8 @@
-import { ActionIcon, Box, Button, Center, Collapse, Group, Image, LoadingOverlay, Menu, Pagination, Paper, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
+import { ActionIcon, Box, Button, Center, Collapse, Group, Image, LoadingOverlay, Menu, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconAlignBoxCenterStretch, IconFilter, IconMail, IconPhoneCall, IconSearch } from "@tabler/icons-react";
+import * as _ from "lodash";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GetEmployeeListParams } from "../../apis/EmployeeAPI";
@@ -11,14 +12,13 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
 import { EmployeeDetail } from "../../models/Employee";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandEmployeeListPage.module.scss";
-import * as _ from "lodash";
 
 type SearchShopField = {
   employeeStatus: string | null;
-  shopId: string;
+  shopId: string | null;
 };
 
 const SearchCategory = {
@@ -31,16 +31,15 @@ const BrandEmployeeListPage = () => {
   const form = useForm<SearchShopField>({
     initialValues: {
       employeeStatus: EmployeeStatus.Active,
-      shopId: "",
+      shopId: null,
     },
   });
 
-  const pageSize = 6;
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>("5");
   const [search, setSearch] = useState<string>("");
-  const [searchShop, setSearchShop] = useState<string>("");
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
   const { data: shopList, isLoading: isLoadingShop } = useGetShopList({ enabled: true, size: 999 });
   const [debounced] = useDebouncedValue(search, 500);
@@ -70,8 +69,6 @@ const BrandEmployeeListPage = () => {
           name: "shopId",
           loading: isLoadingShop,
           searchable: true,
-          searchValue: searchShop,
-          onSearchChange: setSearchShop,
         },
         spans: 6,
       },
@@ -80,7 +77,7 @@ const BrandEmployeeListPage = () => {
 
   const searchParams: GetEmployeeListParams = useMemo(() => {
     let sb: GetEmployeeListParams = {
-      size: pageSize,
+      size: Number(pageSize),
       shopId: form.values.shopId,
       pageIndex: activePage - 1,
       employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
@@ -109,7 +106,7 @@ const BrandEmployeeListPage = () => {
       key={row?.id}
       onClick={() => navigate(`/brand/employee/${row?.id}`)}
     >
-      <Table.Td>{index + 1}</Table.Td>
+      <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
       <Table.Td>
         <Tooltip label="View Employee" withArrow position="top-start">
           <Text size={rem(14)} className={classes.clickable_link} c="blue">
@@ -221,10 +218,7 @@ const BrandEmployeeListPage = () => {
         <Group justify="space-between">
           <EditAndUpdateForm fields={fields} />
           <Button variant="transparent" ml={"auto"}
-            onClick={() => {
-              form.reset;
-              setSearchShop("");
-            }}>
+            onClick={form.reset}>
             Clear all filter
           </Button>
         </Group>
@@ -269,11 +263,22 @@ const BrandEmployeeListPage = () => {
             </Table>
           </Table.ScrollContainer>
         )}
-        <Group justify="flex-end" mt="lg">
+        <Group justify="space-between" align="end">
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((data?.totalCount ?? 0) / pageSize)}
+            total={Math.ceil((data?.totalCount ?? 0) / Number(pageSize))}
+          />
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={pageSizeSelect} defaultValue={"20"}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
           />
         </Group>
       </Box>

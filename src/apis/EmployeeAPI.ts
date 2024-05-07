@@ -8,8 +8,8 @@ export type GetEmployeeListParams = {
   search?: string;
   employeeStatus?: string | null;
   brandId?: string;
-  shopId?: string;
-  size?: number;
+  shopId?: string | null;
+  size?: number | null;
   pageIndex?: number;
   email?: string
   phone?: string
