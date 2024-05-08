@@ -234,26 +234,28 @@ const ShopListPage = () => {
             />
           </Center>
         ) : (
-          <Table
-            miw={1000}
-            highlightOnHover
-            verticalSpacing={"md"}
-            striped
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>#</Table.Th>
-                <Table.Th>Shop name</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Open time</Table.Th>
-                <Table.Th>Close time</Table.Th>
-                <Table.Th>Phone</Table.Th>
-                <Table.Th>Shop manager</Table.Th>
-                <Table.Th ta={"center"}>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <Table.ScrollContainer minWidth={1000}>
+            <Table
+              miw={1000}
+              highlightOnHover
+              verticalSpacing={"md"}
+              striped
+            >
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Shop name</Table.Th>
+                  <Table.Th>Address</Table.Th>
+                  <Table.Th>Open time</Table.Th>
+                  <Table.Th>Close time</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Shop manager</Table.Th>
+                  <Table.Th ta={"center"}>Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
       </Box>
       <Group justify="space-between" align="end">

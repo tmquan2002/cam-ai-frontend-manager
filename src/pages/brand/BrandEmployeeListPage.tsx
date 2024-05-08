@@ -246,7 +246,7 @@ const BrandEmployeeListPage = () => {
           </Center>
         ) : (
           <Table.ScrollContainer minWidth={1000}>
-            <Table highlightOnHover verticalSpacing={"sm"} striped>
+            <Table highlightOnHover verticalSpacing={"sm"} striped miw={1000}>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>#</Table.Th>

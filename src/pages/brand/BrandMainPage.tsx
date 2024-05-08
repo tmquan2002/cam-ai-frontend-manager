@@ -437,26 +437,24 @@ const BrandMainPage = () => {
               />
             </Center>
           ) : (
-            <Table
-              striped
-              highlightOnHover
-              verticalSpacing={"md"}
-            >
-              <Table.Thead
-                className={cx(classes.header, { [classes.scrolled]: scrolled })}
-              >
-                <Table.Tr>
-                  <Table.Th>#</Table.Th>
-                  <Table.Th>Shop name</Table.Th>
-                  <Table.Th>Address</Table.Th>
-                  <Table.Th>Open time</Table.Th>
-                  <Table.Th>Close time</Table.Th>
-                  <Table.Th>Phone</Table.Th>
-                  <Table.Th ta={"center"}>Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
+            <Table.ScrollContainer minWidth={1000}>
+              <Table striped highlightOnHover verticalSpacing={"md"}>
+                <Table.Thead
+                  className={cx(classes.header, { [classes.scrolled]: scrolled })}
+                >
+                  <Table.Tr>
+                    <Table.Th>#</Table.Th>
+                    <Table.Th>Shop name</Table.Th>
+                    <Table.Th>Address</Table.Th>
+                    <Table.Th>Open time</Table.Th>
+                    <Table.Th>Close time</Table.Th>
+                    <Table.Th>Phone</Table.Th>
+                    <Table.Th ta={"center"}>Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
           )}
         </ScrollArea.Autosize>
         <Group justify="space-between" align="end">

@@ -434,7 +434,7 @@ const ShopDetailPageManager = () => {
                     <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                       {data?.name}
                     </Text>
-                    <StatusBadge statusName={data?.shopStatus ?? "None"} mt={rem(6)}/>
+                    <StatusBadge statusName={data?.shopStatus ?? "None"} mt={rem(6)} />
                   </Group>
 
                   {isChangeShopStatusLoading ? (
@@ -639,25 +639,27 @@ const ShopDetailPageManager = () => {
                       />
                     </Center>
                   ) : (
-                    <Table highlightOnHover verticalSpacing={"md"} striped>
-                      <Table.Thead
-                        className={clsx(classes.header, {
-                          [classes.scrolled]: scrolled,
-                        })}
-                      >
-                        <Table.Tr>
-                          <Table.Th>#</Table.Th>
-                          <Table.Th>Name</Table.Th>
-                          <Table.Th>Email</Table.Th>
-                          <Table.Th>Phone</Table.Th>
-                          <Table.Th>Birthday</Table.Th>
-                          <Table.Th>Gender</Table.Th>
-                          <Table.Th>Address</Table.Th>
-                          <Table.Th ta="center">Status</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>{rows}</Table.Tbody>
-                    </Table>
+                    <Table.ScrollContainer minWidth={1000}>
+                      <Table highlightOnHover verticalSpacing={"md"} striped>
+                        <Table.Thead
+                          className={clsx(classes.header, {
+                            [classes.scrolled]: scrolled,
+                          })}
+                        >
+                          <Table.Tr>
+                            <Table.Th>#</Table.Th>
+                            <Table.Th>Name</Table.Th>
+                            <Table.Th>Email</Table.Th>
+                            <Table.Th>Phone</Table.Th>
+                            <Table.Th>Birthday</Table.Th>
+                            <Table.Th>Gender</Table.Th>
+                            <Table.Th>Address</Table.Th>
+                            <Table.Th ta="center">Status</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                      </Table>
+                    </Table.ScrollContainer>
                   )}
                 </ScrollArea>
               )}

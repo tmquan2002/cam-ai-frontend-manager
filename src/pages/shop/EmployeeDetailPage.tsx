@@ -392,21 +392,23 @@ const EmployeeDetailPage = () => {
               />
             </Center>
           ) : (
-            <Table
-              striped
-              highlightOnHover
-              verticalSpacing={"md"}
-            >
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>#</Table.Th>
-                  <Table.Th>Incident type</Table.Th>
-                  <Table.Th>Time</Table.Th>
-                  <Table.Th ta="center">Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
+            <Table.ScrollContainer minWidth={1000}>
+              <Table
+                striped
+                highlightOnHover
+                verticalSpacing={"md"}
+              >
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>#</Table.Th>
+                    <Table.Th>Incident type</Table.Th>
+                    <Table.Th>Time</Table.Th>
+                    <Table.Th ta="center">Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
           )}
         </Box>
         <Group

@@ -30,15 +30,12 @@ const BrandShopManagerListPage = () => {
   };
 
   const rows = data?.values.map((row: AccountDetail, index) => (
-    <Table.Tr
-      key={row?.id}
-      onClick={() => navigate(`/brand/account/${row?.id}`)}
-    >
+    <Table.Tr key={row?.id}>
       <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
       <Table.Td>
-        <Tooltip label="View Account" withArrow position="top-start">
+        <Tooltip label="View Shop Manager" withArrow position="top-start">
           <Text
-            onClick={() => navigate(`/brand/shop/${row?.managingShop?.id}`)}
+            onClick={() => navigate(`/brand/account/${row?.id}`)}
             size={rem(14)} c="blue"
             className={classes.clickable_link}
           >
@@ -123,26 +120,28 @@ const BrandShopManagerListPage = () => {
             />
           </Center>
         ) : (
-          <Table
-            miw={1000}
-            highlightOnHover
-            verticalSpacing={"md"}
-            striped
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>#</Table.Th>
-                <Table.Th>Name</Table.Th>
-                <Table.Th>Email</Table.Th>
-                <Table.Th>Phone</Table.Th>
-                <Table.Th>Birthday</Table.Th>
-                <Table.Th>Gender</Table.Th>
-                <Table.Th ta="center">Status</Table.Th>
-                <Table.Th ta="right">Managing shop</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <Table.ScrollContainer minWidth={1000}>
+            <Table
+              miw={1000}
+              highlightOnHover
+              verticalSpacing={"md"}
+              striped
+            >
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Name</Table.Th>
+                  <Table.Th>Email</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Birthday</Table.Th>
+                  <Table.Th>Gender</Table.Th>
+                  <Table.Th ta="center">Status</Table.Th>
+                  <Table.Th ta="right">Managing shop</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
         <Group justify="space-between" align="end">
           <Pagination

@@ -203,8 +203,7 @@ const EmployeeListPage = () => {
           </Center>
         ) : (
           <Table.ScrollContainer minWidth={1000}>
-            <Table
-              miw={1000}
+            <Table miw={1000}
               highlightOnHover
               verticalSpacing={"md"}
               striped

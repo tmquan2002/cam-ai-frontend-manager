@@ -439,26 +439,28 @@ const ShopDetailPage = () => {
                 <Loader />
               ) : (
                 <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)} pl={20} pr={20}>
-                  <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
-                    <Table.Thead
-                      className={clsx(classes.header, {
-                        [classes.scrolled]: scrolled,
-                      })}
-                    >
-                      <Table.Tr>
-                        <Table.Th>#</Table.Th>
-                        <Table.Th>Name</Table.Th>
-                        <Table.Th>Email</Table.Th>
-                        <Table.Th>Phone</Table.Th>
-                        <Table.Th>Birthday</Table.Th>
-                        <Table.Th>Gender</Table.Th>
-                        <Table.Th>Address</Table.Th>
-                        <Table.Th>Status</Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{rows}</Table.Tbody>
-                    {employeeList?.totalCount == 0 && <Table.Caption>Nothing Found</Table.Caption>}
-                  </Table>
+                  <Table.ScrollContainer minWidth={1000}>
+                    <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
+                      <Table.Thead
+                        className={clsx(classes.header, {
+                          [classes.scrolled]: scrolled,
+                        })}
+                      >
+                        <Table.Tr>
+                          <Table.Th>#</Table.Th>
+                          <Table.Th>Name</Table.Th>
+                          <Table.Th>Email</Table.Th>
+                          <Table.Th>Phone</Table.Th>
+                          <Table.Th>Birthday</Table.Th>
+                          <Table.Th>Gender</Table.Th>
+                          <Table.Th>Address</Table.Th>
+                          <Table.Th>Status</Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{rows}</Table.Tbody>
+                      {employeeList?.totalCount == 0 && <Table.Caption>Nothing Found</Table.Caption>}
+                    </Table>
+                  </Table.ScrollContainer>
                 </ScrollArea>
               )}
             </Box>
