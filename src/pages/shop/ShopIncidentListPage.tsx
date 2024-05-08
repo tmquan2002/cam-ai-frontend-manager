@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Modal, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem, useComputedColorScheme } from "@mantine/core";
+import { ActionIcon, Box, Button, Center, Checkbox, Collapse, Divider, Flex, Group, Loader, Modal, Paper, ScrollArea, Select, Skeleton, Text, Tooltip, rem, useComputedColorScheme } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure, useListState } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -10,6 +10,7 @@ import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GetIncidentParams, MassRejectIncidentParams } from "../../apis/IncidentAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
@@ -26,6 +27,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopIncidentListPage.module.scss";
 
+//TODO: Improve list that has pagination
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
   fromTime?: Date | null;
@@ -355,31 +357,6 @@ const ShopIncidentListPage = () => {
     ];
   }, [employeeList?.values, form, isGetEmployeeListLoading]);
 
-  const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return (
-          <Badge color="yellow" radius={"sm"}>
-            {IncidentStatus.New}
-          </Badge>
-        );
-      case IncidentStatus.Accepted:
-        return (
-          <Badge color="green" radius={"sm"}>
-            {IncidentStatus.Accepted}
-          </Badge>
-        );
-      case IncidentStatus.Rejected:
-        return (
-          <Badge color="red" radius={"sm"}>
-            {IncidentStatus.Rejected}
-          </Badge>
-        );
-      case undefined:
-        return <></>;
-    }
-  };
-
   const renderIncidentList = incidentCheckBoxList?.map((row, index) => (
     <Box w={rem(350)} py={rem(14)} px={rem(18)} key={row?.id}
       className={
@@ -409,7 +386,7 @@ const ShopIncidentListPage = () => {
             </Text>
           </Box>
           {/* Badge */}
-          {renderIncidentStatusBadge(row?.status)}
+          <StatusBadge statusName={row?.status || "None"} size="sm" padding={10} />
         </Group>
       </Group>
       {/* <Text>{dayjs(row?.endTime).format("DD/MM/YYYY h:mm A")}</Text> */}
@@ -627,7 +604,7 @@ const ShopIncidentListPage = () => {
                         "DD/MM/YYYY h:mm A"
                       )}
                     </Text>
-                    {renderIncidentStatusBadge(incidentData?.status)}
+                    <StatusBadge statusName={incidentData?.status || "None"} size="sm" padding={10} />
                   </Group>
 
                   <Group>

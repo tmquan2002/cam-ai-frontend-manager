@@ -1,6 +1,6 @@
 import {
   ActionIcon, Box, Button, Center, Collapse, Group, Image,
-  LoadingOverlay, Menu, Pagination, Paper, Table, Text, TextInput, Tooltip, rem
+  LoadingOverlay, Menu, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -12,7 +12,7 @@ import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, { FIELD_TYPES } from "../../components/form/EditAndUpdateForm";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import * as _ from "lodash";
 
@@ -33,10 +33,10 @@ const EmployeeListPage = () => {
     },
   });
 
-  const pageSize = 6;
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>("5");
   const [search, setSearch] = useState<string>("");
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
   const [debounced] = useDebouncedValue(search, 500);
@@ -59,7 +59,7 @@ const EmployeeListPage = () => {
 
   const searchParams: GetEmployeeListParams = useMemo(() => {
     let sb: GetEmployeeListParams = {
-      size: pageSize,
+      size: Number(pageSize),
       pageIndex: activePage - 1,
       employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
     };
@@ -82,23 +82,22 @@ const EmployeeListPage = () => {
     setSearch(value);
   };
 
-  const rows = employeeList?.values?.map((row) => (
-    <Table.Tr
-      style={{
-        cursor: "pointer",
-      }}
-      key={row.id}
-      onClick={() => navigate(`/shop/employee/${row.id}`)}
-    >
-      <Table.Td>{replaceIfNun(row.name)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.email)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
-      <Table.Td ta={"center"}>
-        <StatusBadge statusName={row.employeeStatus} />
-      </Table.Td>
-    </Table.Tr>
+  const rows = employeeList?.values?.map((row, index) => (
+    <Tooltip label="View Employee" key={row.id} openDelay={300}>
+      <Table.Tr style={{ cursor: "pointer", }}
+        onClick={() => navigate(`/shop/employee/${row.id}`)}
+      >
+        <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.name)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.email)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
+        <Table.Td ta={"center"}>
+          <StatusBadge statusName={row.employeeStatus} />
+        </Table.Td>
+      </Table.Tr>
+    </Tooltip>
   ));
 
   const renderDropdownFilter = () => {
@@ -212,6 +211,7 @@ const EmployeeListPage = () => {
             >
               <Table.Thead>
                 <Table.Tr>
+                  <Table.Th>#</Table.Th>
                   <Table.Th>Name</Table.Th>
                   <Table.Th>Email</Table.Th>
                   <Table.Th>Phone</Table.Th>
@@ -224,12 +224,25 @@ const EmployeeListPage = () => {
             </Table>
           </Table.ScrollContainer>
         )}
-        <Group justify="flex-end" mt="lg">
+        <Group justify="space-between" align="end">
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((employeeList?.totalCount ?? 0) / pageSize)}
+            total={Math.ceil((employeeList?.totalCount ?? 0) / Number(pageSize))}
           />
+          {!employeeList?.isValuesEmpty &&
+            < Select
+              label="Page Size"
+              allowDeselect={false}
+              placeholder="0"
+              data={pageSizeSelect} defaultValue={"5"}
+              value={pageSize}
+              onChange={(value) => {
+                setPageSize(value)
+                setPage(1)
+              }}
+            />
+          }
         </Group>
       </Box>
     </Paper >

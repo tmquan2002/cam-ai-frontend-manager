@@ -1,4 +1,4 @@
-import { Accordion, ActionIcon, Badge, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
+import { Accordion, ActionIcon, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
@@ -6,10 +6,11 @@ import { notifications } from "@mantine/notifications";
 import { IconAlertCircle, IconCamera, IconCaretRight, IconFileAnalytics, IconMail, IconMapPin, IconRepeat, IconRouter, IconTrash, IconUser, IconUsers, IconVideo, IconX, } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import clsx from "clsx";
-import _, { isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UpdateShopParams } from "../../apis/ShopAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
 import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
@@ -31,7 +32,6 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
-import StatusBadge from "../../components/badge/StatusBadge";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -434,12 +434,7 @@ const ShopDetailPageManager = () => {
                     <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                       {data?.name}
                     </Text>
-                    <Badge
-                      mt={rem(6)}
-                      color={data?.shopStatus == ShopStatus.Active ? "green" : "red"}
-                    >
-                      {data?.shopStatus}
-                    </Badge>
+                    <StatusBadge statusName={data?.shopStatus ?? "None"} mt={rem(6)}/>
                   </Group>
 
                   {isChangeShopStatusLoading ? (

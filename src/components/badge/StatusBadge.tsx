@@ -4,10 +4,10 @@ import { getColorFromStatusName } from "../../utils/helperFunction";
 interface BadgeParams {
     statusName: string;
     fullWidth?: boolean;
-    mt?: number;
-    mb?: number;
-    ml?: number;
-    mr?: number;
+    mt?: number | string;
+    mb?: number | string;
+    ml?: number | string;
+    mr?: number | string;
     size?: string;
     padding?: number;
     tooltip?: string

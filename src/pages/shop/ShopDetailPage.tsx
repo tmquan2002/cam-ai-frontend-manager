@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Button,
   Flex,
@@ -13,7 +12,7 @@ import {
   Tabs,
   Text,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -35,6 +34,7 @@ import _, { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UpdateShopParams } from "../../apis/ShopAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 import EditAndUpdateForm, {
@@ -104,7 +104,7 @@ const ShopDetailPage = () => {
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
 
-  const rows = employeeList?.values?.map((row) => (
+  const rows = employeeList?.values?.map((row, index) => (
     <Table.Tr
       style={{
         cursor: "pointer",
@@ -112,20 +112,15 @@ const ShopDetailPage = () => {
       key={row.id}
       onClick={() => navigate(`/shop/employee/${row.id}`)}
     >
+      <Table.Td>{index + 1}</Table.Td>
       <Table.Td>{replaceIfNun(row.name)}</Table.Td>
       <Table.Td>{replaceIfNun(row.email)}</Table.Td>
       <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
       <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
       <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
-      <Table.Td>
-        {_.isEqual(row.employeeStatus, "Active") ? (
-          <Badge variant="light">Active</Badge>
-        ) : (
-          <Badge color="gray" variant="light">
-            Disabled
-          </Badge>
-        )}
+      <Table.Td ta="center">
+        <StatusBadge statusName={row.employeeStatus} size="sm" padding={10} />
       </Table.Td>
     </Table.Tr>
   ));
@@ -443,7 +438,7 @@ const ShopDetailPage = () => {
               {isGetEmployeeListLoading ? (
                 <Loader />
               ) : (
-                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)} pl={20} pr={20}>
                   <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
                     <Table.Thead
                       className={clsx(classes.header, {
@@ -451,6 +446,7 @@ const ShopDetailPage = () => {
                       })}
                     >
                       <Table.Tr>
+                        <Table.Th>#</Table.Th>
                         <Table.Th>Name</Table.Th>
                         <Table.Th>Email</Table.Th>
                         <Table.Th>Phone</Table.Th>

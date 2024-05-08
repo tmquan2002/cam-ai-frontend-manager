@@ -635,7 +635,7 @@ export const InteractionReportPage = () => {
                 mah={700}
                 onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
               >
-                <Table striped highlightOnHover withColumnBorders>
+                <Table striped highlightOnHover>
                   <Table.Thead
                     className={cx(classes.header, {
                       [classes.scrolled]: scrolled,

@@ -115,16 +115,6 @@ const ShopEmployeeDetailPage = () => {
           <Table.Td>{index + 1 + Number(12) * (activePage - 1)}</Table.Td>
           <Table.Td><Text>{row.incidentType}</Text></Table.Td>
           <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
-          <Table.Td>
-            <Text
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              {row?.employee?.name}
-            </Text>
-          </Table.Td>
-
           <Table.Td ta="center">
             <StatusBadge statusName={row.status} size="sm" padding={10} />
           </Table.Td>
@@ -313,8 +303,7 @@ const ShopEmployeeDetailPage = () => {
                   <Table.Th>#</Table.Th>
                   <Table.Th>Incident type</Table.Th>
                   <Table.Th>Time</Table.Th>
-                  <Table.Th>Assigned to</Table.Th>
-                  <Table.Th>Status</Table.Th>
+                  <Table.Th ta="center">Status</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>

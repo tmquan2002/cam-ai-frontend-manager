@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Divider,
@@ -12,7 +11,7 @@ import {
   Select,
   Text,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { modals } from "@mantine/modals";
@@ -23,33 +22,21 @@ import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
 import BackButton from "../../components/button/BackButton";
 import LoadingImage from "../../components/image/LoadingImage";
+import NoImage from "../../components/image/NoImage";
 import { useAssignIncident } from "../../hooks/useAssignIncident";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetIncidentById } from "../../hooks/useGetIncidentById";
 import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
+import { EvidenceType } from "../../models/CamAIEnum";
 import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import classes from "./IncidentDetail.module.scss";
-import NoImage from "../../components/image/NoImage";
 
 type IncidentFormField = {
   employeeId: string | null;
-};
-
-const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-  switch (status) {
-    case IncidentStatus.New:
-      return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-    case IncidentStatus.Accepted:
-      return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-    case IncidentStatus.Rejected:
-      return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-    case undefined:
-      return <></>;
-  }
 };
 
 const IncidentDetail = () => {
@@ -173,31 +160,32 @@ const IncidentDetail = () => {
 
   return (
     <Box>
-      <Group px={rem(64)} bg={"white"} justify="space-between" align="center">
-        <Group py={rem(32)} align="center">
-          <BackButton color="#000" w={rem(36)} h={rem(36)} />
-          <Text size={rem(20)} fw={500}>
-            {incidentData?.incidentType} Incident
-          </Text>
-          <Text>|</Text>
-          <Text c={"dimmed"} size={rem(18)} fw={500}>
-            {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
-          </Text>
-          {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
+      <Paper px={rem(64)} mt={rem(64)} ml={rem(64)} mr={rem(20)} shadow="sm">
+        <Group justify="space-between">
+          <Group py={rem(32)} align="center">
+            <BackButton w={rem(36)} h={rem(36)} />
+            <Text size={rem(20)} fw={500}>
+              {incidentData?.incidentType} Incident
+            </Text>
+            <Text>|</Text>
+            <Text c={"dimmed"} size={rem(18)} fw={500}>
+              {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
+            </Text>
+            <StatusBadge statusName={incidentData?.status || "None"} size="sm" padding={10} />
+          </Group>
+          <Tooltip label="Reject incident">
+            <ActionIcon
+              variant="filled"
+              aria-label="Settings"
+              color={"red"}
+              onClick={openModal}
+              loading={isRejectIncidentLoading}
+            >
+              <IconIdOff style={{ width: "70%", height: "70%" }} stroke={1.5} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
-        <Tooltip label="Reject incident">
-          <ActionIcon
-            variant="filled"
-            aria-label="Settings"
-            color={"red"}
-            onClick={openModal}
-            loading={isRejectIncidentLoading}
-          >
-            <IconIdOff style={{ width: "70%", height: "70%" }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-      </Group>
-      <Divider />
+      </Paper>
       <Flex>
         <Box style={{ flex: 1, }}>
           <Paper shadow="xs" mx={rem(64)} my={rem(40)} px={rem(32)} py={rem(28)}>
