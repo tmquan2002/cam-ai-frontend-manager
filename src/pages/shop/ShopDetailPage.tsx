@@ -1,14 +1,11 @@
 import {
   Box,
   Button,
-  Flex,
   Group,
   Loader,
   LoadingOverlay,
   Paper,
-  ScrollArea,
   Skeleton,
-  Table,
   Tabs,
   Text,
   Tooltip,
@@ -22,19 +19,15 @@ import {
   IconCaretRight,
   IconFileAnalytics,
   IconMapPin,
-  IconPlus,
   IconRouter,
-  IconUsers,
   IconVideo,
   IconX
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
-import clsx from "clsx";
 import _, { isEmpty } from "lodash";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { UpdateShopParams } from "../../apis/ShopAPI";
-import StatusBadge from "../../components/badge/StatusBadge";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 import EditAndUpdateForm, {
@@ -43,7 +36,6 @@ import EditAndUpdateForm, {
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { useGetWardList } from "../../hooks/useGetWardList";
@@ -51,8 +43,6 @@ import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeboxInstallStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { phoneRegex } from "../../types/constant";
-import { replaceIfNun } from "../../utils/helperFunction";
-import classes from "./ShopDetailPage.module.scss";
 
 export type FormFieldValue = {
   name: string;
@@ -67,7 +57,6 @@ export type FormFieldValue = {
 };
 
 const ShopDetailPage = () => {
-  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<FormFieldValue>({
@@ -98,32 +87,9 @@ const ShopDetailPage = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
     +(form.values.district ?? 0)
   );
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
 
   const { mutate: updateShop, isLoading: updateShopLoading } =
     useUpdateShopById();
-
-  const rows = employeeList?.values?.map((row, index) => (
-    <Table.Tr
-      style={{
-        cursor: "pointer",
-      }}
-      key={row.id}
-      onClick={() => navigate(`/shop/employee/${row.id}`)}
-    >
-      <Table.Td>{index + 1}</Table.Td>
-      <Table.Td>{replaceIfNun(row.name)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.email)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
-      <Table.Td ta="center">
-        <StatusBadge statusName={row.employeeStatus} size="sm" padding={10} />
-      </Table.Td>
-    </Table.Tr>
-  ));
 
   useEffect(() => {
     if (data) {
@@ -299,9 +265,6 @@ const ShopDetailPage = () => {
             <Tabs.Tab value="camera" leftSection={<IconCamera />}>
               Camera
             </Tabs.Tab>
-            <Tabs.Tab value="employees" leftSection={<IconUsers />}>
-              Employees
-            </Tabs.Tab>
             <Tabs.Tab value="edgebox" leftSection={<IconRouter />}>
               Edge Box
             </Tabs.Tab>
@@ -418,50 +381,6 @@ const ShopDetailPage = () => {
                   ))
                   }
                 </>
-              )}
-            </Box>
-          </Tabs.Panel>
-
-          <Tabs.Panel value="employees">
-            <Box p={rem(32)}>
-              <Flex pb={rem(28)} justify={"space-between "}>
-                <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-                  Employee
-                </Text>
-                <Button
-                  onClick={() => navigate("/shop/employee/create")}
-                  leftSection={<IconPlus size={14} />}
-                >
-                  Add Employee
-                </Button>
-              </Flex>
-              {isGetEmployeeListLoading ? (
-                <Loader />
-              ) : (
-                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)} pl={20} pr={20}>
-                  <Table.ScrollContainer minWidth={1000}>
-                    <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
-                      <Table.Thead
-                        className={clsx(classes.header, {
-                          [classes.scrolled]: scrolled,
-                        })}
-                      >
-                        <Table.Tr>
-                          <Table.Th>#</Table.Th>
-                          <Table.Th>Name</Table.Th>
-                          <Table.Th>Email</Table.Th>
-                          <Table.Th>Phone</Table.Th>
-                          <Table.Th>Birthday</Table.Th>
-                          <Table.Th>Gender</Table.Th>
-                          <Table.Th>Address</Table.Th>
-                          <Table.Th>Status</Table.Th>
-                        </Table.Tr>
-                      </Table.Thead>
-                      <Table.Tbody>{rows}</Table.Tbody>
-                      {employeeList?.totalCount == 0 && <Table.Caption>Nothing Found</Table.Caption>}
-                    </Table>
-                  </Table.ScrollContainer>
-                </ScrollArea>
               )}
             </Box>
           </Tabs.Panel>

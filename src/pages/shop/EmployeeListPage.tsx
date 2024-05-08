@@ -61,10 +61,10 @@ const EmployeeListPage = () => {
     let sb: GetEmployeeListParams = {
       size: Number(pageSize),
       pageIndex: activePage - 1,
-      employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
+      // employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
     };
     // if (searchCategory == SearchCategory.NAME) {
-    sb.search = debounced.toString();
+    // sb.search = debounced.toString();
     // } else if (searchCategory == SearchCategory.EMAIL) {
     //   sb.email = debounced.toString();
     // } else {
@@ -94,7 +94,7 @@ const EmployeeListPage = () => {
         <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
         <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
         <Table.Td ta={"center"}>
-          <StatusBadge statusName={row.employeeStatus} />
+          <StatusBadge statusName={row?.employeeStatus || "None"} />
         </Table.Td>
       </Table.Tr>
     </Tooltip>
