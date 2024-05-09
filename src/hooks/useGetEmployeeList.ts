@@ -3,16 +3,20 @@ import { CommonResponse } from "../models/Common";
 import { EmployeeApi, GetEmployeeListParams } from "../apis/EmployeeAPI";
 import { EmployeeDetail } from "../models/Employee";
 
-export const useGetEmployeeList = (params: GetEmployeeListParams) => {
+export const useGetEmployeeList = ({
+  enabled,
+  ...rest
+}: GetEmployeeListParams & { enabled?: boolean }) => {
   const {
     isError,
     isLoading,
     data,
     error,
   }: UseQueryResult<CommonResponse<EmployeeDetail>, Error> = useQuery({
-    queryKey: ["employees", params],
+    queryKey: ["employees", rest],
+    enabled: enabled ?? true,
     queryFn: async () => {
-      return await EmployeeApi._getEmployeeList(params);
+      return await EmployeeApi._getEmployeeList(rest);
     },
   });
 

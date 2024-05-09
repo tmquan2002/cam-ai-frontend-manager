@@ -4,24 +4,25 @@ import {
   IconFileAnalytics,
   IconExclamationCircle,
   IconMan,
+  IconCalendarTime,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
 import classes from "./Sidebar.module.scss";
-import { IconVideo } from "@tabler/icons-react";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
+  { label: "In charge", icon: IconCalendarTime, path: "/shop/calendar" },
 
   {
-    label: "Your Shop",
+    label: "Shop detail",
     icon: IconPresentationAnalytics,
     path: "/shop/detail",
   },
   {
     label: "Employees",
     icon: IconMan,
-    path: "/shop/employee" ,
+    path: "/shop/employee",
   },
   {
     label: "Incidents & Interactions",
@@ -38,15 +39,9 @@ const mockdata = [
     ],
   },
   {
-    label: "Live",
-    icon: IconVideo,
-    path: "/shop/stream",
-  },
-  {
     label: "Reports",
     icon: IconFileAnalytics,
     links: [
-      { label: "Employee count", link: "/shop/report/count/employee" },
       { label: "Incident", link: "/shop/report/incident" },
       { label: "Interaction", link: "/shop/report/interaction" },
     ],

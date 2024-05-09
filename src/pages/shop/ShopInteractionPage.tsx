@@ -10,7 +10,7 @@ import {
   ScrollArea,
   Skeleton,
   Text,
-  rem
+  rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -18,7 +18,6 @@ import { IconFilter } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { GetIncidentParams } from "../../apis/IncidentAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
@@ -54,7 +53,6 @@ type IncidentFormField = {
 };
 
 const ShopInteractionPage = () => {
-  const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
@@ -152,7 +150,11 @@ const ShopInteractionPage = () => {
   }, [incidentList]);
 
   const renderIncidentList = orderedIncidentList.map((row) => (
-    <Box w={rem(300)} py={rem(14)} px={rem(18)} key={row?.id}
+    <Box
+      w={rem(300)}
+      py={rem(14)}
+      px={rem(18)}
+      key={row?.id}
       onClick={() => {
         setSelectedIncident({ id: row?.id });
       }}
@@ -188,23 +190,6 @@ const ShopInteractionPage = () => {
                     {dayjs(evidence?.createdDate).format("DD/MM/YYYY h:mm A")}
                   </Text>
                 </Box>
-                <Box>
-                  <Text fw={500} c={"dimmed"}>
-                    Camera
-                  </Text>
-                  <Text
-                    fw={500}
-                    c={"blue"}
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() =>
-                      navigate(`/shop/camera/${evidence?.cameraId}`)
-                    }
-                  >
-                    View camera
-                  </Text>
-                </Box>
               </Group>
             </Group>
 
@@ -213,7 +198,7 @@ const ShopInteractionPage = () => {
               bg={"#000"}
               fit="contain"
               imageId={evidence?.imageId}
-            // src={evidence?.image?.hostingUri}
+              // src={evidence?.image?.hostingUri}
             />
           </Box>
         );

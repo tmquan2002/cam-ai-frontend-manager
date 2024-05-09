@@ -1,14 +1,44 @@
 import {
-  ActionIcon, Avatar, Box, Button,
-  Center, Collapse, Flex, Group, Image, Loader, LoadingOverlay, Menu, NumberInput,
+  ActionIcon,
+  Avatar,
+  Box,
+  Button,
+  Center,
+  Collapse,
+  Flex,
+  Group,
+  Image,
+  Loader,
+  LoadingOverlay,
+  Menu,
+  NumberInput,
   Pagination,
-  Paper, ScrollArea, Select, Skeleton, Table, Text, TextInput, Tooltip, rem
+  Paper,
+  ScrollArea,
+  Select,
+  Skeleton,
+  Table,
+  Text,
+  TextInput,
+  Tooltip,
+  rem,
 } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconAlignBoxCenterStretch, IconFilter, IconMail, IconPhone, IconPhoneCall, IconPhoto, IconPlus, IconSearch, IconUpload, IconX, } from "@tabler/icons-react";
+import {
+  IconAlignBoxCenterStretch,
+  IconFilter,
+  IconMail,
+  IconPhone,
+  IconPhoneCall,
+  IconPhoto,
+  IconPlus,
+  IconSearch,
+  IconUpload,
+  IconX,
+} from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import cx from "clsx";
 import * as _ from "lodash";
@@ -29,7 +59,11 @@ import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
-import { formatTime, isEmpty, mapLookupToArray } from "../../utils/helperFunction";
+import {
+  formatTime,
+  isEmpty,
+  mapLookupToArray,
+} from "../../utils/helperFunction";
 import classes from "./BrandMainPage.module.scss";
 
 type SearchShopField = {
@@ -55,10 +89,14 @@ const BrandMainPage = () => {
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
   const [scrolled, setScrolled] = useState(false);
-  const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
+  const [searchCategory, setSearchCategory] = useState<JSX.Element>(
+    SearchCategory.NAME
+  );
   const { data, isLoading, refetch } = useGetBrandList({ size: 1 });
-  const { mutate: uploadBrandBanner, isLoading: isUploadBrandBannerLoading } = useUploadBrandImage();
-  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } = useUploadBrandImage();
+  const { mutate: uploadBrandBanner, isLoading: isUploadBrandBannerLoading } =
+    useUploadBrandImage();
+  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } =
+    useUploadBrandImage();
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
@@ -76,9 +114,17 @@ const BrandMainPage = () => {
     sb = _.omitBy(sb, _.isNil) as GetShopListHookParams;
     sb = _.omitBy(sb, _.isNaN) as GetShopListHookParams;
     return sb;
-  }, [activePage, pageSize, data?.values, debounced, form.values.status, searchCategory]);
+  }, [
+    activePage,
+    pageSize,
+    data?.values,
+    debounced,
+    form.values.status,
+    searchCategory,
+  ]);
 
-  const { data: shopList, isLoading: isShopListLoading } = useGetShopList(searchParams);
+  const { data: shopList, isLoading: isShopListLoading } =
+    useGetShopList(searchParams);
 
   const fields = useMemo(() => {
     return [
@@ -413,7 +459,9 @@ const BrandMainPage = () => {
         </Collapse>
 
         <ScrollArea.Autosize
-          pl={20} pr={20} mah={400}
+          pl={20}
+          pr={20}
+          mah={400}
           onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
           mt={"md"}
           pos={"relative"}
@@ -440,7 +488,9 @@ const BrandMainPage = () => {
             <Table.ScrollContainer minWidth={1000}>
               <Table striped highlightOnHover verticalSpacing={"md"}>
                 <Table.Thead
-                  className={cx(classes.header, { [classes.scrolled]: scrolled })}
+                  className={cx(classes.header, {
+                    [classes.scrolled]: scrolled,
+                  })}
                 >
                   <Table.Tr>
                     <Table.Th>#</Table.Th>

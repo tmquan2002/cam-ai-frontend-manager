@@ -9,7 +9,7 @@ import {
   Tabs,
   Text,
   Tooltip,
-  rem
+  rem,
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -21,7 +21,7 @@ import {
   IconMapPin,
   IconRouter,
   IconVideo,
-  IconX
+  IconX,
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import _, { isEmpty } from "lodash";
@@ -62,8 +62,12 @@ const ShopDetailPage = () => {
   const form = useForm<FormFieldValue>({
     validate: {
       name: isNotEmpty("Name should not be empty"),
-      phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+      phone: (value) =>
+        isEmpty(value)
+          ? null
+          : phoneRegex.test(value)
+          ? null
+          : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -311,7 +315,13 @@ const ShopDetailPage = () => {
                     });
                   })}
                 >
-                  <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={20}>
+                  <Text
+                    size="lg"
+                    fw={"bold"}
+                    fz={25}
+                    c={"light-blue.4"}
+                    mb={20}
+                  >
                     Shop Detail
                   </Text>
                   <EditAndUpdateForm fields={fields} />
@@ -331,14 +341,30 @@ const ShopDetailPage = () => {
 
           <Tabs.Panel value="camera">
             <Box p={rem(32)}>
-              <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
+              <Text
+                size="lg"
+                fw={"bold"}
+                fz={25}
+                mb={rem(20)}
+                c={"light-blue.4"}
+              >
                 Camera list
               </Text>
               {isGetCameraListLoading ? (
                 <Loader />
               ) : (
                 <>
-                  {cameraList?.values?.length == 0 && <Text c="dimmed" w={'100%'} ta={"center"} mt={20} fs="italic">No Camera found</Text>}
+                  {cameraList?.values?.length == 0 && (
+                    <Text
+                      c="dimmed"
+                      w={"100%"}
+                      ta={"center"}
+                      mt={20}
+                      fs="italic"
+                    >
+                      No Camera found
+                    </Text>
+                  )}
                   {cameraList?.values?.map((item) => (
                     <Tooltip label="View camera" key={item?.id}>
                       <Button
@@ -358,7 +384,9 @@ const ShopDetailPage = () => {
                             navigate(`/shop/camera/${item?.id}`);
                           }
                         }}
-                        rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                        rightSection={
+                          <IconCaretRight style={{ width: rem(24) }} />
+                        }
                         px={rem(16)}
                         mb={rem(16)}
                       >
@@ -378,8 +406,7 @@ const ShopDetailPage = () => {
                         </Group>
                       </Button>
                     </Tooltip>
-                  ))
-                  }
+                  ))}
                 </>
               )}
             </Box>
@@ -388,7 +415,12 @@ const ShopDetailPage = () => {
           <Tabs.Panel value="edgebox">
             <Skeleton visible={isEdgeboxInstallListLoading}>
               <Box p={rem(32)}>
-                <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
+                <Group
+                  justify="space-between"
+                  align="center"
+                  pb={rem(20)}
+                  gap={"sm"}
+                >
                   <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                     Edge box
                   </Text>

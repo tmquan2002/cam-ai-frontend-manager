@@ -3,10 +3,9 @@
 }
 
 .static-card {
-  border-radius: 0.4rem;
+  border-radius: rem(8);
   padding: 1.25rem;
-  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.1);
 
   @include light {
     background-color: white;
@@ -15,33 +14,21 @@
   @include dark {
     background-color: #1f1f1f;
   }
-
-  &:hover {
-
-    @include light {
-      background-color: #f8f6fc;
-    }
-
-    @include dark {
-      background-color: #242424;
-    }
-  }
 }
 
 .static-card-title {
   color: #5f6980;
-  font-size: 1.125rem;
+  font-size: rem(15);
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.625rem;
 }
 
 .static-card-number {
-  font-size: 1.625rem;
+  font-size: rem(32);
   font-style: normal;
   font-weight: 600;
   line-height: 2.5rem;
-  margin-bottom: 1.8rem;
 }
 
 .static-card-link {
@@ -52,4 +39,15 @@
   line-height: 1.25;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.card_footer {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
+  border-top: rem(1px) solid var(--mantine-color-gray-2);
+}
+
+.main_container {
+  cursor: pointer;
 }

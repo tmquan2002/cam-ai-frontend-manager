@@ -1,3 +1,11 @@
+.icon {
+  color: #000;
+}
+
+.activeIcon {
+  color: #1864ab;
+}
+
 .control,
 .activeControl,
 .activeControlLink {
@@ -5,6 +13,8 @@
   display: block;
   width: 100%;
   padding: 0.625rem 1rem;
+  border-radius: rem(6);
+  margin-bottom: rem(4);
 
   .label {
     @include light {
@@ -18,16 +28,19 @@
     padding-left: 15px;
   }
 
-  font-size: 1rem;
+  font-size: rem(15);
+}
+
+.control:hover .icon {
+  color: #1864ab;
 }
 
 .control:hover,
-.activeControl,
-.activeControlLink {
-  background-color: var(--mantine-color-light-blue-2);
+.activeControl {
+  background-color: #eee;
 
   @include light {
-    color: black;
+    color: #1864ab;
   }
 
   @include dark {
@@ -44,8 +57,8 @@
   display: block;
   text-decoration: none;
   padding: 0.625rem 1rem;
-  padding-left: 1rem;
   margin-left: 1rem;
+
   font-size: 0.9rem;
   cursor: pointer;
 
@@ -58,14 +71,6 @@
   }
 
   border-left: 1px solid #dee2e6;
-
-  //   @mixin hover {
-  //     background-color: light-dark(
-  //       var(--mantine-color-gray-0),
-  //       var(--mantine-color-dark-7)
-  //     );
-  //     color: light-dark(var(--mantine-color-black), var(--mantine-color-dark-0));
-  //   }
 }
 
 .link:hover {

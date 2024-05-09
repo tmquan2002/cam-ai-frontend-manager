@@ -87,8 +87,21 @@ const renderPasswordInput = ({ fieldProps }: any) => {
 
 const renderSelect = ({ fieldProps }: any) => {
   const {
-    label, placeholder, data, form, name, disabled, searchable, loading, required, rightSection,
-    readonly, rightSectionWidth, fontWeight, radius, clearable
+    label,
+    placeholder,
+    data,
+    form,
+    name,
+    disabled,
+    searchable,
+    loading,
+    required,
+    rightSection,
+    readonly,
+    rightSectionWidth,
+    fontWeight,
+    radius,
+    clearable,
   } = fieldProps;
   if (loading) return <Loader />;
 
@@ -109,6 +122,9 @@ const renderSelect = ({ fieldProps }: any) => {
           fontWeight: 500,
           fontSize: rem(14),
           marginBottom: rem(8),
+        },
+        dropdown: {
+          fontWeight: fontWeight ?? 400,
         },
       }}
       rightSection={rightSection}
@@ -192,8 +208,18 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, maxDate, radius, fontWeight } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    maxDate,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <DateInput
       required={required}
@@ -228,7 +254,8 @@ const renderDateTime = ({ fieldProps }: any) => {
     label,
     required,
     disabled,
-    readonly, withSeconds,
+    readonly,
+    withSeconds,
     radius,
     fontWeight,
   } = fieldProps;
@@ -258,8 +285,18 @@ const renderDateTime = ({ fieldProps }: any) => {
 };
 
 const renderTime = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, withSeconds, radius, fontWeight } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    withSeconds,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <CustomTimeInput
       // required={required}
@@ -286,8 +323,19 @@ const renderTime = ({ fieldProps }: any) => {
 };
 
 const renderFile = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, accept, multiple, readOnly, description, width } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    accept,
+    multiple,
+    readOnly,
+    description,
+    width,
+  } = fieldProps;
   return (
     <FileInput
       accept={accept}

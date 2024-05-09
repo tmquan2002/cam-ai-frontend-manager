@@ -28,7 +28,6 @@ import { Chart } from "react-chartjs-2";
 import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import NoImage from "../../../../components/image/NoImage";
 import { useForm } from "@mantine/form";
-import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";
@@ -36,7 +35,6 @@ import _ from "lodash";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
-import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
 import LegendCard, {
   LEGEND_TYPES,
 } from "../../../../components/card/LegendCard";
@@ -49,7 +47,10 @@ import { useScrollIntoView } from "@mantine/hooks";
 import {
   addDaysBaseOnReportInterval,
   differentDateReturnFormattedString,
+  makeDivisibleByDivider,
 } from "../../../../utils/helperFunction";
+import { useShopHumanCountReport } from "../../../../hooks/useGetHumanCountReport";
+import { GetShopHumanCountReportParams } from "../../../../apis/ReportAPI";
 dayjs.extend(LocalizedFormat);
 
 ChartJS.register(
@@ -110,10 +111,10 @@ export const InteractionReportPage = () => {
     }),
   });
 
-  const searchParams: GetIncidentReportByTimeParams & { enabled: boolean } =
+  const searchParams: GetShopHumanCountReportParams & { enabled: boolean } =
     useMemo(() => {
       if (form.isValid() && form.values.startDate && form.values.toDate) {
-        let sb: GetIncidentReportByTimeParams & { enabled: boolean } = {
+        let sb: GetShopHumanCountReportParams & { enabled: boolean } = {
           startDate: form.values.startDate
             ? dayjs(form.values.startDate).format("YYYY-MM-DD")
             : undefined,
@@ -122,9 +123,8 @@ export const InteractionReportPage = () => {
             : undefined,
           interval: form.values.interval,
           enabled: true,
-          type: IncidentType.Interaction,
         };
-        sb = _.omitBy(sb, _.isNil) as GetIncidentReportByTimeParams & {
+        sb = _.omitBy(sb, _.isNil) as GetShopHumanCountReportParams & {
           enabled: boolean;
         };
         return sb;
@@ -132,7 +132,6 @@ export const InteractionReportPage = () => {
         return {
           enabled: true,
           interval: form.values.interval,
-          type: IncidentType.Interaction,
         };
       }
     }, [form.values.interval, form.values.startDate, form.values.toDate]);
@@ -140,7 +139,7 @@ export const InteractionReportPage = () => {
   const {
     data: incidentReportByTimeData,
     isLoading: isGetIncidentReportByTimeDataLoading,
-  } = useGetIncidentReportByTime(searchParams);
+  } = useShopHumanCountReport(searchParams);
 
   const { data: interactionList, isLoading: isGetInteractionListLoading } =
     useGetIncidentList({
@@ -148,6 +147,7 @@ export const InteractionReportPage = () => {
       fromTime: selectedDuration?.startTime,
       toTime: selectedDuration?.endTime,
       incidentType: IncidentType.Interaction,
+      size: 999,
     });
 
   const data = useMemo(() => {
@@ -157,8 +157,8 @@ export const InteractionReportPage = () => {
     return incidentReportByTimeData?.data.map((item) => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
-        count: item.count,
-        avarageDuration: item?.averageDuration ? item?.averageDuration / 60 : 0,
+        humanCount: item.humanCount.median,
+        interactionCount: item?.interaction.count,
       };
     });
   }, [incidentReportByTimeData]);
@@ -313,13 +313,13 @@ export const InteractionReportPage = () => {
   }, [selectedInteractionItem]);
 
   return (
-    <Flex px={rem(28)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
+    <Flex px={rem(40)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
       <Text
-        size={rem(26)}
+        size={rem(24)}
         fw={700}
         my={rem(20)}
         c={"light-blue.4"}
-        mb={rem(32)}
+        mb={rem(28)}
       >
         Interaction report
       </Text>
@@ -365,7 +365,7 @@ export const InteractionReportPage = () => {
                 <LegendCard
                   type={LEGEND_TYPES.LINE}
                   color="rgb(37, 150, 190)"
-                  title="Average interaction time"
+                  title="Total employee"
                 />
               </Group>
               <Flex>
@@ -399,6 +399,7 @@ export const InteractionReportPage = () => {
                         y: {
                           ticks: {
                             padding: 10,
+                            count: 7,
                           },
                           beginAtZero: true,
                           afterFit: (ctx) => {
@@ -410,6 +411,13 @@ export const InteractionReportPage = () => {
                           border: {
                             color: "#000",
                           },
+                          suggestedMax: 8,
+                          max: makeDivisibleByDivider(
+                            _.maxBy(data, function (o) {
+                              return o.interactionCount;
+                            })?.interactionCount ?? 6,
+                            8
+                          ),
                         },
                       },
 
@@ -426,8 +434,8 @@ export const InteractionReportPage = () => {
                       labels: data?.map((i) => i.time),
                       datasets: [
                         {
-                          label: "Total interactions",
-                          data: data?.map((i) => i.count),
+                          label: "Total interaction",
+                          data: data?.map((i) => i.interactionCount),
                           borderColor: "rgb(37, 150, 190)",
                           backgroundColor: "rgb(37, 150, 190, 0.5)",
                         },
@@ -471,6 +479,7 @@ export const InteractionReportPage = () => {
                           y: {
                             ticks: {
                               display: false,
+                              count: 7,
                             },
 
                             grid: {
@@ -483,6 +492,31 @@ export const InteractionReportPage = () => {
                             border: {
                               dash: [8, 4],
                             },
+                            max: makeDivisibleByDivider(
+                              _.maxBy(data, function (o) {
+                                return o.interactionCount;
+                              })?.interactionCount ?? 6,
+                              8
+                            ),
+
+                            suggestedMax: 8,
+                          },
+                          y1: {
+                            suggestedMax: 6,
+                            ticks: {
+                              display: false,
+                              count: 7,
+                            },
+                            grid: {
+                              drawTicks: false,
+                              tickWidth: 0,
+                              tickLength: 0,
+                              tickColor: "#000",
+                            },
+                            border: {
+                              dash: [8, 4],
+                            },
+                            max: 6,
                           },
                           x: {
                             ticks: {
@@ -529,8 +563,8 @@ export const InteractionReportPage = () => {
                         datasets: [
                           {
                             type: "line" as const,
-                            label: "Average duration ",
-                            data: data?.map((i) => i.avarageDuration),
+                            label: "Total employee",
+                            data: data?.map((i) => i.humanCount),
                             borderColor: "rgb(37, 150, 190)",
                             backgroundColor: "rgb(37, 150, 190, 0.5)",
                             cubicInterpolationMode: "monotone",
@@ -541,11 +575,12 @@ export const InteractionReportPage = () => {
                             pointRadius: 3,
                             fill: false,
                             pointHitRadius: 7,
+                            yAxisID: "y1",
                           },
                           {
                             type: "bar" as const,
-                            label: "Total interactions",
-                            data: data?.map((i) => i.count),
+                            label: "Total interaction",
+                            data: data?.map((i) => i.interactionCount),
                             borderColor: "rgb(255, 99, 132)",
                             backgroundColor: "rgba(255, 99, 132, 0.5)",
 
@@ -559,6 +594,7 @@ export const InteractionReportPage = () => {
                               topRight: 5,
                               topLeft: 5,
                             },
+                            yAxisID: "y",
 
                             borderSkipped: false,
                           },

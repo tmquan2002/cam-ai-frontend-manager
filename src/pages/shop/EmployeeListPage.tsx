@@ -1,15 +1,39 @@
 import {
-  ActionIcon, Box, Button, Center, Collapse, Group, Image,
-  LoadingOverlay, Menu, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem
+  ActionIcon,
+  Box,
+  Button,
+  Center,
+  Collapse,
+  Group,
+  Image,
+  LoadingOverlay,
+  Menu,
+  Pagination,
+  Paper,
+  Select,
+  Table,
+  Text,
+  TextInput,
+  Tooltip,
+  rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconAlignBoxCenterStretch, IconFilter, IconMail, IconPhoneCall, IconPlus, IconSearch } from "@tabler/icons-react";
+import {
+  IconAlignBoxCenterStretch,
+  IconFilter,
+  IconMail,
+  IconPhoneCall,
+  IconPlus,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GetEmployeeListParams } from "../../apis/EmployeeAPI";
 import StatusBadge from "../../components/badge/StatusBadge";
-import EditAndUpdateForm, { FIELD_TYPES } from "../../components/form/EditAndUpdateForm";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
@@ -38,7 +62,9 @@ const EmployeeListPage = () => {
   const [activePage, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<string | null>("5");
   const [search, setSearch] = useState<string>("");
-  const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
+  const [searchCategory, setSearchCategory] = useState<JSX.Element>(
+    SearchCategory.NAME
+  );
   const [debounced] = useDebouncedValue(search, 500);
 
   const fields = useMemo(() => {
@@ -53,7 +79,7 @@ const EmployeeListPage = () => {
           data: mapLookupToArray(EmployeeStatus ?? {}),
         },
         spans: 12,
-      }
+      },
     ];
   }, [form]);
 
@@ -75,7 +101,8 @@ const EmployeeListPage = () => {
     return sb;
   }, [activePage, debounced, searchCategory, form]);
 
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList(searchParams);
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
+    useGetEmployeeList(searchParams);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -84,7 +111,8 @@ const EmployeeListPage = () => {
 
   const rows = employeeList?.values?.map((row, index) => (
     <Tooltip label="View Employee" key={row.id} openDelay={300}>
-      <Table.Tr style={{ cursor: "pointer", }}
+      <Table.Tr
+        style={{ cursor: "pointer" }}
         onClick={() => navigate(`/shop/employee/${row.id}`)}
       >
         <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
@@ -113,18 +141,40 @@ const EmployeeListPage = () => {
 
         <Menu.Dropdown>
           <Menu.Label>Search by</Menu.Label>
-          <Menu.Item leftSection={<IconAlignBoxCenterStretch size={"1.3rem"} stroke={1.5} color="#228be6" />}
-            onClick={() => { setSearch(""); setSearchCategory(SearchCategory.NAME); }}
+          <Menu.Item
+            leftSection={
+              <IconAlignBoxCenterStretch
+                size={"1.3rem"}
+                stroke={1.5}
+                color="#228be6"
+              />
+            }
+            onClick={() => {
+              setSearch("");
+              setSearchCategory(SearchCategory.NAME);
+            }}
           >
             Name
           </Menu.Item>
-          <Menu.Item leftSection={<IconMail size={"1.3rem"} stroke={1.5} color="#E78C8C" />}
-            onClick={() => { setSearch(""); setSearchCategory(SearchCategory.EMAIL); }}
+          <Menu.Item
+            leftSection={
+              <IconMail size={"1.3rem"} stroke={1.5} color="#E78C8C" />
+            }
+            onClick={() => {
+              setSearch("");
+              setSearchCategory(SearchCategory.EMAIL);
+            }}
           >
             Email
           </Menu.Item>
-          <Menu.Item leftSection={<IconPhoneCall size={"1.3rem"} stroke={1.5} color={"#15aabf"} />}
-            onClick={() => { setSearch(""); setSearchCategory(SearchCategory.PHONE); }}
+          <Menu.Item
+            leftSection={
+              <IconPhoneCall size={"1.3rem"} stroke={1.5} color={"#15aabf"} />
+            }
+            onClick={() => {
+              setSearch("");
+              setSearchCategory(SearchCategory.PHONE);
+            }}
           >
             Phone
           </Menu.Item>
@@ -175,14 +225,13 @@ const EmployeeListPage = () => {
       <Collapse in={opened} mb={20} ml={20} mr={20}>
         <Group justify="space-between">
           <EditAndUpdateForm fields={fields} />
-          <Button variant="transparent" ml={"auto"}
-            onClick={form.reset}>
+          <Button variant="transparent" ml={"auto"} onClick={form.reset}>
             Clear all filter
           </Button>
         </Group>
       </Collapse>
 
-      <Box pos={"relative"} pl={20} pr={20}>
+      <Box pos={"relative"}>
         <LoadingOverlay
           visible={isGetEmployeeListLoading}
           zIndex={1000}
@@ -203,11 +252,7 @@ const EmployeeListPage = () => {
           </Center>
         ) : (
           <Table.ScrollContainer minWidth={1000}>
-            <Table miw={1000}
-              highlightOnHover
-              verticalSpacing={"md"}
-              striped
-            >
+            <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>#</Table.Th>
@@ -227,24 +272,27 @@ const EmployeeListPage = () => {
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((employeeList?.totalCount ?? 0) / Number(pageSize))}
+            total={Math.ceil(
+              (employeeList?.totalCount ?? 0) / Number(pageSize)
+            )}
           />
-          {!employeeList?.isValuesEmpty &&
-            < Select
+          {!employeeList?.isValuesEmpty && (
+            <Select
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={pageSizeSelect} defaultValue={"5"}
+              data={pageSizeSelect}
+              defaultValue={"5"}
               value={pageSize}
               onChange={(value) => {
-                setPageSize(value)
-                setPage(1)
+                setPageSize(value);
+                setPage(1);
               }}
             />
-          }
+          )}
         </Group>
       </Box>
-    </Paper >
+    </Paper>
   );
 };
 
