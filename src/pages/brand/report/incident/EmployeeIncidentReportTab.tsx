@@ -14,7 +14,6 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
   Grid,
   Group,
   Paper,
@@ -114,14 +113,8 @@ const EmployeeIncidentReportTab = ({
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList(searchParams);
 
-  console.log(
-    incidentList?.values?.filter(
-      (i) => i.incidentType != IncidentType.Interaction
-    ).length
-  );
-
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({ size: 999 });
+    useGetEmployeeList({ size: 999, shopId: shopId ?? "", enabled: !!shopId });
 
   const removedInteractionIncident = useMemo(() => {
     if (isGetEmployeeListLoading) {
@@ -187,6 +180,8 @@ const EmployeeIncidentReportTab = ({
           name: "fromTime",
           placeholder: "Start date",
           type: "range",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -196,6 +191,8 @@ const EmployeeIncidentReportTab = ({
           form,
           name: "toTime",
           placeholder: "End date",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -205,6 +202,8 @@ const EmployeeIncidentReportTab = ({
           form,
           name: "incidentType",
           placeholder: "Incident type",
+          fontWeight: 500,
+          radius: rem(8),
           data: [
             {
               key: IncidentType.Phone,
@@ -222,16 +221,25 @@ const EmployeeIncidentReportTab = ({
   }, [form]);
 
   return (
-    <Box>
-      <Card
+    <Box mt={rem(20)}>
+      <Box
         style={{
-          borderBottom: "1px solid #ccc",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          marginTop: rem(20),
+          overflow: "hidden",
+          paddingBottom: rem(40),
         }}
-        pb={rem(32)}
-        shadow="md"
       >
-        <Card.Section withBorder inheritPadding mb={rem(32)}>
-          <Group justify="flex-end" my={rem(20)}>
+        <Box
+          mb={rem(32)}
+          bg={"#f9fafb"}
+          py={rem(20)}
+          style={{
+            borderBottom: "1px solid #ccc",
+          }}
+        >
+          <Group justify="flex-end" mr={rem(12)}>
             <Group>
               {form.isDirty() ? (
                 <Button
@@ -244,9 +252,7 @@ const EmployeeIncidentReportTab = ({
                   Reset
                 </Button>
               ) : (
-                <Text size="md" fw={500}>
-                  Filter
-                </Text>
+                <Text size="md" fw={500}></Text>
               )}
 
               <Box miw={rem(360)}>
@@ -254,17 +260,19 @@ const EmployeeIncidentReportTab = ({
               </Box>
             </Group>
           </Group>
-        </Card.Section>
+        </Box>
 
-        {newArray?.map((item, index) => (
-          <Box key={index} pt={index == 0 ? 0 : rem(12)}>
-            <EmployeeIncidentCardManager
-              employee={item?.employee}
-              incidentList={item?.incidentList}
-            />
-          </Box>
-        ))}
-      </Card>
+        <Box mx={rem(20)}>
+          {newArray?.map((item, index) => (
+            <Box key={index} pt={index == 0 ? 0 : rem(12)}>
+              <EmployeeIncidentCardManager
+                employee={item?.employee}
+                incidentList={item?.incidentList}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Box>
 
       <Grid mt={rem(28)} justify="space-between" gutter={rem(40)}>
         <Grid.Col span={4}>

@@ -480,12 +480,7 @@ const BrandDetailPageManager = () => {
           </Group>
         </Collapse>
 
-        <ScrollArea
-          h={600}
-          onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-          mt={"md"}
-          pos={"relative"}
-        >
+        <Box mt={"md"} pos={"relative"}>
           <LoadingOverlay
             visible={isShopListLoading}
             zIndex={1000}
@@ -512,9 +507,7 @@ const BrandDetailPageManager = () => {
               withColumnBorders
               verticalSpacing={"md"}
             >
-              <Table.Thead
-                className={cx(classes.header, { [classes.scrolled]: scrolled })}
-              >
+              <Table.Thead>
                 <Table.Tr>
                   <Table.Th>Shop name</Table.Th>
                   <Table.Th>Address</Table.Th>
@@ -527,7 +520,7 @@ const BrandDetailPageManager = () => {
               <Table.Tbody>{rows}</Table.Tbody>
             </Table>
           )}
-        </ScrollArea>
+        </Box>
         <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}

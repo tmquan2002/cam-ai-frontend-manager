@@ -170,3 +170,11 @@ export const addDaysBaseOnReportInterval = (
 
   return result.format(formattedString ?? "YYYY-MM-DDTHH:mm:ss");
 };
+
+export function makeDivisibleByDivider(number: number, divider: number) {
+  if (!number) return divider;
+  const remainder = number % divider;
+  const amountToAdd = (divider - remainder) % divider;
+  const result = number + amountToAdd;
+  return result;
+}

@@ -1,7 +1,7 @@
 import { getAccessToken } from "../context/AuthContext";
 import { ReportInterval } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
-import { ChartReportData, HumanCountDataDetail } from "../models/Report";
+import { ChartReportData, HumanCountDetail } from "../models/Report";
 import http, { toQueryParams } from "../utils/http";
 
 export type GetReportListParams = {
@@ -10,8 +10,8 @@ export type GetReportListParams = {
 };
 
 export type GetShopHumanCountReportParams = {
-  startDate: string;
-  endDate: string;
+  startDate?: string;
+  endDate?: string;
   interval: ReportInterval;
 };
 
@@ -42,7 +42,7 @@ export const ReportApi = {
   },
   _getHumanCountReport: async (params: GetShopHumanCountReportParams) => {
     const access_token = getAccessToken();
-    const res = await http.get<HumanCountDataDetail>(
+    const res = await http.get<HumanCountDetail>(
       `/api/shops/customer?${toQueryParams(params)}`,
       {
         headers: {

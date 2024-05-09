@@ -121,6 +121,9 @@ const renderSelect = ({ fieldProps }: any) => {
           fontSize: rem(14),
           marginBottom: rem(8),
         },
+        dropdown: {
+          fontWeight: fontWeight ?? 400,
+        },
       }}
       rightSection={rightSection}
       style={{
@@ -203,8 +206,18 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, maxDate, radius, fontWeight } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    maxDate,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <DateInput
       required={required}
@@ -239,7 +252,8 @@ const renderDateTime = ({ fieldProps }: any) => {
     label,
     required,
     disabled,
-    readonly, withSeconds,
+    readonly,
+    withSeconds,
     radius,
     fontWeight,
   } = fieldProps;
@@ -269,8 +283,18 @@ const renderDateTime = ({ fieldProps }: any) => {
 };
 
 const renderTime = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, withSeconds, radius, fontWeight } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    withSeconds,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <CustomTimeInput
       // required={required}
@@ -297,8 +321,18 @@ const renderTime = ({ fieldProps }: any) => {
 };
 
 const renderFile = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, accept, multiple, readOnly, description } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    accept,
+    multiple,
+    readOnly,
+    description,
+  } = fieldProps;
   return (
     <FileInput
       accept={accept}

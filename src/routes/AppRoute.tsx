@@ -25,10 +25,9 @@ import IncidentListPage from "../pages/brand/IncidentListPage";
 import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
 import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
-import BranddReportPage from "../pages/brand/BrandReportPage";
+import BrandReportPage from "../pages/brand/BrandReportPage";
 import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 import CameraDetailPage from "../pages/brand/CameraDetailPage";
-import ShopStreamPage from "../pages/shop/ShopStreamPage";
 import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
 import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
 import IncidentReportPageManager from "../pages/brand/report/incident/IncidentReportPageManager";
@@ -73,10 +72,6 @@ const AppRoute = () => {
           path: "detail",
           element: <ShopDetailPage />,
         },
-        {
-          path: "stream",
-          element: <ShopStreamPage />,
-        },
 
         {
           path: "brand/detail",
@@ -104,10 +99,7 @@ const AppRoute = () => {
           path: "camera/:id",
           element: <CameraDetailPage />,
         },
-        {
-          path: "report/count/employee",
-          element: <CountEmployeeReportPage />,
-        },
+
         {
           path: "report/incident",
           element: <IncidentReportPage />,
@@ -179,7 +171,7 @@ const AppRoute = () => {
         },
         {
           path: "report",
-          element: <BranddReportPage />,
+          element: <BrandReportPage />,
         },
         {
           path: "camera/:id",

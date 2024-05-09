@@ -35,14 +35,21 @@ export type HumanCountDetail = {
   startDate: string;
   endDate: string;
   interval: ReportInterval;
+  totalInteraction: number;
   data: HumanCountDataDetail[];
 };
 
 export type HumanCountDataDetail = {
   time: string;
-  low: number;
-  high: number;
-  open: number;
-  close: number;
-  median: number;
+  humanCount: {
+    low: number;
+    high: number;
+    open: number;
+    close: number;
+    median: number;
+  };
+  interaction: {
+    count: number;
+    averageDuration: number;
+  };
 };

@@ -5,6 +5,7 @@ import {
   Group,
   Indicator,
   Popover,
+  Text,
   Tooltip,
   rem,
 } from "@mantine/core";
@@ -60,7 +61,7 @@ const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
       <Group>
         <Burger onClick={toggleMobile} hiddenFrom="sm" size="sm" />
         <Burger onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-        <b>CAMAI</b>
+        <Text fw={600}>CAMAI</Text>
       </Group>
       <Group gap={5}>
         <LightDarkSwitch size="md" />

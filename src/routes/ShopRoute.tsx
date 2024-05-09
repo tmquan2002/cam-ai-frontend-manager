@@ -47,14 +47,13 @@ const ShopRoute = () => {
 
           <AppShell.Main
             style={{
-              display: 'flex',
+              display: "flex",
               flex: 1,
-              flexDirection: 'column',
+              flexDirection: "column",
               backgroundColor:
                 computedColorScheme === "light" ? "#f6f8fc" : "#1A1A1A",
             }}
           >
-
             <Outlet />
           </AppShell.Main>
         </AppShell>
@@ -62,12 +61,7 @@ const ShopRoute = () => {
     case Role.BrandManager:
       return <Navigate to={"/brand"} />;
     default:
-      return (
-        <Navigate
-          to={"/login"}
-          replace
-        />
-      );
+      return <Navigate to={"/login"} replace />;
   }
 };
 
