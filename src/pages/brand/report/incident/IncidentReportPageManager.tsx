@@ -1,6 +1,6 @@
 import {
   Box,
-  Card,
+  Flex,
   Group,
   Loader,
   Select,
@@ -23,10 +23,10 @@ const IncidentReportPageManager = () => {
   });
 
   return (
-    <Box pb={rem(40)} mx={rem(28)} mt={rem(28)}>
-      <Group justify="space-between" my={rem(20)}>
+    <Flex px={rem(40)} pt={rem(20)} bg={"#fff"} flex={1} direction={"column"}>
+      <Group justify="space-between" align="center" my={rem(20)}>
         <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
-          INCIDENT REPORT
+          Incident Report
         </Text>
         {isGetShopListLoading ? (
           <Loader />
@@ -34,8 +34,17 @@ const IncidentReportPageManager = () => {
           <Select
             value={selectedShop}
             onChange={setSelectedShop}
-            size="md"
+            size="sm"
+            radius={rem(8)}
             w={rem(320)}
+            style={{
+              fontWeight: 500,
+            }}
+            styles={{
+              dropdown: {
+                fontWeight: 500,
+              },
+            }}
             data={
               shopList
                 ? shopList?.values.map((item) => {
@@ -51,30 +60,20 @@ const IncidentReportPageManager = () => {
         )}
       </Group>
 
-      <Card shadow="xs" pb={rem(40)}>
-        <Tabs
-          keepMounted={false}
-          variant="default"
-          defaultValue="ByEmployee"
-          c={"blue"}
-          color="blue"
-        >
+      <Box pb={rem(40)}>
+        <Tabs keepMounted={false} variant="default" defaultValue="ByEmployee">
           <Tabs.List>
             <Tabs.Tab
               value="ByEmployee"
               leftSection={<IconUser style={iconStyle} />}
             >
-              <Text size="md" fw={500}>
-                Employee report
-              </Text>
+              <Text fw={500}>Employee report</Text>
             </Tabs.Tab>
             <Tabs.Tab
               value="ByTime"
               leftSection={<IconClock style={iconStyle} />}
             >
-              <Text size="md" fw={500}>
-                Time report
-              </Text>
+              <Text fw={500}>Time report</Text>
             </Tabs.Tab>
           </Tabs.List>
 
@@ -82,8 +81,8 @@ const IncidentReportPageManager = () => {
             {selectedShop ? (
               <EmployeeIncidentReportTab shopId={selectedShop} />
             ) : (
-              <Text mt={rem(28)} size="xl" fw={700}>
-                Please select shop
+              <Text mt={rem(28)} size="md" fw={500}>
+                No shop selected
               </Text>
             )}
           </Tabs.Panel>
@@ -92,14 +91,14 @@ const IncidentReportPageManager = () => {
             {selectedShop ? (
               <TimeIncidentReportTab shopId={selectedShop} />
             ) : (
-              <Text size="xl" mt={rem(20)} fw={700}>
-                Please select shop
+              <Text size="md" mt={rem(28)} fw={500}>
+                No shop selected
               </Text>
             )}
           </Tabs.Panel>
         </Tabs>
-      </Card>
-    </Box>
+      </Box>
+    </Flex>
   );
 };
 

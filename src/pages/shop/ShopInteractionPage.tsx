@@ -1,6 +1,4 @@
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
-  Badge,
   Box,
   Button,
   Center,
@@ -14,28 +12,28 @@ import {
   Text,
   rem,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { IconFilter } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
-import classes from "./ShopInteractionPage.module.scss";
+import { GetIncidentParams } from "../../apis/IncidentAPI";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import LoadingImage from "../../components/image/LoadingImage";
+import NoImage from "../../components/image/NoImage";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
   EvidenceType,
   IncidentStatus,
   IncidentType,
 } from "../../models/CamAIEnum";
-import { IconFilter } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { useForm } from "@mantine/form";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { GetIncidentParams } from "../../apis/IncidentAPI";
-import dayjs from "dayjs";
-import _ from "lodash";
-import { useGetIncidentById } from "../../hooks/useGetIncidentById";
 import { EvidenceDetail } from "../../models/Evidence";
-import NoImage from "../../components/image/NoImage";
-import { useNavigate } from "react-router-dom";
-import LoadingImage from "../../components/image/LoadingImage";
+import classes from "./ShopInteractionPage.module.scss";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -55,7 +53,6 @@ type IncidentFormField = {
 };
 
 const ShopInteractionPage = () => {
-  const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
@@ -148,31 +145,6 @@ const ShopInteractionPage = () => {
     ];
   }, [employeeList?.values, form, isGetEmployeeListLoading]);
 
-  const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return (
-          <Badge color="yellow" radius={"sm"}>
-            {IncidentStatus.New}
-          </Badge>
-        );
-      case IncidentStatus.Accepted:
-        return (
-          <Badge color="green" radius={"sm"}>
-            {IncidentStatus.Accepted}
-          </Badge>
-        );
-      case IncidentStatus.Rejected:
-        return (
-          <Badge color="red" radius={"sm"}>
-            {IncidentStatus.Rejected}
-          </Badge>
-        );
-      case undefined:
-        return <></>;
-    }
-  };
-
   const orderedIncidentList = useMemo(() => {
     return _.orderBy(incidentList?.values || [], ["startTime"], ["desc"]);
   }, [incidentList]);
@@ -196,12 +168,6 @@ const ShopInteractionPage = () => {
         <Text size="md">
           {dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}
         </Text>
-
-        {new Date(row?.startTime).getTime() - new Date().getTime() > 0 ? (
-          renderIncidentStatusBadge(IncidentStatus.New)
-        ) : (
-          <></>
-        )}
       </Group>
       <Text c="dimmed" size="sm">
         {row?.incidentType}
@@ -222,23 +188,6 @@ const ShopInteractionPage = () => {
                   </Text>
                   <Text fw={500}>
                     {dayjs(evidence?.createdDate).format("DD/MM/YYYY h:mm A")}
-                  </Text>
-                </Box>
-                <Box>
-                  <Text fw={500} c={"dimmed"}>
-                    Camera
-                  </Text>
-                  <Text
-                    fw={500}
-                    c={"blue"}
-                    style={{
-                      cursor: "pointer",
-                    }}
-                    onClick={() =>
-                      navigate(`/shop/camera/${evidence?.cameraId}`)
-                    }
-                  >
-                    View camera
                   </Text>
                 </Box>
               </Group>
@@ -323,22 +272,14 @@ const ShopInteractionPage = () => {
                 <Group justify="space-between" align="center">
                   <Group py={rem(32)} align="center">
                     <Text size={rem(20)} fw={500}>
-                      {incidentData?.incidentType} Incident
+                      Interaction on
                     </Text>
-                    <Text>|</Text>
                     <Text size={rem(20)} fw={500} c={"dimmed"}>
                       {" "}
                       {dayjs(incidentData?.startTime).format(
                         "DD/MM/YYYY h:mm A"
                       )}
                     </Text>
-                    {new Date(incidentData?.startTime ?? "").getTime() -
-                      new Date().getTime() >
-                    0 ? (
-                      renderIncidentStatusBadge(IncidentStatus.New)
-                    ) : (
-                      <></>
-                    )}
                   </Group>
                 </Group>
                 <Group justify="space-between" mb={rem(12)}>

@@ -4,7 +4,7 @@ import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useMemo } from "react";
 import dayjs from "dayjs";
 import _ from "lodash";
-import { Box, Card, Group, Skeleton, Text, rem } from "@mantine/core";
+import { Box, Flex, Group, Skeleton, Text, rem } from "@mantine/core";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
@@ -20,9 +20,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import zoomPlugin from "chartjs-plugin-zoom";
 
-import { Line } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
+import LegendCard from "../../../../components/card/LegendCard";
 
 ChartJS.register(
   CategoryScale,
@@ -31,8 +31,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend,
-  zoomPlugin
+  Legend
 );
 
 export type TimeIncidentReportTabProps = {
@@ -51,7 +50,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
     initialValues: {
       startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
-      interval: ReportInterval.HalfHour,
+      interval: ReportInterval.HalfDay,
     },
     validate: (values) => ({
       toDate:
@@ -121,7 +120,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
     }
     return incidentReportByTimeData?.data.map((item) => {
       return {
-        time: dayjs(item.time).format("HH:mm DD-MM-YYYY"),
+        time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
       };
     });
@@ -135,6 +134,8 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           form,
           name: "startDate",
           placeholder: "Start date",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -144,6 +145,8 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           form,
           name: "toDate",
           placeholder: "End date",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -153,6 +156,8 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           form,
           name: "interval",
           placeholder: "Interval",
+          fontWeight: 500,
+          radius: rem(8),
           data: [
             {
               value: ReportInterval.HalfHour,
@@ -182,81 +187,248 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
   }, [form]);
 
   return (
-    <Skeleton visible={isGetIncidentReportByTimeDataLoading}>
-      <Card shadow="md" pb={rem(40)}>
-        <Card.Section withBorder inheritPadding mb={rem(32)}>
-          <Group justify="flex-end" my={rem(20)}>
-            <Group>
-              <Text size="md" fw={500}>
-                Filter
-              </Text>
-              <Box miw={rem(360)}>
-                <EditAndUpdateForm fields={fields} />
-              </Box>
-            </Group>
-          </Group>
-        </Card.Section>
-
-        {!shopId ? (
-          <Text size="lg" fw={600}>
-            Please select shop
-          </Text>
-        ) : !incidentReportByTimeData ||
-          incidentReportByTimeData?.data?.length == 0 ? (
-          <NoImage type="NO_DATA" />
-        ) : (
+    <Box pb={rem(40)}>
+      <Skeleton visible={isGetIncidentReportByTimeDataLoading}>
+        <Box
+          style={{
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            marginTop: rem(20),
+            overflow: "hidden",
+          }}
+        >
           <Box
+            mb={rem(32)}
+            bg={"#f9fafb"}
+            py={rem(20)}
             style={{
-              width: "100%",
-              maxWidth: "100%",
-              height: "640px",
-              overflowX: "scroll",
+              borderBottom: "1px solid #ccc",
             }}
           >
-            <Box
-              style={
-                data && data?.length > 7
-                  ? {
-                      width: `${1500 + (data?.length - 7) * 30}px`,
-                      height: "600px",
-                    }
-                  : {
-                      height: "600px",
-                    }
-              }
-            >
-              <Line
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  scales: {
-                    y: {
-                      beginAtZero: true,
-                    },
-                  },
-                  plugins: {
-                    title: {
-                      display: true,
-                    },
-                  },
-                }}
-                data={{
-                  labels: data?.map((i) => i.time),
-                  datasets: [
-                    {
-                      label: "Total incidents",
-                      data: data?.map((i) => i.count),
-                      borderColor: "rgb(255, 99, 132)",
-                      backgroundColor: "rgba(255, 99, 132, 0.5)",
-                    },
-                  ],
-                }}
-              ></Line>
-            </Box>
+            <Group justify="flex-end" mr={rem(20)}>
+              <Group>
+                <Box miw={rem(360)}>
+                  <EditAndUpdateForm fields={fields} />
+                </Box>
+              </Group>
+            </Group>
           </Box>
-        )}
-      </Card>
-    </Skeleton>
+
+          {!shopId ? (
+            <Text size="lg" fw={600}>
+              Please select shop
+            </Text>
+          ) : !incidentReportByTimeData ||
+            incidentReportByTimeData?.data?.length == 0 ? (
+            <NoImage type="NO_DATA" />
+          ) : (
+            <Box>
+              <Group justify="flex-end" mt={rem(20)} mb={rem(6)} mr={rem(12)}>
+                <LegendCard
+                  type="line"
+                  color="rgb(37, 150, 190)"
+                  title="Total incident"
+                />
+                <LegendCard
+                  type="bar"
+                  color="rgba(255, 99, 132, 1)"
+                  title="Average incident time"
+                />
+              </Group>
+              <Flex mb={rem(32)}>
+                <Box
+                  style={{
+                    width: "40px",
+                    zIndex: 999,
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  <Chart
+                    type="bar"
+                    options={{
+                      maintainAspectRatio: false,
+                      responsive: true,
+                      layout: {
+                        padding: {
+                          bottom: 47,
+                        },
+                      },
+
+                      scales: {
+                        x: {
+                          ticks: {
+                            display: false,
+                          },
+                          grid: {
+                            display: false,
+                          },
+                        },
+                        y: {
+                          ticks: {
+                            padding: 10,
+                          },
+                          beginAtZero: true,
+                          afterFit: (ctx) => {
+                            ctx.width = 39;
+                          },
+                          grid: {
+                            drawTicks: false,
+                          },
+                          border: {
+                            color: "#000",
+                          },
+                          suggestedMax: 10,
+                        },
+                      },
+
+                      plugins: {
+                        title: {
+                          display: false,
+                        },
+                        legend: {
+                          display: false,
+                        },
+                      },
+                    }}
+                    data={{
+                      labels: data?.map((i) => i.time),
+                      datasets: [
+                        {
+                          type: "bar",
+                          label: "Total interactions",
+                          borderColor: "rgb(37, 150, 190)",
+                          backgroundColor: "rgb(37, 150, 190, 0.5)",
+                          data: data?.map((i) => i.count),
+                        },
+                      ],
+                    }}
+                  />
+                </Box>
+
+                <Box
+                  style={{
+                    width: "100%",
+                    maxWidth: "100%",
+                    height: "620px",
+                    overflowX: "scroll",
+                    transform: "translateX(-9px)",
+                  }}
+                >
+                  <Box
+                    style={
+                      data && data?.length > 7
+                        ? {
+                            width: `${1500 + (data?.length - 7) * 70}px`,
+                            height: "600px",
+                          }
+                        : {
+                            height: "600px",
+                          }
+                    }
+                  >
+                    <Chart
+                      type="line"
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: {
+                          padding: {
+                            top: 17,
+                          },
+                        },
+                        scales: {
+                          y: {
+                            ticks: {
+                              display: false,
+                            },
+
+                            grid: {
+                              drawTicks: false,
+                              tickWidth: 0,
+                              tickLength: 0,
+                              tickColor: "#000",
+                            },
+
+                            border: {
+                              dash: [8, 4],
+                            },
+                            suggestedMax: 10,
+                          },
+                          x: {
+                            ticks: {
+                              padding: 10,
+                            },
+
+                            border: {
+                              color: "#000",
+                              dash: [8, 4],
+                            },
+                            beginAtZero: true,
+                            grid: {
+                              drawTicks: false,
+                            },
+                          },
+                        },
+                        plugins: {
+                          title: {
+                            display: false,
+                          },
+                          legend: {
+                            display: false,
+                          },
+                        },
+                        onClick(_event, elements, _chart) {
+                          if (elements.length > 0) {
+                            // const selectedData =
+                            //   incidentReportByTimeData?.data?.[
+                            //     elements[0].index
+                            //   ];
+                            // setSelectedIncidentItem(null);
+                            // setSelectedDuration({
+                            //   startTime: selectedData?.time,
+                            //   endTime: addDaysBaseOnReportInterval(
+                            //     selectedData?.time,
+                            //     form.values.interval
+                            //   ),
+                            // });
+                          }
+                        },
+                      }}
+                      data={{
+                        labels: data?.map((i) => i.time),
+                        datasets: [
+                          {
+                            type: "line",
+                            label: "Total incident ",
+                            data: data?.map((i) => i.count),
+                            borderColor: "rgb(37, 150, 190)",
+                            backgroundColor: "rgb(37, 150, 190, 0.5)",
+                            cubicInterpolationMode: "monotone",
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: "#fff",
+                            pointBackgroundColor: "rgb(37, 150, 190)",
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            fill: true,
+                            pointHitRadius: 7,
+                          },
+                          {
+                            type: "bar" as const,
+                            label: "Average duration ",
+                            data: data?.map((i) => i.count),
+                            hidden: true,
+                          },
+                        ],
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Flex>
+            </Box>
+          )}
+        </Box>
+      </Skeleton>
+    </Box>
   );
 };
 

@@ -8,7 +8,7 @@ export type GetBrandListParams = {
   name?: string;
   statusId?: string;
   brandId?: string;
-  size: number;
+  size?: number;
   pageIndex?: number;
 };
 

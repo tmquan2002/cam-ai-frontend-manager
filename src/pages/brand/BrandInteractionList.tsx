@@ -1,7 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
-  Badge,
   Box,
   Button,
   Center,
@@ -11,24 +8,29 @@ import {
   LoadingOverlay,
   Pagination,
   Paper,
+  Select,
   Table,
   Text,
-  rem,
+  Tooltip,
+  rem
 } from "@mantine/core";
-import { useMemo, useState } from "react";
-import { IMAGE_CONSTANT } from "../../types/constant";
-import classes from "./BrandInteractionList.module.scss";
-import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IconFilter } from "@tabler/icons-react";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { IconFilter } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GetIncidentParams } from "../../apis/IncidentAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useForm } from "@mantine/form";
-import { GetIncidentParams } from "../../apis/IncidentAPI";
-import dayjs from "dayjs";
-import _ from "lodash";
+import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
+import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
+import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import classes from "./BrandInteractionList.module.scss";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -46,8 +48,8 @@ type SearchIncidentField = {
 const BrandInteractionList = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
-
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>("5");
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
@@ -56,13 +58,12 @@ const BrandInteractionList = () => {
       status: null,
       toTime: null,
       incidentType: IncidentType.Interaction,
-      size: 20,
       pageIndex: activePage - 1,
     },
   });
 
   const searchParams: GetIncidentParams = useMemo(() => {
-    console.log(form.values);
+    // console.log(form.values);
 
     let sb: GetIncidentParams = {
       employeeId: form.values.employeeId,
@@ -75,25 +76,20 @@ const BrandInteractionList = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: form.values.size,
+      size: Number(pageSize),
       pageIndex: activePage - 1,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
     return sb;
   }, [
-    activePage,
+    activePage, pageSize,
     form.values.fromTime,
     form.values.incidentType,
     form.values.shopId,
   ]);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList(searchParams);
-
-  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
-    enabled: true,
-    size: 999,
-  });
+  const { data: incidentList, isLoading: isGetIncidentListLoading } = useGetIncidentList(searchParams);
+  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({ enabled: true, size: 999, });
 
   const fields = useMemo(() => {
     return [
@@ -132,18 +128,7 @@ const BrandInteractionList = () => {
         spans: 4,
       },
     ];
-  }, [form, , shopList, isGetShopListLoading]);
-
-  const renderIncidentStatusBadge = (status: IncidentStatus) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-      case IncidentStatus.Accepted:
-        return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-      case IncidentStatus.Rejected:
-        return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-    }
-  };
+  }, [form, shopList, isGetShopListLoading]);
 
   const rows = incidentList?.values?.map((row, index) => {
     return (
@@ -152,30 +137,34 @@ const BrandInteractionList = () => {
         className={classes["clickable"]}
         onClick={() => navigate(`/brand/incident/${row?.id}`)}
       >
-        <Table.Td>
-          <Text>{row?.incidentType}</Text>
-        </Table.Td>
-        <Table.Td
-          className={classes["pointer-style"]}
-          c={"blue"}
+        <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
+
+        <Table.Td className={classes["pointer-style"]} c={"blue"}
           onClick={(e) => {
             e.stopPropagation();
             navigate(`/brand/shop/${row?.shopId}`);
           }}
         >
-          <Text>{row?.shop?.name}</Text>
+          <Tooltip label="View Shop" withArrow position="top-start">
+            <Text>{row?.shop?.name}</Text>
+          </Tooltip>
         </Table.Td>
+
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
 
-        <Table.Td>
+        <Table.Td ta="center">
+          <StatusBadge statusName={row?.status} size="sm" padding={10} />
+        </Table.Td>
+
+        {/* <Table.Td>
           {" "}
           {new Date(row?.startTime ?? "").getTime() - new Date().getTime() >
-          0 ? (
+            0 ? (
             renderIncidentStatusBadge(IncidentStatus.New)
           ) : (
             <></>
           )}
-        </Table.Td>
+        </Table.Td> */}
       </Table.Tr>
     );
   });
@@ -184,7 +173,7 @@ const BrandInteractionList = () => {
     <Paper p={rem(32)} m={rem(32)} shadow="xs">
       <Group align="center" justify="space-between" mb={"lg"}>
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Incident list
+          Interaction list
         </Text>
         <Group>
           {form.isDirty() ? (
@@ -209,7 +198,7 @@ const BrandInteractionList = () => {
         <EditAndUpdateForm fields={fields} />
       </Collapse>
 
-      <Box pos={"relative"} mb={"lg"}>
+      <Box pos={"relative"} mb={"lg"} pl={20} pr={20}>
         <LoadingOverlay
           visible={isGetIncidentListLoading}
           zIndex={1000}
@@ -230,32 +219,38 @@ const BrandInteractionList = () => {
             />
           </Center>
         ) : (
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            verticalSpacing={"md"}
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Incident type</Table.Th>
-                <Table.Th>Shop name</Table.Th>
-                <Table.Th>Time</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <Table.ScrollContainer minWidth={1000}>
+            <Table striped highlightOnHover verticalSpacing={"md"}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Shop name</Table.Th>
+                  <Table.Th>Time</Table.Th>
+                  <Table.Th ta={"center"}>Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
       </Box>
-      <Group justify="flex-end">
+      <Group justify="space-between" align="end">
         <Pagination
-          value={activePage}
-          onChange={setPage}
+          value={activePage} onChange={setPage}
           total={Math.ceil(
-            (incidentList?.totalCount ?? 0) / (form.values.size ?? 20)
+            (incidentList?.totalCount ?? 0) / (Number(pageSize) ?? 20)
           )}
+        />
+        <Select
+          label="Page Size"
+          allowDeselect={false}
+          placeholder="0"
+          data={pageSizeSelect} defaultValue={"20"}
+          value={pageSize}
+          onChange={(value) => {
+            setPageSize(value)
+            setPage(1)
+          }}
         />
       </Group>
     </Paper>

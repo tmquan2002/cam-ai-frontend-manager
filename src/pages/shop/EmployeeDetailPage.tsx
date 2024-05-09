@@ -1,15 +1,5 @@
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
-import { useEffect, useMemo, useState } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Center,
@@ -23,26 +13,46 @@ import {
   Paper,
   Table,
   Text,
-  rem,
+  rem
 } from "@mantine/core";
-import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
+import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
-import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
-import dayjs from "dayjs";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
-import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
-import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
-import { Gender, IncidentStatus } from "../../models/CamAIEnum";
-import BackButton from "../../components/button/BackButton";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
-import classes from "./EmployeeDetailPage.module.scss";
-import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
 import { isEmpty } from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
+import BackButton from "../../components/button/BackButton";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
+import { useGetIncidentList } from "../../hooks/useGetIncidentList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
+import { Gender } from "../../models/CamAIEnum";
+import { ResponseErrorDetail } from "../../models/Response";
+import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./EmployeeDetailPage.module.scss";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Employee",
+    link: "/shop/employee"
+  },
+  {
+    title: "Detail"
+  }
+]
 export type CreateEmployeeField = {
   name: string;
   email: string;
@@ -116,19 +126,6 @@ const EmployeeDetailPage = () => {
   const { mutate: updateEmployee, isLoading: isUpdateEmployeeLoading } =
     useUpdateEmployeeById();
 
-  const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-      case IncidentStatus.Accepted:
-        return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-      case IncidentStatus.Rejected:
-        return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-      case undefined:
-        <></>;
-    }
-  };
-
   const rows = incidentList?.values.map((row, index) => {
     return (
       <Table.Tr
@@ -136,24 +133,12 @@ const EmployeeDetailPage = () => {
         className={classes["clickable"]}
         onClick={() => navigate(`/shop/incident/${row.id}`)}
       >
-        <Table.Td>
-          <Text>{row.incidentType}</Text>
-        </Table.Td>
+        <Table.Td>{index + 1 + Number(12) * (activePage - 1)}</Table.Td>
+        <Table.Td><Text>{row.incidentType}</Text></Table.Td>
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
-        <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/shop/employee/${row?.employee?.id}`);
-            }}
-          >
-            {row?.employee?.name}
-          </Text>
+        <Table.Td ta="center">
+          <StatusBadge statusName={row.status} size="sm" padding={10} />
         </Table.Td>
-
-        <Table.Td>{renderIncidentStatusBadge(row?.status)}</Table.Td>
       </Table.Tr>
     );
   });
@@ -278,16 +263,11 @@ const EmployeeDetailPage = () => {
 
   return (
     <Box pb={rem(40)}>
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        shadow="xs"
-      >
-        <Group
-          justify={"space-between"}
-          align="center"
-          pb={rem(28)}
-        >
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
+      <Paper m={rem(32)} p={rem(32)} shadow="xs"      >
+        <Group justify={"space-between"} align="center" pb={rem(28)}>
           <Group>
             <BackButton />
 
@@ -297,7 +277,7 @@ const EmployeeDetailPage = () => {
               fz={25}
               c={"light-blue.4"}
             >
-              Employee - {employeeData?.name}
+              General Information
             </Text>
           </Group>
 
@@ -389,7 +369,7 @@ const EmployeeDetailPage = () => {
           Incidents
         </Text>
 
-        <Box
+        <Box pl={20} pr={20}
           mt={"xl"}
           pos={"relative"}
         >
@@ -412,23 +392,23 @@ const EmployeeDetailPage = () => {
               />
             </Center>
           ) : (
-            <Table
-              striped
-              highlightOnHover
-              withTableBorder
-              withColumnBorders
-              verticalSpacing={"md"}
-            >
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Incident type</Table.Th>
-                  <Table.Th>Time</Table.Th>
-                  <Table.Th>Assigned to</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
+            <Table.ScrollContainer minWidth={1000}>
+              <Table
+                striped
+                highlightOnHover
+                verticalSpacing={"md"}
+              >
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>#</Table.Th>
+                    <Table.Th>Incident type</Table.Th>
+                    <Table.Th>Time</Table.Th>
+                    <Table.Th ta="center">Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
           )}
         </Box>
         <Group

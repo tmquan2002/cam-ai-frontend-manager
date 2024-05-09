@@ -2,8 +2,8 @@ import { Center, Image, rem } from "@mantine/core";
 import { IMAGE_CONSTANT } from "../../types/constant";
 
 export type NoImageProps = {
-  type: "NO_DATA" | "CANNOT_LOAD";
-};
+  type: "NO_DATA" | "CANNOT_LOAD"
+}
 
 const NoImage = ({ type }: NoImageProps) => {
   return (
@@ -21,7 +21,7 @@ const NoImage = ({ type }: NoImageProps) => {
         }}
       />
     </Center>
-  );
-};
+  )
+}
 
-export default NoImage;
+export default NoImage

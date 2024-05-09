@@ -1,16 +1,17 @@
-import { Accordion, ActionIcon, Badge, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Text, Tooltip, rem } from "@mantine/core";
+import { Accordion, ActionIcon, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconAlertCircle, IconCaretRight, IconMail, IconMapPin, IconRepeat, IconTrash, IconUser, IconVideo, IconX, } from "@tabler/icons-react";
+import { IconAlertCircle, IconCamera, IconCaretRight, IconFileAnalytics, IconMail, IconMapPin, IconRepeat, IconRouter, IconTrash, IconUser, IconUsers, IconVideo, IconX, } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import clsx from "clsx";
-import _, { isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UpdateShopParams } from "../../apis/ShopAPI";
-import BackButton from "../../components/button/BackButton";
+import StatusBadge from "../../components/badge/StatusBadge";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
@@ -31,6 +32,16 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
+
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Shop",
+    link: "/brand/shop"
+  },
+  {
+    title: "Detail"
+  }
+]
 
 export type FormFieldValue = {
   name: string;
@@ -53,47 +64,49 @@ const ShopDetailPageManager = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [opened, { toggle }] = useDisclosure(false);
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({ shopId: id });
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({ shopId: id });
+  const { data: cameraList, isLoading: isGetCameraListLoading } = useGetCameraListByShopId(id);
+  const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } = useChangeShopStatus();
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading, refetch: refetchEdgeBoxInstallList, } = useGetEdgeBoxInstallByShopId(id ?? "");
 
-  const { data: cameraList, isLoading: isGetCameraListLoading } =
-    useGetCameraListByShopId(id);
-
-  const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } =
-    useChangeShopStatus();
-
-  const {
-    data: edgeBoxInstallList,
-    isLoading: isEdgeboxInstallListLoading,
-    refetch: refetchEdgeBoxInstallList,
-  } = useGetEdgeBoxInstallByShopId(id ?? "");
-
-  const rows = employeeList?.values?.map((row) => (
-    <Table.Tr
-      style={{
-        cursor: "pointer",
-      }}
-      key={row.id}
-      onClick={() => navigate(`/brand/employee/${row.id}`)}
-    >
-      <Table.Td>{replaceIfNun(row.name)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.email)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
-      <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
-      <Table.Td>
-        {_.isEqual(row.employeeStatus, "Active") ? (
-          <Badge variant="light">Active</Badge>
-        ) : (
-          <Badge color="gray" variant="light">
-            Disabled
-          </Badge>
-        )}
-      </Table.Td>
-    </Table.Tr>
+  const rows = employeeList?.values?.map((row, index) => (
+    <Tooltip label="View Employee" key={row.id}>
+      <Table.Tr
+        style={{
+          cursor: "pointer",
+        }}
+        onClick={() => navigate(`/brand/employee/${row.id}`)}
+      >
+        <Table.Td>{index + 1}</Table.Td>
+        <Table.Td>{replaceIfNun(row.name)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.email)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.phone)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
+        <Table.Td>{replaceIfNun(row.addressLine)}</Table.Td>
+        <Table.Td ta="center">
+          <StatusBadge statusName={row.employeeStatus} size="sm" padding={10} />
+        </Table.Td>
+      </Table.Tr>
+    </Tooltip>
   ));
+
+  const activationForm = useForm<ActivationFormValue>();
+
+  const { data, isLoading, refetch } = useGetShopById(id ?? "0");
+
   const form = useForm<FormFieldValue>({
+    initialValues: {
+      name: data?.name ?? "",
+      phone: data?.phone ?? "",
+      wardId: `${data?.wardId}`,
+      addressLine: data?.addressLine ?? "",
+      brandName: data?.brand?.name ?? "",
+      province: `${data?.ward?.district?.province?.id}`,
+      district: `${data?.ward?.district?.id}`,
+      openTime: data?.openTime ?? "00:00:00",
+      closeTime: data?.closeTime ?? "00:00:00",
+    },
     validate: {
       name: hasLength(
         { min: 2, max: 50 },
@@ -109,31 +122,14 @@ const ShopDetailPageManager = () => {
       closeTime: isNotEmpty("Close time is required"),
     },
   });
-  const activationForm = useForm<ActivationFormValue>();
 
-  const { data, isLoading, refetch } = useGetShopById(id ?? "0");
-  const {
-    data: accountList,
-    isLoading: isAccountListLoading,
-    refetch: refetchAccountList,
-  } = useGetAccountList({
-    size: 999,
-  });
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
-  );
-  const { mutate: updateShop, isLoading: updateShopLoading } =
-    useUpdateShopById();
-  const { mutate: updateShopManager, isLoading: updateShopManagerLoading } =
-    useUpdateShopById();
-
-  const { mutate: activeEdgeBox, isLoading: isActiveEdgeBoxLoading } =
-    useActiveEdgeBoxByShopId();
+  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({ size: 999, });
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
+  const { mutate: updateShop, isLoading: updateShopLoading } = useUpdateShopById();
+  const { mutate: updateShopManager, isLoading: updateShopManagerLoading } = useUpdateShopById();
+  const { mutate: activeEdgeBox, isLoading: isActiveEdgeBoxLoading } = useActiveEdgeBoxByShopId();
 
   const handleToggleShopStatus = (currentStatus: ShopStatus) => {
     changeShopStatus(
@@ -260,18 +256,17 @@ const ShopDetailPageManager = () => {
   useEffect(() => {
     if (data) {
       const initialData: FormFieldValue = {
-        name: data.name,
+        name: data?.name,
         phone: data?.phone ?? "",
-        wardId: `${data.wardId}`,
-        addressLine: data.addressLine,
-        brandName: data.brand.name,
-        province: `${data.ward.district.province.id}`,
-        district: `${data.ward.district.id}`,
+        wardId: `${data?.wardId}`,
+        addressLine: data?.addressLine,
+        brandName: data?.brand?.name,
+        province: `${data?.ward?.district?.province?.id}`,
+        district: `${data?.ward?.district?.id}`,
         openTime: data?.openTime,
         closeTime: data?.closeTime,
       };
-      form.setInitialValues(initialData);
-      form.reset();
+      form.setValues(initialData);
     }
   }, [data]);
 
@@ -327,6 +322,7 @@ const ShopDetailPageManager = () => {
           placeholder: "Brand",
           label: "Brand",
           readonly: true,
+          disabled: true,
         },
       },
       {
@@ -402,281 +398,315 @@ const ShopDetailPageManager = () => {
 
   return (
     <Box pb={20}>
-      <Paper p={rem(32)} m={rem(32)} shadow="xs" pos="relative">
-        <LoadingOverlay
-          visible={isLoading || updateShopLoading}
-          zIndex={1000}
-          overlayProps={{ radius: "sm", blur: 2 }}
-        />
-        <Box>
-          <Group justify="space-between" pb={rem(20)}>
-            <Group align="center">
-              <BackButton />
-              <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-                {data?.name}
-              </Text>
-              <Badge
-                mt={rem(6)}
-                color={data?.shopStatus == ShopStatus.Active ? "green" : "red"}
-              >
-                {data?.shopStatus}
-              </Badge>
-            </Group>
-
-            {isChangeShopStatusLoading ? (
-              <Loader />
-            ) : (
-              <ActionIcon
-                color={data?.shopStatus == ShopStatus.Active ? "red" : "green"}
-                onClick={() =>
-                  openModal(data?.shopStatus ?? ShopStatus.Inactive)
-                }
-              >
-                {data?.shopStatus == ShopStatus.Active ? (
-                  <IconTrash style={{ width: rem(16), height: rem(16) }} />
-                ) : (
-                  <IconRepeat style={{ width: rem(16), height: rem(16) }} />
-                )}
-              </ActionIcon>
-            )}
-          </Group>
-          <form
-            onSubmit={form.onSubmit((values) => {
-              const updateShopParams: UpdateShopParams = {
-                shopId: data?.id ?? "0",
-                addressLine: values.addressLine,
-                wardId: values.wardId ?? "0",
-                name: values.name,
-                phone: values.phone == "" ? null : values.phone,
-                openTime: values?.openTime,
-                closeTime: values?.closeTime,
-              };
-
-              updateShop(updateShopParams, {
-                onSuccess() {
-                  notifications.show({
-                    title: "Update successfully",
-                    message: "Shop detail updated!",
-                  });
-                  refetch();
-                },
-                onError(data) {
-                  const error = data as AxiosError<ResponseErrorDetail>;
-                  notifications.show({
-                    color: "red",
-                    icon: <IconX />,
-                    title: "Update failed",
-                    message: error.response?.data?.message,
-                  });
-                },
-              });
-            })}
-          >
-            <EditAndUpdateForm fields={fields} />
-
-            <Group justify="flex-end" mt="md">
-              <Button disabled={!form.isDirty()} type="submit">
-                Submit
-              </Button>
-            </Group>
-          </form>
-        </Box>
-      </Paper>
-
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
       <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Group pb={rem(20)}>
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-            Shop manager
-          </Text>
-        </Group>
+        <Tabs defaultValue="general">
+          <Tabs.List>
+            <Tabs.Tab value="general" leftSection={<IconFileAnalytics />}>
+              General
+            </Tabs.Tab>
+            <Tabs.Tab value="shopManager" leftSection={<IconUser />}>
+              Shop Manager
+            </Tabs.Tab>
+            <Tabs.Tab value="camera" leftSection={<IconCamera />}>
+              Camera
+            </Tabs.Tab>
+            <Tabs.Tab value="employees" leftSection={<IconUsers />}>
+              Employee
+            </Tabs.Tab>
+            <Tabs.Tab value="edgebox" leftSection={<IconRouter />}>
+              Edge Box
+            </Tabs.Tab>
+          </Tabs.List>
 
-        {isAccountListLoading ? (
-          <Loader />
-        ) : (
-          <Button
-            onClick={toggle}
-            rightSection={<IconCaretRight />}
-            variant="light"
-            fullWidth
-            autoContrast
-            justify="space-between"
-            size="xl"
-            px={rem(16)}
-          >
-            <Stack
-              align="flex-start"
-              justify="flex-start"
-              gap={0}
-              className={classes["pointer-style"]}
-              onClick={() =>
-                navigate(`/brand/account/${data?.shopManager?.id}`)
-              }
-            >
-              {data?.shopManager ? (
-                <>
-                  <Group>
-                    <IconUser className={classes.icon} />
-
-                    <Text size="lg">{data?.shopManager?.name}</Text>
-                  </Group>
-                  <Group>
-                    <IconMail className={classes.icon} />
-
-                    <Text size="sm" c={"dimmed"} fw={400}>
-                      {data?.shopManager?.email}
+          <Tabs.Panel value="general">
+            <Box p={rem(32)}>
+              <LoadingOverlay
+                visible={isLoading || updateShopLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 2 }}
+              />
+              <Box>
+                <Group justify="space-between" pb={rem(20)}>
+                  <Group align="center">
+                    <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                      {data?.name}
                     </Text>
+                    <StatusBadge statusName={data?.shopStatus ?? "None"} mt={rem(6)} />
                   </Group>
-                </>
-              ) : (
-                <Text size="lg">Assign a shop manager to this shop</Text>
-              )}
-            </Stack>
-          </Button>
-        )}
 
-        <Collapse in={opened}>
-          <Accordion chevronPosition="right" variant="contained">
-            {accountListItem}
-          </Accordion>
-        </Collapse>
-      </Paper>
-
-      <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
-          Camera list
-        </Text>
-        {isGetCameraListLoading ? (
-          <Loader />
-        ) : cameraList?.isValuesEmpty ? (
-          <NoImage type="NO_DATA" />
-        ) : (
-          cameraList?.values?.map((item) => (
-            <Tooltip label="View camera" key={item?.id}>
-              <Button
-                mb={rem(12)}
-                variant="outline"
-                fullWidth
-                size={rem(52)}
-                justify="space-between"
-                onClick={() => {
-                  if (item?.status != CameraStatus.Connected) {
-                    notifications.show({
-                      color: "red",
-                      title: "Camera is disconnected",
-                      message:
-                        "Camera is disconnected, cannot view live stream",
-                    });
-                  } else {
-                    navigate(`/brand/camera/${item?.id}`);
-                  }
-                }}
-                rightSection={<IconCaretRight style={{ width: rem(24) }} />}
-                px={rem(16)}
-              >
-                <Group>
-                  <Group mr={rem(20)}>
-                    <IconVideo style={{ width: rem(20) }} />
-                    <Text key={item?.id}> {item?.name}</Text>
-                  </Group>
-                  <Group mr={rem(20)}>
-                    <IconMapPin style={{ width: rem(20) }} />
-                    <Text key={item?.id}> {item?.zone}</Text>
-                  </Group>
-                  <Group>
-                    <IconAlertCircle style={{ width: rem(20) }} />
-                    <Text key={item?.id}> {item?.status}</Text>
-                  </Group>
+                  {isChangeShopStatusLoading ? (
+                    <Loader />
+                  ) : (
+                    <ActionIcon
+                      color={data?.shopStatus == ShopStatus.Active ? "red" : "green"}
+                      onClick={() =>
+                        openModal(data?.shopStatus ?? ShopStatus.Inactive)
+                      }
+                    >
+                      {data?.shopStatus == ShopStatus.Active ? (
+                        <IconTrash style={{ width: rem(16), height: rem(16) }} />
+                      ) : (
+                        <IconRepeat style={{ width: rem(16), height: rem(16) }} />
+                      )}
+                    </ActionIcon>
+                  )}
                 </Group>
-              </Button>
-            </Tooltip>
-          ))
-        )}
-      </Paper>
+                <form
+                  onSubmit={form.onSubmit((values) => {
+                    const updateShopParams: UpdateShopParams = {
+                      shopId: data?.id ?? "0",
+                      addressLine: values.addressLine,
+                      wardId: values.wardId ?? "0",
+                      name: values.name,
+                      phone: values.phone == "" ? null : values.phone,
+                      openTime: values?.openTime,
+                      closeTime: values?.closeTime,
+                    };
 
-      <Paper p={rem(32)} m={rem(32)} shadow="xs">
-        <Flex pb={rem(20)} justify={"space-between "}>
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-            Employee
-          </Text>
-        </Flex>
-        {isGetEmployeeListLoading ? (
-          <Loader />
-        ) : (
-          <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-            {employeeList?.isValuesEmpty ? (
-              <Center>
-                <Image
-                  radius={"md"}
-                  src={IMAGE_CONSTANT.NO_DATA}
-                  fit="contain"
-                  h={rem(400)}
-                  w={"auto"}
-                  style={{
-                    borderBottom: "1px solid #dee2e6",
-                  }}
-                />
-              </Center>
-            ) : (
-              <Table highlightOnHover verticalSpacing={"md"} striped>
-                <Table.Thead
-                  className={clsx(classes.header, {
-                    [classes.scrolled]: scrolled,
+                    console.log(updateShopParams)
+
+                    updateShop(updateShopParams, {
+                      onSuccess() {
+                        notifications.show({
+                          title: "Update successfully",
+                          message: "Shop detail updated!",
+                        });
+                        refetch();
+                      },
+                      onError(data) {
+                        const error = data as AxiosError<ResponseErrorDetail>;
+                        notifications.show({
+                          color: "red",
+                          icon: <IconX />,
+                          title: "Update failed",
+                          message: error.response?.data?.message,
+                        });
+                      },
+                    });
                   })}
                 >
-                  <Table.Tr>
-                    <Table.Th>Name</Table.Th>
-                    <Table.Th>Email</Table.Th>
-                    <Table.Th>Phone</Table.Th>
-                    <Table.Th>Birthday</Table.Th>
-                    <Table.Th>Gender</Table.Th>
-                    <Table.Th>Address</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            )}
-          </ScrollArea>
-        )}
-      </Paper>
-      <Skeleton visible={isEdgeboxInstallListLoading}>
-        <Paper p={rem(32)} m={rem(32)} shadow="xs">
-          <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
-            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-              Edge box
-            </Text>
-          </Group>
+                  <EditAndUpdateForm fields={fields} />
 
-          {edgeBoxInstall ? (
-            <>
-              {edgeBoxInstall.activationStatus !=
-                EdgeBoxActivationStatus.Activated && (
-                <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
-                  <Group pb={rem(28)}>
-                    <Input
-                      style={{
-                        flex: 1,
-                      }}
-                      {...activationForm.getInputProps("activationCode")}
-                      placeholder="Enter an activation code here"
-                    />
-                    <Button
-                      type="submit"
-                      loading={isActiveEdgeBoxLoading}
-                      disabled={!activationForm.isDirty()}
-                    >
-                      Confirm
+                  {/* <Group justify="flex-end" mt="md">
+                    <Button disabled={!form.isDirty()} type="submit">
+                      Submit
                     </Button>
-                  </Group>
+                  </Group> */}
                 </form>
+              </Box>
+            </Box>
+          </Tabs.Panel>
+          <Tabs.Panel value="shopManager">
+            <Box p={rem(32)}>
+              <Group justify="space-between" mb={rem(20)}>
+                <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                  Shop manager
+                </Text>
+                <Button>
+                  Assign Shop Manager
+                </Button>
+              </Group>
+
+              {isAccountListLoading ? (
+                <Loader />
+              ) : (
+                <Button
+                  onClick={toggle}
+                  rightSection={<IconCaretRight />}
+                  variant="light"
+                  fullWidth
+                  autoContrast
+                  justify="space-between"
+                  size="xl"
+                  px={rem(16)}
+                >
+                  <Stack
+                    align="flex-start"
+                    justify="flex-start"
+                    gap={0}
+                    className={classes["pointer-style"]}
+                    onClick={() =>
+                      navigate(`/brand/account/${data?.shopManager?.id}`)
+                    }
+                  >
+                    {data?.shopManager ? (
+                      <>
+                        <Group>
+                          <IconUser className={classes.icon} />
+
+                          <Text size="lg">{data?.shopManager?.name}</Text>
+                        </Group>
+                        <Group>
+                          <IconMail className={classes.icon} />
+
+                          <Text size="sm" c={"dimmed"} fw={400}>
+                            {data?.shopManager?.email}
+                          </Text>
+                        </Group>
+                      </>
+                    ) : (
+                      <Text size="lg">Assign a shop manager to this shop</Text>
+                    )}
+                  </Stack>
+                </Button>
               )}
-              <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
-            </>
-          ) : (
-            <EdgeBoxInstallEmpty />
-          )}
-        </Paper>
-      </Skeleton>
+
+              <Collapse in={opened}>
+                <Accordion chevronPosition="right" variant="contained">
+                  {accountListItem}
+                </Accordion>
+              </Collapse>
+            </Box>
+          </Tabs.Panel>
+          <Tabs.Panel value="camera">
+            <Box p={rem(32)}>
+              <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
+                Camera list
+              </Text>
+              {isGetCameraListLoading ? (
+                <Loader />
+              ) : cameraList?.isValuesEmpty ? (
+                <NoImage type="NO_DATA" />
+              ) : (
+                cameraList?.values?.map((item) => (
+                  <Tooltip label="View camera" key={item?.id}>
+                    <Button
+                      mb={rem(12)}
+                      variant="outline"
+                      fullWidth
+                      size={rem(52)}
+                      justify="space-between"
+                      onClick={() => {
+                        if (item?.status != CameraStatus.Connected) {
+                          notifications.show({
+                            color: "red",
+                            title: "Camera is disconnected",
+                            message:
+                              "Camera is disconnected, cannot view live stream",
+                          });
+                        } else {
+                          navigate(`/brand/camera/${item?.id}`);
+                        }
+                      }}
+                      rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                      px={rem(16)}
+                    >
+                      <Group>
+                        <Group mr={rem(20)}>
+                          <IconVideo style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.name}</Text>
+                        </Group>
+                        <Group mr={rem(20)}>
+                          <IconMapPin style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.zone}</Text>
+                        </Group>
+                        <Group>
+                          <IconAlertCircle style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.status}</Text>
+                        </Group>
+                      </Group>
+                    </Button>
+                  </Tooltip>
+                ))
+              )}
+            </Box>
+          </Tabs.Panel>
+          <Tabs.Panel value="employees">
+            <Box p={rem(32)}>
+              <Flex pb={rem(20)} justify={"space-between "}>
+                <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                  Employee
+                </Text>
+              </Flex>
+              {isGetEmployeeListLoading ? (
+                <Loader />
+              ) : (
+                <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)} pl={20} pr={20}>
+                  {employeeList?.isValuesEmpty ? (
+                    <Center>
+                      <Image
+                        radius={"md"}
+                        src={IMAGE_CONSTANT.NO_DATA}
+                        fit="contain"
+                        h={rem(400)}
+                        w={"auto"}
+                        style={{
+                          borderBottom: "1px solid #dee2e6",
+                        }}
+                      />
+                    </Center>
+                  ) : (
+                    <Table.ScrollContainer minWidth={1000}>
+                      <Table highlightOnHover verticalSpacing={"md"} striped>
+                        <Table.Thead
+                          className={clsx(classes.header, {
+                            [classes.scrolled]: scrolled,
+                          })}
+                        >
+                          <Table.Tr>
+                            <Table.Th>#</Table.Th>
+                            <Table.Th>Name</Table.Th>
+                            <Table.Th>Email</Table.Th>
+                            <Table.Th>Phone</Table.Th>
+                            <Table.Th>Birthday</Table.Th>
+                            <Table.Th>Gender</Table.Th>
+                            <Table.Th>Address</Table.Th>
+                            <Table.Th ta="center">Status</Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                      </Table>
+                    </Table.ScrollContainer>
+                  )}
+                </ScrollArea>
+              )}
+            </Box>
+          </Tabs.Panel>
+          <Tabs.Panel value="edgebox">
+            <Skeleton visible={isEdgeboxInstallListLoading}>
+              <Box p={rem(32)}>
+                <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
+                  <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+                    Edge box
+                  </Text>
+                </Group>
+
+                {edgeBoxInstall ? (
+                  <>
+                    {edgeBoxInstall.activationStatus !=
+                      EdgeBoxActivationStatus.Activated && (
+                        <form onSubmit={activationForm.onSubmit(onAssignIncident)}>
+                          <Group pb={rem(28)}>
+                            <Input
+                              style={{
+                                flex: 1,
+                              }}
+                              {...activationForm.getInputProps("activationCode")}
+                              placeholder="Enter an activation code here"
+                            />
+                            <Button
+                              type="submit"
+                              loading={isActiveEdgeBoxLoading}
+                              disabled={!activationForm.isDirty()}
+                            >
+                              Confirm
+                            </Button>
+                          </Group>
+                        </form>
+                      )}
+                    <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
+                  </>
+                ) : (
+                  <EdgeBoxInstallEmpty />
+                )}
+              </Box>
+            </Skeleton>
+          </Tabs.Panel>
+        </Tabs>
+      </Paper>
     </Box>
   );
 };
