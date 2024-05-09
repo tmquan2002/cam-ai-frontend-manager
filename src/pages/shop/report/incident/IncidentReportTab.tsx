@@ -1,7 +1,7 @@
 import _ from "lodash";
 import EmployeeIncidentReport from "./EmployeeIncidentReport";
 import { Box, Flex, Tabs, Text, rem } from "@mantine/core";
-import { IconClock, IconClockFilled } from "@tabler/icons-react";
+import { IconClock } from "@tabler/icons-react";
 import TimeIncidentReport from "./TimeIncidentReport";
 import { IconUser } from "@tabler/icons-react";
 

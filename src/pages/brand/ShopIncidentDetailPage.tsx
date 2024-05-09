@@ -1,27 +1,28 @@
 import {
-  Badge,
   Box,
   Divider,
   Flex,
   Group,
   Loader,
   Paper,
+  ScrollArea,
   Select,
   Text,
-  rem,
+  rem
 } from "@mantine/core";
-import BackButton from "../../components/button/BackButton";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
-import { useGetIncidentById } from "../../hooks/useGetIncidentById";
-import { useParams } from "react-router-dom";
-import dayjs from "dayjs";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
-import { EvidenceDetail } from "../../models/Evidence";
-import NoImage from "../../components/image/NoImage";
+import dayjs from "dayjs";
 import _ from "lodash";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import BackButton from "../../components/button/BackButton";
 import LoadingImage from "../../components/image/LoadingImage";
+import NoImage from "../../components/image/NoImage";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { EvidenceType } from "../../models/CamAIEnum";
+import { EvidenceDetail } from "../../models/Evidence";
 
 type IncidentFormField = {
   employeeId: string | null;
@@ -62,18 +63,7 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
   }
 };
 
-const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-  switch (status) {
-    case IncidentStatus.New:
-      return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-    case IncidentStatus.Accepted:
-      return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-    case IncidentStatus.Rejected:
-      return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-    case undefined:
-      return <></>;
-  }
-};
+
 
 const ShopIncidentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -99,30 +89,23 @@ const ShopIncidentDetailPage = () => {
 
   return (
     <Box>
-      <Group px={rem(64)} bg={"white"} justify="space-between" align="center">
+      <Paper px={rem(64)} mt={rem(64)} ml={rem(64)} mr={rem(20)} shadow="sm">
         <Group py={rem(32)} align="center">
-          <BackButton color="#000" w={rem(36)} h={rem(36)} />
+          <BackButton w={rem(36)} h={rem(36)} />
           <Text size={rem(20)} fw={500}>
             {incidentData?.incidentType} Incident -{" "}
             {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
           </Text>
-          {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
+          <StatusBadge statusName={incidentData?.status ?? "None"} size="sm" padding={10} />
         </Group>
-      </Group>
-      <Divider />
+      </Paper>
       <Flex>
         <Box
           style={{
             flex: 1,
           }}
         >
-          <Paper
-            shadow="xs"
-            mx={rem(64)}
-            my={rem(40)}
-            px={rem(32)}
-            py={rem(28)}
-          >
+          <Paper shadow="xs" mx={rem(64)} my={rem(40)} px={rem(32)} py={rem(28)}>
             <Group justify="space-between" align="flex-end" mb={rem(20)}>
               <Text fw={500} size={rem(20)}>
                 Evidence
@@ -144,17 +127,19 @@ const ShopIncidentDetailPage = () => {
               </Group>
             </Group>
             <Divider color="#acacac" mb={rem(20)} />
-            {_.isEmpty(incidentData?.evidences) ? (
-              <NoImage type="NO_DATA" />
-            ) : (
-              incidentData?.evidences?.map((item) => {
-                return (
-                  <Box key={item.id} mb={rem(20)}>
-                    {renderIncidentFootage(item)}
-                  </Box>
-                );
-              })
-            )}
+            <ScrollArea h={470}>
+              {_.isEmpty(incidentData?.evidences) ? (
+                <NoImage type="NO_DATA" />
+              ) : (
+                incidentData?.evidences?.map((item) => {
+                  return (
+                    <Box key={item.id} mb={rem(20)}>
+                      {renderIncidentFootage(item)}
+                    </Box>
+                  );
+                })
+              )}
+            </ScrollArea>
           </Paper>
         </Box>
         <Box w={rem(500)}>

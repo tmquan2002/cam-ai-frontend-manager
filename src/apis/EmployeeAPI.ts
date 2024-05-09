@@ -6,11 +6,13 @@ import http, { toQueryParams } from "../utils/http";
 
 export type GetEmployeeListParams = {
   search?: string;
-  employeeStatusId?: number;
+  employeeStatus?: string | null;
   brandId?: string;
-  shopId?: string;
-  size?: number;
+  shopId?: string | null;
+  size?: number | null;
   pageIndex?: number;
+  email?: string
+  phone?: string
 };
 
 export type CreateEmployeeParams = {
@@ -91,6 +93,50 @@ export const EmployeeApi = {
     const access_token = getAccessToken();
 
     const res = await http.delete(`/api/employees/${employeeId}`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _uploadEmployeeFile: async (params: { file: File }) => {
+    const access_token = getAccessToken();
+    const form = new FormData();
+    form.append("file", params.file);
+
+    const res = await http.post<{ taskId: string, message: string }>(`/api/employees/upsert`, form, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getEmployeeUpsertTask: async () => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<string[]>(`/api/employees/upsert/task`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getEmployeeUpsertTaskResult: async (taskId: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<{
+      inserted: number;
+      updated: number;
+      failed: number;
+      metadata: string[];
+    }>(`/api/employees/upsert/task/${taskId}/result`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

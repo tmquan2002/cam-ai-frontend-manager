@@ -1,11 +1,9 @@
 import {
   Box,
   Card,
-  Center,
   Flex,
   Grid,
   Group,
-  Loader,
   ScrollArea,
   Skeleton,
   Stack,
@@ -15,7 +13,6 @@ import {
 } from "@mantine/core";
 import * as _ from "lodash";
 import classes from "./ShopHomePage.module.scss";
-import NoImage from "../../components/image/NoImage";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { IncidentDetail, WebSocketIncident } from "../../models/Incident";
@@ -28,7 +25,7 @@ import { notifications } from "@mantine/notifications";
 import { NotificationColorPalette } from "../../types/constant";
 import { useGetNewIncident } from "../../hooks/useReport";
 import { ReadyState } from "react-use-websocket";
-import { IconCaretRight, IconTrendingUp } from "@tabler/icons-react";
+import { IconCaretRight } from "@tabler/icons-react";
 import CameraCard from "../../components/card/CameraCard";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
 

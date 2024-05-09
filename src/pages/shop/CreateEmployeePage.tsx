@@ -20,6 +20,8 @@ import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction
 import { emailRegex } from "../../types/constant";
 import { useDisclosure } from "@mantine/hooks";
 import BackButton from "../../components/button/BackButton";
+import { useUploadEmployeeFile } from "../../hooks/useFiles";
+import DownloadButton from "../../components/button/DownloadButton";
 
 export type CreateEmployeeField = {
   name: string | null;
@@ -66,6 +68,7 @@ const CreateEmployeePage = () => {
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createEmployeeForm.values.province ?? 0));
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createEmployeeForm.values.district ?? 0));
   const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } = useCreateEmployee();
+  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } = useUploadEmployeeFile();
 
   const createEmployeeFields = useMemo(() => {
     return [
@@ -189,11 +192,13 @@ const CreateEmployeePage = () => {
       {
         type: FIELD_TYPES.FILE,
         fieldProps: {
-          description: "Choose your file to import multiple employess for your shop at once",
+          description: "Choose your file to import multiple employess for your shop at once, accept .csv file",
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
           label: "Import File",
+          accept: ".csv",
+          width: 300,
           required: true,
         },
       }
@@ -261,14 +266,34 @@ const CreateEmployeePage = () => {
 
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Multiple Employees" centered closeOnClickOutside={false}>
-        {/* TODO: Add API Import here */}
-        <form autoComplete="off" onSubmit={massImportForm.onSubmit(() => { })}>
-          <EditAndUpdateForm fields={massImportFields} />
+        <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
+          console.log(file)
+          uploadEmployee({ file }, {
+            onSuccess() {
+              notifications.show({
+                title: "Successfully",
+                message: "Import successful!",
+              });
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                color: "red",
+                title: "Failed",
+                message: error.response?.data?.message,
+              });
+            },
+          })
+        })}>
+          <Group align="end">
+            <EditAndUpdateForm fields={massImportFields} />
+            <DownloadButton type="employee"/>
+          </Group>
           <Group mt="md">
-            <Button type="submit">
+            <Button type="submit" loading={isUploadEmployeeLoading}>
               Import
             </Button>
-            <Button type="submit" variant="outline" onClick={closeMassImport}>
+            <Button type="submit" variant="outline" onClick={closeMassImport} loading={isUploadEmployeeLoading}>
               Cancel
             </Button>
           </Group>

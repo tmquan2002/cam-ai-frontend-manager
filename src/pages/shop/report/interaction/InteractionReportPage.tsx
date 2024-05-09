@@ -28,7 +28,6 @@ import { Chart } from "react-chartjs-2";
 import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import NoImage from "../../../../components/image/NoImage";
 import { useForm } from "@mantine/form";
-import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";
@@ -36,7 +35,6 @@ import _ from "lodash";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
-import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
 import LegendCard, {
   LEGEND_TYPES,
 } from "../../../../components/card/LegendCard";
@@ -673,7 +671,7 @@ export const InteractionReportPage = () => {
                 mah={700}
                 onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
               >
-                <Table striped highlightOnHover withColumnBorders>
+                <Table striped highlightOnHover>
                   <Table.Thead
                     className={cx(classes.header, {
                       [classes.scrolled]: scrolled,

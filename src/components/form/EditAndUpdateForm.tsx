@@ -101,6 +101,7 @@ const renderSelect = ({ fieldProps }: any) => {
     rightSectionWidth,
     fontWeight,
     radius,
+    clearable,
   } = fieldProps;
   if (loading) return <Loader />;
 
@@ -113,6 +114,7 @@ const renderSelect = ({ fieldProps }: any) => {
       rightSectionWidth={rightSectionWidth}
       rightSectionPointerEvents="all"
       placeholder={placeholder}
+      clearable={clearable}
       data={data}
       radius={radius ?? "sm"}
       styles={{
@@ -332,6 +334,7 @@ const renderFile = ({ fieldProps }: any) => {
     multiple,
     readOnly,
     description,
+    width,
   } = fieldProps;
   return (
     <FileInput
@@ -343,6 +346,7 @@ const renderFile = ({ fieldProps }: any) => {
       label={label}
       placeholder={placeholder}
       multiple={multiple}
+      w={width}
       {...form.getInputProps(name)}
     />
   );

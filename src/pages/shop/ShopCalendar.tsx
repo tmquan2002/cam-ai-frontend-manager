@@ -10,7 +10,6 @@ import {
   Flex,
   Group,
   Loader,
-  Modal,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -39,7 +38,7 @@ import {
   IconChevronRight,
   IconExclamationCircle,
 } from "@tabler/icons-react";
-import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
+import { useScrollIntoView } from "@mantine/hooks";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import dayjs from "dayjs";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
@@ -70,14 +69,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
   } = useScrollIntoView<HTMLDivElement>();
   const [selectedIncidentItem, setSelectedIncidentItem] =
     useState<IncidentDetail | null>(null);
-  const [
-    reAssignModalOpened,
-    { open: openReAssignModal, close: closeReAssignModal },
-  ] = useDisclosure(false);
-  const [
-    updateShiftModalOpened,
-    { open: openUpdateShiftModal, close: closeUpdateShiftModal },
-  ] = useDisclosure(false);
+
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -113,16 +105,16 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
     }, {});
   }, [events]);
 
-  // useEffect(() => {
-  //   if (incidentList) {
-  //     scrollIntoView();
-  //   }
-  // }, [incidentList]);
-  // useEffect(() => {
-  //   if (selectedIncidentItem) {
-  //     scrollIntoIncidentDetail();
-  //   }
-  // }, [selectedIncidentItem]);
+  useEffect(() => {
+    if (incidentList) {
+      scrollIntoView();
+    }
+  }, [incidentList]);
+  useEffect(() => {
+    if (selectedIncidentItem) {
+      scrollIntoIncidentDetail();
+    }
+  }, [selectedIncidentItem]);
 
   const rows = isGetIncidentListLoading ? (
     <Table.Tr>
@@ -211,80 +203,6 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
 
   return (
     <>
-      <Modal
-        opened={reAssignModalOpened}
-        onClose={closeReAssignModal}
-        title="Re-assign supervisor"
-        styles={{
-          title: {
-            fontWeight: 400,
-          },
-        }}
-      >
-        {isEmployeeListLoading ? (
-          <Loader />
-        ) : (
-          <Select
-            pt={rem(4)}
-            radius={rem(8)}
-            style={{
-              fontWeight: 500,
-            }}
-            placeholder="Select a supervisor"
-            data={employeeList?.values?.map((i) => {
-              return { value: i.id, label: i.name };
-            })}
-          />
-        )}
-        <Group justify="flex-end" mt="sm">
-          <Button
-            color="rgb(79, 70, 229)"
-            c={"#fff"}
-            radius={rem(8)}
-            onClick={closeReAssignModal}
-          >
-            Confirm
-          </Button>
-        </Group>
-      </Modal>
-
-      <Modal
-        opened={updateShiftModalOpened}
-        onClose={closeUpdateShiftModal}
-        title="Update shift modal"
-        styles={{
-          title: {
-            fontWeight: 400,
-          },
-        }}
-      >
-        {isEmployeeListLoading ? (
-          <Loader />
-        ) : (
-          <Select
-            pt={rem(4)}
-            radius={rem(8)}
-            style={{
-              fontWeight: 500,
-            }}
-            placeholder="Select a supervisor"
-            data={employeeList?.values?.map((i) => {
-              return { value: i.id, label: i.name };
-            })}
-          />
-        )}
-        <Group justify="flex-end" mt="sm">
-          <Button
-            color="rgb(79, 70, 229)"
-            c={"#fff"}
-            radius={rem(8)}
-            onClick={closeUpdateShiftModal}
-          >
-            Confirm
-          </Button>
-        </Group>
-      </Modal>
-
       <Flex
         px={rem(60)}
         pt={rem(20)}
@@ -306,42 +224,48 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         <Group align="flex-start" gap={rem(60)}>
           <Box flex={4}>
             <Group>
-              <Select
-                flex={1}
-                radius={rem(8)}
-                style={{
-                  fontWeight: 500,
-                }}
-                searchable
-                nothingFoundMessage="Nothing found..."
-                styles={{
-                  label: {
-                    marginBottom: rem(4),
-                  },
-                }}
-                label="Head supervisor"
-                data={employeeList?.values?.map((i) => {
-                  return { value: i.id, label: i.name };
-                })}
-              />
-              <Select
-                flex={1}
-                radius={rem(8)}
-                style={{
-                  fontWeight: 500,
-                }}
-                nothingFoundMessage="Nothing found..."
-                styles={{
-                  label: {
-                    marginBottom: rem(4),
-                  },
-                }}
-                searchable
-                label="In charge supervisor"
-                data={employeeList?.values?.map((i) => {
-                  return { value: i.id, label: i.name };
-                })}
-              />
+              {isEmployeeListLoading ? (
+                <Loader />
+              ) : (
+                <>
+                  <Select
+                    flex={1}
+                    radius={rem(8)}
+                    style={{
+                      fontWeight: 500,
+                    }}
+                    searchable
+                    nothingFoundMessage="Nothing found..."
+                    styles={{
+                      label: {
+                        marginBottom: rem(4),
+                      },
+                    }}
+                    label="Head supervisor"
+                    data={employeeList?.values?.map((i) => {
+                      return { value: i.id, label: i.name };
+                    })}
+                  />
+                  <Select
+                    flex={1}
+                    radius={rem(8)}
+                    style={{
+                      fontWeight: 500,
+                    }}
+                    nothingFoundMessage="Nothing found..."
+                    styles={{
+                      label: {
+                        marginBottom: rem(4),
+                      },
+                    }}
+                    searchable
+                    label="In charge supervisor"
+                    data={employeeList?.values?.map((i) => {
+                      return { value: i.id, label: i.name };
+                    })}
+                  />
+                </>
+              )}
             </Group>
 
             <Accordion

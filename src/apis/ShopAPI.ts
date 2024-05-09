@@ -113,4 +113,48 @@ export const ShopAPI = {
 
     return res?.data;
   },
+
+  _uploadShopFile: async (params: { file: File }) => {
+    const access_token = getAccessToken();
+    const form = new FormData();
+    form.append("file", params.file);
+
+    const res = await http.post<{ taskId: string, message: string }>(`/api/shops/upsert`, form, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getShopUpsertTask: async () => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<string[]>(`/api/shops/upsert/task`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getShopUpsertTaskResult: async (taskId: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<{
+      inserted: number;
+      updated: number;
+      failed: number;
+      metadata: string[];
+    }>(`/api/shops/upsert/task/${taskId}/result`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
 };

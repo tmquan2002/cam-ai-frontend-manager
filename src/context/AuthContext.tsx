@@ -79,14 +79,16 @@ export function SessionProvider(props: React.PropsWithChildren) {
         return res;
       },
       (err) => {
-          if (err?.response?.status == 401) {
-            if (err?.response?.headers.auto != "True") {
+        if (err?.response?.status == 401) {
+          if (err?.response?.headers.auto != "True") {
             console.log("clear tokens auth context");
-              localStorage.clear();
-              navigate("/");
-            }
+            const darkMode = localStorage.getItem("mantine-color-scheme-value");
+            localStorage.clear();
+            localStorage.setItem("mantine-color-scheme-value", darkMode ?? "light");
+            navigate("/");
           }
-          throw err;
+        }
+        throw err;
 
       }
     );
@@ -102,8 +104,10 @@ export function SessionProvider(props: React.PropsWithChildren) {
           navigate(0);
         },
         signOut: () => {
-          
+
+          const darkMode = localStorage.getItem("mantine-color-scheme-value");
           localStorage.clear()
+          localStorage.setItem("mantine-color-scheme-value", darkMode ?? "light");
           navigate("/login");
         },
         isLoading: isAccessTokenLoading || isRefreshTokenLoading,

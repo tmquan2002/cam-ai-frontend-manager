@@ -4,7 +4,7 @@ import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useMemo } from "react";
 import dayjs from "dayjs";
 import _ from "lodash";
-import { Box, Card, Flex, Group, Skeleton, Text, rem } from "@mantine/core";
+import { Box, Flex, Group, Skeleton, Text, rem } from "@mantine/core";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
@@ -379,10 +379,10 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                         },
                         onClick(_event, elements, _chart) {
                           if (elements.length > 0) {
-                            const selectedData =
-                              incidentReportByTimeData?.data?.[
-                                elements[0].index
-                              ];
+                            // const selectedData =
+                            //   incidentReportByTimeData?.data?.[
+                            //     elements[0].index
+                            //   ];
                             // setSelectedIncidentItem(null);
                             // setSelectedDuration({
                             //   startTime: selectedData?.time,

@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Divider,
@@ -8,67 +7,46 @@ import {
   Group,
   Loader,
   Paper,
+  ScrollArea,
   Select,
   Text,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
-import BackButton from "../../components/button/BackButton";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
-import { useGetIncidentById } from "../../hooks/useGetIncidentById";
-import { useNavigate, useParams } from "react-router-dom";
-import dayjs from "dayjs";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
-import { EvidenceDetail } from "../../models/Evidence";
-import { IconIdOff, IconX } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
-import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { useAssignIncident } from "../../hooks/useAssignIncident";
 import { notifications } from "@mantine/notifications";
-import { ResponseErrorDetail } from "../../models/Response";
+import { IconIdOff, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
-import NoImage from "../../components/image/NoImage";
+import dayjs from "dayjs";
 import _ from "lodash";
-import classes from "./IncidentDetail.module.scss";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import BackButton from "../../components/button/BackButton";
 import LoadingImage from "../../components/image/LoadingImage";
+import NoImage from "../../components/image/NoImage";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
+import { EvidenceType } from "../../models/CamAIEnum";
+import { EvidenceDetail } from "../../models/Evidence";
+import { ResponseErrorDetail } from "../../models/Response";
+import classes from "./IncidentDetail.module.scss";
 
 type IncidentFormField = {
   employeeId: string | null;
 };
 
-const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-  switch (status) {
-    case IncidentStatus.New:
-      return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-    case IncidentStatus.Accepted:
-      return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-    case IncidentStatus.Rejected:
-      return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-    case undefined:
-      return <></>;
-  }
-};
-
 const IncidentDetail = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const form = useForm<IncidentFormField>();
-
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-
-  const {
-    data: incidentData,
-    isLoading: isGetIncidentLoading,
-    refetch: refetchIncident,
-  } = useGetIncidentById(id ?? "");
-
-  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
-    useRejectIncidentById();
-  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
-    useAssignIncident();
+  const { id } = useParams<{ id: string }>()
+  const form = useForm<IncidentFormField>()
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({})
+  const { data: incidentData, isLoading: isGetIncidentLoading, refetch: refetchIncident, } = useGetIncidentById(id ?? "")
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } = useRejectIncidentById()
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } = useAssignIncident()
 
   const onAssignIncident = (fieldValues: IncidentFormField) => {
     assignIncident(
@@ -78,8 +56,8 @@ const IncidentDetail = () => {
           notifications.show({
             title: "Assign successfully",
             message: "Incident assign success!",
-          });
-          refetchIncident();
+          })
+          refetchIncident()
         },
         onError(data) {
           const error = data as AxiosError<ResponseErrorDetail>;
@@ -182,44 +160,36 @@ const IncidentDetail = () => {
 
   return (
     <Box>
-      <Group px={rem(64)} bg={"white"} justify="space-between" align="center">
-        <Group py={rem(32)} align="center">
-          <BackButton color="#000" w={rem(36)} h={rem(36)} />
-          <Text size={rem(20)} fw={500}>
-            {incidentData?.incidentType} Incident
-          </Text>
-          <Text>|</Text>
-          <Text c={"dimmed"} size={rem(18)} fw={500}>
-            {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
-          </Text>
-          {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
+      <Paper px={rem(64)} mt={rem(64)} ml={rem(64)} mr={rem(20)} shadow="sm">
+        <Group justify="space-between">
+          <Group py={rem(32)} align="center">
+            <BackButton w={rem(36)} h={rem(36)} />
+            <Text size={rem(20)} fw={500}>
+              {incidentData?.incidentType} Incident
+            </Text>
+            <Text>|</Text>
+            <Text c={"dimmed"} size={rem(18)} fw={500}>
+              {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
+            </Text>
+            <StatusBadge statusName={incidentData?.status || "None"} size="sm" padding={10} />
+          </Group>
+          <Tooltip label="Reject incident">
+            <ActionIcon
+              variant="filled"
+              aria-label="Settings"
+              color={"red"}
+              onClick={openModal}
+              loading={isRejectIncidentLoading}
+            >
+              <IconIdOff style={{ width: "70%", height: "70%" }} stroke={1.5} />
+            </ActionIcon>
+          </Tooltip>
         </Group>
-        <Tooltip label="Reject incident">
-          <ActionIcon
-            variant="filled"
-            aria-label="Settings"
-            color={"red"}
-            onClick={openModal}
-            loading={isRejectIncidentLoading}
-          >
-            <IconIdOff style={{ width: "70%", height: "70%" }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-      </Group>
-      <Divider />
+      </Paper>
       <Flex>
-        <Box
-          style={{
-            flex: 1,
-          }}
-        >
-          <Paper
-            shadow="xs"
-            mx={rem(64)}
-            my={rem(40)}
-            px={rem(32)}
-            py={rem(28)}
-          >
+        <Box style={{ flex: 1, }}>
+          <Paper shadow="xs" mx={rem(64)} my={rem(40)} px={rem(32)} py={rem(28)}>
+
             <Group mb={rem(20)} justify="space-between" align="flex-end">
               <Text fw={500} size={rem(20)}>
                 Evidence
@@ -241,17 +211,20 @@ const IncidentDetail = () => {
               </Group>
             </Group>
             <Divider color="#acacac" mb={rem(20)} />
-            {_.isEmpty(incidentData?.evidences) ? (
-              <NoImage type="NO_DATA" />
-            ) : (
-              incidentData?.evidences?.map((item) => {
-                return (
-                  <Box key={item.id} mb={rem(20)}>
-                    {renderIncidentFootage(item)}
-                  </Box>
-                );
-              })
-            )}
+            <ScrollArea h={470}>
+              {_.isEmpty(incidentData?.evidences) ? (
+                <NoImage type="NO_DATA" />
+              ) : (
+                incidentData?.evidences?.map((item) => {
+                  return (
+                    <Box key={item.id} mb={rem(20)}>
+                      {renderIncidentFootage(item)}
+                      <Divider mt={20} />
+                    </Box>
+                  )
+                })
+              )}
+            </ScrollArea>
           </Paper>
         </Box>
         <Box w={rem(500)}>
@@ -274,7 +247,7 @@ const IncidentDetail = () => {
                       return {
                         value: item?.id,
                         label: item?.name,
-                      };
+                      }
                     })}
                     nothingFoundMessage="Nothing found..."
                   />
