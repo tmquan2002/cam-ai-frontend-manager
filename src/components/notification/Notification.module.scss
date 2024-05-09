@@ -21,22 +21,16 @@
 }
 
 .detail-card:hover {
-  background-color: #f8f9fa;
+  @include light {
+    background-color: #e1e1e1;
+  }
+
+  @include dark {
+    background-color: #454545;
+  }
+
   cursor: pointer;
 
-}
-
-.detail-card-active{
-  cursor: pointer;
-  background-color: #d2e3fc;
-  border-bottom: 1px solid #ccc;
-
-}
-
-.detail-card-active:hover{
-  background-color: #f8f9fa;
-  cursor: pointer;
-  
 }
 
 .anchor:hover {
@@ -46,8 +40,6 @@
 }
 
 
-.tabtext {
-}
+.tabtext {}
 
-.tabtext-active {
-}
+.tabtext-active {}

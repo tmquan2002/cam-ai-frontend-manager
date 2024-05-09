@@ -1,5 +1,6 @@
-import { Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
+import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -7,22 +8,30 @@ import _, { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
+import DownloadButton from "../../components/button/DownloadButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
 import { useCreateEmployee } from "../../hooks/useCreateEmployee";
+import { useUploadEmployeeFile } from "../../hooks/useFiles";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
 import { emailRegex } from "../../types/constant";
-import { useDisclosure } from "@mantine/hooks";
-import BackButton from "../../components/button/BackButton";
-import { useUploadEmployeeFile } from "../../hooks/useFiles";
-import DownloadButton from "../../components/button/DownloadButton";
+import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Employee",
+    link: "/shop/employee"
+  },
+  {
+    title: "Add"
+  }
+]
 export type CreateEmployeeField = {
   name: string | null;
   email: string;
@@ -207,12 +216,14 @@ const CreateEmployeePage = () => {
 
   return (
     <>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
       <Paper m={rem(32)} p={rem(32)} shadow="xs">
         <Group pb={20} align="center" justify="space-between">
           <Group>
-            <BackButton />
             <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-              Add employee
+              New employee
             </Text>
           </Group>
           <Button onClick={openMassImport}>Import File</Button>
@@ -287,7 +298,7 @@ const CreateEmployeePage = () => {
         })}>
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
-            <DownloadButton type="employee"/>
+            <DownloadButton type="employee" />
           </Group>
           <Group mt="md">
             <Button type="submit" loading={isUploadEmployeeLoading}>

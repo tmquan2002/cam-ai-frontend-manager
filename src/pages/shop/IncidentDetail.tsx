@@ -34,7 +34,17 @@ import { EvidenceType } from "../../models/CamAIEnum";
 import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import classes from "./IncidentDetail.module.scss";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Incident",
+    link: "/shop/incident"
+  },
+  {
+    title: "Detail"
+  }
+]
 type IncidentFormField = {
   employeeId: string | null;
 };
@@ -160,6 +170,9 @@ const IncidentDetail = () => {
 
   return (
     <Box>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
       <Paper px={rem(64)} mt={rem(64)} ml={rem(64)} mr={rem(20)} shadow="sm">
         <Group justify="space-between">
           <Group py={rem(32)} align="center">

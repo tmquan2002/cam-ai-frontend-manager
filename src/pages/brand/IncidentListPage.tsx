@@ -321,17 +321,19 @@ const IncidentListPage = () => {
             (incidentList?.totalCount ?? 0) / (Number(pageSize) ?? 5)
           )}
         />
-        <Select
-          label="Page Size"
-          allowDeselect={false}
-          placeholder="0"
-          data={pageSizeSelect} defaultValue={"5"}
-          value={pageSize}
-          onChange={(value) => {
-            setPageSize(value)
-            setPage(1)
-          }}
-        />
+        {!incidentList?.isValuesEmpty &&
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={pageSizeSelect} defaultValue={"5"}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
+          />
+        }
       </Group>
     </Paper>
   );
