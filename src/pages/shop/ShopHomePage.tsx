@@ -66,7 +66,7 @@ const ShopHomePage = () => {
   });
 
   const { data: cameraList, isLoading: isGetCameraListLoading } =
-    useGetCameraListByShopId(shopData?.values?.[0].id);
+    useGetCameraListByShopId(shopData?.values?.[0]?.id);
 
   const { data: edgeBoxList, isLoading: isGetEdgeBoxLoading } =
     useGetEdgeBoxInstallByShopId(shopData?.values?.[0]?.id ?? null);
