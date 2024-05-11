@@ -20,7 +20,14 @@
 }
 
 .detail-card:hover {
-  background-color: #f8f9fa;
+  @include light {
+    background-color: #e1e1e1;
+  }
+
+  @include dark {
+    background-color: #454545;
+  }
+
   cursor: pointer;
 }
 

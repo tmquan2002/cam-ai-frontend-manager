@@ -51,7 +51,7 @@ export function SidebarLinksGroup({
         onClick={() => setOpened((o) => !o)}
         className={
           (hasLinks && links.some((e) => location.pathname === e.link)) ||
-          location.pathname === path!
+            location.pathname === path!
             ? `${classes["activeControl"]}`
             : `${classes["control"]}`
         }
@@ -71,7 +71,7 @@ export function SidebarLinksGroup({
               variant="transparent"
               className={
                 (hasLinks && links.some((e) => location.pathname === e.link)) ||
-                location.pathname === path!
+                  location.pathname === path!
                   ? classes["activeIcon"]
                   : classes["icon"]
               }

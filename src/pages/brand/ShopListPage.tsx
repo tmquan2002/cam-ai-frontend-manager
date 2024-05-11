@@ -264,17 +264,19 @@ const ShopListPage = () => {
           onChange={setPage}
           total={Math.ceil((shopList?.totalCount ?? 0) / Number(pageSize))}
         />
-        <Select
-          label="Page Size"
-          allowDeselect={false}
-          placeholder="0"
-          data={pageSizeSelect} defaultValue={"5"}
-          value={pageSize}
-          onChange={(value) => {
-            setPageSize(value)
-            setPage(1)
-          }}
-        />
+        {!shopList?.isValuesEmpty &&
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={pageSizeSelect} defaultValue={"5"}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
+          />
+        }
       </Group>
     </Paper>
   );

@@ -79,7 +79,6 @@ const BrandShopManagerListPage = () => {
         <TextInput
           style={{ flex: 1 }}
           placeholder="Search by name"
-          classNames={{ input: classes.search_input }}
           rightSectionWidth={52}
           leftSectionWidth={52}
           leftSection={
@@ -92,7 +91,7 @@ const BrandShopManagerListPage = () => {
           onChange={handleSearchChange}
         />
         <Button
-          ml={rem(24)}
+          ml={rem(20)}
           leftSection={<IconPlus size={14} />}
           onClick={() => navigate("/brand/create/manager")}
         >
@@ -149,17 +148,19 @@ const BrandShopManagerListPage = () => {
             onChange={setPage}
             total={Math.ceil((data?.totalCount ?? 0) / Number(pageSize))}
           />
-          <Select
-            label="Page Size"
-            allowDeselect={false}
-            placeholder="0"
-            data={pageSizeSelect} defaultValue={"5"}
-            value={pageSize}
-            onChange={(value) => {
-              setPageSize(value)
-              setPage(1)
-            }}
-          />
+          {!data?.isValuesEmpty &&
+            <Select
+              label="Page Size"
+              allowDeselect={false}
+              placeholder="0"
+              data={pageSizeSelect} defaultValue={"5"}
+              value={pageSize}
+              onChange={(value) => {
+                setPageSize(value)
+                setPage(1)
+              }}
+            />
+          }
         </Group>
       </Box>
     </Paper>

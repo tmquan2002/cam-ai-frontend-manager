@@ -49,7 +49,7 @@ const BrandInteractionList = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>("20");
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
@@ -238,20 +238,22 @@ const BrandInteractionList = () => {
         <Pagination
           value={activePage} onChange={setPage}
           total={Math.ceil(
-            (incidentList?.totalCount ?? 0) / (Number(pageSize) ?? 20)
+            (incidentList?.totalCount ?? 0) / (Number(pageSize))
           )}
         />
-        <Select
-          label="Page Size"
-          allowDeselect={false}
-          placeholder="0"
-          data={pageSizeSelect} defaultValue={"20"}
-          value={pageSize}
-          onChange={(value) => {
-            setPageSize(value)
-            setPage(1)
-          }}
-        />
+        {!incidentList?.isValuesEmpty &&
+          < Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={pageSizeSelect} defaultValue={"20"}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
+          />
+        }
       </Group>
     </Paper>
   );

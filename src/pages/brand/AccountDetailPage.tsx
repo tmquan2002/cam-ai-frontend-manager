@@ -1,40 +1,49 @@
 import {
-  Box,
   ActionIcon,
+  Box,
   Button,
   Group,
-  Modal,
-  Mark,
   LoadingOverlay,
+  Mark,
+  Modal,
   Paper,
   Text,
   rem,
 } from "@mantine/core";
+import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { IconTrash } from "@tabler/icons-react";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
+import { isEmpty } from "lodash";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { UpdateAccountParams } from "../../apis/AccountAPI";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useEffect, useMemo } from "react";
 import { useDeleteShopById } from "../../hooks/useDeleteShopById";
-import { useDisclosure } from "@mantine/hooks";
-import { IconTrash } from "@tabler/icons-react";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender, AccountStatus } from "../../models/CamAIEnum";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
-import { useParams, useNavigate } from "react-router-dom";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
-import { UpdateAccountParams } from "../../apis/AccountAPI";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { AccountStatus, Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import dayjs from "dayjs";
-import BackButton from "../../components/button/BackButton";
 import { phoneRegex } from "../../types/constant";
-import { isEmpty } from "lodash";
+import { mapLookupToArray } from "../../utils/helperFunction";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Shop Manager",
+    link: "/brand/account"
+  },
+  {
+    title: "Detail"
+  }
+]
 type ProfileFieldValue = {
   name: string;
   email: string;
@@ -221,94 +230,50 @@ const AccountDetailPage = () => {
     useDeleteShopById();
 
   return (
-    <Paper m={rem(32)} p={rem(32)} style={{ flex: 1 }} shadow="xs">
-      <Group mb={rem(20)} align="center" justify={"space-between"}>
-        <Group>
-          <BackButton />
-          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-            Manager profile - {accountData?.name}
-          </Text>
-        </Group>
-
-        {accountData?.accountStatus != AccountStatus.Inactive && (
-          <ActionIcon color="red" onClick={open} size={"lg"}>
-            <IconTrash style={{ width: rem(20), height: rem(20) }} />
-          </ActionIcon>
-        )}
-      </Group>
-      <Box pos={"relative"}>
-        {isAccountDataLoading ? (
-          <LoadingOverlay
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 2 }}
-          />
-        ) : (
-          <form
-            onSubmit={form.onSubmit((values) => {
-              const params: UpdateAccountParams = {
-                addressLine: values.addressLine,
-                birthday: values.birthday
-                  ? dayjs(values.birthday).format("YYYY-MM-DD")
-                  : null,
-                gender: values.gender,
-                name: values.name,
-                phone: values.phone,
-                wardId: +values?.wardId,
-                userId: id ?? "",
-              };
-              updateAccount(params, {
-                onSuccess() {
-                  notifications.show({
-                    title: "Successfully",
-                    message: "Update account success!",
-                  });
-                },
-                onError(data) {
-                  const error = data as AxiosError<ResponseErrorDetail>;
-                  notifications.show({
-                    color: "red",
-                    title: "Failed",
-                    message: error.response?.data?.message,
-                  });
-                },
-              });
-            })}
-          >
-            <EditAndUpdateForm fields={fields} />
-            <Group justify="flex-end" mt="md" pb={rem(10)}>
-              <Button
-                disabled={!form.isDirty()}
-                loading={isUpdateAccountLoading}
-                type="submit"
-                mt={10}
-              >
-                Submit
-              </Button>
-            </Group>
-          </form>
-        )}
-
-        <Modal
-          opened={opened}
-          onClose={close}
-          title={
-            <Text>
-              Confirm delete <Mark>{accountData?.name}</Mark> account?
+    <>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
+      <Paper m={rem(32)} p={rem(32)} style={{ flex: 1 }} shadow="xs">
+        <Group mb={rem(20)} align="center" justify={"space-between"}>
+          <Group>
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+              {accountData?.name}
             </Text>
-          }
-          // centered
-        >
-          <Group justify="flex-end" mt="md">
-            <Button
-              loading={isDeleteShopLoading}
-              onClick={() => {
-                deleteShop(id ?? "", {
+          </Group>
+
+          {accountData?.accountStatus != AccountStatus.Inactive && (
+            <ActionIcon color="red" onClick={open} size={"lg"}>
+              <IconTrash style={{ width: rem(20), height: rem(20) }} />
+            </ActionIcon>
+          )}
+        </Group>
+        <Box pos={"relative"}>
+          {isAccountDataLoading ? (
+            <LoadingOverlay
+              zIndex={1000}
+              overlayProps={{ radius: "sm", blur: 2 }}
+            />
+          ) : (
+            <form
+              onSubmit={form.onSubmit((values) => {
+                const params: UpdateAccountParams = {
+                  addressLine: values.addressLine,
+                  birthday: values.birthday
+                    ? dayjs(values.birthday).format("YYYY-MM-DD")
+                    : null,
+                  gender: values.gender,
+                  name: values.name,
+                  phone: values.phone,
+                  wardId: +values?.wardId,
+                  userId: id ?? "",
+                };
+                updateAccount(params, {
                   onSuccess() {
                     notifications.show({
                       title: "Successfully",
-                      message: "Delete shop successfully!",
+                      message: "Update account success!",
                     });
-                    navigate("/shop/detail");
                   },
                   onError(data) {
                     const error = data as AxiosError<ResponseErrorDetail>;
@@ -319,19 +284,67 @@ const AccountDetailPage = () => {
                     });
                   },
                 });
-              }}
-              variant="filled"
-              size="xs"
+              })}
             >
-              Yes
-            </Button>
-            <Button onClick={close} color={"red"} variant="outline" size="xs">
-              No
-            </Button>
-          </Group>
-        </Modal>
-      </Box>
-    </Paper>
+              <EditAndUpdateForm fields={fields} />
+              <Group justify="flex-end" mt="md" pb={rem(10)}>
+                <Button
+                  disabled={!form.isDirty()}
+                  loading={isUpdateAccountLoading}
+                  type="submit"
+                  mt={10}
+                >
+                  Submit
+                </Button>
+              </Group>
+            </form>
+          )}
+
+          <Modal
+            opened={opened}
+            onClose={close}
+            title={
+              <Text>
+                Confirm delete <Mark>{accountData?.name}</Mark> account?
+              </Text>
+            }
+          // centered
+          >
+            <Group justify="flex-end" mt="md">
+              <Button
+                loading={isDeleteShopLoading}
+                onClick={() => {
+                  deleteShop(id ?? "", {
+                    onSuccess() {
+                      notifications.show({
+                        title: "Successfully",
+                        message: "Delete shop successfully!",
+                      });
+                      navigate("/shop/detail");
+                    },
+                    onError(data) {
+                      const error = data as AxiosError<ResponseErrorDetail>;
+                      notifications.show({
+                        color: "red",
+                        title: "Failed",
+                        message: error.response?.data?.message,
+                      });
+                    },
+                  });
+                }}
+                variant="filled"
+                size="xs"
+              >
+                Yes
+              </Button>
+              <Button onClick={close} color={"red"} variant="outline" size="xs">
+                No
+              </Button>
+            </Group>
+          </Modal>
+        </Box>
+      </Paper>
+    </>
   );
 };
 

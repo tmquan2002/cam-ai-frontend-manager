@@ -1,5 +1,11 @@
 .icon {
-  color: #000;
+  @include light {
+    color: black;
+  }
+
+  @include dark {
+    color: white;
+  }
 }
 
 .activeIcon {
@@ -37,15 +43,8 @@
 
 .control:hover,
 .activeControl {
-  background-color: #eee;
-
-  @include light {
-    color: #1864ab;
-  }
-
-  @include dark {
-    color: black;
-  }
+  background-color: var(--mantine-color-light-blue-1);
+  color: #1864ab;
 }
 
 .activeControlLink {
