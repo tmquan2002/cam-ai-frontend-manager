@@ -38,7 +38,7 @@ const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
     data: notificationList,
     isLoading: isGetNotificationListLoading,
     refetch: refetchNotificationList,
-  } = useGetNotificationList();
+  } = useGetNotificationList({ size: 20 });
 
   useEffect(() => {
     if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {

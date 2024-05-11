@@ -38,7 +38,7 @@ const BrandEmployeeListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>("20");
   const [search, setSearch] = useState<string>("");
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
   const { data: shopList, isLoading: isLoadingShop } = useGetShopList({ enabled: true, size: 999 });
@@ -269,17 +269,19 @@ const BrandEmployeeListPage = () => {
             onChange={setPage}
             total={Math.ceil((data?.totalCount ?? 0) / Number(pageSize))}
           />
-          <Select
-            label="Page Size"
-            allowDeselect={false}
-            placeholder="0"
-            data={pageSizeSelect} defaultValue={"20"}
-            value={pageSize}
-            onChange={(value) => {
-              setPageSize(value)
-              setPage(1)
-            }}
-          />
+          {!data?.isValuesEmpty &&
+            <Select
+              label="Page Size"
+              allowDeselect={false}
+              placeholder="0"
+              data={pageSizeSelect} defaultValue={"20"}
+              value={pageSize}
+              onChange={(value) => {
+                setPageSize(value)
+                setPage(1)
+              }}
+            />
+          }
         </Group>
       </Box>
     </Paper>

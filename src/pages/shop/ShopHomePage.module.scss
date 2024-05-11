@@ -44,10 +44,10 @@
 .card_footer {
   display: flex;
   justify-content: space-between;
-  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
   border-top: rem(1px) solid var(--mantine-color-gray-2);
 }
 
 .main_container {
   cursor: pointer;
+  box-shadow: 0px 1px 10px 0px rgba(0, 0, 0, 0.1);
 }

@@ -1,5 +1,6 @@
-import { Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
+import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -7,22 +8,35 @@ import _, { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
+import CustomBreadcrumb, {
+  BreadcrumbItem,
+} from "../../components/breadcrumbs/CustomBreadcrumb";
+import DownloadButton from "../../components/button/DownloadButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
 import { useCreateEmployee } from "../../hooks/useCreateEmployee";
+import { useUploadEmployeeFile } from "../../hooks/useFiles";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
+import {
+  getDateFromSetYear,
+  mapLookupToArray,
+} from "../../utils/helperFunction";
 import { emailRegex } from "../../types/constant";
-import { useDisclosure } from "@mantine/hooks";
-import BackButton from "../../components/button/BackButton";
-import { useUploadEmployeeFile } from "../../hooks/useFiles";
-import DownloadButton from "../../components/button/DownloadButton";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Employee",
+    link: "/shop/employee",
+  },
+  {
+    title: "Add",
+  },
+];
 export type CreateEmployeeField = {
   name: string | null;
   email: string;
@@ -36,7 +50,8 @@ export type CreateEmployeeField = {
 };
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
-  const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
+    useDisclosure(false);
 
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
@@ -44,7 +59,7 @@ const CreateEmployeePage = () => {
       email: "",
       gender: Gender.Male,
       phone: "",
-      birthday: new Date("01/01/2000"),
+      birthday: null,
       addressLine: "",
       wardId: null,
       province: "",
@@ -52,8 +67,12 @@ const CreateEmployeePage = () => {
     },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: (value) => isEmpty(value) ? null
-        : emailRegex.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      email: (value) =>
+        isEmpty(value)
+          ? null
+          : emailRegex.test(value)
+          ? null
+          : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -61,14 +80,21 @@ const CreateEmployeePage = () => {
   const massImportForm = useForm<{ file: File }>({
     validate: {
       file: isNotEmpty("Please choose a file"),
-    }
+    },
   });
 
-  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createEmployeeForm.values.province ?? 0));
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createEmployeeForm.values.district ?? 0));
-  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } = useCreateEmployee();
-  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } = useUploadEmployeeFile();
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(createEmployeeForm.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(createEmployeeForm.values.district ?? 0)
+  );
+  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
+    useCreateEmployee();
+  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } =
+    useUploadEmployeeFile();
 
   const createEmployeeFields = useMemo(() => {
     return [
@@ -122,7 +148,7 @@ const CreateEmployeePage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          maxDate: getDateFromSetYear(18)
+          maxDate: getDateFromSetYear(18),
         },
       },
       {
@@ -192,7 +218,8 @@ const CreateEmployeePage = () => {
       {
         type: FIELD_TYPES.FILE,
         fieldProps: {
-          description: "Choose your file to import multiple employess for your shop at once, accept .csv file",
+          description:
+            "Choose your file to import multiple employess for your shop at once, accept .csv file",
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
@@ -201,18 +228,20 @@ const CreateEmployeePage = () => {
           width: 300,
           required: true,
         },
-      }
+      },
     ];
-  }, [massImportForm])
+  }, [massImportForm]);
 
   return (
     <>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
       <Paper m={rem(32)} p={rem(32)} shadow="xs">
         <Group pb={20} align="center" justify="space-between">
           <Group>
-            <BackButton />
             <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-              Add employee
+              New employee
             </Text>
           </Group>
           <Button onClick={openMassImport}>Import File</Button>
@@ -226,7 +255,9 @@ const CreateEmployeePage = () => {
                 name: name ?? "",
                 gender: gender,
                 addressLine,
-                birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
+                birthday: birthday
+                  ? dayjs(birthday).format("YYYY-MM-DD")
+                  : null,
                 phone,
                 wardId,
               };
@@ -265,35 +296,53 @@ const CreateEmployeePage = () => {
       </Paper>
 
       {/* Mass import modal section */}
-      <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Multiple Employees" centered closeOnClickOutside={false}>
-        <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
-          console.log(file)
-          uploadEmployee({ file }, {
-            onSuccess() {
-              notifications.show({
-                title: "Successfully",
-                message: "Import successful!",
-              });
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                color: "red",
-                title: "Failed",
-                message: error.response?.data?.message,
-              });
-            },
-          })
-        })}>
+      <Modal
+        opened={openedMassImport}
+        onClose={closeMassImport}
+        size="lg"
+        title="Import Multiple Employees"
+        centered
+        closeOnClickOutside={false}
+      >
+        <form
+          autoComplete="off"
+          onSubmit={massImportForm.onSubmit(({ file }) => {
+            console.log(file);
+            uploadEmployee(
+              { file },
+              {
+                onSuccess() {
+                  notifications.show({
+                    title: "Successfully",
+                    message: "Import successful!",
+                  });
+                },
+                onError(data) {
+                  const error = data as AxiosError<ResponseErrorDetail>;
+                  notifications.show({
+                    color: "red",
+                    title: "Failed",
+                    message: error.response?.data?.message,
+                  });
+                },
+              }
+            );
+          })}
+        >
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
-            <DownloadButton type="employee"/>
+            <DownloadButton type="employee" />
           </Group>
           <Group mt="md">
             <Button type="submit" loading={isUploadEmployeeLoading}>
               Import
             </Button>
-            <Button type="submit" variant="outline" onClick={closeMassImport} loading={isUploadEmployeeLoading}>
+            <Button
+              type="submit"
+              variant="outline"
+              onClick={closeMassImport}
+              loading={isUploadEmployeeLoading}
+            >
               Cancel
             </Button>
           </Group>

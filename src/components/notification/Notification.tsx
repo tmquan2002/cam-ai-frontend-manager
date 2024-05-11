@@ -1,23 +1,10 @@
-import {
-  Avatar,
-  Box,
-  Center,
-  Divider,
-  Flex,
-  Highlight,
-  Loader,
-  ScrollArea,
-  Tabs,
-  Text,
-  // ThemeIcon,
-  rem,
-} from "@mantine/core";
-import classes from "./Notification.module.scss";
-import { useState } from "react";
+import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, } from "@mantine/core";
 import dayjs from "dayjs";
-import { NotificationStatus } from "../../models/CamAIEnum";
+import { useState } from "react";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
+import { NotificationStatus } from "../../models/CamAIEnum";
 import { NotificationDetail } from "../../models/Notification";
+import classes from "./Notification.module.scss";
 
 export const TabsHeader = ({
   active,
@@ -57,39 +44,35 @@ const DetailCard = (props: {
   isRead: boolean;
 }) => {
   return (
-    <Flex
-      p={20}
-      className={
-        props?.isRead ? classes["detail-card"] : classes["detail-card-active"]
-      }
-    >
-      <Avatar
-        mr={16}
-        size={"lg"}
-        color="indigo"
-        style={{
-          cursor: "pointer",
-          boxShadow: "0 0 3px 0 rgba(34, 34, 34, 1)",
-          transition: "box-shadow 100ms",
-        }}
-        src={
-          "https://cdn.dribbble.com/users/2552597/screenshots/15555751/media/6f80ecb0743b4d1d9e4ed388f3808026.png?resize=450x338&vertical=center"
-        }
-      />
-      <Box>
+    <Flex p={20} className={classes["detail-card"]}>
+      <Indicator size={props?.isRead ? 0 : 15} color="pale-red.6" offset={7} processing >
+        <Avatar
+          size={"lg"}
+          color="indigo"
+          style={{
+            cursor: "pointer",
+            boxShadow: "0 0 3px 0 rgba(34, 34, 34, 1)",
+            transition: "box-shadow 100ms",
+          }}
+          src={
+            "https://cdn.dribbble.com/users/2552597/screenshots/15555751/media/6f80ecb0743b4d1d9e4ed388f3808026.png?resize=450x338&vertical=center"
+          }
+        />
+      </Indicator>
+      <Box ml={16}>
         <Highlight
           highlight={[props?.title]}
           highlightStyles={{
             backgroundImage:
               "linear-gradient(45deg, var(--mantine-color-cyan-5), var(--mantine-color-indigo-5))",
-            fontWeight: 700,
+            fontWeight: 600,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
           lineClamp={2}
           mb={10}
         >
-          {`${props?.title} | ${props.content}`}
+          {`${props?.title}  - ${props.content}`}
         </Highlight>
 
         <Flex align={"center"}>
@@ -163,20 +146,6 @@ const Notification = ({
               text="All notification"
             />
           </Tabs.Tab>
-          {/* <Tabs.Tab value="messages">
-            <TabsHeader
-              active={activeTab == "messages"}
-              number={12}
-              text="sad"
-            />
-          </Tabs.Tab>
-          <Tabs.Tab value="settings">
-            <TabsHeader
-              active={activeTab == "settings"}
-              number={12}
-              text="sad"
-            />
-          </Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="gallery">

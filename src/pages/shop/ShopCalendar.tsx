@@ -46,6 +46,10 @@ import { IncidentDetail } from "../../models/Incident";
 import { differentDateReturnFormattedString } from "../../utils/helperFunction";
 import NoImage from "../../components/image/NoImage";
 import LoadingImage from "../../components/image/LoadingImage";
+import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
+import { Role } from "../../models/CamAIEnum";
+import { notifications } from "@mantine/notifications";
+import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -73,6 +77,8 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+  const { mutate: assignHeadSuperVisor } = useAssignSupervisor();
+
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList({
       enabled: true,
@@ -82,6 +88,12 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
 
   const { data: employeeList, isLoading: isEmployeeListLoading } =
     useGetEmployeeList({ size: 999 });
+
+  const { data, isLoading } = useGetSupervisorAssignmentHistory({
+    date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
+  });
+
+  console.log({ data, isLoading });
 
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
@@ -115,6 +127,38 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       scrollIntoIncidentDetail();
     }
   }, [selectedIncidentItem]);
+
+  const handleSetSuperVisor = ({
+    id,
+    role,
+  }: {
+    id: string;
+    role: Role.ShopHeadSupervisor | Role.ShopSupervisor;
+  }) => {
+    if (role == Role.ShopHeadSupervisor) {
+      assignHeadSuperVisor(
+        { accountId: id, role },
+        {
+          onSuccess() {
+            notifications.show({
+              title: "Success",
+              message: "Assign head supervisor successfully!",
+              autoClose: 6000,
+              c: NotificationColorPalette.UP_COMING,
+            });
+          },
+          onError() {
+            notifications.show({
+              title: "Failed",
+              message: "Assign head supervisor failed!",
+              autoClose: 6000,
+              c: NotificationColorPalette.ALERT_MESSAGE,
+            });
+          },
+        }
+      );
+    }
+  };
 
   const rows = isGetIncidentListLoading ? (
     <Table.Tr>
@@ -234,6 +278,12 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                     style={{
                       fontWeight: 500,
                     }}
+                    onChange={(id) => {
+                      handleSetSuperVisor({
+                        id: id ?? "",
+                        role: Role.ShopHeadSupervisor,
+                      });
+                    }}
                     searchable
                     nothingFoundMessage="Nothing found..."
                     styles={{
@@ -348,7 +398,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
             <Box pb={rem(12)}>
               <Group justify="space-between" align="center">
                 <Text size={rem(17)} fw={600}>
-                  {format(currentDate, "MMMM YYY")}
+                  {format(currentDate, "MMMM yyy")}
                 </Text>
 
                 <Group gap={rem(4)}>
@@ -393,9 +443,9 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
 
             <Box>
               <SimpleGrid cols={7} spacing={0} style={{}}>
-                {WEEKDAYS.map((day) => {
+                {WEEKDAYS.map((day, i) => {
                   return (
-                    <Box py={rem(8)} key={day}>
+                    <Box py={rem(8)} key={day + i}>
                       <Text
                         key={day}
                         c={"rgb(55 65 81)"}

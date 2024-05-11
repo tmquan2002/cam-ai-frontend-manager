@@ -16,7 +16,7 @@ import _ from "lodash";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import StatusBadge from "../../components/badge/StatusBadge";
-import BackButton from "../../components/button/BackButton";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
@@ -24,6 +24,15 @@ import { useGetIncidentById } from "../../hooks/useGetIncidentById";
 import { EvidenceType } from "../../models/CamAIEnum";
 import { EvidenceDetail } from "../../models/Evidence";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Incident",
+    link: "/brand/incident"
+  },
+  {
+    title: "Detail"
+  }
+]
 type IncidentFormField = {
   employeeId: string | null;
 };
@@ -89,9 +98,11 @@ const ShopIncidentDetailPage = () => {
 
   return (
     <Box>
-      <Paper px={rem(64)} mt={rem(64)} ml={rem(64)} mr={rem(20)} shadow="sm">
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
+      <Paper px={rem(64)} mt={rem(32)} ml={rem(64)} mr={rem(20)} shadow="sm">
         <Group py={rem(32)} align="center">
-          <BackButton w={rem(36)} h={rem(36)} />
           <Text size={rem(20)} fw={500}>
             {incidentData?.incidentType} Incident -{" "}
             {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}

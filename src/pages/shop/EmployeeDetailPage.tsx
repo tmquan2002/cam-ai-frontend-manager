@@ -27,7 +27,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
 import StatusBadge from "../../components/badge/StatusBadge";
 import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
-import BackButton from "../../components/button/BackButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
@@ -269,7 +268,6 @@ const EmployeeDetailPage = () => {
       <Paper m={rem(32)} p={rem(32)} shadow="xs"      >
         <Group justify={"space-between"} align="center" pb={rem(28)}>
           <Group>
-            <BackButton />
 
             <Text
               size="lg"

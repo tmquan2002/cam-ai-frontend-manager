@@ -157,7 +157,8 @@ export const InteractionReportPage = () => {
     return incidentReportByTimeData?.data.map((item) => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
-        humanCount: item.humanCount.median,
+        humanCount: item.humanCount.high,
+        averageInteractionDuration: item?.interaction.averageDuration,
         interactionCount: item?.interaction.count,
       };
     });
@@ -416,7 +417,7 @@ export const InteractionReportPage = () => {
                             _.maxBy(data, function (o) {
                               return o.interactionCount;
                             })?.interactionCount ?? 6,
-                            8
+                            6
                           ),
                         },
                       },
@@ -567,7 +568,7 @@ export const InteractionReportPage = () => {
                             data: data?.map((i) => i.humanCount),
                             borderColor: "rgb(37, 150, 190)",
                             backgroundColor: "rgb(37, 150, 190, 0.5)",
-                            cubicInterpolationMode: "monotone",
+                            // cubicInterpolationMode: "monotone",
                             pointHoverRadius: 7,
                             pointHoverBackgroundColor: "#fff",
                             pointBackgroundColor: "rgb(37, 150, 190)",
@@ -752,7 +753,7 @@ export const InteractionReportPage = () => {
         {selectedInteractionItem ? (
           <Card
             radius={8}
-            w={"100%"}
+            w={"80%"}
             ref={interactionDetailRef}
             style={{
               border: "1px solid rgb(229 231 235)",

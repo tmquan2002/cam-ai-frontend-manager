@@ -2,9 +2,9 @@ import { ReportInterval } from "./CamAIEnum";
 import { IncidentDetail } from "./Incident";
 
 export type ChartReportData = {
-  Time: string;
-  Total: number;
-  ShopId: string;
+  time: string;
+  total: number;
+  shopId: string;
 };
 
 export type InteractionReportDetail = {

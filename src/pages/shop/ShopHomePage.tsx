@@ -8,8 +8,8 @@ import {
   Skeleton,
   Stack,
   Text,
+  Transition,
   rem,
-  useComputedColorScheme,
 } from "@mantine/core";
 import * as _ from "lodash";
 import classes from "./ShopHomePage.module.scss";
@@ -20,10 +20,15 @@ import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import dayjs from "dayjs";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { useGetCameraListByShopId } from "../../hooks/useGetCameraListByShopId";
-import { CameraStatus, EventType, IncidentType } from "../../models/CamAIEnum";
+import {
+  CameraStatus,
+  EventType,
+  IncidentStatus,
+  IncidentType,
+} from "../../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import { NotificationColorPalette } from "../../types/constant";
-import { useGetNewIncident } from "../../hooks/useReport";
+import { useGetNewIncident, useReports } from "../../hooks/useReport";
 import { ReadyState } from "react-use-websocket";
 import { IconCaretRight } from "@tabler/icons-react";
 import CameraCard from "../../components/card/CameraCard";
@@ -41,7 +46,7 @@ const TitleAndNumberCard = ({
   count,
 }: {
   name: string;
-  count?: number;
+  count?: number | string;
 }) => {
   return (
     <Box className={classes["static-card"]}>
@@ -51,9 +56,99 @@ const TitleAndNumberCard = ({
   );
 };
 
-const ShopHomePage = () => {
-  // const { data, lastJsonMessage, readyState } = useReports();
+const IncidentCard = ({
+  startTime,
+  incidentType,
+  status,
+  evidences,
+  id,
+}: IncidentDetail) => {
   const navigate = useNavigate();
+  const [mouted, setMouted] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setMouted(true);
+    }, 200);
+  });
+
+  return (
+    <Transition
+      mounted={mouted}
+      transition="fade-left"
+      duration={400}
+      timingFunction="ease"
+    >
+      {(styles) => (
+        <Card
+          style={styles}
+          className={classes.main_container}
+          w={rem(400)}
+          p={rem(20)}
+          radius={rem(8)}
+          onClick={() => navigate(`/shop/incident/${id}`)}
+        >
+          <Group justify="space-between" align="center" mb={"md"}>
+            <Text fw={500} size={rem(16)}>
+              {incidentType == IncidentType.Interaction
+                ? "Interaction"
+                : incidentType + " incident"}{" "}
+            </Text>
+            <IconCaretRight style={{ width: "20px", height: "20px" }} />
+          </Group>
+          <Card.Section
+            className={classes.card_footer}
+            py={rem(12)}
+            px={rem(20)}
+          >
+            <div>
+              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+                Evidence(s)
+              </Text>
+              <Text fw={600} size={rem(14)} lh={rem(20)} c={"rgb(17, 24, 39)"}>
+                {evidences ? evidences?.length : 0}
+              </Text>
+            </div>
+            <div>
+              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+                Status
+              </Text>
+              <Flex align={"center"}>
+                <Text
+                  fw={600}
+                  size={rem(14)}
+                  lh={rem(20)}
+                  c={
+                    status == IncidentStatus.Accepted
+                      ? NotificationColorPalette.UP_COMING
+                      : status == IncidentStatus.New
+                      ? NotificationColorPalette.UNAPPROVED
+                      : NotificationColorPalette.ALERT_MESSAGE
+                  }
+                >
+                  {status}
+                </Text>
+              </Flex>
+            </div>
+            <div>
+              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+                Time
+              </Text>
+              <Text fw={600} size={rem(14)} lh={rem(20)} c={"rgb(17, 24, 39)"}>
+                {dayjs(startTime).format("HH:mm")}
+              </Text>
+            </div>
+          </Card.Section>
+        </Card>
+      )}
+    </Transition>
+  );
+};
+
+const ShopHomePage = () => {
+  const { lastJsonMessage: humanCountData } = useReports();
+  const { lastJsonMessage, readyState } = useGetNewIncident();
+
   const [incidentList, setIncidentList] = useState<IncidentDetail[]>([]);
   const { data: currentIncidentData, isLoading: isGetCurrentIncidentListData } =
     useGetIncidentList({
@@ -66,7 +161,7 @@ const ShopHomePage = () => {
   });
 
   const { data: cameraList, isLoading: isGetCameraListLoading } =
-    useGetCameraListByShopId(shopData?.values?.[0].id);
+    useGetCameraListByShopId(shopData?.values?.[0]?.id);
 
   const { data: edgeBoxList, isLoading: isGetEdgeBoxLoading } =
     useGetEdgeBoxInstallByShopId(shopData?.values?.[0]?.id ?? null);
@@ -75,21 +170,24 @@ const ShopHomePage = () => {
     notifications.show({
       title: "New incident",
       message: `Incident found at ${dayjs(incident?.startTime).format(
-        "HH:ss"
+        "HH:mm"
       )} `,
-      autoClose: 4000,
+      autoClose: 6000,
       c: NotificationColorPalette.UP_COMING,
     });
     setIncidentList([incident, ...incidentList]);
   };
 
+  console.log({ lastJsonMessage, readyState });
+  console.log({ humanCountData, readyState });
+
   const handleMoreInteraction = (incident: IncidentDetail) => {
     notifications.show({
       title: "More evidence found",
       message: `Incident at ${dayjs(incident.startTime).format(
-        "HH:ss"
+        "HH:mm"
       )} updated`,
-      autoClose: 4000,
+      autoClose: 6000,
       c: NotificationColorPalette.REPORT_EXPENSES,
     });
     const evidentIndex = _.findIndex(incidentList, (listTime) => {
@@ -121,77 +219,11 @@ const ShopHomePage = () => {
     }
   }, [currentIncidentData, isGetCurrentIncidentListData]);
 
-  const { lastJsonMessage, readyState } = useGetNewIncident();
-
   useEffect(() => {
     if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
       handleUpdateNewIncident(lastJsonMessage);
     }
   }, [readyState, lastJsonMessage]);
-
-  const computedColorScheme = useComputedColorScheme("light", {
-    getInitialValueInEffect: true,
-  });
-
-  const renderContent = ({
-    startTime,
-    incidentType,
-    status,
-    evidences,
-    id,
-  }: IncidentDetail) => {
-    return (
-      <Card
-        withBorder
-        padding="lg"
-        key={id}
-        className={classes.main_container}
-        w={rem(400)}
-        p="md"
-        onClick={() => navigate(`/shop/incident/${id}`)}
-      >
-        <Group justify="space-between" align="center" mb={"md"}>
-          <Text fw={500}>
-            {incidentType == IncidentType.Interaction
-              ? "Interaction"
-              : incidentType + " incident"}{" "}
-          </Text>
-          <IconCaretRight
-            style={{ width: "20px", height: "20px" }}
-            color={computedColorScheme == "dark" ? "#5787db" : "#39588f"}
-          />
-        </Group>
-        <Card.Section className={classes.card_footer}>
-          <div>
-            <Text size="xs" c="dimmed">
-              Evidence(s)
-            </Text>
-            <Text fw={500} size="sm">
-              {evidences ? evidences?.length : 0}
-            </Text>
-          </div>
-          <div>
-            <Text size="xs" c="dimmed">
-              Status
-            </Text>
-            <Flex align={"center"}>
-              <Text fw={500} size="sm">
-                {status}
-              </Text>
-            </Flex>
-          </div>
-          <div>
-            <Text size="xs" c="dimmed">
-              Time
-            </Text>
-            <Text fw={500} size="sm">
-              {dayjs(startTime).format("HH:mm DD-MM-YYYY")}
-            </Text>
-          </div>
-        </Card.Section>
-      </Card>
-    );
-  };
 
   const renderStatisticContent = () => {
     if (isShopDataLoading || isGetEdgeBoxLoading) {
@@ -227,7 +259,10 @@ const ShopHomePage = () => {
           />
         </Grid.Col>
         <Grid.Col span={6}>
-          <TitleAndNumberCard name={"Human count"} count={5} />
+          <TitleAndNumberCard
+            name={"Human count"}
+            count={humanCountData?.total ?? 0}
+          />
         </Grid.Col>
       </Grid>
     );
@@ -248,21 +283,25 @@ const ShopHomePage = () => {
 
     return (
       <Flex justify={"space-between"}>
-        <Group justify="center" align="flex-start">
+        <Group align="flex-start">
           {cameraList?.values?.map((item) =>
             item?.status == CameraStatus.Connected ? (
               <CameraCard cameraId={item?.id} key={item?.id} />
             ) : (
-              <Box key={item?.id}></Box>
+              <></>
             )
           )}
         </Group>
 
-        <Box maw={400} ml={rem(20)}>
+        <Box maw={420}>
           <Skeleton visible={isGetCurrentIncidentListData}>
-            <ScrollArea h={"80vh"}>
-              <Stack gap={"lg"}>
-                {incidentList?.map((item) => renderContent(item))}
+            <ScrollArea h={"70vh"} scrollbars="y">
+              <Stack gap={"lg"} px={rem(10)}>
+                {incidentList?.map((item) => (
+                  <Box key={item.id}>
+                    <IncidentCard {...item} />
+                  </Box>
+                ))}
               </Stack>
             </ScrollArea>
           </Skeleton>
