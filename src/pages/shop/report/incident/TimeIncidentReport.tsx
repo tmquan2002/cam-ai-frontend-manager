@@ -185,6 +185,7 @@ const TimeIncidentReport = () => {
       enabled: !!selectedDuration?.startTime && !!selectedDuration?.endTime,
       fromTime: selectedDuration?.startTime,
       toTime: selectedDuration?.endTime,
+      size: 999,
     });
 
   const { data: incidentPercent, isLoading: isGetIncidentPercentLoading } =

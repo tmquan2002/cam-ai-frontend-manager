@@ -1,4 +1,4 @@
-import { useEffect, useId } from "react";
+import { useEffect, useId, useState } from "react";
 import { useGetCameraLiveUrl } from "../../hooks/useGetCameraLiveUrl";
 //@ts-ignore
 import JSMpeg from "@cycjimmy/jsmpeg-player";
@@ -10,11 +10,20 @@ export type CameraCardProps = {
 
 const CameraCard = ({ cameraId }: CameraCardProps) => {
   const { data, isLoading, error } = useGetCameraLiveUrl(cameraId);
+  const [isLoadingVideo] = useState<boolean>(false);
   const videoWrapperID = useId();
   useEffect(() => {
     if (data) {
       new JSMpeg.VideoElement(`#${CSS.escape(videoWrapperID)}`, data, {
         autoplay: true,
+        // hooks: {
+        //   load: () => {
+        //     setIsLoadingVideo(true);
+        //   },
+        //   play: () => {
+        //     setIsLoadingVideo(false);
+        //   },
+        // },
       });
     }
   }, [data]);
@@ -28,7 +37,7 @@ const CameraCard = ({ cameraId }: CameraCardProps) => {
   return (
     <Paper>
       <Center>
-        <Skeleton visible={isLoading}>
+        <Skeleton visible={isLoading || isLoadingVideo}>
           <Box w={rem(1080)} h={rem(720)} id={videoWrapperID}></Box>
         </Skeleton>
       </Center>

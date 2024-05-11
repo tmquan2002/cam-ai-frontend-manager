@@ -25,18 +25,9 @@ const mockdata = [
     path: "/shop/employee",
   },
   {
-    label: "Incidents & Interactions",
+    label: "Incidents",
     icon: IconExclamationCircle,
-    links: [
-      {
-        label: "Incident",
-        link: "/shop/incident",
-      },
-      {
-        label: "Interaction",
-        link: "/shop/interaction",
-      },
-    ],
+    path: "/shop/incident",
   },
   {
     label: "Reports",

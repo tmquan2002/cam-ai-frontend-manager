@@ -1,9 +1,9 @@
 import { UseQueryResult, useQuery } from "react-query";
 import { CommonResponse } from "../models/Common";
 import { NotificationDetail } from "../models/Notification";
-import { NotificationAPI } from "../apis/Notification";
+import { GetNotificationParams, NotificationAPI } from "../apis/Notification";
 
-export const useGetNotificationList = () => {
+export const useGetNotificationList = (params: GetNotificationParams) => {
   const {
     isError,
     isLoading,
@@ -11,9 +11,9 @@ export const useGetNotificationList = () => {
     error,
     refetch,
   }: UseQueryResult<CommonResponse<NotificationDetail>, Error> = useQuery({
-    queryKey: ["Notifications"],
+    queryKey: ["Notifications", params],
     queryFn: async () => {
-      return await NotificationAPI._getNotificationList();
+      return await NotificationAPI._getNotificationList(params);
     },
   });
 

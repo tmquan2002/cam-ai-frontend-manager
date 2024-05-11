@@ -110,18 +110,18 @@ export const EmployeeIncidentCard = ({
             <Stack py={rem(12)} gap={rem(3)} ml={rem(20)}>
               <Group align="center">
                 <IconUser style={{ width: rem(18), color: "#000" }} />
-                <Text c={"#000"} size={"md"} fw={500}>
+                <Text c={"#000"} size={rem(15)} fw={500}>
                   {employee?.name ?? "Empty"}
                 </Text>
               </Group>
               <Group align="center">
-                <IconMail style={{ width: rem(18), color: "#000" }} />
-                <Text fw={400} c={"dimmed"}>
+                <IconMail style={{ width: rem(18), color: "rgb(75 85 99)" }} />
+                <Text size={rem(14)} fw={400} c={"rgb(75 85 99)"}>
                   {employee?.email ?? "Empty"}
                 </Text>
                 <IconPointFilled style={{ width: rem(16), color: "#000" }} />
-                <IconPhone style={{ width: rem(18), color: "#000" }} />
-                <Text fw={400} c={"dimmed"}>
+                <IconPhone style={{ width: rem(18), color: "rgb(75 85 99)" }} />
+                <Text size={rem(14)} fw={400} c={"rgb(75 85 99)"}>
                   {employee?.phone ?? "Empty"}
                 </Text>
               </Group>
@@ -130,7 +130,7 @@ export const EmployeeIncidentCard = ({
         </Group>
 
         <Group align="center" py={rem(12)}>
-          <Badge>{incidentList?.length}</Badge>
+          <Badge bg={"blue.7"}>{incidentList?.length}</Badge>
           <IconChevronDown style={{ width: rem(20) }} stroke={1.5} />
         </Group>
       </Group>

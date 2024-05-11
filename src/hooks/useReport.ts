@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useWebSocket from "react-use-websocket";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 import { getAccessToken } from "../context/AuthContext";
 import {
   removeDate,
@@ -22,35 +22,11 @@ export const useReports = () => {
     webSocketUrl + "/api/shops/chart/customer",
     {
       protocols: ["Bearer", `${getAccessToken()}`],
-    }
+    },
+    !!getAccessToken()
   );
 
-  const [data, setData] = useState<ChartReportData[]>(
-    Array(...Array(4)).map(function () {
-      return {
-        Time: "00:00:00",
-        Total: 0,
-        ShopId: "",
-      };
-    })
-  );
-
-  useEffect(() => {
-    if (lastJsonMessage) {
-      const updatedJson = {
-        ...lastJsonMessage,
-        Time: removeDate(lastJsonMessage.Time, true),
-      };
-
-      const newArray = removeFirstUpdateLastArray<ChartReportData>(
-        data,
-        updatedJson
-      );
-      setData(newArray);
-    }
-  }, [lastJsonMessage]);
-
-  return { data, lastJsonMessage, readyState };
+  return { lastJsonMessage, readyState };
 };
 
 /**
@@ -68,9 +44,9 @@ export const useReportByShop = (shopId: string) => {
   const [data, setData] = useState<ChartReportData[]>(
     Array(...Array(5)).map(function () {
       return {
-        Time: "00:00:00",
-        Total: 0,
-        ShopId: shopId,
+        time: "00:00:00",
+        total: 0,
+        shopId: shopId,
       };
     })
   );
@@ -79,7 +55,7 @@ export const useReportByShop = (shopId: string) => {
     if (lastJsonMessage) {
       const updatedJson = {
         ...lastJsonMessage,
-        Time: removeDate(lastJsonMessage.Time, true),
+        Time: removeDate(lastJsonMessage.time, true),
       };
 
       const newArray = removeFirstUpdateLastArray<ChartReportData>(
@@ -138,13 +114,14 @@ export const useGetPastReportByShop = (params: GetReportListParams) => {
 };
 
 export const useGetNewIncident = () => {
-  const { lastJsonMessage, readyState } = useWebSocket<WebSocketIncident>(
-    webSocketUrl + `/api/incidents/new`,
-    {
-      protocols: ["Bearer", `${getAccessToken()}`],
-    },
-    !!getAccessToken()
-  );
+  const { lastJsonMessage, readyState, sendMessage } =
+    useWebSocket<WebSocketIncident>(
+      webSocketUrl + `/api/incidents/new`,
+      {
+        protocols: ["Bearer", `${getAccessToken()}`],
+      },
+      !!getAccessToken()
+    );
 
   const [data, setData] = useState<WebSocketIncident | undefined>(undefined);
 
@@ -153,6 +130,12 @@ export const useGetNewIncident = () => {
       setData(lastJsonMessage);
     }
   }, [lastJsonMessage]);
+
+  useEffect(() => {
+    if (readyState == ReadyState.CLOSED) {
+      sendMessage("");
+    }
+  }, [readyState]);
 
   return {
     lastJsonMessage: data,

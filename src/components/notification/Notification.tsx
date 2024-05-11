@@ -82,14 +82,14 @@ const DetailCard = (props: {
           highlightStyles={{
             backgroundImage:
               "linear-gradient(45deg, var(--mantine-color-cyan-5), var(--mantine-color-indigo-5))",
-            fontWeight: 700,
+            fontWeight: 600,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
           lineClamp={2}
           mb={10}
         >
-          {`${props?.title} | ${props.content}`}
+          {`${props?.title}  - ${props.content}`}
         </Highlight>
 
         <Flex align={"center"}>
@@ -163,20 +163,6 @@ const Notification = ({
               text="All notification"
             />
           </Tabs.Tab>
-          {/* <Tabs.Tab value="messages">
-            <TabsHeader
-              active={activeTab == "messages"}
-              number={12}
-              text="sad"
-            />
-          </Tabs.Tab>
-          <Tabs.Tab value="settings">
-            <TabsHeader
-              active={activeTab == "settings"}
-              number={12}
-              text="sad"
-            />
-          </Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="gallery">

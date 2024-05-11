@@ -16,27 +16,23 @@
 }
 
 .detail-card {
-  border-bottom: 1px solid #ccc;
-
+  border-bottom: 1px solid #eee;
 }
 
 .detail-card:hover {
   background-color: #f8f9fa;
   cursor: pointer;
-
 }
 
-.detail-card-active{
+.detail-card-active {
   cursor: pointer;
   background-color: #d2e3fc;
-  border-bottom: 1px solid #ccc;
-
+  border-bottom: 1px solid #eee;
 }
 
-.detail-card-active:hover{
+.detail-card-active:hover {
   background-color: #f8f9fa;
   cursor: pointer;
-  
 }
 
 .anchor:hover {
@@ -44,7 +40,6 @@
   cursor: pointer;
   font-weight: 500;
 }
-
 
 .tabtext {
 }

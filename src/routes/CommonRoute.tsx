@@ -4,7 +4,7 @@ import { getUserRole } from "../context/AuthContext";
 import { Role } from "../models/CamAIEnum";
 
 const CommonRoute = () => {
-  const [userRole, setUserRole] = useState<Role | null>(Role.Employee);
+  const [userRole, setUserRole] = useState<Role | null>(Role.SystemHandler);
   useEffect(() => {
     const currentUserRole: Role | null = getUserRole();
     setUserRole(currentUserRole);

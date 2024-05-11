@@ -267,7 +267,14 @@ const EmployeeIncidentReport = () => {
               <Skeleton
                 visible={isGetIncidentListLoading || isGetEmployeeListLoading}
               >
-                <Paper px={rem(20)} py={rem(20)} radius={"md"} shadow="lg">
+                <Paper
+                  px={rem(20)}
+                  py={rem(20)}
+                  radius={"md"}
+                  style={{
+                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
                   <Group>
                     <Avatar
                       radius={"md"}
@@ -297,7 +304,14 @@ const EmployeeIncidentReport = () => {
               <Skeleton
                 visible={isGetIncidentListLoading || isGetEmployeeListLoading}
               >
-                <Paper px={rem(20)} py={rem(20)} shadow="lg" radius={"md"}>
+                <Paper
+                  px={rem(20)}
+                  py={rem(20)}
+                  style={{
+                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
+                  }}
+                  radius={"md"}
+                >
                   <Group>
                     <Avatar radius={"md"} color="blue" size={rem(68)}>
                       <IconEye size={"2rem"} />
@@ -323,7 +337,14 @@ const EmployeeIncidentReport = () => {
               <Skeleton
                 visible={isGetIncidentListLoading || isGetEmployeeListLoading}
               >
-                <Paper px={rem(20)} py={rem(20)} shadow="lg" radius={"md"}>
+                <Paper
+                  px={rem(20)}
+                  py={rem(20)}
+                  style={{
+                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
+                  }}
+                  radius={"md"}
+                >
                   <Group>
                     <Avatar radius={"md"} color="red" size={rem(68)}>
                       <IconX size={"2rem"} />

@@ -27,7 +27,6 @@ import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
 import BrandRoute from "./BrandRoute";
 import CommonRoute from "./CommonRoute";
 import ShopRoute from "./ShopRoute";
-import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
 import BrandShopManagerListPage from "../pages/brand/BrandShopManagerListPage";
 import BrandEmployeeListPage from "../pages/brand/BrandEmployeeListPage";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
@@ -36,6 +35,7 @@ import CreateShop from "../pages/brand/CreateShop";
 import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import BrandInteractionList from "../pages/brand/BrandInteractionList";
 import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
+import BrandMainPage from "../pages/brand/BrandMainPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -122,7 +122,7 @@ const AppRoute = () => {
       children: [
         {
           path: "",
-          element: <BrandShopDetailPage />,
+          element: <BrandMainPage />,
         },
         {
           path: "account",
