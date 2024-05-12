@@ -88,7 +88,7 @@ const EmployeeListPage = () => {
       size: Number(pageSize),
       pageIndex: activePage - 1,
       // employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
-      search: search,
+      search: debounced.toString() || "",
     };
     // if (searchCategory == SearchCategory.NAME) {
     // sb.search = debounced.toString();
@@ -123,7 +123,7 @@ const EmployeeListPage = () => {
         <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
         <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
         <Table.Td ta={"center"}>
-          <StatusBadge statusName={row?.employeeStatus || "None"} />
+          <StatusBadge statusName={row?.employeeStatus || "None"} padding={10} size="sm"/>
         </Table.Td>
       </Table.Tr>
     </Tooltip>
