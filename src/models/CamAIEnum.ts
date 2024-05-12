@@ -78,10 +78,11 @@ export enum RequestType {
 
 export enum Role {
   Admin = "Admin",
-  Technician = "Technician",
   BrandManager = "BrandManager",
   ShopManager = "ShopManager",
-  Employee = "Employee",
+  SystemHandler = "SystemHandler",
+  ShopHeadSupervisor = "ShopHeadSupervisor",
+  ShopSupervisor = "ShopSupervisor",
 }
 
 export enum ShopStatus {
@@ -189,7 +190,7 @@ export enum StatusColor {
   MIDDLE = "#465574",
   INACTIVE = "#f23f43",
   IDLE = "#f0b232",
-  NONE = "#80848e"
+  NONE = "#80848e",
 }
 
 export enum StatusColorLight {
@@ -197,5 +198,5 @@ export enum StatusColorLight {
   MIDDLE = "#748dc0",
   INACTIVE = "#F08080",
   IDLE = "#E7E48C",
-  NONE = "#c4cbda"
+  NONE = "#c4cbda",
 }

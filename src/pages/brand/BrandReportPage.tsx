@@ -71,7 +71,7 @@ const BrandReportPage = () => {
   }, [setFilterSearchId, date]);
 
   // Right data render
-  const renderContent = ({ Time, Total }: ChartReportData, id: number) => {
+  const renderContent = ({ time, total }: ChartReportData, id: number) => {
     return (
       <Card
         withBorder
@@ -83,7 +83,7 @@ const BrandReportPage = () => {
         onClick={() => navigate(`/shop/incident/${id}`)}
       >
         <Group justify="space-between" align="center" mb={"md"}>
-          <Text fw={500}> {Time}</Text>
+          <Text fw={500}> {time}</Text>
           <IconCaretRight
             style={{ width: "20px", height: "20px" }}
             color={computedColorScheme == "dark" ? "#5787db" : "#39588f"}
@@ -95,7 +95,7 @@ const BrandReportPage = () => {
               Total
             </Text>
             <Text fw={500} size="sm">
-              {Total}
+              {total}
             </Text>
           </div>
           <div>
@@ -117,7 +117,7 @@ const BrandReportPage = () => {
               Time
             </Text>
             <Text fw={500} size="sm">
-              {Time}
+              {time}
             </Text>
           </div>
         </Card.Section>
@@ -184,7 +184,7 @@ const BrandReportPage = () => {
               </Text>
               <Text mt={10} size="sm">
                 <b>Last update: </b>
-                {lastJsonMessage ? getDateTime(lastJsonMessage.Time) : "None"}
+                {lastJsonMessage ? getDateTime(lastJsonMessage.time) : "None"}
               </Text>
               <LineChart
                 h={300}

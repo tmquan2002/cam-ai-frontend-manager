@@ -67,7 +67,7 @@ const DetailCard = (props: {
             backgroundImage: props?.isRead ?
               "linear-gradient(45deg, #98D6E1, #BACBFB)" :
               "linear-gradient(45deg, var(--mantine-color-cyan-5), var(--mantine-color-indigo-5))",
-            fontWeight: 700,
+            fontWeight: 600,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
@@ -151,20 +151,6 @@ const Notification = ({
               text="All notification"
             />
           </Tabs.Tab>
-          {/* <Tabs.Tab value="messages">
-            <TabsHeader
-              active={activeTab == "messages"}
-              number={12}
-              text="sad"
-            />
-          </Tabs.Tab>
-          <Tabs.Tab value="settings">
-            <TabsHeader
-              active={activeTab == "settings"}
-              number={12}
-              text="sad"
-            />
-          </Tabs.Tab> */}
         </Tabs.List>
 
         <Tabs.Panel value="gallery">

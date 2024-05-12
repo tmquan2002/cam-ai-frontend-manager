@@ -17,7 +17,7 @@ export type IncidentDetail = {
   employeeId: string;
   status: IncidentStatus;
   shopId: string;
-  shop: ShopDetail;
+  shop: ShopDetail | null;
   edgeBox: EdgeBoxStatus | null;
   employee: EmployeeDetail | null;
   evidences: EvidenceDetail[];

@@ -14,7 +14,6 @@ import {
   NumberInput,
   Pagination,
   Paper,
-  ScrollArea,
   Select,
   Skeleton,
   Table,
@@ -40,7 +39,6 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
-import cx from "clsx";
 import * as _ from "lodash";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -88,7 +86,6 @@ const BrandMainPage = () => {
   const [pageSize, setPageSize] = useState<string | null>("5");
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
-  const [scrolled, setScrolled] = useState(false);
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
     SearchCategory.NAME
   );
@@ -264,7 +261,7 @@ const BrandMainPage = () => {
   return (
     <>
       <Paper p={rem(32)} style={{ flex: 1 }}>
-        <Box mb={rem(16)}>
+        <Box>
           {isUploadBrandBannerLoading ? (
             <Loader />
           ) : (
@@ -342,7 +339,7 @@ const BrandMainPage = () => {
           )}
         </Box>
 
-        <Flex align={"center"} mb={rem(32)}>
+        <Flex align={"center"} mb={rem(12)}>
           <Tooltip label="Brand logo">
             <Dropzone
               mr={rem(16)}
@@ -458,14 +455,7 @@ const BrandMainPage = () => {
           </Group>
         </Collapse>
 
-        <ScrollArea.Autosize
-          pl={20}
-          pr={20}
-          mah={400}
-          onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
-          mt={"md"}
-          pos={"relative"}
-        >
+        <Box>
           <LoadingOverlay
             visible={isShopListLoading}
             zIndex={1000}
@@ -487,11 +477,7 @@ const BrandMainPage = () => {
           ) : (
             <Table.ScrollContainer minWidth={1000}>
               <Table striped highlightOnHover verticalSpacing={"md"}>
-                <Table.Thead
-                  className={cx(classes.header, {
-                    [classes.scrolled]: scrolled,
-                  })}
-                >
+                <Table.Thead>
                   <Table.Tr>
                     <Table.Th>#</Table.Th>
                     <Table.Th>Shop name</Table.Th>
@@ -506,7 +492,7 @@ const BrandMainPage = () => {
               </Table>
             </Table.ScrollContainer>
           )}
-        </ScrollArea.Autosize>
+        </Box>
         <Group justify="space-between" align="end">
           <Pagination
             value={activePage}

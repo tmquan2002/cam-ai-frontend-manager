@@ -8,7 +8,9 @@ import _, { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
-import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
+import CustomBreadcrumb, {
+  BreadcrumbItem,
+} from "../../components/breadcrumbs/CustomBreadcrumb";
 import DownloadButton from "../../components/button/DownloadButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
@@ -26,12 +28,12 @@ import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: "Employee",
-    link: "/shop/employee"
+    link: "/shop/employee",
   },
   {
-    title: "Add"
-  }
-]
+    title: "Add",
+  },
+];
 export type CreateEmployeeField = {
   name: string | null;
   email: string;
@@ -45,7 +47,8 @@ export type CreateEmployeeField = {
 };
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
-  const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
+    useDisclosure(false);
 
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
@@ -53,7 +56,7 @@ const CreateEmployeePage = () => {
       email: "",
       gender: Gender.Male,
       phone: "",
-      birthday: new Date("01/01/2000"),
+      birthday: null,
       addressLine: "",
       wardId: null,
       province: "",
@@ -70,14 +73,21 @@ const CreateEmployeePage = () => {
   const massImportForm = useForm<{ file: File }>({
     validate: {
       file: isNotEmpty("Please choose a file"),
-    }
+    },
   });
 
-  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createEmployeeForm.values.province ?? 0));
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createEmployeeForm.values.district ?? 0));
-  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } = useCreateEmployee();
-  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } = useUploadEmployeeFile();
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(createEmployeeForm.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(createEmployeeForm.values.district ?? 0)
+  );
+  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
+    useCreateEmployee();
+  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } =
+    useUploadEmployeeFile();
 
   const createEmployeeFields = useMemo(() => {
     return [
@@ -131,7 +141,7 @@ const CreateEmployeePage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          maxDate: getDateFromSetYear(18)
+          maxDate: getDateFromSetYear(18),
         },
       },
       {
@@ -201,7 +211,8 @@ const CreateEmployeePage = () => {
       {
         type: FIELD_TYPES.FILE,
         fieldProps: {
-          description: "Choose your file to import multiple employess for your shop at once, accept .csv file",
+          description:
+            "Choose your file to import multiple employess for your shop at once, accept .csv file",
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
@@ -210,9 +221,9 @@ const CreateEmployeePage = () => {
           width: 300,
           required: true,
         },
-      }
+      },
     ];
-  }, [massImportForm])
+  }, [massImportForm]);
 
   return (
     <>
@@ -237,7 +248,9 @@ const CreateEmployeePage = () => {
                 name: name ?? "",
                 gender: gender,
                 addressLine,
-                birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
+                birthday: birthday
+                  ? dayjs(birthday).format("YYYY-MM-DD")
+                  : null,
                 phone,
                 wardId,
               };
@@ -304,7 +317,12 @@ const CreateEmployeePage = () => {
             <Button type="submit" loading={isUploadEmployeeLoading}>
               Import
             </Button>
-            <Button type="submit" variant="outline" onClick={closeMassImport} loading={isUploadEmployeeLoading}>
+            <Button
+              type="submit"
+              variant="outline"
+              onClick={closeMassImport}
+              loading={isUploadEmployeeLoading}
+            >
               Cancel
             </Button>
           </Group>
