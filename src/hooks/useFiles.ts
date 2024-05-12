@@ -2,6 +2,9 @@ import { UseQueryResult, useMutation, useQuery } from "react-query";
 import { EmployeeApi } from "../apis/EmployeeAPI";
 import { FilesAPI } from "../apis/FilesAPI";
 import { ShopAPI } from "../apis/ShopAPI";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../models/Response";
 
 export const useGetShopTemplate = () => {
     const downloadFile = async () => {
@@ -83,7 +86,7 @@ export const useGetShopUpsertTask = () => {
     return { isError, isLoading, data, error };
 };
 
-export const useGetShopUpsertTaskResult = (taskId: string) => {
+export const useGetShopUpsertTaskResult = (taskId: string, delay: number) => {
     const { isError, isLoading, data, error, }: UseQueryResult<{
         inserted: number;
         updated: number;
@@ -94,6 +97,27 @@ export const useGetShopUpsertTaskResult = (taskId: string) => {
         queryFn: async () => {
             return await ShopAPI._getShopUpsertTaskResult(taskId);
         },
+        refetchInterval: delay,
+        enabled: !!taskId,
+        onSuccess: (data) => {
+            // Handle successful fetch
+            console.log(data)
+            notifications.update({
+                id: "uploadShopProgress",
+                title: "Notice",
+                message: "Import in progress",
+                autoClose: false,
+            });
+        },
+        onError: (data) => {
+            // Handle error
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+                color: "red",
+                title: "Failed",
+                message: error.response?.data?.message,
+            });
+        }
     });
 
     return { isError, isLoading, data, error };
@@ -121,7 +145,7 @@ export const useGetEmployeeUpsertTask = () => {
     return { isError, isLoading, data, error };
 };
 
-export const useGetEmployeeUpsertTaskResult = (taskId: string) => {
+export const useGetEmployeeUpsertTaskResult = (taskId: string, delay: number) => {
     const { isError, isLoading, data, error, }: UseQueryResult<{
         inserted: number;
         updated: number;
@@ -132,6 +156,26 @@ export const useGetEmployeeUpsertTaskResult = (taskId: string) => {
         queryFn: async () => {
             return await EmployeeApi._getEmployeeUpsertTaskResult(taskId);
         },
+        refetchInterval: delay,
+        enabled: !!taskId,
+        onSuccess: (data) => {
+            // Handle successful fetch
+            console.log(data)
+            notifications.show({
+                color: "green",
+                title: "Notice",
+                message: "Import in progress",
+            });
+        },
+        onError: (data) => {
+            // Handle error
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+                color: "red",
+                title: "Failed",
+                message: error.response?.data?.message,
+            });
+        }
     });
 
     return { isError, isLoading, data, error };

@@ -29,7 +29,7 @@ import EditAndUpdateForm, {
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import classes from "./BrandInteractionList.module.scss";
 
 type SearchIncidentField = {
@@ -246,7 +246,7 @@ const BrandInteractionList = () => {
             label="Page Size"
             allowDeselect={false}
             placeholder="0"
-            data={pageSizeSelect} defaultValue={"20"}
+            data={PAGE_SIZE_SELECT} defaultValue={"20"}
             value={pageSize}
             onChange={(value) => {
               setPageSize(value)

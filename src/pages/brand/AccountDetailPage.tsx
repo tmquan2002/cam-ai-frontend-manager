@@ -32,7 +32,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { AccountStatus, Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { phoneRegex } from "../../types/constant";
+import { PHONE_REGEX } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -76,7 +76,7 @@ const AccountDetailPage = () => {
       email: isEmail("Invalid email - ex: name@gmail.com"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
   const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();

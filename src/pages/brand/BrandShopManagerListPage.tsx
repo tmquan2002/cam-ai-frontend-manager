@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/badge/StatusBadge";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { AccountDetail } from "../../models/Account";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
 
@@ -153,7 +153,7 @@ const BrandShopManagerListPage = () => {
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={pageSizeSelect} defaultValue={"5"}
+              data={PAGE_SIZE_SELECT} defaultValue={"5"}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value)

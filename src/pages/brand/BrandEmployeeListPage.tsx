@@ -12,7 +12,7 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
 import { EmployeeDetail } from "../../models/Employee";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandEmployeeListPage.module.scss";
 
@@ -274,7 +274,7 @@ const BrandEmployeeListPage = () => {
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={pageSizeSelect} defaultValue={"20"}
+              data={PAGE_SIZE_SELECT} defaultValue={"20"}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value)

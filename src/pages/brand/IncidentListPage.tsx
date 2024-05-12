@@ -30,7 +30,7 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./IncidentListPage.module.scss";
 
@@ -65,7 +65,7 @@ const IncidentListPage = () => {
   });
 
   const searchParams: GetIncidentParams = useMemo(() => {
-    console.log(form.values);
+    // console.log(form.values);
 
     let sb: GetIncidentParams = {
       employeeId: form.values.employeeId,
@@ -326,7 +326,7 @@ const IncidentListPage = () => {
             label="Page Size"
             allowDeselect={false}
             placeholder="0"
-            data={pageSizeSelect} defaultValue={"5"}
+            data={PAGE_SIZE_SELECT} defaultValue={"5"}
             value={pageSize}
             onChange={(value) => {
               setPageSize(value)

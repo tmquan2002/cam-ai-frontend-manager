@@ -20,7 +20,7 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { emailRegex } from "../../types/constant";
+import { EMAIL_REGEX } from "../../types/constant";
 import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -62,7 +62,7 @@ const CreateEmployeePage = () => {
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value) => isEmpty(value) ? null
-        : emailRegex.test(value) ? null : "Invalid email - ex: name@gmail.com",
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -278,7 +278,7 @@ const CreateEmployeePage = () => {
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Multiple Employees" centered closeOnClickOutside={false}>
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
-          console.log(file)
+          // console.log(file)
           uploadEmployee({ file }, {
             onSuccess() {
               notifications.show({

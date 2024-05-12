@@ -42,7 +42,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeboxInstallStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { phoneRegex } from "../../types/constant";
+import { PHONE_REGEX } from "../../types/constant";
 
 export type FormFieldValue = {
   name: string;
@@ -65,9 +65,9 @@ const ShopDetailPage = () => {
       phone: (value) =>
         isEmpty(value)
           ? null
-          : phoneRegex.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+          : PHONE_REGEX.test(value)
+            ? null
+            : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -77,23 +77,12 @@ const ShopDetailPage = () => {
     },
   });
   const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
-  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
-    useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-
-  const { data: cameraList, isLoading: isGetCameraListLoading } =
-    useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
-
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(form.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(form.values.district ?? 0)
-  );
-
-  const { mutate: updateShop, isLoading: updateShopLoading } =
-    useUpdateShopById();
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } = useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: cameraList, isLoading: isGetCameraListLoading } = useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
+  const { mutate: updateShop, isLoading: updateShopLoading } = useUpdateShopById();
 
   useEffect(() => {
     if (data) {
@@ -141,7 +130,6 @@ const ShopDetailPage = () => {
           radius: "md",
         },
       },
-
       {
         type: FIELD_TYPES.TEXT,
         fieldProps: {
@@ -149,10 +137,9 @@ const ShopDetailPage = () => {
           form,
           name: "brandName",
           placeholder: "Brand",
-          label: "Shop",
-          disabled: true,
+          label: "Brand",
           radius: "md",
-        },
+        }
       },
       {
         type: FIELD_TYPES.TIME,
@@ -254,9 +241,7 @@ const ShopDetailPage = () => {
     isWardsLoading,
   ]);
 
-  let edgeBoxInstall = edgeBoxInstallList?.values.find(
-    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled
-  );
+  let edgeBoxInstall = edgeBoxInstallList?.values.find((x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled);
 
   return (
     <Box pb={20}>
@@ -286,11 +271,12 @@ const ShopDetailPage = () => {
                 <form
                   onSubmit={form.onSubmit((values) => {
                     const updateShopParams: UpdateShopParams = {
-                      shopId: data?.values[0].id ?? "0",
-                      addressLine: values.addressLine,
-                      wardId: values.wardId ?? "0",
-                      name: values.name,
-                      phone: values.phone,
+                      shopId: data?.values[0]?.id ?? "0",
+                      shopManagerId: data?.values[0]?.shopManager?.id ?? "0",
+                      addressLine: values?.addressLine,
+                      wardId: values?.wardId ?? "0",
+                      name: values?.name,
+                      phone: values?.phone,
                       openTime: values?.openTime,
                       closeTime: values?.closeTime,
                     };
@@ -326,14 +312,14 @@ const ShopDetailPage = () => {
                   </Text>
                   <EditAndUpdateForm fields={fields} />
 
-                  <Group justify="flex-end" mt="md">
-                    {/* <Button
-                type="submit"
-                disabled={!form.isDirty()}
-              >
-                Submit
-              </Button> */}
-                  </Group>
+                  {/* <Group justify="flex-end" mt="md">
+                    <Button
+                      type="submit"
+                      disabled={!form.isDirty()}
+                    >
+                      Submit
+                    </Button>
+                  </Group> */}
                 </form>
               </Box>
             </Box>
@@ -415,17 +401,6 @@ const ShopDetailPage = () => {
           <Tabs.Panel value="edgebox">
             <Skeleton visible={isEdgeboxInstallListLoading}>
               <Box p={rem(32)}>
-                <Group
-                  justify="space-between"
-                  align="center"
-                  pb={rem(20)}
-                  gap={"sm"}
-                >
-                  <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-                    Edge box
-                  </Text>
-                </Group>
-
                 {edgeBoxInstall ? (
                   <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
                 ) : (

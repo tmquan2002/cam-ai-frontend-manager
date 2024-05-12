@@ -29,7 +29,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
 
@@ -113,7 +113,7 @@ const ShopDetailPageManager = () => {
         "Shop name must be 1- 50 characters long"
       ),
       phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -291,7 +291,6 @@ const ShopDetailPageManager = () => {
           label: "Shop phone",
         },
       },
-
       {
         type: FIELD_TYPES.TIME,
         fieldProps: {
@@ -466,7 +465,7 @@ const ShopDetailPageManager = () => {
                       closeTime: values?.closeTime,
                     };
 
-                    console.log(updateShopParams)
+                    // console.log(updateShopParams)
 
                     updateShop(updateShopParams, {
                       onSuccess() {

@@ -1,9 +1,9 @@
 import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, } from "@mantine/core";
-import dayjs from "dayjs";
 import { useState } from "react";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
 import { NotificationStatus } from "../../models/CamAIEnum";
 import { NotificationDetail } from "../../models/Notification";
+import { timeSince } from "../../utils/helperFunction";
 import classes from "./Notification.module.scss";
 
 export const TabsHeader = ({
@@ -61,23 +61,28 @@ const DetailCard = (props: {
       </Indicator>
       <Box ml={16}>
         <Highlight
+          c={props?.isRead ? "dimmed" : undefined} size="md"
           highlight={[props?.title]}
           highlightStyles={{
-            backgroundImage:
+            backgroundImage: props?.isRead ?
+              "linear-gradient(45deg, #98D6E1, #BACBFB)" :
               "linear-gradient(45deg, var(--mantine-color-cyan-5), var(--mantine-color-indigo-5))",
             fontWeight: 700,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
           lineClamp={2}
-          mb={10}
         >
-          {`${props?.title} | ${props.content}`}
+          {props?.title}
         </Highlight>
+        <Text c={props?.isRead ? "dimmed" : undefined} mb={5} size="sm">
+          {props?.content}
+        </Text>
 
         <Flex align={"center"}>
           <Text c="dimmed" fw={500} size="sm">
-            {dayjs(props?.time).format("HH:mm DD-MM-YYYY")}
+            {props?.time ? timeSince(new Date(props.time)) : "No Data"}
+            {/* {dayjs(props?.time).format("HH:mm DD-MM-YYYY")} */}
           </Text>
         </Flex>
       </Box>

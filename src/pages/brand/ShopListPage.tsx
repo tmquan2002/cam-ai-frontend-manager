@@ -13,7 +13,7 @@ import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import { GetShopListHookParams, useGetShopList, } from "../../hooks/useGetShopList";
 import { ShopStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { formatTime, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopListPage.module.scss";
 
@@ -269,7 +269,7 @@ const ShopListPage = () => {
             label="Page Size"
             allowDeselect={false}
             placeholder="0"
-            data={pageSizeSelect} defaultValue={"5"}
+            data={PAGE_SIZE_SELECT} defaultValue={"5"}
             value={pageSize}
             onChange={(value) => {
               setPageSize(value)

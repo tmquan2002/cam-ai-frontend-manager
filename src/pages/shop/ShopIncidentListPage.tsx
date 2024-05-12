@@ -333,7 +333,7 @@ const ShopIncidentListPage = () => {
               [])
             : [],
         };
-        console.log(params);
+        // console.log(params);
 
         massRejectIncident(params, {
           onSuccess() {

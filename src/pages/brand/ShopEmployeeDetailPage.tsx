@@ -69,6 +69,17 @@ const ShopEmployeeDetailPage = () => {
       employeeId: params?.id
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
+    initialValues: {
+      name: '',
+      email: '',
+      gender: Gender.Male,
+      phone: '',
+      birthday: new Date('01/01/2000'),
+      addressLine: '',
+      wardId: ``,
+      province: ``,
+      district: ``,
+    },
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: isEmail("Invalid email - ex: name@gmail.com"),
@@ -84,20 +95,19 @@ const ShopEmployeeDetailPage = () => {
 
   useEffect(() => {
     if (employeeData) {
-      updateEmployeeForm.setInitialValues({
-        name: employeeData?.name ?? undefined,
-        email: employeeData?.email ?? undefined,
-        gender: employeeData?.gender ?? undefined,
-        phone: employeeData?.phone ?? undefined,
+      updateEmployeeForm.setValues({
+        name: employeeData?.name ?? '',
+        email: employeeData?.email ?? '',
+        gender: employeeData?.gender ?? '',
+        phone: employeeData?.phone ?? '',
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
-          : undefined,
-        addressLine: employeeData?.addressLine ?? undefined,
+          : new Date("01/01/2000"),
+        addressLine: employeeData?.addressLine ?? '',
         wardId: `${employeeData?.wardId}`,
         province: `${employeeData?.ward?.district?.provinceId}`,
         district: `${employeeData?.ward?.districtId}`,
       });
-      updateEmployeeForm.reset();
     }
   }, [employeeData, isFetching]);
 

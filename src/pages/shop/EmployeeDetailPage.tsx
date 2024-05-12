@@ -39,7 +39,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./EmployeeDetailPage.module.scss";
 
@@ -88,7 +88,7 @@ const EmployeeDetailPage = () => {
       email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
       gender: isNotEmpty("Please select gender"),
       phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =

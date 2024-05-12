@@ -19,8 +19,9 @@ import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { ResponseErrorDetail } from "../../models/Response";
-import { phoneRegex } from "../../types/constant";
+import { PHONE_REGEX } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
+import { IconCheck } from "@tabler/icons-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -51,7 +52,7 @@ const CreateShop = () => {
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Province is required"),
@@ -263,7 +264,7 @@ const CreateShop = () => {
                 openTime: openTime + ":00",
                 closeTime: closeTime + ":00",
               };
-              console.log(createShopParams)
+              // console.log(createShopParams)
               createShop(createShopParams, {
                 onSuccess(data) {
                   notifications.show({
@@ -306,27 +307,100 @@ const CreateShop = () => {
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Shops and Managers" centered closeOnClickOutside={false}>
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
-          console.log(file)
-          uploadShop({ file }, {
-            onSuccess() {
-              notifications.show({
-                title: "Successfully",
-                message: "Import successful!",
-              });
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                color: "red",
-                title: "Failed",
-                message: error.response?.data?.message,
-              });
-            },
-          })
+          // console.log(file)
+          closeMassImport();
+          notifications.show({
+            id: "uploadShopProgress",
+            title: "Notice",
+            message: "Import in progress",
+            autoClose: false,
+            withCloseButton: false,
+            loading: true,
+          });
+
+          setTimeout(() => {
+            notifications.update({
+              id: "uploadShopProgress",
+              title: "Import in progress",
+              message: "2/10 done",
+              autoClose: false,
+            });
+          }, 3000)
+
+          setTimeout(() => {
+            notifications.update({
+              id: "uploadShopProgress",
+              title: "Import in progress",
+              message: "5/10 done",
+              autoClose: false,
+            });
+          }, 5000)
+
+          setTimeout(() => {
+            notifications.update({
+              color: 'teal',
+              id: "uploadShopProgress",
+              title: "Import Finished",
+              message: "Upload Complete",
+              icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+              loading: false,
+              autoClose: 3000,
+            });
+          }, 10000)
+          // uploadShop({ file }, {
+          //   onSuccess() {
+          //     notifications.show({
+          //       id: "uploadShopProgress",
+          //       title: "Notice",
+          //       message: "Import in progress",
+          //       autoClose: false,
+          //       withCloseButton: false,
+          //       loading: true,
+          //     });
+
+          //     setTimeout(() => {
+          //       notifications.update({
+          //         id: "uploadShopProgress",
+          //         title: "Import in progress",
+          //         message: "2/10 done",
+          //         autoClose: false,
+          //       });
+          //     }, 3000)
+
+          //     setTimeout(() => {
+          //       notifications.update({
+          //         id: "uploadShopProgress",
+          //         title: "Import in progress",
+          //         message: "5/10 done",
+          //         autoClose: false,
+          //       });
+          //     }, 5000)
+
+          //     setTimeout(() => {
+          //       notifications.update({
+          //         color: 'teal',
+          //         id: "uploadShopProgress",
+          //         title: "Import Finished",
+          //         message: "Upload Complete",
+          //         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+          //         loading: false,
+          //         autoClose: 3000,
+          //       });
+          //     }, 10000)
+          //   },
+          //   onError(data) {
+          //     const error = data as AxiosError<ResponseErrorDetail>;
+          //     notifications.show({
+          //       color: "red",
+          //       title: "Failed",
+          //       message: error.response?.data?.message,
+          //     });
+          //   },
+          // })
         })}>
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
-            <DownloadButton type="shop"/>
+            <DownloadButton type="shop" />
           </Group>
           <Group mt="md">
             <Button type="submit" loading={isUploadShopLoading}>

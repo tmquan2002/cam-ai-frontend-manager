@@ -15,7 +15,7 @@ import { useGetProvinceList } from "../../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../../hooks/useGetWardList";
 import { Gender, Role } from "../../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../../models/Response";
-import { phoneRegex } from "../../../types/constant";
+import { PHONE_REGEX } from "../../../types/constant";
 import { getDateFromSetYear, mapLookupToArray } from "../../../utils/helperFunction";
 
 export type CreateAccountField = {
@@ -57,7 +57,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
             email: isEmail("Invalid email - ex: name@gmail.com"),
             gender: isNotEmpty("Please select gender"),
             phone: (value) => isEmpty(value) ? null :
-                phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+                PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
         },
     });
 

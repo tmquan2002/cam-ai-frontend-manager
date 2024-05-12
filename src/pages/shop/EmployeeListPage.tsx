@@ -36,7 +36,7 @@ import EditAndUpdateForm, {
 } from "../../components/form/EditAndUpdateForm";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import * as _ from "lodash";
 
@@ -88,6 +88,7 @@ const EmployeeListPage = () => {
       size: Number(pageSize),
       pageIndex: activePage - 1,
       // employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
+      search: search,
     };
     // if (searchCategory == SearchCategory.NAME) {
     // sb.search = debounced.toString();
@@ -281,7 +282,7 @@ const EmployeeListPage = () => {
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={pageSizeSelect}
+              data={PAGE_SIZE_SELECT}
               defaultValue={"5"}
               value={pageSize}
               onChange={(value) => {
