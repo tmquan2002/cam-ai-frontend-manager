@@ -1,4 +1,4 @@
-import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, } from "@mantine/core";
+import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, useComputedColorScheme, } from "@mantine/core";
 import { useState } from "react";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
 import { NotificationStatus } from "../../models/CamAIEnum";
@@ -43,9 +43,11 @@ const DetailCard = (props: {
   time: string;
   isRead: boolean;
 }) => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
   return (
     <Flex p={20} className={classes["detail-card"]}>
-      <Indicator size={props?.isRead ? 0 : 15} color="pale-red.6" offset={7} processing >
+      <Indicator size={props?.isRead ? 0 : 15} color="pale-red.6" offset={7} >
         <Avatar
           size={"lg"}
           color="indigo"
@@ -61,11 +63,11 @@ const DetailCard = (props: {
       </Indicator>
       <Box ml={16}>
         <Highlight
-          c={props?.isRead ? "dimmed" : undefined} size="md"
+          size="md"
           highlight={[props?.title]}
           highlightStyles={{
             backgroundImage: props?.isRead ?
-              "linear-gradient(45deg, #98D6E1, #BACBFB)" :
+              "linear-gradient(45deg, #53ADBF, #6380DB)" :
               "linear-gradient(45deg, var(--mantine-color-cyan-5), var(--mantine-color-indigo-5))",
             fontWeight: 600,
             WebkitBackgroundClip: "text",
@@ -75,7 +77,7 @@ const DetailCard = (props: {
         >
           {props?.title}
         </Highlight>
-        <Text c={props?.isRead ? "dimmed" : undefined} mb={5} size="sm">
+        <Text c={props?.isRead ? computedColorScheme == "dark" ? "#D0D0D0" : "#565656" : undefined} mb={5} size="sm">
           {props?.content}
         </Text>
 
