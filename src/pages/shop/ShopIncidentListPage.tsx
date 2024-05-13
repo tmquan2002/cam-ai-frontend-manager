@@ -11,6 +11,7 @@ import {
   Loader,
   Modal,
   Paper,
+  Popover,
   ScrollArea,
   Select,
   Skeleton,
@@ -26,9 +27,8 @@ import { notifications } from "@mantine/notifications";
 import {
   IconFilter,
   IconIdOff,
-  IconSelect,
   IconUserUp,
-  IconX,
+  IconX
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -84,19 +84,15 @@ type IncidentFormField = {
 
 const ShopIncidentListPage = () => {
   const [openedFilter, { toggle: toggleFilter }] = useDisclosure(false);
-  const [assignOpened, { open: openAssign, close: closeAssign }] =
-    useDisclosure(false);
+  const [assignOpened, { open: openAssign, close: closeAssign }] = useDisclosure(false);
+  const [selectedPopoverOpened, { toggle: toggleSelectedPopover, close: closeSelectedPopover }] = useDisclosure(false);
+
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
   } | null>(null);
-
-  // For selection
-  const [openedSelect, { toggle: toggleSelect }] = useDisclosure(false);
-  // const [openedMerge, { toggle: toggleMerge }] = useDisclosure(false);
-  const [checkBoxMode, setCheckBoxMode] = useState("None");
 
   //Check box list section
   const [incidentCheckBoxList, handlers] =
@@ -150,28 +146,19 @@ const ShopIncidentListPage = () => {
   };
 
   const onMassAssignIncident = (fieldValues: IncidentFormField) => {
-    if (selectedCount == 0) {
-      notifications.show({
-        color: "yellow",
-        title: "Note",
-        message: "No incident selected",
-      });
-      return;
-    }
-
     massAssignIncident(
       {
         employeeId: fieldValues.employeeId ?? "",
         incidentIds: incidentCheckBoxList
           ? incidentCheckBoxList?.reduce(function (
-              filtered: string[],
-              incident
-            ) {
-              if (incident.checked) {
-                filtered.push(incident.id);
-              }
-              return filtered;
-            },
+            filtered: string[],
+            incident
+          ) {
+            if (incident.checked) {
+              filtered.push(incident.id);
+            }
+            return filtered;
+          },
             [])
           : [],
       },
@@ -183,6 +170,7 @@ const ShopIncidentListPage = () => {
           });
           refetchIncident();
           refetchIncidentList();
+          closeSelectedPopover();
         },
         onError(data) {
           const error = data as AxiosError<ResponseErrorDetail>;
@@ -322,14 +310,14 @@ const ShopIncidentListPage = () => {
         const params: MassRejectIncidentParams = {
           incidentIds: incidentCheckBoxList
             ? incidentCheckBoxList?.reduce(function (
-                filtered: string[],
-                incident
-              ) {
-                if (incident.checked) {
-                  filtered.push(incident.id);
-                }
-                return filtered;
-              },
+              filtered: string[],
+              incident
+            ) {
+              if (incident.checked) {
+                filtered.push(incident.id);
+              }
+              return filtered;
+            },
               [])
             : [],
         };
@@ -442,23 +430,21 @@ const ShopIncidentListPage = () => {
       }
     >
       <Group justify="space-between">
-        {openedSelect && checkBoxMode !== "None" && (
-          <Checkbox
-            w={20}
-            checked={row.checked}
-            disabled={row.disabled}
-            onChange={(event) =>
-              handlers.setItemProp(
-                index,
-                "checked",
-                event.currentTarget.checked
-              )
-            }
-          />
-        )}
+        <Checkbox
+          w={20}
+          checked={row.checked}
+          disabled={row.disabled}
+          onChange={(event) =>
+            handlers.setItemProp(
+              index,
+              "checked",
+              event.currentTarget.checked
+            )
+          }
+        />
         <Group
           justify="space-between"
-          w={openedSelect && checkBoxMode !== "None" ? 260 : "100%"}
+          w={260}
           onClick={() => {
             setSelectedIncident({ id: row?.id });
           }}
@@ -508,7 +494,7 @@ const ShopIncidentListPage = () => {
               bg={"#000"}
               fit="contain"
               imageId={evidence?.imageId}
-              // src={evidence?.image?.hostingUri}
+            // src={evidence?.image?.hostingUri}
             />
           </Box>
         );
@@ -523,15 +509,37 @@ const ShopIncidentListPage = () => {
     >
       <Group
         p={rem(24)}
-        pb={!openedFilter ? rem(24) : rem(0)}
-        align="center"
-        justify="space-between"
       >
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incident list
         </Text>
+      </Group>
+
+      <Group
+        px={rem(24)} pt={rem(12)}
+        pb={!openedFilter ? rem(24) : rem(0)}
+        justify="space-between"
+      >
 
         {/* Top section */}
+        <Group gap={50}>
+          <Checkbox
+            label="Check All"
+            checked={allChecked}
+            indeterminate={indeterminate}
+            onChange={() =>
+              handlers.setState((current) =>
+                current.map((value) => ({ ...value, checked: !allChecked }))
+              )
+            }
+          />
+          {selectedCount > 0 &&
+            <Text size="sm" fs="italic">
+              {selectedCount} incident&#40;s&#41; selected
+            </Text>
+          }
+        </Group>
+
         <Group>
           {form.isDirty() ? (
             <Button variant="transparent" ml={"auto"} onClick={form.reset}>
@@ -540,138 +548,87 @@ const ShopIncidentListPage = () => {
           ) : (
             <></>
           )}
+          <Group>
+            {selectedCount > 0 &&
+              <Popover trapFocus position="bottom" withArrow shadow="md" opened={selectedPopoverOpened}>
+                <Popover.Target>
+                  <Tooltip label="Assign selected" withArrow>
+                    <ActionIcon
+                      variant="subtle"
+                      color={computedColorScheme == "dark" ? "white" : "black"}
+                      onClick={toggleSelectedPopover}
+                    >
+                      <IconUserUp size={20} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Popover.Target>
+                <Popover.Dropdown>
+                  <form onSubmit={massAssignIncidentForm.onSubmit(onMassAssignIncident)}>
+                    <Group align="baseline">
+                      {isGetEmployeeListLoading ? (
+                        <Loader mt={rem(30)} />
+                      ) : (
+                        <Select
+                          size="xs"
+                          {...massAssignIncidentForm.getInputProps("employeeId")}
+                          placeholder="Assign to.."
+                          data={employeeList?.values?.map((item) => {
+                            return {
+                              value: item?.id,
+                              label: item?.name,
+                            };
+                          })}
+                          nothingFoundMessage="Nothing found..."
+                        />
+                      )}
+                      <Button
+                        variant="gradient"
+                        size="xs"
+                        type="submit"
+                        loading={isMassAssignIncidentLoading}
+                        gradient={{
+                          from: "light-blue.5",
+                          to: "light-blue.7",
+                          deg: 90,
+                        }}
+                      >
+                        Assign
+                      </Button>
+                    </Group>
+                  </form>
+                </Popover.Dropdown>
+              </Popover>
+            }
 
-          <Tooltip label="Select Multiple" withArrow>
-            <ActionIcon
-              variant={checkBoxMode == "Select" ? "filled" : "subtle"}
-              onClick={() => {
-                handlers.setState(incidentList || []);
+            {selectedCount > 0 &&
+              <Tooltip label="Reject selected" withArrow>
+                <ActionIcon
+                  variant="subtle"
+                  color={computedColorScheme == "dark" ? "white" : "black"}
+                  onClick={openMassRejectModal}
+                  loading={isMassRejectIncidentLoading}
+                >
+                  <IconIdOff size={20} />
+                </ActionIcon>
+              </Tooltip>
+            }
 
-                if (openedSelect) {
-                  setCheckBoxMode("None");
-                  toggleSelect();
-                } else {
-                  setCheckBoxMode("Select");
-                  toggleSelect();
-                }
-
-                if (openedFilter) toggleFilter();
-                // if (openedMerge) toggleMerge()
-              }}
-              color={computedColorScheme == "dark" ? "white" : "black"}
-            >
-              <IconSelect size={20} />
-            </ActionIcon>
-          </Tooltip>
-
-          <Tooltip label="Filter" withArrow>
-            <ActionIcon
-              variant={checkBoxMode == "Filter" ? "filled" : "subtle"}
-              onClick={() => {
-                handlers.setState(incidentList || []);
-
-                if (openedFilter) {
-                  setCheckBoxMode("None");
-                  toggleFilter();
-                } else {
-                  setCheckBoxMode("Filter");
-                  toggleFilter();
-                }
-
-                if (openedSelect) toggleSelect();
-                // if (openedMerge) toggleMerge()
-              }}
-              color={computedColorScheme == "dark" ? "white" : "black"}
-            >
-              <IconFilter size={20} />
-            </ActionIcon>
-          </Tooltip>
+            <Tooltip label="Filter" withArrow>
+              <ActionIcon
+                variant={openedFilter ? "filled" : "subtle"}
+                onClick={toggleFilter}
+                color={computedColorScheme == "dark" ? "white" : "black"}
+              >
+                <IconFilter size={20} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
         </Group>
       </Group>
 
       {/* Filter collapse section */}
       <Collapse px={rem(28)} in={openedFilter} mb={"xl"} mt={"xs"}>
         <EditAndUpdateForm fields={filterFields} />
-      </Collapse>
-
-      {/* Select collapse section */}
-      <Collapse px={rem(28)} in={openedSelect} mb={"xl"}>
-        <Group justify="space-between" align="baseline">
-          <Group gap={100}>
-            <Checkbox
-              label="Check All"
-              checked={allChecked}
-              indeterminate={indeterminate}
-              onChange={() =>
-                handlers.setState((current) =>
-                  current.map((value) => ({ ...value, checked: !allChecked }))
-                )
-              }
-            />
-            <Text size="sm" fs="italic">
-              {selectedCount} incident&#40;s&#41; selected
-            </Text>
-          </Group>
-
-          <Group justify="flex-end" align="baseline">
-            <form
-              onSubmit={massAssignIncidentForm.onSubmit(onMassAssignIncident)}
-            >
-              <Group gap={5} align="baseline">
-                {isGetEmployeeListLoading ? (
-                  <Loader mt={rem(30)} />
-                ) : (
-                  <Select
-                    w={rem(200)}
-                    size="xs"
-                    {...massAssignIncidentForm.getInputProps("employeeId")}
-                    placeholder="Assign incident to an employee"
-                    data={employeeList?.values?.map((item) => {
-                      return {
-                        value: item?.id,
-                        label: item?.name,
-                      };
-                    })}
-                    nothingFoundMessage="Nothing found..."
-                  />
-                )}
-                <Button
-                  variant="gradient"
-                  size="xs"
-                  type="submit"
-                  loading={isMassAssignIncidentLoading}
-                  gradient={{
-                    from: "light-blue.5",
-                    to: "light-blue.7",
-                    deg: 90,
-                  }}
-                >
-                  Assign Selected
-                </Button>
-              </Group>
-            </form>
-
-            <Button
-              variant="gradient"
-              size="xs"
-              onClick={() => {
-                if (selectedCount == 0) {
-                  notifications.show({
-                    color: "yellow",
-                    title: "Note",
-                    message: "No incident selected",
-                  });
-                } else {
-                  openMassRejectModal();
-                }
-              }}
-              loading={isMassRejectIncidentLoading}
-              gradient={{ from: "pale-red.5", to: "pale-red.7", deg: 90 }}
-            >
-              Reject Selected
-            </Button>
-          </Group>
-        </Group>
       </Collapse>
 
       {/* Main section */}
