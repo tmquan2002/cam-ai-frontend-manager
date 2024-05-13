@@ -347,56 +347,56 @@ const CreateShop = () => {
               autoClose: 3000,
             });
           }, 10000)
-          // uploadShop({ file }, {
-          //   onSuccess() {
-          //     notifications.show({
-          //       id: "uploadShopProgress",
-          //       title: "Notice",
-          //       message: "Import in progress",
-          //       autoClose: false,
-          //       withCloseButton: false,
-          //       loading: true,
-          //     });
+          uploadShop({ file }, {
+            onSuccess() {
+              notifications.show({
+                id: "uploadShopProgress",
+                title: "Notice",
+                message: "Import in progress",
+                autoClose: false,
+                withCloseButton: false,
+                loading: true,
+              });
 
-          //     setTimeout(() => {
-          //       notifications.update({
-          //         id: "uploadShopProgress",
-          //         title: "Import in progress",
-          //         message: "2/10 done",
-          //         autoClose: false,
-          //       });
-          //     }, 3000)
+              setTimeout(() => {
+                notifications.update({
+                  id: "uploadShopProgress",
+                  title: "Import in progress",
+                  message: "2/10 done",
+                  autoClose: false,
+                });
+              }, 3000)
 
-          //     setTimeout(() => {
-          //       notifications.update({
-          //         id: "uploadShopProgress",
-          //         title: "Import in progress",
-          //         message: "5/10 done",
-          //         autoClose: false,
-          //       });
-          //     }, 5000)
+              setTimeout(() => {
+                notifications.update({
+                  id: "uploadShopProgress",
+                  title: "Import in progress",
+                  message: "5/10 done",
+                  autoClose: false,
+                });
+              }, 5000)
 
-          //     setTimeout(() => {
-          //       notifications.update({
-          //         color: 'teal',
-          //         id: "uploadShopProgress",
-          //         title: "Import Finished",
-          //         message: "Upload Complete",
-          //         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-          //         loading: false,
-          //         autoClose: 3000,
-          //       });
-          //     }, 10000)
-          //   },
-          //   onError(data) {
-          //     const error = data as AxiosError<ResponseErrorDetail>;
-          //     notifications.show({
-          //       color: "red",
-          //       title: "Failed",
-          //       message: error.response?.data?.message,
-          //     });
-          //   },
-          // })
+              setTimeout(() => {
+                notifications.update({
+                  color: 'teal',
+                  id: "uploadShopProgress",
+                  title: "Import Finished",
+                  message: "Upload Complete",
+                  icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                  loading: false,
+                  autoClose: 3000,
+                });
+              }, 10000)
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                color: "red",
+                title: "Failed",
+                message: error.response?.data?.message,
+              });
+            },
+          })
         })}>
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
