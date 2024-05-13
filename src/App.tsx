@@ -30,6 +30,7 @@ const theme = createTheme({
     "pale-red": pale_red,
     shading: shading,
   },
+  cursorType: "pointer",
 });
 
 //TODO: Fix form don't have managerId
