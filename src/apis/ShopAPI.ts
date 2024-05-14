@@ -1,6 +1,7 @@
 import { getAccessToken } from "../context/AuthContext";
 import { ShopStatus } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
+import { Progress } from "../models/Progress";
 import { ShopDetail } from "../models/Shop";
 import http, { toQueryParams } from "../utils/http";
 
@@ -144,12 +145,19 @@ export const ShopAPI = {
   _getShopUpsertTaskResult: async (taskId: string) => {
     const access_token = getAccessToken();
 
-    const res = await http.get<{
-      inserted: number;
-      updated: number;
-      failed: number;
-      metadata: string[];
-    }>(`/api/shops/upsert/task/${taskId}/result`, {
+    const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/result`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getShopProgress: async (taskId: string | null) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/progress`, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },

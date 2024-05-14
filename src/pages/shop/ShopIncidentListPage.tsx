@@ -212,7 +212,7 @@ const ShopIncidentListPage = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: form?.values.size,
+      size: 20,
       pageIndex: activePage - 1,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;

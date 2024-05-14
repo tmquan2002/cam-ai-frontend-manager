@@ -104,7 +104,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     placeholder: "Phone",
                     label: "Phone",
                 },
-                spans: 6,
+                spans: 4,
             },
 
             {
@@ -117,7 +117,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     name: "gender",
                     required: true,
                 },
-                spans: 6,
+                spans: 4,
             },
             {
                 type: FIELD_TYPES.DATE,
@@ -128,7 +128,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     placeholder: "Birthday",
                     label: "Birthday",
                 },
-                spans: 6,
+                spans: 4,
             },
 
             {
