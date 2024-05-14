@@ -24,6 +24,8 @@ import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { EMAIL_REGEX } from "../../types/constant";
 import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -47,8 +49,8 @@ export type CreateEmployeeField = {
 };
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
-  const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
-    useDisclosure(false);
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+  const { setTaskId } = useTaskShop();
 
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
@@ -76,18 +78,11 @@ const CreateEmployeePage = () => {
     },
   });
 
-  const { data: provinces, isLoading: isProvicesLoading } =
-    useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
-    +(createEmployeeForm.values.province ?? 0)
-  );
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
-    +(createEmployeeForm.values.district ?? 0)
-  );
-  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
-    useCreateEmployee();
-  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } =
-    useUploadEmployeeFile();
+  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createEmployeeForm.values.province ?? 0));
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createEmployeeForm.values.district ?? 0));
+  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } = useCreateEmployee();
+  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } = useUploadEmployeeFile();
 
   const createEmployeeFields = useMemo(() => {
     return [
@@ -216,7 +211,7 @@ const CreateEmployeePage = () => {
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
-          label: "Import File",
+          label: "Import Employees",
           accept: ".csv",
           width: 300,
           required: true,
@@ -293,18 +288,29 @@ const CreateEmployeePage = () => {
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
           // console.log(file)
           uploadEmployee({ file }, {
-            onSuccess() {
+            onSuccess(data) {
+              closeMassImport();
               notifications.show({
-                title: "Successfully",
-                message: "Import successful!",
+                id: "uploadEmployeeProgress",
+                title: "Notice",
+                message: "Import in progress",
+                autoClose: false,
+                withCloseButton: false,
+                icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                loading: true,
               });
+              setTaskId(data.taskId)
             },
             onError(data) {
               const error = data as AxiosError<ResponseErrorDetail>;
               notifications.show({
+                id: "uploadEmployeeProgress",
                 color: "red",
                 title: "Failed",
-                message: error.response?.data?.message,
+                message: error.response?.data?.message || "Something wrong happen trying to upload the file",
+                autoClose: 5000,
+                icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                loading: false,
               });
             },
           })

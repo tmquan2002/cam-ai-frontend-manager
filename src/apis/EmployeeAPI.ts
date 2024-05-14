@@ -144,4 +144,22 @@ export const EmployeeApi = {
 
     return res?.data;
   },
+
+  _getEmployeeProgress: async (taskId: string | null) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<{
+      percent: number,
+      detailed: {
+        currentFinishedRecord: number,
+        total: number
+      }
+    }>(`/api/employees/upsert/task/${taskId}/progress`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
 };

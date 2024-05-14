@@ -2,6 +2,7 @@ import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { isEmpty } from "lodash";
 import { useMemo } from "react";
@@ -19,9 +20,9 @@ import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { ResponseErrorDetail } from "../../models/Response";
+import { useTaskBrand } from "../../routes/BrandRoute";
 import { PHONE_REGEX } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
-import { IconCheck } from "@tabler/icons-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -47,6 +48,7 @@ export type CreateShopField = {
 const CreateShop = () => {
   const [openedCreateManager, { open: openCreateManager, close: closeCreateManager }] = useDisclosure(false);
   const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+  const { setTaskId } = useTaskBrand();
 
   const createShopForm = useForm<CreateShopField>({
     validate: {
@@ -76,7 +78,6 @@ const CreateShop = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createShopForm.values.district ?? 0));
   const { mutate: createShop, isLoading: isCreateShopLoading } = useCreateShop();
   const { mutate: uploadShop, isLoading: isUploadShopLoading } = useUploadShopFile();
-
 
   const createShopFields = useMemo(() => {
     return [
@@ -228,7 +229,7 @@ const CreateShop = () => {
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
-          label: "Import File",
+          label: "Import Shops",
           accept: ".csv",
           width: 300,
           required: true,
@@ -308,92 +309,30 @@ const CreateShop = () => {
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Shops and Managers" centered closeOnClickOutside={false}>
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
           // console.log(file)
-          closeMassImport();
-          notifications.show({
-            id: "uploadShopProgress",
-            title: "Notice",
-            message: "Import in progress",
-            autoClose: false,
-            withCloseButton: false,
-            loading: true,
-          });
-
-          setTimeout(() => {
-            notifications.update({
-              id: "uploadShopProgress",
-              title: "Import in progress",
-              message: "2/10 done",
-              autoClose: false,
-            });
-          }, 3000)
-
-          setTimeout(() => {
-            notifications.update({
-              id: "uploadShopProgress",
-              title: "Import in progress",
-              message: "5/10 done",
-              autoClose: false,
-            });
-          }, 5000)
-
-          setTimeout(() => {
-            notifications.update({
-              color: 'teal',
-              id: "uploadShopProgress",
-              title: "Import Finished",
-              message: "Upload Complete",
-              icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-              loading: false,
-              autoClose: 3000,
-            });
-          }, 10000)
           uploadShop({ file }, {
-            onSuccess() {
+            onSuccess(data) {
+              closeMassImport();
               notifications.show({
                 id: "uploadShopProgress",
                 title: "Notice",
                 message: "Import in progress",
                 autoClose: false,
                 withCloseButton: false,
+                icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
                 loading: true,
               });
-
-              setTimeout(() => {
-                notifications.update({
-                  id: "uploadShopProgress",
-                  title: "Import in progress",
-                  message: "2/10 done",
-                  autoClose: false,
-                });
-              }, 3000)
-
-              setTimeout(() => {
-                notifications.update({
-                  id: "uploadShopProgress",
-                  title: "Import in progress",
-                  message: "5/10 done",
-                  autoClose: false,
-                });
-              }, 5000)
-
-              setTimeout(() => {
-                notifications.update({
-                  color: 'teal',
-                  id: "uploadShopProgress",
-                  title: "Import Finished",
-                  message: "Upload Complete",
-                  icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-                  loading: false,
-                  autoClose: 3000,
-                });
-              }, 10000)
+              setTaskId(data.taskId)
             },
             onError(data) {
               const error = data as AxiosError<ResponseErrorDetail>;
               notifications.show({
+                id: "uploadShopProgress",
                 color: "red",
                 title: "Failed",
-                message: error.response?.data?.message,
+                message: error.response?.data?.message || "Something wrong happen trying to upload the file",
+                autoClose: 5000,
+                icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                loading: false,
               });
             },
           })

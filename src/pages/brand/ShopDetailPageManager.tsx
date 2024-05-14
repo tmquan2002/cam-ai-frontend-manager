@@ -180,8 +180,8 @@ const ShopDetailPageManager = () => {
       {
         onSuccess() {
           notifications.show({
-            title: "Assign successfully",
-            message: "EdgeBox assign success!",
+            title: "Success",
+            message: "Activate Edge Box successfully!",
           });
           refetchEdgeBoxInstallList();
         },

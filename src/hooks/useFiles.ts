@@ -1,9 +1,10 @@
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
 import { UseQueryResult, useMutation, useQuery } from "react-query";
 import { EmployeeApi } from "../apis/EmployeeAPI";
 import { FilesAPI } from "../apis/FilesAPI";
 import { ShopAPI } from "../apis/ShopAPI";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
+import { Progress } from "../models/Progress";
 import { ResponseErrorDetail } from "../models/Response";
 
 export const useGetShopTemplate = () => {
@@ -179,4 +180,32 @@ export const useGetEmployeeUpsertTaskResult = (taskId: string, delay: number) =>
     });
 
     return { isError, isLoading, data, error };
+};
+
+export const useGetShopProgress = (taskId: string | null, delay: number) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<Progress, Error> = useQuery({
+        queryKey: ["getShopProgress"],
+        queryFn: async () => {
+            return await ShopAPI._getShopProgress(taskId);
+        },
+        enabled: !!taskId,
+        refetchInterval: query => query?.percents == 100 ? false : delay,
+        refetchIntervalInBackground: true
+    });
+
+    return { isError, isLoading, data, error, refetch };
+};
+
+export const useGetEmployeeProgress = (taskId: string | null, delay: number) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<Progress, Error> = useQuery({
+        queryKey: ["getEmployeeProgress"],
+        queryFn: async () => {
+            return await EmployeeApi._getEmployeeProgress(taskId);
+        },
+        refetchInterval: query => query?.percent == 100 ? false : delay,
+        enabled: !!taskId,
+        refetchIntervalInBackground: true,
+    });
+
+    return { isError, isLoading, data, error, refetch };
 };
