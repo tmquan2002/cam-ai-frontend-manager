@@ -81,7 +81,7 @@ export function SessionProvider(props: React.PropsWithChildren) {
       (err) => {
         if (err?.response?.status == 401) {
           if (err?.response?.headers.auto != "True") {
-            console.log("clear tokens auth context");
+            // console.log("clear tokens auth context");
             const darkMode = localStorage.getItem("mantine-color-scheme-value");
             localStorage.clear();
             localStorage.setItem("mantine-color-scheme-value", darkMode ?? "light");

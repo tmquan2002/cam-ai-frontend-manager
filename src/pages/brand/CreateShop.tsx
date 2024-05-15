@@ -2,6 +2,7 @@ import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { isEmpty } from "lodash";
 import { useMemo } from "react";
@@ -19,7 +20,8 @@ import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { ResponseErrorDetail } from "../../models/Response";
-import { phoneRegex } from "../../types/constant";
+import { useTaskBrand } from "../../routes/BrandRoute";
+import { PHONE_REGEX } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -46,12 +48,13 @@ export type CreateShopField = {
 const CreateShop = () => {
   const [openedCreateManager, { open: openCreateManager, close: closeCreateManager }] = useDisclosure(false);
   const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+  const { setTaskId } = useTaskBrand();
 
   const createShopForm = useForm<CreateShopField>({
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Province is required"),
@@ -75,7 +78,6 @@ const CreateShop = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createShopForm.values.district ?? 0));
   const { mutate: createShop, isLoading: isCreateShopLoading } = useCreateShop();
   const { mutate: uploadShop, isLoading: isUploadShopLoading } = useUploadShopFile();
-
 
   const createShopFields = useMemo(() => {
     return [
@@ -227,7 +229,7 @@ const CreateShop = () => {
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
-          label: "Import File",
+          label: "Import Shops",
           accept: ".csv",
           width: 300,
           required: true,
@@ -263,7 +265,7 @@ const CreateShop = () => {
                 openTime: openTime + ":00",
                 closeTime: closeTime + ":00",
               };
-              console.log(createShopParams)
+              // console.log(createShopParams)
               createShop(createShopParams, {
                 onSuccess(data) {
                   notifications.show({
@@ -306,27 +308,38 @@ const CreateShop = () => {
       {/* Mass import modal section */}
       <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Shops and Managers" centered closeOnClickOutside={false}>
         <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
-          console.log(file)
+          // console.log(file)
           uploadShop({ file }, {
-            onSuccess() {
+            onSuccess(data) {
+              closeMassImport();
               notifications.show({
-                title: "Successfully",
-                message: "Import successful!",
+                id: "uploadShopProgress",
+                title: "Notice",
+                message: "Import in progress",
+                autoClose: false,
+                withCloseButton: false,
+                icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                loading: true,
               });
+              setTaskId(data.taskId)
             },
             onError(data) {
               const error = data as AxiosError<ResponseErrorDetail>;
               notifications.show({
+                id: "uploadShopProgress",
                 color: "red",
                 title: "Failed",
-                message: error.response?.data?.message,
+                message: error.response?.data?.message || "Something wrong happen trying to upload the file",
+                autoClose: 5000,
+                icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                loading: false,
               });
             },
           })
         })}>
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
-            <DownloadButton type="shop"/>
+            <DownloadButton type="shop" />
           </Group>
           <Group mt="md">
             <Button type="submit" loading={isUploadShopLoading}>

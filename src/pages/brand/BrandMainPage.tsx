@@ -56,7 +56,7 @@ import {
 import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import {
   formatTime,
   isEmpty,
@@ -504,7 +504,7 @@ const BrandMainPage = () => {
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={pageSizeSelect} defaultValue={"5"}
+              data={PAGE_SIZE_SELECT} defaultValue={"5"}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value)

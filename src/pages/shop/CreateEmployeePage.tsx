@@ -22,11 +22,13 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
+import { EMAIL_REGEX } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
 } from "../../utils/helperFunction";
-import { emailRegex } from "../../types/constant";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -52,6 +54,7 @@ const CreateEmployeePage = () => {
   const navigate = useNavigate();
   const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
     useDisclosure(false);
+  const { setTaskId } = useTaskShop();
 
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
@@ -68,7 +71,7 @@ const CreateEmployeePage = () => {
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value) =>
-        emailRegex.test(value) ? null : "Invalid email - ex: name@gmail.com",
+        EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -230,7 +233,7 @@ const CreateEmployeePage = () => {
           form: massImportForm,
           name: "file",
           placeholder: "Choose a file",
-          label: "Import File",
+          label: "Import Employees",
           accept: ".csv",
           width: 300,
           required: true,
@@ -314,22 +317,37 @@ const CreateEmployeePage = () => {
         <form
           autoComplete="off"
           onSubmit={massImportForm.onSubmit(({ file }) => {
-            console.log(file);
+            // console.log(file)
             uploadEmployee(
               { file },
               {
-                onSuccess() {
+                onSuccess(data) {
+                  closeMassImport();
                   notifications.show({
-                    title: "Successfully",
-                    message: "Import successful!",
+                    id: "uploadEmployeeProgress",
+                    title: "Notice",
+                    message: "Import in progress",
+                    autoClose: false,
+                    withCloseButton: false,
+                    icon: (
+                      <IconCheck style={{ width: rem(18), height: rem(18) }} />
+                    ),
+                    loading: true,
                   });
+                  setTaskId(data.taskId);
                 },
                 onError(data) {
                   const error = data as AxiosError<ResponseErrorDetail>;
                   notifications.show({
+                    id: "uploadEmployeeProgress",
                     color: "red",
                     title: "Failed",
-                    message: error.response?.data?.message,
+                    message:
+                      error.response?.data?.message ||
+                      "Something wrong happen trying to upload the file",
+                    autoClose: 5000,
+                    icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                    loading: false,
                   });
                 },
               }

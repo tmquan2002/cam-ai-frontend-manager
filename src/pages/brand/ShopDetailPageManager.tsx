@@ -1,9 +1,9 @@
-import { Accordion, ActionIcon, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
+import { Accordion, ActionIcon, Box, Button, Center, Collapse, Divider, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconAlertCircle, IconCamera, IconCaretRight, IconFileAnalytics, IconMail, IconMapPin, IconRepeat, IconRouter, IconTrash, IconUser, IconUsers, IconVideo, IconX, } from "@tabler/icons-react";
+import { IconAlertCircle, IconCaretRight, IconFileAnalytics, IconMail, IconMapPin, IconRepeat, IconRouter, IconTrash, IconUser, IconUsers, IconVideo, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import clsx from "clsx";
 import { isEmpty } from "lodash";
@@ -15,7 +15,6 @@ import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/C
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
-import NoImage from "../../components/image/NoImage";
 import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
 import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
@@ -29,7 +28,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
 
@@ -113,7 +112,7 @@ const ShopDetailPageManager = () => {
         "Shop name must be 1- 50 characters long"
       ),
       phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -180,8 +179,8 @@ const ShopDetailPageManager = () => {
       {
         onSuccess() {
           notifications.show({
-            title: "Assign successfully",
-            message: "EdgeBox assign success!",
+            title: "Success",
+            message: "Activate Edge Box successfully!",
           });
           refetchEdgeBoxInstallList();
         },
@@ -291,7 +290,6 @@ const ShopDetailPageManager = () => {
           label: "Shop phone",
         },
       },
-
       {
         type: FIELD_TYPES.TIME,
         fieldProps: {
@@ -410,9 +408,6 @@ const ShopDetailPageManager = () => {
             <Tabs.Tab value="shopManager" leftSection={<IconUser />}>
               Shop Manager
             </Tabs.Tab>
-            <Tabs.Tab value="camera" leftSection={<IconCamera />}>
-              Camera
-            </Tabs.Tab>
             <Tabs.Tab value="employees" leftSection={<IconUsers />}>
               Employee
             </Tabs.Tab>
@@ -466,7 +461,7 @@ const ShopDetailPageManager = () => {
                       closeTime: values?.closeTime,
                     };
 
-                    console.log(updateShopParams)
+                    // console.log(updateShopParams)
 
                     updateShop(updateShopParams, {
                       onSuccess() {
@@ -561,59 +556,6 @@ const ShopDetailPageManager = () => {
               </Collapse>
             </Box>
           </Tabs.Panel>
-          <Tabs.Panel value="camera">
-            <Box p={rem(32)}>
-              <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
-                Camera list
-              </Text>
-              {isGetCameraListLoading ? (
-                <Loader />
-              ) : cameraList?.isValuesEmpty ? (
-                <NoImage type="NO_DATA" />
-              ) : (
-                cameraList?.values?.map((item) => (
-                  <Tooltip label="View camera" key={item?.id}>
-                    <Button
-                      mb={rem(12)}
-                      variant="outline"
-                      fullWidth
-                      size={rem(52)}
-                      justify="space-between"
-                      onClick={() => {
-                        if (item?.status != CameraStatus.Connected) {
-                          notifications.show({
-                            color: "red",
-                            title: "Camera is disconnected",
-                            message:
-                              "Camera is disconnected, cannot view live stream",
-                          });
-                        } else {
-                          navigate(`/brand/camera/${item?.id}`);
-                        }
-                      }}
-                      rightSection={<IconCaretRight style={{ width: rem(24) }} />}
-                      px={rem(16)}
-                    >
-                      <Group>
-                        <Group mr={rem(20)}>
-                          <IconVideo style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.name}</Text>
-                        </Group>
-                        <Group mr={rem(20)}>
-                          <IconMapPin style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.zone}</Text>
-                        </Group>
-                        <Group>
-                          <IconAlertCircle style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.status}</Text>
-                        </Group>
-                      </Group>
-                    </Button>
-                  </Tooltip>
-                ))
-              )}
-            </Box>
-          </Tabs.Panel>
           <Tabs.Panel value="employees">
             <Box p={rem(32)}>
               <Flex pb={rem(20)} justify={"space-between "}>
@@ -666,7 +608,7 @@ const ShopDetailPageManager = () => {
             </Box>
           </Tabs.Panel>
           <Tabs.Panel value="edgebox">
-            <Skeleton visible={isEdgeboxInstallListLoading}>
+            <Skeleton visible={isEdgeboxInstallListLoading || isGetCameraListLoading}>
               <Box p={rem(32)}>
                 <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
                   <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
@@ -701,6 +643,66 @@ const ShopDetailPageManager = () => {
                   </>
                 ) : (
                   <EdgeBoxInstallEmpty />
+                )}
+              </Box>
+              <Divider />
+              <Box p={rem(32)}>
+                <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
+                  Camera list
+                </Text>
+                {cameraList?.isValuesEmpty ? (
+                  <Flex>
+                    <Box ml={rem(40)} style={{ flex: 1 }}>
+                      <Text c="dimmed"
+                        w={"100%"}
+                        ta={"center"}
+                        mt={20}
+                        fs="italic">
+                        No camera found
+                      </Text>
+                    </Box>
+                  </Flex>
+                ) : (
+                  cameraList?.values?.map((item) => (
+                    <Tooltip label="View camera" key={item?.id}>
+                      <Button
+                        mb={rem(12)}
+                        variant="outline"
+                        fullWidth
+                        size={rem(52)}
+                        justify="space-between"
+                        onClick={() => {
+                          if (item?.status != CameraStatus.Connected) {
+                            notifications.show({
+                              color: "red",
+                              title: "Camera is disconnected",
+                              message:
+                                "Camera is disconnected, cannot view live stream",
+                            });
+                          } else {
+                            navigate(`/brand/camera/${item?.id}`);
+                          }
+                        }}
+                        rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                        px={rem(16)}
+                      >
+                        <Group>
+                          <Group mr={rem(20)}>
+                            <IconVideo style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.name}</Text>
+                          </Group>
+                          <Group mr={rem(20)}>
+                            <IconMapPin style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.zone}</Text>
+                          </Group>
+                          <Group>
+                            <IconAlertCircle style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.status}</Text>
+                          </Group>
+                        </Group>
+                      </Button>
+                    </Tooltip>
+                  ))
                 )}
               </Box>
             </Skeleton>

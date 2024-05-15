@@ -64,7 +64,7 @@ export const useReportByShop = (shopId: string) => {
         data,
         updatedJson
       );
-      console.log(newArray);
+      // console.log(newArray);
       setData(newArray);
     }
   }, [lastJsonMessage]);

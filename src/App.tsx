@@ -30,13 +30,13 @@ const theme = createTheme({
     "pale-red": pale_red,
     shading: shading,
   },
+  cursorType: "pointer",
 });
 
 //TODO: Fix form don't have managerId
-//TODO: Brand Update Employee page
-//TODO: Merge edge box and camera and shop detail page
+//TODO: Merge edge box and camera in shop detail page
 //TODO: View Shop Manager info and add assign button
-//TODO: Check and redesign status badges using reusable badge components
+//TODO: Add a new page to show import result for notification button and notification progress bar
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">
@@ -44,7 +44,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <SessionProvider>
-              <Notifications position="top-right" />
+              <Notifications position="bottom-right" />
               <AppRoute />
             </SessionProvider>
           </BrowserRouter>

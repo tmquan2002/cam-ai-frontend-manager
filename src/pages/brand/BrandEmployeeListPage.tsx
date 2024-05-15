@@ -12,7 +12,7 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
 import { EmployeeDetail } from "../../models/Employee";
-import { IMAGE_CONSTANT, pageSizeSelect } from "../../types/constant";
+import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandEmployeeListPage.module.scss";
 
@@ -83,7 +83,7 @@ const BrandEmployeeListPage = () => {
       employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
     };
     // if (searchCategory == SearchCategory.NAME) {
-    sb.search = debounced.toString();
+    sb.search = debounced.toString() || "";
     // } else if (searchCategory == SearchCategory.EMAIL) {
     //   sb.email = debounced.toString();
     // } else {
@@ -119,7 +119,7 @@ const BrandEmployeeListPage = () => {
       <Table.Td>{replaceIfNun(row?.birthday)}</Table.Td>
       <Table.Td>{replaceIfNun(row?.gender)}</Table.Td>
       <Table.Td ta={"center"}>
-        <StatusBadge statusName={row.employeeStatus} />
+        <StatusBadge statusName={row.employeeStatus} padding={10} size="sm"/>
       </Table.Td>
       <Table.Td>
         <Tooltip label="View Shop" withArrow position="top-start">
@@ -274,7 +274,7 @@ const BrandEmployeeListPage = () => {
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={pageSizeSelect} defaultValue={"20"}
+              data={PAGE_SIZE_SELECT} defaultValue={"20"}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value)

@@ -41,7 +41,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
@@ -95,7 +95,7 @@ const EmployeeDetailPage = () => {
       phone: (value) =>
         isEmpty(value)
           ? null
-          : phoneRegex.test(value)
+          : PHONE_REGEX.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
     },

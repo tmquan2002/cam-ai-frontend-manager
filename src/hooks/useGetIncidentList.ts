@@ -35,7 +35,7 @@ export const useGetOrderedIncidentListChecked = (params: GetIncidentParams) => {
     data,
     error,
     refetch,
-  }: UseQueryResult<IncidentDetailWithChecked[], Error> = useQuery({
+  }: UseQueryResult<CommonResponse<IncidentDetailWithChecked>, Error> = useQuery({
     queryKey: ["orderedIncidents", params],
     queryFn: async () => {
       const response = await IncidentApi._getIncidentList(params)
@@ -50,7 +50,7 @@ export const useGetOrderedIncidentListChecked = (params: GetIncidentParams) => {
           checked: false,
           disabled: false,
         }))
-      return orderedCheckedResponse
+      return { ...response, values: orderedCheckedResponse }
     },
   });
 

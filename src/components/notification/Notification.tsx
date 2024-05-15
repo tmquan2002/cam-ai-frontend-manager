@@ -1,9 +1,9 @@
-import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, } from "@mantine/core";
-import dayjs from "dayjs";
+import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, useComputedColorScheme, } from "@mantine/core";
 import { useState } from "react";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
 import { NotificationStatus } from "../../models/CamAIEnum";
 import { NotificationDetail } from "../../models/Notification";
+import { timeSince } from "../../utils/helperFunction";
 import classes from "./Notification.module.scss";
 
 export const TabsHeader = ({
@@ -43,9 +43,11 @@ const DetailCard = (props: {
   time: string;
   isRead: boolean;
 }) => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+
   return (
     <Flex p={20} className={classes["detail-card"]}>
-      <Indicator size={props?.isRead ? 0 : 15} color="pale-red.6" offset={7} processing >
+      <Indicator size={props?.isRead ? 0 : 15} color="pale-red.6" offset={7} >
         <Avatar
           size={"lg"}
           color="indigo"
@@ -61,23 +63,28 @@ const DetailCard = (props: {
       </Indicator>
       <Box ml={16}>
         <Highlight
+          size="md"
           highlight={[props?.title]}
           highlightStyles={{
-            backgroundImage:
+            backgroundImage: props?.isRead ?
+              "linear-gradient(45deg, #53ADBF, #6380DB)" :
               "linear-gradient(45deg, var(--mantine-color-cyan-5), var(--mantine-color-indigo-5))",
             fontWeight: 600,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
           lineClamp={2}
-          mb={10}
         >
-          {`${props?.title}  - ${props.content}`}
+          {props?.title}
         </Highlight>
+        <Text c={props?.isRead ? computedColorScheme == "dark" ? "#D0D0D0" : "#565656" : undefined} mb={5} size="sm">
+          {props?.content}
+        </Text>
 
         <Flex align={"center"}>
           <Text c="dimmed" fw={500} size="sm">
-            {dayjs(props?.time).format("HH:mm DD-MM-YYYY")}
+            {props?.time ? timeSince(new Date(props.time)) : "No Data"}
+            {/* {dayjs(props?.time).format("HH:mm DD-MM-YYYY")} */}
           </Text>
         </Flex>
       </Box>

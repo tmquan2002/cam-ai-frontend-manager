@@ -33,7 +33,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { AccountStatus, Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { phoneRegex } from "../../types/constant";
+import { PHONE_REGEX } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
 
@@ -80,7 +80,7 @@ const AccountDetailPage = () => {
       phone: (value) =>
         isEmpty(value)
           ? null
-          : phoneRegex.test(value)
+          : PHONE_REGEX.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
     },

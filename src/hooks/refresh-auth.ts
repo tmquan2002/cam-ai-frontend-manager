@@ -13,7 +13,7 @@ export const refreshAuth = async (failedRequest: any) => {
     localStorage.setItem(CommonConstant.USER_ACCESS_TOKEN, newToken);
     return Promise.resolve(newToken);
   } else {
-    console.log("clear tokens refresh-auth");
+    // console.log("clear tokens refresh-auth");
     localStorage.clear();
     location.reload();
 
