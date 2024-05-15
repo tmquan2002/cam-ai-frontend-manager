@@ -33,7 +33,7 @@ import { useAssignIncident } from "../../hooks/useAssignIncident";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetIncidentById } from "../../hooks/useGetIncidentById";
 import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { EvidenceType } from "../../models/CamAIEnum";
+import { EvidenceType, IncidentType } from "../../models/CamAIEnum";
 import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import classes from "./IncidentDetail.module.scss";
@@ -239,23 +239,30 @@ const IncidentDetail = () => {
                 </Text>
               </Stack>
             </Group>
-            <Group>
-              <Button fw={500} bg={"rgb(77,69,228)"} c={"#fff"} onClick={open}>
-                Assign
-              </Button>
-              <Button
-                bg={"#fff"}
-                c={"#c92a2a"}
-                fw={500}
-                style={{
-                  borderColor: "#c92a2a",
-                }}
-                onClick={openModal}
-                loading={isRejectIncidentLoading}
-              >
-                Reject
-              </Button>
-            </Group>
+            {incidentData?.incidentType != IncidentType.Interaction && (
+              <Group>
+                <Button
+                  fw={500}
+                  bg={"rgb(77,69,228)"}
+                  c={"#fff"}
+                  onClick={open}
+                >
+                  Assign
+                </Button>
+                <Button
+                  bg={"#fff"}
+                  c={"#c92a2a"}
+                  fw={500}
+                  style={{
+                    borderColor: "#c92a2a",
+                  }}
+                  onClick={openModal}
+                  loading={isRejectIncidentLoading}
+                >
+                  Reject
+                </Button>
+              </Group>
+            )}
           </Group>
         </Box>
         <Group

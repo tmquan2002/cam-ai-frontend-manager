@@ -4,7 +4,7 @@ import { SuperVisorAssignmentDetail } from "../models/Shop";
 import http, { toQueryParams } from "../utils/http";
 
 export type AssignSuperVisorParams = {
-  accountId: string;
+  employeeId: string;
   role: Role.ShopHeadSupervisor | Role.ShopSupervisor;
 };
 
@@ -12,11 +12,15 @@ export type GetAssignHistoryParams = {
   date: string;
 };
 
+export type GetSupervisorAssignHistoryParams = {
+  date: string;
+};
+
 export const CalendarAPI = {
   _assignSuperVisor: async (params: AssignSuperVisorParams) => {
     const access_token = getAccessToken();
 
-    const res = await http.post(`/api/shops/supervisor`, params, {
+    const res = await http.post(`/api/shops/employee/supervisor`, params, {
       headers: {
         Authorization: `Bearer ${access_token}`,
       },
@@ -27,7 +31,23 @@ export const CalendarAPI = {
   _getAssignHistory: async (params: GetAssignHistoryParams) => {
     const access_token = getAccessToken();
 
-    const res = await http.get<SuperVisorAssignmentDetail>(
+    const res = await http.get<SuperVisorAssignmentDetail[]>(
+      `/api/supervisorassignments?${toQueryParams(params)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    return res?.data;
+  },
+  _getSupervisorAssignHistory: async (
+    params: GetSupervisorAssignHistoryParams
+  ) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<SuperVisorAssignmentDetail[]>(
       `/api/supervisorassignments?${toQueryParams(params)}`,
       {
         headers: {

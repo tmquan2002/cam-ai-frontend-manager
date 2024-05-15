@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import _, { isEmpty } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
@@ -68,11 +68,7 @@ const CreateEmployeePage = () => {
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value) =>
-        isEmpty(value)
-          ? null
-          : emailRegex.test(value)
-          ? null
-          : "Invalid email - ex: name@gmail.com",
+        emailRegex.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -106,6 +102,7 @@ const CreateEmployeePage = () => {
           placeholder: "Name",
           label: "Name",
           required: true,
+          radius: "md",
         },
       },
       {
@@ -115,6 +112,8 @@ const CreateEmployeePage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
+          required: true,
+          radius: "md",
         },
       },
       {
@@ -126,6 +125,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "gender",
           required: true,
+          radius: "md",
         },
         spans: 6,
       },
@@ -138,6 +138,7 @@ const CreateEmployeePage = () => {
           type: "number",
           placeholder: "Phone",
           label: "Phone",
+          radius: "md",
         },
         spans: 6,
       },
@@ -149,6 +150,7 @@ const CreateEmployeePage = () => {
           placeholder: "Birthday",
           label: "Birthday",
           maxDate: getDateFromSetYear(18),
+          radius: "md",
         },
       },
       {
@@ -161,6 +163,8 @@ const CreateEmployeePage = () => {
           }),
           form: createEmployeeForm,
           name: "province",
+          radius: "md",
+
           loading: isProvicesLoading,
         },
         spans: 4,
@@ -176,6 +180,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "district",
           loading: isDistrictsLoading,
+          radius: "md",
         },
         spans: 4,
       },
@@ -190,6 +195,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "wardId",
           loading: isWardsLoading,
+          radius: "md",
         },
         spans: 4,
       },
@@ -200,6 +206,7 @@ const CreateEmployeePage = () => {
           name: "addressLine",
           placeholder: "Employee address",
           label: "Employee address",
+          radius: "md",
         },
       },
     ];

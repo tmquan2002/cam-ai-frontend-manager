@@ -20,11 +20,12 @@ import { isEmpty } from "lodash";
 import { useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UpdateAccountParams } from "../../apis/AccountAPI";
-import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
+import CustomBreadcrumb, {
+  BreadcrumbItem,
+} from "../../components/breadcrumbs/CustomBreadcrumb";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { useDeleteShopById } from "../../hooks/useDeleteShopById";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
@@ -34,16 +35,17 @@ import { AccountStatus, Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { phoneRegex } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
+import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: "Shop Manager",
-    link: "/brand/account"
+    link: "/brand/account",
   },
   {
-    title: "Detail"
-  }
-]
+    title: "Detail",
+  },
+];
 type ProfileFieldValue = {
   name: string;
   email: string;
@@ -75,15 +77,26 @@ const AccountDetailPage = () => {
       name: isNotEmpty("Name is required"),
       email: isEmail("Invalid email - ex: name@gmail.com"),
       gender: isNotEmpty("Please select gender"),
-      phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+      phone: (value) =>
+        isEmpty(value)
+          ? null
+          : phoneRegex.test(value)
+          ? null
+          : "A phone number should have a length of 10-12 characters",
     },
   });
-  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
-  const { data: accountData, isLoading: isAccountDataLoading } = useGetAccountById(id ?? "");
-  const { mutate: updateAccount, isLoading: isUpdateAccountLoading } = useUpdateAccount();
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(form.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(form.values.district ?? 0)
+  );
+  const { data: accountData, isLoading: isAccountDataLoading } =
+    useGetAccountById(id ?? "");
+  const { mutate: updateAccount, isLoading: isUpdateAccountLoading } =
+    useUpdateAccount();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -226,8 +239,8 @@ const AccountDetailPage = () => {
     wards,
   ]);
 
-  const { mutate: deleteShop, isLoading: isDeleteShopLoading } =
-    useDeleteShopById();
+  const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
+    useDeleteEmployeeById();
 
   return (
     <>
@@ -308,13 +321,13 @@ const AccountDetailPage = () => {
                 Confirm delete <Mark>{accountData?.name}</Mark> account?
               </Text>
             }
-          // centered
+            // centered
           >
             <Group justify="flex-end" mt="md">
               <Button
-                loading={isDeleteShopLoading}
+                loading={isDeleteEmployeeLoading}
                 onClick={() => {
-                  deleteShop(id ?? "", {
+                  deleteEmployee(id ?? "", {
                     onSuccess() {
                       notifications.show({
                         title: "Successfully",

@@ -288,7 +288,7 @@ const ShopHomePage = () => {
             item?.status == CameraStatus.Connected ? (
               <CameraCard cameraId={item?.id} key={item?.id} />
             ) : (
-              <></>
+              <div key={item?.id}></div>
             )
           )}
         </Group>

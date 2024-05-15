@@ -36,6 +36,8 @@ import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import BrandInteractionList from "../pages/brand/BrandInteractionList";
 import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
 import BrandMainPage from "../pages/brand/BrandMainPage";
+import HeadSupervisorRoute from "./HeadSupervisorRoute";
+import HeadSupervisorMainPage from "../pages/headsupervisor/HeadSupervisorMainPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -186,6 +188,16 @@ const AppRoute = () => {
         {
           path: "report/interaction",
           element: <InteractionReportPageManager />,
+        },
+      ],
+    },
+    {
+      path: "headsupervisor",
+      element: <HeadSupervisorRoute />,
+      children: [
+        {
+          path: "",
+          element: <HeadSupervisorMainPage />,
         },
       ],
     },

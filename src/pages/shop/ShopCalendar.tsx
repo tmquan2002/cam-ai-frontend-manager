@@ -14,6 +14,7 @@ import {
   Select,
   SimpleGrid,
   Skeleton,
+  Stack,
   Table,
   Text,
   rem,
@@ -33,6 +34,7 @@ import { NotificationColorPalette } from "../../types/constant";
 import classes from "./ShopCalendar.module.scss";
 import clsx from "clsx";
 import {
+  IconBrandHipchat,
   IconCalendarTime,
   IconChevronLeft,
   IconChevronRight,
@@ -50,6 +52,9 @@ import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
 import { Role } from "../../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
+import { modals } from "@mantine/modals";
+import _ from "lodash";
+import { SuperVisorAssignmentDetail } from "../../models/Shop";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -64,9 +69,6 @@ interface ShopCalendarProps {
 
 const ShopCalendar = ({ events }: ShopCalendarProps) => {
   const [scrolled, setScrolled] = useState(false);
-  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
-    offset: 60,
-  });
   const {
     scrollIntoView: scrollIntoIncidentDetail,
     targetRef: incidentDetailRef,
@@ -76,24 +78,29 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
 
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedShift, setSelectedShift] =
+    useState<SuperVisorAssignmentDetail | null>(null);
 
-  const { mutate: assignHeadSuperVisor } = useAssignSupervisor();
+  const { mutate: assignSuperVisor, isLoading: isAssignSupervisorLoading } =
+    useAssignSupervisor();
 
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList({
-      enabled: true,
-      fromTime: "2024-04-10T00:00:00",
-      toTime: "2024-04-16T00:00:00",
+      enabled: !!selectedShift,
+      fromTime: selectedShift?.startTime,
+      toTime: selectedShift?.endTime,
     });
 
   const { data: employeeList, isLoading: isEmployeeListLoading } =
     useGetEmployeeList({ size: 999 });
 
-  const { data, isLoading } = useGetSupervisorAssignmentHistory({
+  const {
+    data: supervisorList,
+    isLoading: isGetSupervisorListLoading,
+    refetch: refetchSupervisorList,
+  } = useGetSupervisorAssignmentHistory({
     date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
   });
-
-  console.log({ data, isLoading });
 
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
@@ -117,48 +124,134 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
     }, {});
   }, [events]);
 
-  useEffect(() => {
-    if (incidentList) {
-      scrollIntoView();
-    }
-  }, [incidentList]);
+  const openConfirmHeadSupervisorModal = ({
+    id,
+    supervisorName,
+  }: {
+    id: string;
+    supervisorName: string;
+  }) =>
+    modals.openConfirmModal({
+      title: "Please confirm modify head supervisor",
+      children: (
+        <Text size="sm">
+          Confirm modify{" "}
+          <Text inherit span fw={600}>
+            {supervisorName}
+          </Text>{" "}
+          as new head supervisor
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        assignSuperVisor(
+          { employeeId: id, role: Role.ShopHeadSupervisor },
+          {
+            onSuccess() {
+              notifications.show({
+                title: "Success",
+                message: "Assign head supervisor successfully!",
+                autoClose: 6000,
+                c: NotificationColorPalette.UP_COMING,
+              });
+              refetchSupervisorList();
+            },
+            onError() {
+              notifications.show({
+                title: "Failed",
+                message: "Assign head supervisor failed!",
+                autoClose: 6000,
+                c: NotificationColorPalette.ALERT_MESSAGE,
+              });
+            },
+          }
+        );
+      },
+    });
+
+  const openConfirmSupervisorModal = ({
+    id,
+    supervisorName,
+  }: {
+    id: string;
+    supervisorName: string;
+  }) =>
+    modals.openConfirmModal({
+      title: "Please confirm modify supervisor",
+      children: (
+        <Text size="sm">
+          Confirm modify{" "}
+          <Text inherit span fw={600}>
+            {supervisorName}
+          </Text>{" "}
+          as new supervisor
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        assignSuperVisor(
+          { employeeId: id, role: Role.ShopSupervisor },
+          {
+            onSuccess() {
+              notifications.show({
+                title: "Success",
+                message: "Assign supervisor successfully!",
+                autoClose: 6000,
+                c: NotificationColorPalette.UP_COMING,
+              });
+              refetchSupervisorList();
+            },
+            onError() {
+              notifications.show({
+                title: "Failed",
+                message: "Assign supervisor failed!",
+                autoClose: 6000,
+                c: NotificationColorPalette.ALERT_MESSAGE,
+              });
+            },
+          }
+        );
+      },
+    });
+
+  // useEffect(() => {
+  //   if (incidentList) {
+  //     scrollIntoView();
+  //   }
+  // }, [incidentList]);
+
   useEffect(() => {
     if (selectedIncidentItem) {
       scrollIntoIncidentDetail();
     }
   }, [selectedIncidentItem]);
 
-  const handleSetSuperVisor = ({
-    id,
-    role,
-  }: {
-    id: string;
-    role: Role.ShopHeadSupervisor | Role.ShopSupervisor;
-  }) => {
-    if (role == Role.ShopHeadSupervisor) {
-      assignHeadSuperVisor(
-        { accountId: id, role },
-        {
-          onSuccess() {
-            notifications.show({
-              title: "Success",
-              message: "Assign head supervisor successfully!",
-              autoClose: 6000,
-              c: NotificationColorPalette.UP_COMING,
-            });
-          },
-          onError() {
-            notifications.show({
-              title: "Failed",
-              message: "Assign head supervisor failed!",
-              autoClose: 6000,
-              c: NotificationColorPalette.ALERT_MESSAGE,
-            });
-          },
-        }
-      );
+  const reverseSupervisorList = useMemo(() => {
+    return supervisorList?.reverse();
+  }, [supervisorList]);
+
+  useEffect(() => {
+    if (reverseSupervisorList && reverseSupervisorList.length > 0) {
+      const lastShiftItem = reverseSupervisorList?.[0];
+      setSelectedShift({
+        ...lastShiftItem,
+        startTime: dayjs(lastShiftItem?.startTime).format(
+          "YYYY-MM-DDTHH:mm:ss"
+        ),
+        endTime: dayjs(lastShiftItem?.endTime).format("YYYY-MM-DDTHH:mm:ss"),
+      });
     }
-  };
+  }, [reverseSupervisorList]);
+
+  const employeeStatisticData = useMemo(() => {
+    if (employeeList) {
+      return _.groupBy(employeeList?.values, (i) => {
+        return i.employeeRole;
+      });
+    }
+  }, [employeeList]);
 
   const rows = isGetIncidentListLoading ? (
     <Table.Tr>
@@ -245,17 +338,41 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
     ))
   );
 
+  const handleSetSuperVisor = ({
+    id,
+    role,
+    name,
+  }: {
+    id: string;
+    role: Role.ShopHeadSupervisor | Role.ShopSupervisor;
+    name: string;
+  }) => {
+    if (role == Role.ShopHeadSupervisor) {
+      openConfirmHeadSupervisorModal({
+        id: id,
+        supervisorName: name,
+      });
+    }
+
+    if (role == Role.ShopSupervisor) {
+      openConfirmSupervisorModal({
+        id: id,
+        supervisorName: name,
+      });
+    }
+  };
+
   return (
     <>
       <Flex
         px={rem(60)}
-        pt={rem(20)}
+        pt={rem(60)}
         bg={"#fff"}
         flex={1}
         pb={rem(40)}
         direction={"column"}
       >
-        <Text
+        {/* <Text
           size={rem(24)}
           fw={700}
           my={rem(20)}
@@ -263,73 +380,251 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
           mb={rem(28)}
         >
           Supervisor calendar
-        </Text>
+        </Text> */}
 
         <Group align="flex-start" gap={rem(60)}>
           <Box flex={4}>
-            <Group>
-              {isEmployeeListLoading ? (
+            <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(16)}>
+              In charge
+            </Text>
+            <>
+              {isEmployeeListLoading ||
+              isAssignSupervisorLoading ||
+              isGetSupervisorListLoading ? (
                 <Loader />
               ) : (
                 <>
-                  <Select
-                    flex={1}
-                    radius={rem(8)}
+                  <Stack
+                    gap={0}
+                    px={rem(20)}
                     style={{
-                      fontWeight: 500,
+                      borderRadius: rem(8),
+                      backgroundColor: "#fefefe",
+                      border: "1px solid #ccc",
                     }}
-                    onChange={(id) => {
-                      handleSetSuperVisor({
-                        id: id ?? "",
-                        role: Role.ShopHeadSupervisor,
-                      });
-                    }}
-                    searchable
-                    nothingFoundMessage="Nothing found..."
-                    styles={{
-                      label: {
-                        marginBottom: rem(4),
-                      },
-                    }}
-                    label="Head supervisor"
-                    data={employeeList?.values?.map((i) => {
-                      return { value: i.id, label: i.name };
-                    })}
-                  />
-                  <Select
-                    flex={1}
-                    radius={rem(8)}
-                    style={{
-                      fontWeight: 500,
-                    }}
-                    nothingFoundMessage="Nothing found..."
-                    styles={{
-                      label: {
-                        marginBottom: rem(4),
-                      },
-                    }}
-                    searchable
-                    label="In charge supervisor"
-                    data={employeeList?.values?.map((i) => {
-                      return { value: i.id, label: i.name };
-                    })}
-                  />
+                  >
+                    <Group
+                      justify="space-between"
+                      align="center"
+                      py={rem(16)}
+                      style={{
+                        borderBottom: "1px solid #ccc",
+                      }}
+                    >
+                      <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                        Head supervisor
+                      </Text>
+                      <Select
+                        radius={rem(8)}
+                        size={"sm"}
+                        style={{
+                          fontWeight: 500,
+                          fontSize: rem(14),
+                        }}
+                        clearable
+                        disabled={!!selectedDate && !isToday(selectedDate)}
+                        allowDeselect
+                        onChange={(_value, option) => {
+                          handleSetSuperVisor({
+                            id: _value ?? "",
+                            role: Role.ShopHeadSupervisor,
+                            name: option?.label,
+                          });
+                        }}
+                        placeholder="Head supervisor is empty"
+                        p={0}
+                        value={selectedShift?.headSupervisorId}
+                        searchable
+                        nothingFoundMessage="Nothing found..."
+                        data={[
+                          {
+                            group: "Head supervisor",
+                            items: employeeStatisticData
+                              ? employeeStatisticData?.HeadSupervisor.map(
+                                  (i) => {
+                                    return {
+                                      value: i.id,
+                                      label: i.name,
+                                    };
+                                  }
+                                )
+                              : [],
+                          },
+                          {
+                            group: "Supervisor",
+                            items: employeeStatisticData
+                              ? employeeStatisticData?.Supervisor.map((i) => {
+                                  return {
+                                    value: i.id,
+                                    label: i.name,
+                                  };
+                                })
+                              : [],
+                          },
+                          {
+                            group: "Employee",
+                            items: employeeStatisticData
+                              ? employeeStatisticData?.Employee.map((i) => {
+                                  return {
+                                    value: i.id,
+                                    label: i.name,
+                                  };
+                                })
+                              : [],
+                          },
+                        ]}
+                      />
+                    </Group>
+
+                    <Group
+                      justify="space-between"
+                      align="center"
+                      py={rem(16)}
+                      style={{
+                        borderBottom: "1px solid #ccc",
+                      }}
+                    >
+                      <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                        Supervisor
+                      </Text>
+                      <Select
+                        radius={rem(8)}
+                        style={{
+                          fontWeight: 500,
+                          fontSize: rem(14),
+                        }}
+                        clearable
+                        allowDeselect
+                        p={0}
+                        disabled={!!selectedDate && !isToday(selectedDate)}
+                        placeholder="Supervisor is empty"
+                        onChange={(_value, option) => {
+                          handleSetSuperVisor({
+                            id: _value ?? "",
+                            role: Role.ShopSupervisor,
+                            name: option?.label,
+                          });
+                        }}
+                        value={selectedShift?.supervisorId}
+                        searchable
+                        nothingFoundMessage="Nothing found..."
+                        data={[
+                          {
+                            group: "Head supervisor",
+                            items: employeeStatisticData
+                              ? employeeStatisticData?.HeadSupervisor.map(
+                                  (i) => {
+                                    return {
+                                      value: i.id,
+                                      label: i.name,
+                                    };
+                                  }
+                                )
+                              : [],
+                          },
+                          {
+                            group: "Supervisor",
+                            items: employeeStatisticData
+                              ? employeeStatisticData?.Supervisor.map((i) => {
+                                  return {
+                                    value: i.id,
+                                    label: i.name,
+                                  };
+                                })
+                              : [],
+                          },
+                          {
+                            group: "Employee",
+                            items: employeeStatisticData
+                              ? employeeStatisticData?.Employee.map((i) => {
+                                  return {
+                                    value: i.id,
+                                    label: i.name,
+                                  };
+                                })
+                              : [],
+                          },
+                        ]}
+                      />
+                    </Group>
+
+                    <Group justify="space-between" align="center" py={rem(24)}>
+                      <Text c={"rgb(17, 24, 39)"} size={rem(14)} fw={500}>
+                        Currently in charge
+                      </Text>
+                      <Group
+                        justify="space-between"
+                        align="center"
+                        gap={rem(6)}
+                      >
+                        <Text c={"rgb(79, 70, 229)"} fw={500} size={rem(14)}>
+                          {selectedShift?.inChargeAccount.name}
+                        </Text>
+
+                        <Text
+                          py={rem(4)}
+                          px={rem(7)}
+                          bg={"rgb(240 253 244)"}
+                          c={"rgb(21 128 61)"}
+                          size={rem(12)}
+                          fw={500}
+                          style={{
+                            borderRadius: 999,
+                            border: "1px solid #e5e7eb",
+                          }}
+                        >
+                          {selectedShift?.inChargeAccountRole
+                            .match(/[A-Z][a-z]*|[0-9]+/g)
+                            ?.join(" ")}
+                        </Text>
+                      </Group>
+                    </Group>
+                  </Stack>
                 </>
               )}
-            </Group>
+            </>
+
+            <Text
+              c={"rgb(17, 24, 39)"}
+              fw={600}
+              size={rem(17)}
+              mb={rem(16)}
+              mt={rem(32)}
+            >
+              Supervisor shift
+            </Text>
 
             <Accordion
-              variant="contained"
+              variant="separated"
               radius="md"
               mt={rem(12)}
               disableChevronRotation
               chevron={<IconChevronRight />}
             >
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Accordion.Item key={i} value={i.toString()}>
+              {reverseSupervisorList?.map((i) => (
+                <Accordion.Item
+                  style={{
+                    backgroundColor: "#fefefe",
+                    border: "1px solid #ccc",
+                  }}
+                  key={i.id}
+                  value={i.id}
+                  className={
+                    i.id == selectedShift?.id ? classes["activeAccordion"] : ""
+                  }
+                  onClick={() => {
+                    setSelectedShift({
+                      ...i,
+                      startTime: dayjs(i?.startTime).format(
+                        "YYYY-MM-DDTHH:mm:ss"
+                      ),
+                      endTime: dayjs(i?.endTime).format("YYYY-MM-DDTHH:mm:ss"),
+                    });
+                  }}
+                >
                   <Accordion.Control>
                     <Group
-                      key={i}
+                      key={i.id}
                       justify="space-between"
                       py={rem(8)}
                       px={rem(12)}
@@ -342,7 +637,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                           size={rem(16)}
                           mb={rem(4)}
                         >
-                          Nguyen Quang Huy
+                          {i?.inChargeAccount?.name}
                         </Text>
                         <Group gap={0}>
                           <IconCalendarTime
@@ -360,31 +655,65 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                             size={rem(14)}
                           >
                             {format(
-                              selectedDate ?? new Date(),
+                              i.startTime ?? new Date(),
                               "MMMM do, yyyy "
                             )}
-                            from 11:00 AM to 2:00 PM
+                            from {format(i?.startTime ?? new Date(), "hh:mm a")}{" "}
+                            to{" "}
+                            {i?.endTime
+                              ? format(i?.endTime ?? new Date(), "hh:mm a")
+                              : "Now"}
                           </Text>
-                          <Divider
-                            mx={rem(16)}
-                            color="rgb(107,114,128,.5)"
-                            orientation="vertical"
-                          />
-                          <IconExclamationCircle
-                            style={{
-                              width: rem(20),
-                              aspectRatio: 1,
-                            }}
-                            color={"#c92a2a"}
-                          />
-                          <Text
-                            ml={rem(10)}
-                            c={"#c92a2a"}
-                            lh={rem(26)}
-                            size={rem(14)}
-                          >
-                            20 incident(s)
-                          </Text>
+                          {i.incidents.length != 0 && (
+                            <>
+                              <Divider
+                                mx={rem(16)}
+                                color="rgb(107,114,128,.5)"
+                                orientation="vertical"
+                              />
+                              <IconExclamationCircle
+                                style={{
+                                  width: rem(20),
+                                  aspectRatio: 1,
+                                }}
+                                color={"#c92a2a"}
+                              />
+                              <Text
+                                ml={rem(6)}
+                                c={"#c92a2a"}
+                                lh={rem(26)}
+                                size={rem(14)}
+                              >
+                                {i.incidents.length + " "}
+                                incident(s)
+                              </Text>
+                            </>
+                          )}
+                          {i.interactions.length != 0 && (
+                            <>
+                              <Divider
+                                mx={rem(16)}
+                                color="rgb(107,114,128,.5)"
+                                orientation="vertical"
+                              />
+                              <IconBrandHipchat
+                                style={{
+                                  width: rem(20),
+                                  aspectRatio: 1,
+                                }}
+                                color={"#198754"}
+                              />
+                              <Text
+                                ml={rem(6)}
+                                c={"#198754"}
+                                lh={rem(26)}
+                                size={rem(14)}
+                              >
+                                {i.interactions.length + " "}
+                                interaction(s)
+                              </Text>
+                            </>
+                          )}
                         </Group>
                       </Box>
                     </Group>
@@ -395,7 +724,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
           </Box>
 
           <Box flex={3}>
-            <Box pb={rem(12)}>
+            <Box pb={rem(4)}>
               <Group justify="space-between" align="center">
                 <Text size={rem(17)} fw={600}>
                   {format(currentDate, "MMMM yyy")}
@@ -499,7 +828,9 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                           ? clsx(classes.selectedDay, classes.activeCard)
                           : classes["activeCard"]
                       }
-                      onClick={() => setSelectedDate(day)}
+                      onClick={() => {
+                        setSelectedDate(day);
+                      }}
                     >
                       <Text c={"rgb(55, 65, 81)"} size={rem(12)} lh={rem(48)}>
                         {format(day, "d")}
@@ -542,7 +873,6 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
               radius={8}
               w={"100%"}
               mb={rem(40)}
-              ref={targetRef}
               style={{
                 border: "1px solid #ccc",
               }}
@@ -573,7 +903,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       c={"#000"}
                       mr={rem(10)}
                     >
-                      {/* {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")} */}
+                      {dayjs(selectedShift?.startTime).format("HH:mm | DD-MM")}
                     </Badge>
                     <Text fw={500} size="sm">
                       to
@@ -588,7 +918,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       c={"#000"}
                       mr={rem(16)}
                     >
-                      {/* {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")} */}
+                      {dayjs(selectedShift?.endTime).format("HH:mm DD-MM")}
                     </Badge>
                   </Group>
                 </Group>
@@ -599,90 +929,98 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                   mah={700}
                   onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
                 >
-                  <Table striped highlightOnHover withColumnBorders>
-                    <Table.Thead
-                      className={cx(classes.header, {
-                        [classes.scrolled]: scrolled,
-                      })}
-                    >
-                      <Table.Tr>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Type
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Start time
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              End time
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Evidences
-                            </Text>
-                          </Center>
-                        </Table.Th>
+                  {incidentList?.isValuesEmpty ? (
+                    <Box my={rem(10)}>
+                      <NoImage type="NO_DATA" />
+                    </Box>
+                  ) : (
+                    <Table striped highlightOnHover withColumnBorders>
+                      <>
+                        <Table.Thead
+                          className={cx(classes.header, {
+                            [classes.scrolled]: scrolled,
+                          })}
+                        >
+                          <Table.Tr>
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  Type
+                                </Text>
+                              </Center>
+                            </Table.Th>
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  Start time
+                                </Text>
+                              </Center>
+                            </Table.Th>
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  End time
+                                </Text>
+                              </Center>
+                            </Table.Th>
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  Evidences
+                                </Text>
+                              </Center>
+                            </Table.Th>
 
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Assigned to
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Status
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{rows}</Table.Tbody>
-                  </Table>
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  Assigned to
+                                </Text>
+                              </Center>
+                            </Table.Th>
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  Status
+                                </Text>
+                              </Center>
+                            </Table.Th>
+                          </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                      </>
+                    </Table>
+                  )}
                 </ScrollArea.Autosize>
               </Card.Section>
             </Card>

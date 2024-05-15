@@ -615,7 +615,7 @@ export const InteractionReportPage = () => {
           <Card
             radius={8}
             w={"100%"}
-            mb={rem(80)}
+            mb={rem(40)}
             ref={targetRef}
             style={{
               border: "1px solid #ccc",
@@ -668,7 +668,7 @@ export const InteractionReportPage = () => {
               </Group>
             </Card.Section>
             <Card.Section>
-              <ScrollArea.Autosize
+              <ScrollArea
                 mah={700}
                 onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
               >
@@ -743,7 +743,7 @@ export const InteractionReportPage = () => {
                   </Table.Thead>
                   <Table.Tbody>{rows}</Table.Tbody>
                 </Table>
-              </ScrollArea.Autosize>
+              </ScrollArea>
             </Card.Section>
           </Card>
         ) : (
@@ -753,7 +753,7 @@ export const InteractionReportPage = () => {
         {selectedInteractionItem ? (
           <Card
             radius={8}
-            w={"80%"}
+            w={"100%"}
             ref={interactionDetailRef}
             style={{
               border: "1px solid rgb(229 231 235)",
