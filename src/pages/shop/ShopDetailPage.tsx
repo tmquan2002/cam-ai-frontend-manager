@@ -1,27 +1,27 @@
 import {
   Box,
   Button,
+  Divider,
+  Flex,
   Group,
-  Loader,
   LoadingOverlay,
   Paper,
   Skeleton,
   Tabs,
   Text,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import {
   IconAlertCircle,
-  IconCamera,
   IconCaretRight,
   IconFileAnalytics,
   IconMapPin,
   IconRouter,
   IconVideo,
-  IconX,
+  IconX
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import _, { isEmpty } from "lodash";
@@ -251,9 +251,6 @@ const ShopDetailPage = () => {
             <Tabs.Tab value="general" leftSection={<IconFileAnalytics />}>
               General
             </Tabs.Tab>
-            <Tabs.Tab value="camera" leftSection={<IconCamera />}>
-              Camera
-            </Tabs.Tab>
             <Tabs.Tab value="edgebox" leftSection={<IconRouter />}>
               Edge Box
             </Tabs.Tab>
@@ -325,87 +322,81 @@ const ShopDetailPage = () => {
             </Box>
           </Tabs.Panel>
 
-          <Tabs.Panel value="camera">
-            <Box p={rem(32)}>
-              <Text
-                size="lg"
-                fw={"bold"}
-                fz={25}
-                mb={rem(20)}
-                c={"light-blue.4"}
-              >
-                Camera list
-              </Text>
-              {isGetCameraListLoading ? (
-                <Loader />
-              ) : (
-                <>
-                  {cameraList?.values?.length == 0 && (
-                    <Text
-                      c="dimmed"
-                      w={"100%"}
-                      ta={"center"}
-                      mt={20}
-                      fs="italic"
-                    >
-                      No Camera found
-                    </Text>
-                  )}
-                  {cameraList?.values?.map((item) => (
-                    <Tooltip label="View camera" key={item?.id}>
-                      <Button
-                        variant="outline"
-                        fullWidth
-                        size={rem(52)}
-                        justify="space-between"
-                        onClick={() => {
-                          if (item?.status != CameraStatus.Connected) {
-                            notifications.show({
-                              color: "red",
-                              title: "Camera is disconnected",
-                              message:
-                                "Camera is disconnected, cannot view live stream",
-                            });
-                          } else {
-                            navigate(`/shop/camera/${item?.id}`);
-                          }
-                        }}
-                        rightSection={
-                          <IconCaretRight style={{ width: rem(24) }} />
-                        }
-                        px={rem(16)}
-                        mb={rem(16)}
-                      >
-                        <Group>
-                          <Group mr={rem(20)}>
-                            <IconVideo style={{ width: rem(20) }} />
-                            <Text key={item?.id}> {item?.name}</Text>
-                          </Group>
-                          <Group mr={rem(20)}>
-                            <IconMapPin style={{ width: rem(20) }} />
-                            <Text key={item?.id}> {item?.zone}</Text>
-                          </Group>
-                          <Group>
-                            <IconAlertCircle style={{ width: rem(20) }} />
-                            <Text key={item?.id}> {item?.status}</Text>
-                          </Group>
-                        </Group>
-                      </Button>
-                    </Tooltip>
-                  ))}
-                </>
-              )}
-            </Box>
-          </Tabs.Panel>
-
           <Tabs.Panel value="edgebox">
-            <Skeleton visible={isEdgeboxInstallListLoading}>
+            <Skeleton visible={isEdgeboxInstallListLoading || isGetCameraListLoading}>
               <Box p={rem(32)}>
                 {edgeBoxInstall ? (
                   <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
                 ) : (
                   <EdgeBoxInstallEmpty />
                 )}
+              </Box>
+              <Divider />
+              <Box p={rem(32)}>
+                <Text
+                  size="lg"
+                  fw={"bold"}
+                  fz={25}
+                  mb={rem(20)}
+                  c={"light-blue.4"}
+                >
+                  Camera list
+                </Text>
+                {cameraList?.values?.length == 0 && (
+                  <Flex>
+                    <Box ml={rem(40)} style={{ flex: 1 }}>
+                      <Text c="dimmed"
+                        w={"100%"}
+                        ta={"center"}
+                        mt={20}
+                        fs="italic">
+                        No camera found
+                      </Text>
+                    </Box>
+                  </Flex>
+                )}
+                {cameraList?.values?.map((item) => (
+                  <Tooltip label="View camera" key={item?.id}>
+                    <Button
+                      variant="outline"
+                      fullWidth
+                      size={rem(52)}
+                      justify="space-between"
+                      onClick={() => {
+                        if (item?.status != CameraStatus.Connected) {
+                          notifications.show({
+                            color: "red",
+                            title: "Camera is disconnected",
+                            message:
+                              "Camera is disconnected, cannot view live stream",
+                          });
+                        } else {
+                          navigate(`/shop/camera/${item?.id}`);
+                        }
+                      }}
+                      rightSection={
+                        <IconCaretRight style={{ width: rem(24) }} />
+                      }
+                      px={rem(16)}
+                      mb={rem(16)}
+                    >
+                      <Group>
+                        <Group mr={rem(20)}>
+                          <IconVideo style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.name}</Text>
+                        </Group>
+                        <Group mr={rem(20)}>
+                          <IconMapPin style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.zone}</Text>
+                        </Group>
+                        <Group>
+                          <IconAlertCircle style={{ width: rem(20) }} />
+                          <Text key={item?.id}> {item?.status}</Text>
+                        </Group>
+                      </Group>
+                    </Button>
+                  </Tooltip>
+                ))}
               </Box>
             </Skeleton>
           </Tabs.Panel>
