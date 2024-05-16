@@ -1,13 +1,15 @@
-import { Accordion, ActionIcon, Box, Button, Center, Collapse, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, ScrollArea, Skeleton, Stack, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
+import { ActionIcon, Box, Button, Center, Divider, Flex, Group, Image, Input, Loader, LoadingOverlay, Paper, Popover, ScrollArea, Select, Skeleton, Table, Tabs, Text, Tooltip, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { IconAlertCircle, IconCamera, IconCaretRight, IconFileAnalytics, IconMail, IconMapPin, IconRepeat, IconRouter, IconTrash, IconUser, IconUsers, IconVideo, IconX, } from "@tabler/icons-react";
+import { IconAlertCircle, IconCaretRight, IconFileAnalytics, IconMapPin, IconRepeat, IconRouter, IconTrash, IconUser, IconUsers, IconVideo, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import clsx from "clsx";
 import { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { BsGenderFemale, BsGenderMale } from "react-icons/bs";
+import { MdCalendarToday, MdEmail, MdHome, MdPhone } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import { UpdateShopParams } from "../../apis/ShopAPI";
 import StatusBadge from "../../components/badge/StatusBadge";
@@ -15,7 +17,6 @@ import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/C
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
 import { EdgeBoxInstallEmpty } from "../../components/edgeBoxInstall/EdgeBoxInstallEmpty";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
-import NoImage from "../../components/image/NoImage";
 import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
 import { useChangeShopStatus } from "../../hooks/useChangeShopStatus";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
@@ -30,7 +31,7 @@ import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
-import { replaceIfNun } from "../../utils/helperFunction";
+import { removeTime, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -55,9 +56,14 @@ export type FormFieldValue = {
   closeTime: string;
 };
 
+export type AssignManagerFormField = {
+  shopManagerId: string | null;
+};
+
 export type ActivationFormValue = {
   activationCode: string;
 };
+
 
 const ShopDetailPageManager = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -120,6 +126,12 @@ const ShopDetailPageManager = () => {
       district: isNotEmpty("District is required"),
       openTime: isNotEmpty("Open time is required"),
       closeTime: isNotEmpty("Close time is required"),
+    },
+  });
+
+  const assignManagerForm = useForm<AssignManagerFormField>({
+    validate: {
+      shopManagerId: isNotEmpty("Please select an employee to assign"),
     },
   });
 
@@ -198,60 +210,35 @@ const ShopDetailPageManager = () => {
     );
   };
 
-  const accountListItem = accountList?.values.map((item) => (
-    <Accordion.Item value={item.id} key={item.id}>
-      <Accordion.Control disabled={item?.managingShop != null}>
-        <Group wrap="nowrap">
-          <div>
-            <Text>{item.name}</Text>
-            <Text size="sm" c="dimmed" fw={400}>
-              {item.email}
-            </Text>
-          </div>
-        </Group>
-      </Accordion.Control>
-      <Accordion.Panel>
-        <Group justify="flex-end">
-          <Button
-            loading={updateShopManagerLoading}
-            disabled={data?.shopManager?.id == item?.id}
-            onClick={() => {
-              const params: UpdateShopParams = {
-                shopId: id ?? "",
-                addressLine: data?.addressLine ?? undefined,
-                name: data?.name,
-                phone: data?.phone ?? null,
-                shopManagerId: item?.id,
-                wardId: data?.wardId ? data?.wardId.toString() : undefined,
-              };
-              updateShopManager(params, {
-                onSuccess() {
-                  notifications.show({
-                    title: "Assign account successfully",
-                    message: "Shop updated!",
-                  });
-                  refetch();
-                  refetchAccountList();
-                  toggle();
-                },
-                onError(data) {
-                  const error = data as AxiosError<ResponseErrorDetail>;
-                  notifications.show({
-                    color: "red",
-                    icon: <IconX />,
-                    title: "Update failed",
-                    message: error.response?.data?.message,
-                  });
-                },
-              });
-            }}
-          >
-            Assign this account to shop
-          </Button>
-        </Group>
-      </Accordion.Panel>
-    </Accordion.Item>
-  ));
+  const onAssignManager = (fieldValues: AssignManagerFormField) => {
+    updateShopManager({
+      shopId: id ?? "",
+      addressLine: data?.addressLine ?? undefined,
+      name: data?.name,
+      phone: data?.phone ?? null,
+      shopManagerId: fieldValues?.shopManagerId ?? "",
+      wardId: data?.wardId ? data?.wardId.toString() : undefined,
+    }, {
+      onSuccess() {
+        notifications.show({
+          title: "Assign account successfully",
+          message: "Shop updated!",
+        });
+        refetch();
+        refetchAccountList();
+        toggle();
+      },
+      onError(data) {
+        const error = data as AxiosError<ResponseErrorDetail>;
+        notifications.show({
+          color: "red",
+          icon: <IconX />,
+          title: "Update failed",
+          message: error.response?.data?.message,
+        });
+      },
+    });
+  };
 
   useEffect(() => {
     if (data) {
@@ -409,9 +396,6 @@ const ShopDetailPageManager = () => {
             <Tabs.Tab value="shopManager" leftSection={<IconUser />}>
               Shop Manager
             </Tabs.Tab>
-            <Tabs.Tab value="camera" leftSection={<IconCamera />}>
-              Camera
-            </Tabs.Tab>
             <Tabs.Tab value="employees" leftSection={<IconUsers />}>
               Employee
             </Tabs.Tab>
@@ -500,117 +484,91 @@ const ShopDetailPageManager = () => {
           </Tabs.Panel>
           <Tabs.Panel value="shopManager">
             <Box p={rem(32)}>
-              <Group justify="space-between" mb={rem(20)}>
-                <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-                  Shop manager
-                </Text>
-                <Button>
-                  Assign Shop Manager
-                </Button>
-              </Group>
+              <Box>
+                <Group justify="space-between" mb={rem(20)}>
+                  <Group mb={15} gap={30}>
+                    <div>
+                      <Text size='md' fw={'bold'} fz={25} c={"light-blue.4"}>{data?.shopManager?.name}</Text>
+                      {data?.shopManager?.role && <Text size="md" fw="bold">{data.shopManager.role.replace(/([A-Z])/g, ' $1').trim()}</Text>}
+                    </div>
+                    <StatusBadge statusName={data?.shopManager?.accountStatus ? data.shopManager?.accountStatus : "None"}
+                      mb={15} mt={15} />
+                  </Group>
 
-              {isAccountListLoading ? (
-                <Loader />
-              ) : (
-                <Button
-                  onClick={toggle}
-                  rightSection={<IconCaretRight />}
-                  variant="light"
-                  fullWidth
-                  autoContrast
-                  justify="space-between"
-                  size="xl"
-                  px={rem(16)}
-                >
-                  <Stack
-                    align="flex-start"
-                    justify="flex-start"
-                    gap={0}
-                    className={classes["pointer-style"]}
-                    onClick={() =>
-                      navigate(`/brand/account/${data?.shopManager?.id}`)
+                  <Popover trapFocus position="bottom" withArrow shadow="md" opened={opened}>
+                    <Popover.Target>
+                      <Tooltip label="Assign selected" withArrow>
+                        <Button onClick={toggle}>
+                          Assign Shop Manager
+                        </Button>
+                      </Tooltip>
+                    </Popover.Target>
+
+                    <Popover.Dropdown>
+                      <form onSubmit={assignManagerForm.onSubmit(onAssignManager)}>
+                        <Group align="baseline">
+                          {isAccountListLoading ? (
+                            <Loader mt={rem(30)} />
+                          ) : (
+                            <Select
+                              size="xs"
+                              {...assignManagerForm.getInputProps("shopManagerId")}
+                              placeholder="Assign to.."
+                              data={accountList?.values?.map((item) => {
+                                return {
+                                  value: item?.id,
+                                  label: item?.name,
+                                  disabled: item?.id == data?.shopManager?.id,
+                                };
+                              })}
+                              nothingFoundMessage="Nothing found..."
+                            />
+                          )}
+                          <Button loading={updateShopManagerLoading} type="submit">
+                            Assign
+                          </Button>
+                        </Group>
+                      </form>
+                    </Popover.Dropdown>
+                  </Popover>
+
+                </Group>
+                {data?.shopManager?.gender &&
+                  <Group>
+                    {data?.shopManager?.gender == "Female" ?
+                      <BsGenderFemale /> :
+                      <BsGenderMale />
                     }
-                  >
-                    {data?.shopManager ? (
-                      <>
-                        <Group>
-                          <IconUser className={classes.icon} />
-
-                          <Text size="lg">{data?.shopManager?.name}</Text>
-                        </Group>
-                        <Group>
-                          <IconMail className={classes.icon} />
-
-                          <Text size="sm" c={"dimmed"} fw={400}>
-                            {data?.shopManager?.email}
-                          </Text>
-                        </Group>
-                      </>
-                    ) : (
-                      <Text size="lg">Assign a shop manager to this shop</Text>
-                    )}
-                  </Stack>
-                </Button>
-              )}
-
-              <Collapse in={opened}>
-                <Accordion chevronPosition="right" variant="contained">
-                  {accountListItem}
-                </Accordion>
-              </Collapse>
-            </Box>
-          </Tabs.Panel>
-          <Tabs.Panel value="camera">
-            <Box p={rem(32)}>
-              <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
-                Camera list
-              </Text>
-              {isGetCameraListLoading ? (
-                <Loader />
-              ) : cameraList?.isValuesEmpty ? (
-                <NoImage type="NO_DATA" />
-              ) : (
-                cameraList?.values?.map((item) => (
-                  <Tooltip label="View camera" key={item?.id}>
-                    <Button
-                      mb={rem(12)}
-                      variant="outline"
-                      fullWidth
-                      size={rem(52)}
-                      justify="space-between"
-                      onClick={() => {
-                        if (item?.status != CameraStatus.Connected) {
-                          notifications.show({
-                            color: "red",
-                            title: "Camera is disconnected",
-                            message:
-                              "Camera is disconnected, cannot view live stream",
-                          });
-                        } else {
-                          navigate(`/brand/camera/${item?.id}`);
-                        }
-                      }}
-                      rightSection={<IconCaretRight style={{ width: rem(24) }} />}
-                      px={rem(16)}
-                    >
-                      <Group>
-                        <Group mr={rem(20)}>
-                          <IconVideo style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.name}</Text>
-                        </Group>
-                        <Group mr={rem(20)}>
-                          <IconMapPin style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.zone}</Text>
-                        </Group>
-                        <Group>
-                          <IconAlertCircle style={{ width: rem(20) }} />
-                          <Text key={item?.id}> {item?.status}</Text>
-                        </Group>
-                      </Group>
-                    </Button>
-                  </Tooltip>
-                ))
-              )}
+                    <Text size="md">{data?.shopManager?.gender}</Text>
+                  </Group>
+                }
+                {data?.shopManager?.email &&
+                  <Group>
+                    <MdEmail />
+                    <Text size="md">{data?.shopManager?.email}</Text>
+                  </Group>
+                }
+                {data?.phone &&
+                  <Group>
+                    <MdPhone />
+                    <Text size="md">{data?.phone}</Text>
+                  </Group>
+                }
+                {data?.shopManager?.birthday &&
+                  <Group>
+                    <MdCalendarToday />
+                    <Text size="md">{removeTime(data?.shopManager?.birthday, "/", "dd/MM/yyyy")}</Text>
+                  </Group>
+                }
+                {(data?.shopManager?.ward || data?.shopManager?.addressLine) &&
+                  <Group>
+                    <MdHome />
+                    {(data?.shopManager?.ward && data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.addressLine}, {data?.shopManager?.ward?.name}, {data?.shopManager?.ward?.district?.name}, {data?.shopManager?.ward?.district?.province?.name}</Text>}
+                    {(data?.shopManager?.ward && !data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.ward?.name}, {data?.shopManager?.ward?.district?.name}, {data?.shopManager?.ward?.district?.province?.name}</Text>}
+                    {(!data?.shopManager?.ward && data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.addressLine}</Text>}
+                  </Group>
+                }
+              </Box>
             </Box>
           </Tabs.Panel>
           <Tabs.Panel value="employees">
@@ -665,7 +623,7 @@ const ShopDetailPageManager = () => {
             </Box>
           </Tabs.Panel>
           <Tabs.Panel value="edgebox">
-            <Skeleton visible={isEdgeboxInstallListLoading}>
+            <Skeleton visible={isEdgeboxInstallListLoading || isGetCameraListLoading}>
               <Box p={rem(32)}>
                 <Group justify="space-between" align="center" pb={rem(20)} gap={"sm"}>
                   <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
@@ -700,6 +658,66 @@ const ShopDetailPageManager = () => {
                   </>
                 ) : (
                   <EdgeBoxInstallEmpty />
+                )}
+              </Box>
+              <Divider />
+              <Box p={rem(32)}>
+                <Text size="lg" fw={"bold"} fz={25} mb={rem(20)} c={"light-blue.4"}>
+                  Camera list
+                </Text>
+                {cameraList?.isValuesEmpty ? (
+                  <Flex>
+                    <Box ml={rem(40)} style={{ flex: 1 }}>
+                      <Text c="dimmed"
+                        w={"100%"}
+                        ta={"center"}
+                        mt={20}
+                        fs="italic">
+                        No camera found
+                      </Text>
+                    </Box>
+                  </Flex>
+                ) : (
+                  cameraList?.values?.map((item) => (
+                    <Tooltip label="View camera" key={item?.id}>
+                      <Button
+                        mb={rem(12)}
+                        variant="outline"
+                        fullWidth
+                        size={rem(52)}
+                        justify="space-between"
+                        onClick={() => {
+                          if (item?.status != CameraStatus.Connected) {
+                            notifications.show({
+                              color: "red",
+                              title: "Camera is disconnected",
+                              message:
+                                "Camera is disconnected, cannot view live stream",
+                            });
+                          } else {
+                            navigate(`/brand/camera/${item?.id}`);
+                          }
+                        }}
+                        rightSection={<IconCaretRight style={{ width: rem(24) }} />}
+                        px={rem(16)}
+                      >
+                        <Group>
+                          <Group mr={rem(20)}>
+                            <IconVideo style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.name}</Text>
+                          </Group>
+                          <Group mr={rem(20)}>
+                            <IconMapPin style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.zone}</Text>
+                          </Group>
+                          <Group>
+                            <IconAlertCircle style={{ width: rem(20) }} />
+                            <Text key={item?.id}> {item?.status}</Text>
+                          </Group>
+                        </Group>
+                      </Button>
+                    </Tooltip>
+                  ))
                 )}
               </Box>
             </Skeleton>

@@ -5,7 +5,9 @@ import {
   Button,
   Center,
   Collapse,
+  Divider,
   Flex,
+  Grid,
   Group,
   Image,
   Loader,
@@ -30,6 +32,7 @@ import {
   IconAlignBoxCenterStretch,
   IconFilter,
   IconMail,
+  IconNetwork,
   IconPhone,
   IconPhoneCall,
   IconPhoto,
@@ -250,271 +253,306 @@ const BrandMainPage = () => {
     );
   };
 
-  if (isLoading) {
-    return (
-      <Paper p={rem(32)} style={{ flex: 1 }} pos={"relative"} h={"100vh"}>
-        <LoadingOverlay visible={isLoading} />
-      </Paper>
-    );
-  }
-
   return (
-    <>
-      <Paper p={rem(32)} style={{ flex: 1 }}>
-        <Box>
-          {isUploadBrandBannerLoading ? (
-            <Loader />
-          ) : (
-            <Tooltip label="Brand banner">
-              <Dropzone
-                onDrop={(files) =>
-                  handleUploadBrandImage(files, UploadBrandImageType.Banner)
-                }
-                onReject={(files) => console.log("rejected files", files)}
-                maxSize={5 * 1024 ** 2}
-                maxFiles={1}
-                accept={{
-                  "image/*": [],
-                }}
-              >
-                {data?.values[0]?.banner ? (
-                  <LoadingImage
-                    radius={"md"}
-                    bg={"#000"}
-                    height={280}
-                    fit="cover"
-                    imageId={data?.values[0]?.banner?.id}
-                  />
-                ) : (
-                  <Group
-                    justify="center"
-                    gap="xl"
-                    mih={220}
-                    style={{ pointerEvents: "none" }}
-                  >
-                    <Dropzone.Accept>
-                      <IconUpload
-                        style={{
-                          width: rem(52),
-                          height: rem(52),
-                          color: "var(--mantine-color-blue-6)",
-                        }}
-                        stroke={1.5}
-                      />
-                    </Dropzone.Accept>
-                    <Dropzone.Reject>
-                      <IconX
-                        style={{
-                          width: rem(52),
-                          height: rem(52),
-                          color: "var(--mantine-color-red-6)",
-                        }}
-                        stroke={1.5}
-                      />
-                    </Dropzone.Reject>
-                    <Dropzone.Idle>
-                      <IconPhoto
-                        style={{
-                          width: rem(52),
-                          height: rem(52),
-                          color: "var(--mantine-color-dimmed)",
-                        }}
-                        stroke={1.5}
-                      />
-                    </Dropzone.Idle>
-
-                    <div>
-                      <Text size="xl" inline>
-                        Upload brand banner
-                      </Text>
-                      <Text size="sm" c="dimmed" inline mt={7}>
-                        Only accept .png - .jpeg - .svg+xml - .gif file that are
-                        less than 10mb in size
-                      </Text>
-                    </div>
-                  </Group>
-                )}
-              </Dropzone>
-            </Tooltip>
-          )}
-        </Box>
-
-        <Flex align={"center"} mb={rem(12)}>
-          <Tooltip label="Brand logo">
-            <Dropzone
-              mr={rem(16)}
-              onDrop={(files) =>
-                handleUploadBrandImage(files, UploadBrandImageType.Logo)
-              }
-              onReject={(files) => console.log("rejected files", files)}
-              style={{ border: 0 }}
-              maxSize={5 * 1024 ** 2}
-              maxFiles={1}
-              accept={{
-                "image/*": [],
-              }}
-            >
-              {isUploadBrandLogoLoading ? (
-                <Skeleton height={100} circle />
+    <Paper px={rem(32)} pt={32} pb={64} style={{ flex: 1 }} pos={"relative"}>
+      {isLoading ? <LoadingOverlay visible={isLoading} /> :
+        <Grid justify="space-around">
+          <Grid.Col span={12}>
+            {/* Banner section */}
+            <Box>
+              {isUploadBrandBannerLoading ? (
+                <Loader />
               ) : (
-                <Avatar
-                  h={100}
-                  w={100}
-                  src={
-                    data?.values[0]?.logo?.hostingUri ?? IMAGE_CONSTANT.NO_IMAGE
+                <Tooltip label="Brand banner">
+                  <Dropzone
+                    onDrop={(files) =>
+                      handleUploadBrandImage(files, UploadBrandImageType.Banner)
+                    }
+                    onReject={(files) => console.log("rejected files", files)}
+                    style={{ border: 0, backgroundColor: 'transparent' }}
+                    maxSize={5 * 1024 ** 2}
+
+                    maxFiles={1}
+                    accept={{
+                      "image/*": [],
+                    }}
+                  >
+                    {data?.values[0]?.banner ? (
+                      <LoadingImage
+                        radius={"md"}
+                        bg={"#000"}
+                        height={280}
+                        fit="cover"
+                        imageId={data?.values[0]?.banner?.id}
+                      />
+                    ) : (
+                      <Group
+                        justify="center"
+                        gap="xl"
+                        mih={220}
+                        style={{ pointerEvents: "none" }}
+                      >
+                        <Dropzone.Accept>
+                          <IconUpload
+                            style={{
+                              width: rem(52),
+                              height: rem(52),
+                              color: "var(--mantine-color-blue-6)",
+                            }}
+                            stroke={1.5}
+                          />
+                        </Dropzone.Accept>
+                        <Dropzone.Reject>
+                          <IconX
+                            style={{
+                              width: rem(52),
+                              height: rem(52),
+                              color: "var(--mantine-color-red-6)",
+                            }}
+                            stroke={1.5}
+                          />
+                        </Dropzone.Reject>
+                        <Dropzone.Idle>
+                          <IconPhoto
+                            style={{
+                              width: rem(52),
+                              height: rem(52),
+                              color: "var(--mantine-color-dimmed)",
+                            }}
+                            stroke={1.5}
+                          />
+                        </Dropzone.Idle>
+
+                        <div>
+                          <Text size="xl" inline>
+                            Upload brand banner
+                          </Text>
+                          <Text size="sm" c="dimmed" inline mt={7}>
+                            Only accept .png - .jpeg - .svg+xml - .gif file that are
+                            less than 10mb in size
+                          </Text>
+                        </div>
+                      </Group>
+                    )}
+                  </Dropzone>
+                </Tooltip>
+              )}
+            </Box>
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, lg: 3 }} mx={rem(20)} mb={50}>
+            {/* Logo and brand info section */}
+            <Box>
+              <Tooltip label="Brand logo">
+                <Dropzone
+                  onDrop={(files) =>
+                    handleUploadBrandImage(files, UploadBrandImageType.Logo)
                   }
-                  className={classes.avatar}
+                  onReject={(files) => console.log("rejected files", files)}
+                  style={{ border: 0, backgroundColor: 'transparent', textAlign: 'center' }}
+                  maxSize={5 * 1024 ** 2}
+                  maxFiles={1}
+                  accept={{
+                    "image/*": [],
+                  }}
+                >
+                  <Group justify="center">
+                    {isUploadBrandLogoLoading ? (
+                      <Skeleton height={200} circle />
+                    ) : (
+                      <Avatar
+                        h={200}
+                        w={200}
+                        src={
+                          data?.values[0]?.logo?.hostingUri ?? IMAGE_CONSTANT.NO_IMAGE
+                        }
+                        className={classes.avatar}
+                      />
+                    )}
+                  </Group>
+                </Dropzone>
+              </Tooltip>
+              <Text size="xl" fw={500} mb={rem(8)} ta="center">
+                {data?.values[0]?.name}
+              </Text>
+              
+              <Box mb={20}>
+                <Flex mt={20}>
+                  <Box mr={rem(8)}>
+                    <IconMail width={20} />
+                  </Box>
+                  {data?.values[0]?.email}
+                </Flex>
+                <Flex>
+                  <Box mr={rem(8)}>
+                    <IconPhone width={20} />
+                  </Box>
+                  {data?.values[0]?.phone}
+                </Flex>
+                {data?.values[0]?.brandWebsite &&
+                  <Flex>
+                    <Box mr={rem(8)}>
+                      <IconNetwork width={20} />
+                    </Box>
+                    <a href={"https://" + data?.values[0]?.brandWebsite} style={{ textDecoration: "none" }} target="_blank">
+                      {data?.values[0]?.brandWebsite}
+                    </a>
+                  </Flex>
+                }
+              </Box>
+              {data?.values[0]?.description &&
+                <>
+                  <Text fz={16} fw={'bold'} c={"grey"}>About</Text>
+                  <Divider />
+                  <Text mt={10} mb={20}>{data?.values[0]?.description}</Text>
+                </>
+              }
+              <>
+                <Text fz={16} fw={'bold'} c={"grey"}>Company</Text>
+                <Divider />
+                <Text mt={5} fw="bold">{data?.values[0]?.companyName}</Text>
+                {/* <Text mt={5} fw="bold">{data?.values[0]?.companyAddress}</Text> */}
+                {(data?.values[0]?.companyWard && data?.values[0]?.companyAddress) && <Text>{data?.values[0]?.companyAddress}, {data?.values[0]?.companyWard?.name}, {data?.values[0]?.companyWard?.district?.name}, {data?.values[0]?.companyWard?.district?.province?.name}</Text>}
+                {(data?.values[0]?.companyWard && !data?.values[0]?.companyAddress) && <Text>{data?.values[0]?.companyWard?.name}, {data?.values[0]?.companyWard?.district?.name}, {data?.values[0]?.companyWard?.district?.province?.name}</Text>}
+                {(!data?.values[0]?.companyWard && data?.values[0]?.companyAddress) && <Text>{data?.values[0]?.companyAddress}</Text>}
+              </>
+            </Box>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, lg: 8 }} mr={rem(32)}>
+            <Text size="xl" fw={'bold'} c={"grey"} mb={rem(20)} >
+              Shop List
+            </Text>
+            {/* Input and filter section */}
+            <Flex align={"center"} mr={rem(32)}>
+              {searchCategory == SearchCategory.NAME ? (
+                <TextInput
+                  style={{ flex: 1 }}
+                  placeholder="Search Shop..."
+                  classNames={{ input: classes.search_input }}
+                  rightSectionWidth={52}
+                  leftSectionWidth={52}
+                  leftSection={
+                    <IconSearch
+                      style={{ width: rem(16), height: rem(16) }}
+                      stroke={1.5}
+                    />
+                  }
+                  rightSection={renderDropdownFilter()}
+                  value={search}
+                  onChange={handleSearchChange}
+                />
+              ) : (
+                <NumberInput
+                  style={{ flex: 1 }}
+                  placeholder="Search Shop..."
+                  classNames={{ input: classes.search_input }}
+                  rightSectionWidth={52}
+                  leftSectionWidth={52}
+                  leftSection={
+                    <IconSearch
+                      style={{ width: rem(16), height: rem(16) }}
+                      stroke={1.5}
+                    />
+                  }
+                  rightSection={renderDropdownFilter()}
+                  value={search}
+                  onChange={setSearch}
                 />
               )}
-            </Dropzone>
-          </Tooltip>
-
-          <Box>
-            <Text size="xl" fw={500} mb={rem(8)}>
-              {data?.values[0]?.name}
-            </Text>
-
-            <Flex>
-              <Box mr={rem(8)}>
-                <IconMail width={20} />
-              </Box>
-              {data?.values[0]?.email}
-            </Flex>
-            <Flex>
-              <Box mr={rem(8)}>
-                <IconPhone width={20} />
-              </Box>
-              {data?.values[0]?.phone}
-            </Flex>
-          </Box>
-        </Flex>
-
-        <Flex align={"center"} my={"md"}>
-          {searchCategory == SearchCategory.NAME ? (
-            <TextInput
-              style={{ flex: 1 }}
-              placeholder="Search..."
-              classNames={{ input: classes.search_input }}
-              rightSectionWidth={52}
-              leftSectionWidth={52}
-              leftSection={
-                <IconSearch
-                  style={{ width: rem(16), height: rem(16) }}
-                  stroke={1.5}
-                />
-              }
-              rightSection={renderDropdownFilter()}
-              value={search}
-              onChange={handleSearchChange}
-            />
-          ) : (
-            <NumberInput
-              style={{ flex: 1 }}
-              placeholder="Search..."
-              classNames={{ input: classes.search_input }}
-              rightSectionWidth={52}
-              leftSectionWidth={52}
-              leftSection={
-                <IconSearch
-                  style={{ width: rem(16), height: rem(16) }}
-                  stroke={1.5}
-                />
-              }
-              rightSection={renderDropdownFilter()}
-              value={search}
-              onChange={setSearch}
-            />
-          )}
-          <Button
-            leftSection={<IconFilter size={14} />}
-            variant="default"
-            className={classes.filter_button}
-            onClick={toggle}
-          >
-            Filter
-          </Button>
-          <Button
-            leftSection={<IconPlus size={14} />}
-            variant="outline"
-            h={rem(48)}
-            onClick={() => {
-              navigate("/brand/create/shop");
-            }}
-            ml={rem(12)}
-            radius={"20%/50%"}
-          >
-            Add shop
-          </Button>
-        </Flex>
-        <Collapse in={opened}>
-          <Group>
-            <EditAndUpdateForm fields={fields} />
-            <Button variant="transparent" ml={"auto"} onClick={form.reset}>
-              Clear all filter
-            </Button>
-          </Group>
-        </Collapse>
-
-        <Box>
-          <LoadingOverlay
-            visible={isShopListLoading}
-            zIndex={1000}
-            overlayProps={{ radius: "sm", blur: 1 }}
-          />
-          {shopList?.isValuesEmpty ? (
-            <Center>
-              <Image
-                radius={"md"}
-                src={IMAGE_CONSTANT.NO_DATA}
-                fit="contain"
-                h={rem(400)}
-                w={"auto"}
-                style={{
-                  borderBottom: "1px solid #dee2e6",
+              <Button
+                leftSection={<IconFilter size={14} />}
+                variant="default"
+                className={classes.filter_button}
+                onClick={toggle}
+              >
+                Filter
+              </Button>
+              <Button
+                leftSection={<IconPlus size={14} />}
+                variant="outline"
+                h={rem(48)}
+                onClick={() => {
+                  navigate("/brand/create/shop");
                 }}
+                ml={rem(12)}
+                radius={"20%/50%"}
+              >
+                Add shop
+              </Button>
+            </Flex>
+
+            <Collapse in={opened}>
+              <Group>
+                <EditAndUpdateForm fields={fields} />
+                <Button variant="transparent" ml={"auto"} onClick={form.reset}>
+                  Clear all filter
+                </Button>
+              </Group>
+            </Collapse>
+
+            {/* Table section */}
+            <Box>
+              <LoadingOverlay
+                visible={isShopListLoading}
+                zIndex={1000}
+                overlayProps={{ radius: "sm", blur: 1 }}
               />
-            </Center>
-          ) : (
-            <Table.ScrollContainer minWidth={1000}>
-              <Table striped highlightOnHover verticalSpacing={"md"}>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>#</Table.Th>
-                    <Table.Th>Shop name</Table.Th>
-                    <Table.Th>Address</Table.Th>
-                    <Table.Th>Open time</Table.Th>
-                    <Table.Th>Close time</Table.Th>
-                    <Table.Th>Phone</Table.Th>
-                    <Table.Th ta={"center"}>Status</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            </Table.ScrollContainer>
-          )}
-        </Box>
-        <Group justify="space-between" align="end">
-          <Pagination
-            value={activePage}
-            onChange={setPage}
-            total={Math.ceil((shopList?.totalCount ?? 0) / Number(pageSize))}
-          />
-          {!shopList?.isValuesEmpty &&
-            <Select
-              label="Page Size"
-              allowDeselect={false}
-              placeholder="0"
-              data={PAGE_SIZE_SELECT} defaultValue={"5"}
-              value={pageSize}
-              onChange={(value) => {
-                setPageSize(value)
-                setPage(1)
-              }}
-            />
-          }
-        </Group>
-      </Paper>
-    </>
+              {shopList?.isValuesEmpty ? (
+                <Center>
+                  <Image
+                    radius={"md"}
+                    src={IMAGE_CONSTANT.NO_DATA}
+                    fit="contain"
+                    h={rem(400)}
+                    w={"auto"}
+                    style={{
+                      borderBottom: "1px solid #dee2e6",
+                    }}
+                  />
+                </Center>
+              ) : (
+                <Table.ScrollContainer minWidth={1000}>
+                  <Table striped highlightOnHover verticalSpacing={"md"}>
+                    <Table.Thead>
+                      <Table.Tr>
+                        <Table.Th>#</Table.Th>
+                        <Table.Th>Shop name</Table.Th>
+                        <Table.Th>Address</Table.Th>
+                        <Table.Th>Open time</Table.Th>
+                        <Table.Th>Close time</Table.Th>
+                        <Table.Th>Phone</Table.Th>
+                        <Table.Th ta={"center"}>Status</Table.Th>
+                      </Table.Tr>
+                    </Table.Thead>
+                    <Table.Tbody>{rows}</Table.Tbody>
+                  </Table>
+                </Table.ScrollContainer>
+              )}
+            </Box>
+            <Group justify="space-between" align="end">
+              <Pagination
+                value={activePage}
+                onChange={setPage}
+                total={Math.ceil((shopList?.totalCount ?? 0) / Number(pageSize))}
+              />
+              {!shopList?.isValuesEmpty &&
+                <Select
+                  label="Page Size"
+                  allowDeselect={false}
+                  placeholder="0"
+                  data={PAGE_SIZE_SELECT} defaultValue={"5"}
+                  value={pageSize}
+                  onChange={(value) => {
+                    setPageSize(value)
+                    setPage(1)
+                  }}
+                />
+              }
+            </Group>
+          </Grid.Col>
+        </Grid>
+      }
+    </Paper>
   );
 };
 
