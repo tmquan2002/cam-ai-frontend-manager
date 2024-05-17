@@ -523,7 +523,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                     data={[
                       {
                         group: "Head supervisor",
-                        items: employeeStatisticData
+                        items: employeeStatisticData?.HeadSupervisor
                           ? employeeStatisticData?.HeadSupervisor.map((i) => {
                               return {
                                 value: i.id,
@@ -534,7 +534,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       },
                       {
                         group: "Supervisor",
-                        items: employeeStatisticData
+                        items: employeeStatisticData?.Supervisor
                           ? employeeStatisticData?.Supervisor.map((i) => {
                               return {
                                 value: i.id,
@@ -545,7 +545,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       },
                       {
                         group: "Employee",
-                        items: employeeStatisticData
+                        items: employeeStatisticData?.Employee
                           ? employeeStatisticData?.Employee.map((i) => {
                               return {
                                 value: i.id,
@@ -594,33 +594,33 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                     data={[
                       {
                         group: "Head supervisor",
-                        items: employeeStatisticData
+                        items: employeeStatisticData?.HeadSupervisor
                           ? employeeStatisticData?.HeadSupervisor.map((i) => {
                               return {
-                                value: i.id,
-                                label: i.name,
+                                value: i?.id,
+                                label: i?.name,
                               };
                             })
                           : [],
                       },
                       {
                         group: "Supervisor",
-                        items: employeeStatisticData
+                        items: employeeStatisticData?.Supervisor
                           ? employeeStatisticData?.Supervisor.map((i) => {
                               return {
-                                value: i.id,
-                                label: i.name,
+                                value: i?.id,
+                                label: i?.name,
                               };
                             })
                           : [],
                       },
                       {
                         group: "Employee",
-                        items: employeeStatisticData
+                        items: employeeStatisticData?.Employee
                           ? employeeStatisticData?.Employee.map((i) => {
                               return {
-                                value: i.id,
-                                label: i.name,
+                                value: i?.id,
+                                label: i?.name,
                               };
                             })
                           : [],
@@ -792,7 +792,11 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                   size={rem(14)}
                                   fw={500}
                                 >
-                                  {i?.headSupervisor?.name ?? "Empty"}
+                                  {i?.headSupervisor?.name ?? (
+                                    <Text span inherit c={"#ccc"}>
+                                      Head supervisor is empty
+                                    </Text>
+                                  )}
                                 </Text>
                               </Group>
 
