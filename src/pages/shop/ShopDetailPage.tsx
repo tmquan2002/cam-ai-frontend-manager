@@ -10,7 +10,7 @@ import {
   Tabs,
   Text,
   Tooltip,
-  rem
+  rem,
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -21,7 +21,7 @@ import {
   IconMapPin,
   IconRouter,
   IconVideo,
-  IconX
+  IconX,
 } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import _, { isEmpty } from "lodash";
@@ -66,8 +66,8 @@ const ShopDetailPage = () => {
         isEmpty(value)
           ? null
           : PHONE_REGEX.test(value)
-            ? null
-            : "A phone number should have a length of 10-12 characters",
+          ? null
+          : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -77,12 +77,20 @@ const ShopDetailPage = () => {
     },
   });
   const { data, isLoading } = useGetShopList({ size: 1, enabled: true });
-  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } = useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
-  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
-  const { data: cameraList, isLoading: isGetCameraListLoading } = useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
-  const { mutate: updateShop, isLoading: updateShopLoading } = useUpdateShopById();
+  const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading } =
+    useGetEdgeBoxInstallByShopId(data?.values?.[0]?.id ?? null);
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: cameraList, isLoading: isGetCameraListLoading } =
+    useGetCameraListByShopId(data?.values?.[0]?.id ?? undefined);
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(form.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(form.values.district ?? 0)
+  );
+  const { mutate: updateShop, isLoading: updateShopLoading } =
+    useUpdateShopById();
 
   useEffect(() => {
     if (data) {
@@ -139,7 +147,7 @@ const ShopDetailPage = () => {
           placeholder: "Brand",
           label: "Brand",
           radius: "md",
-        }
+        },
       },
       {
         type: FIELD_TYPES.TIME,
@@ -241,7 +249,9 @@ const ShopDetailPage = () => {
     isWardsLoading,
   ]);
 
-  let edgeBoxInstall = edgeBoxInstallList?.values.find((x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled);
+  let edgeBoxInstall = edgeBoxInstallList?.values.find(
+    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled
+  );
 
   return (
     <Box pb={20}>
@@ -323,7 +333,9 @@ const ShopDetailPage = () => {
           </Tabs.Panel>
 
           <Tabs.Panel value="edgebox">
-            <Skeleton visible={isEdgeboxInstallListLoading || isGetCameraListLoading}>
+            <Skeleton
+              visible={isEdgeboxInstallListLoading || isGetCameraListLoading}
+            >
               <Box p={rem(32)}>
                 {edgeBoxInstall ? (
                   <EdgeBoxInstallDetailComp edgeBoxInstall={edgeBoxInstall} />
@@ -345,11 +357,13 @@ const ShopDetailPage = () => {
                 {cameraList?.values?.length == 0 && (
                   <Flex>
                     <Box ml={rem(40)} style={{ flex: 1 }}>
-                      <Text c="dimmed"
+                      <Text
+                        c="dimmed"
                         w={"100%"}
                         ta={"center"}
                         mt={20}
-                        fs="italic">
+                        fs="italic"
+                      >
                         No camera found
                       </Text>
                     </Box>

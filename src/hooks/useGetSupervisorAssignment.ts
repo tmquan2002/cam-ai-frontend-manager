@@ -11,7 +11,7 @@ export const useGetSupervisorAssignmentHistory = (
     data,
     error,
     refetch,
-  }: UseQueryResult<SuperVisorAssignmentDetail, Error> = useQuery({
+  }: UseQueryResult<SuperVisorAssignmentDetail[], Error> = useQuery({
     queryKey: ["assignment", params],
     queryFn: async () => {
       return await CalendarAPI._getAssignHistory(params);

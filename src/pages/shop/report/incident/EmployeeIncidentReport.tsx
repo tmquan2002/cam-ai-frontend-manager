@@ -45,10 +45,10 @@ const EmployeeIncidentReport = () => {
     validateInputOnChange: true,
     initialValues: {
       employeeId: null,
-      fromTime: null,
+      fromTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       status: null,
-      toTime: null,
-      incidentType: null,
+      toTime: new Date(),
+      incidentType: IncidentType.Incident,
       size: 999,
     },
     validate: (values) => ({
@@ -203,6 +203,10 @@ const EmployeeIncidentReport = () => {
             {
               key: IncidentType.Uniform,
               value: IncidentType.Uniform,
+            },
+            {
+              value: IncidentType.Incident,
+              label: "All incident",
             },
           ],
         },

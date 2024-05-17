@@ -1,4 +1,20 @@
-import { Box, Button, Center, Flex, Group, Image, LoadingOverlay, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Group,
+  Image,
+  LoadingOverlay,
+  Pagination,
+  Paper,
+  Select,
+  Table,
+  Text,
+  TextInput,
+  Tooltip,
+  rem,
+} from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
@@ -9,7 +25,6 @@ import { AccountDetail } from "../../models/Account";
 import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
-
 
 const BrandShopManagerListPage = () => {
   const navigate = useNavigate();
@@ -36,7 +51,8 @@ const BrandShopManagerListPage = () => {
         <Tooltip label="View Shop Manager" withArrow position="top-start">
           <Text
             onClick={() => navigate(`/brand/account/${row?.id}`)}
-            size={rem(14)} c="blue"
+            size={rem(14)}
+            c="blue"
             className={classes.clickable_link}
           >
             {replaceIfNun(row?.name)}
@@ -51,19 +67,20 @@ const BrandShopManagerListPage = () => {
         <StatusBadge statusName={row?.accountStatus} size="sm" padding={10} />
       </Table.Td>
       <Table.Td ta="right">
-        {row?.managingShop ?
+        {row?.managingShop ? (
           <Tooltip label="View Shop" withArrow position="top-end">
             <Text
               onClick={() => navigate(`/brand/shop/${row?.managingShop?.id}`)}
-              size={rem(14)} c="blue"
+              size={rem(14)}
+              c="blue"
               className={classes.clickable_link}
             >
               {row?.managingShop?.name}
             </Text>
           </Tooltip>
-          :
+        ) : (
           <>None</>
-        }
+        )}
       </Table.Td>
     </Table.Tr>
   ));
@@ -71,7 +88,7 @@ const BrandShopManagerListPage = () => {
     <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Group pb={12} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Shop Manager list
+          Shop manager list
         </Text>
       </Group>
 
@@ -120,12 +137,7 @@ const BrandShopManagerListPage = () => {
           </Center>
         ) : (
           <Table.ScrollContainer minWidth={1000}>
-            <Table
-              miw={1000}
-              highlightOnHover
-              verticalSpacing={"md"}
-              striped
-            >
+            <Table miw={1000} highlightOnHover verticalSpacing={"md"} striped>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>#</Table.Th>
@@ -148,19 +160,20 @@ const BrandShopManagerListPage = () => {
             onChange={setPage}
             total={Math.ceil((data?.totalCount ?? 0) / Number(pageSize))}
           />
-          {!data?.isValuesEmpty &&
+          {!data?.isValuesEmpty && (
             <Select
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={PAGE_SIZE_SELECT} defaultValue={"5"}
+              data={PAGE_SIZE_SELECT}
+              defaultValue={"5"}
               value={pageSize}
               onChange={(value) => {
-                setPageSize(value)
-                setPage(1)
+                setPageSize(value);
+                setPage(1);
               }}
             />
-          }
+          )}
         </Group>
       </Box>
     </Paper>

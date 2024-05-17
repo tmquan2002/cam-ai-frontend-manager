@@ -1,8 +1,11 @@
 import { useEffect, useId, useState } from "react";
 import { useGetCameraLiveUrl } from "../../hooks/useGetCameraLiveUrl";
+import ReconnectingWebSocket from "reconnecting-websocket";
 //@ts-ignore
 import JSMpeg from "@cycjimmy/jsmpeg-player";
 import { Box, Center, Paper, Skeleton, Text, rem } from "@mantine/core";
+import { getAccessToken } from "../../context/AuthContext";
+import { notifications } from "@mantine/notifications";
 
 export type CameraCardProps = {
   cameraId: string | null;
@@ -12,19 +15,38 @@ const CameraCard = ({ cameraId }: CameraCardProps) => {
   const { data, isLoading, error } = useGetCameraLiveUrl(cameraId);
   const [isLoadingVideo] = useState<boolean>(false);
   const videoWrapperID = useId();
+
   useEffect(() => {
     if (data) {
-      new JSMpeg.VideoElement(`#${CSS.escape(videoWrapperID)}`, data, {
-        autoplay: true,
-        // hooks: {
-        //   load: () => {
-        //     setIsLoadingVideo(true);
-        //   },
-        //   play: () => {
-        //     setIsLoadingVideo(false);
-        //   },
-        // },
-      });
+      const rws = new ReconnectingWebSocket(
+        data,
+        ["Bearer", `${getAccessToken()}`],
+        {
+          maxRetries: 3,
+        }
+      );
+
+      rws.onerror = (err) => {
+        console.log(err);
+        notifications.show({
+          message: err.message,
+        });
+      };
+
+      rws.onopen = () => {
+        new JSMpeg.VideoElement(`#${CSS.escape(videoWrapperID)}`, data, {
+          autoplay: true,
+        });
+      };
+
+      setInterval(() => {
+        rws.close();
+      }, 2 * 60 * 1000);
+
+      rws.onclose = () => {
+        console.log("Close");
+        rws.reconnect();
+      };
     }
   }, [data]);
 

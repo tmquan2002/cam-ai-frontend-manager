@@ -1,3 +1,4 @@
+import { AccountDetail } from "./Account";
 import {
   EdgeBoxStatus,
   EventType,
@@ -23,6 +24,10 @@ export type IncidentDetail = {
   evidences: EvidenceDetail[];
   id: string;
   createdDate: string;
+  assigningAccount: AccountDetail | null;
+  assigningAccountId: string | null;
+  inChargeAccount: AccountDetail | null;
+  inChargeAccountId: string | null;
 };
 
 export type WebSocketIncident = {

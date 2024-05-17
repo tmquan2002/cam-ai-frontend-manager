@@ -202,7 +202,7 @@ export const useGetEmployeeProgress = (taskId: string | null, delay: number) => 
         queryFn: async () => {
             return await EmployeeApi._getEmployeeProgress(taskId);
         },
-        refetchInterval: query => query?.percent == 100 ? false : delay,
+        refetchInterval: query => query?.percents == 100 ? false : delay,
         enabled: !!taskId,
         refetchIntervalInBackground: true,
     });

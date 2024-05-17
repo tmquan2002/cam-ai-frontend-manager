@@ -13,7 +13,7 @@ import {
   Paper,
   Table,
   Text,
-  rem
+  rem,
 } from "@mantine/core";
 import { isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -26,7 +26,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
 import StatusBadge from "../../components/badge/StatusBadge";
-import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
+import CustomBreadcrumb, {
+  BreadcrumbItem,
+} from "../../components/breadcrumbs/CustomBreadcrumb";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
@@ -40,18 +42,21 @@ import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
-import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
+import {
+  getDateFromSetYear,
+  mapLookupToArray,
+} from "../../utils/helperFunction";
 import classes from "./EmployeeDetailPage.module.scss";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: "Employee",
-    link: "/shop/employee"
+    link: "/shop/employee",
   },
   {
-    title: "Detail"
-  }
-]
+    title: "Detail",
+  },
+];
 export type CreateEmployeeField = {
   name: string;
   email: string;
@@ -80,15 +85,19 @@ const EmployeeDetailPage = () => {
     useGetIncidentList({
       size: 12,
       pageIndex: activePage - 1,
-      employeeId: params?.id ?? undefined
+      employeeId: params?.id ?? undefined,
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
       gender: isNotEmpty("Please select gender"),
-      phone: (value) => isEmpty(value) ? null :
-        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
+      phone: (value) =>
+        isEmpty(value)
+          ? null
+          : PHONE_REGEX.test(value)
+          ? null
+          : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
@@ -133,7 +142,9 @@ const EmployeeDetailPage = () => {
         onClick={() => navigate(`/shop/incident/${row.id}`)}
       >
         <Table.Td>{index + 1 + Number(12) * (activePage - 1)}</Table.Td>
-        <Table.Td><Text>{row.incidentType}</Text></Table.Td>
+        <Table.Td>
+          <Text>{row.incidentType}</Text>
+        </Table.Td>
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td ta="center">
           <StatusBadge statusName={row.status} size="sm" padding={10} />
@@ -152,6 +163,7 @@ const EmployeeDetailPage = () => {
           placeholder: "Name",
           label: "Name",
           required: true,
+          radius: "md",
         },
       },
       {
@@ -162,6 +174,7 @@ const EmployeeDetailPage = () => {
           placeholder: "Email",
           label: "Email",
           required: true,
+          radius: "md",
         },
       },
       {
@@ -173,6 +186,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "gender",
           required: true,
+          radius: "md",
         },
         spans: 6,
       },
@@ -185,6 +199,7 @@ const EmployeeDetailPage = () => {
           type: "number",
           placeholder: "Phone",
           label: "Phone",
+          radius: "md",
         },
         spans: 6,
       },
@@ -195,7 +210,8 @@ const EmployeeDetailPage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          maxDate: getDateFromSetYear(18)
+          maxDate: getDateFromSetYear(18),
+          radius: "md",
         },
       },
       {
@@ -209,6 +225,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "province",
           loading: isProvicesLoading,
+          radius: "md",
         },
         spans: 4,
       },
@@ -223,6 +240,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "district",
           loading: isDistrictsLoading,
+          radius: "md",
         },
         spans: 4,
       },
@@ -236,6 +254,8 @@ const EmployeeDetailPage = () => {
           }),
           form: updateEmployeeForm,
           name: "wardId",
+          radius: "md",
+
           loading: isWardsLoading,
         },
         spans: 4,
@@ -246,6 +266,8 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "addressLine",
           placeholder: "Employee address",
+          radius: "md",
+
           label: "Employee address",
         },
       },
@@ -265,25 +287,15 @@ const EmployeeDetailPage = () => {
       <Box pt={rem(20)} pl={rem(32)}>
         <CustomBreadcrumb items={breadcrumbs} goBack />
       </Box>
-      <Paper m={rem(32)} p={rem(32)} shadow="xs"      >
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
         <Group justify={"space-between"} align="center" pb={rem(28)}>
           <Group>
-
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={25}
-              c={"light-blue.4"}
-            >
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
               General Information
             </Text>
           </Group>
 
-          <ActionIcon
-            color="red"
-            onClick={open}
-            size={"lg"}
-          >
+          <ActionIcon color="red" onClick={open} size={"lg"}>
             <IconTrash style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>
         </Group>
@@ -337,10 +349,7 @@ const EmployeeDetailPage = () => {
             )}
           >
             <EditAndUpdateForm fields={fields} />
-            <Group
-              justify="flex-end"
-              mt="md"
-            >
+            <Group justify="flex-end" mt="md">
               <Button
                 type="submit"
                 disabled={!updateEmployeeForm.isDirty()}
@@ -353,24 +362,12 @@ const EmployeeDetailPage = () => {
         )}
       </Paper>
 
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        shadow="xs"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incidents
         </Text>
 
-        <Box pl={20} pr={20}
-          mt={"xl"}
-          pos={"relative"}
-        >
+        <Box pl={20} pr={20} mt={"xl"} pos={"relative"}>
           <LoadingOverlay
             visible={isGetIncidentListLoading}
             zIndex={1000}
@@ -391,11 +388,7 @@ const EmployeeDetailPage = () => {
             </Center>
           ) : (
             <Table.ScrollContainer minWidth={1000}>
-              <Table
-                striped
-                highlightOnHover
-                verticalSpacing={"md"}
-              >
+              <Table striped highlightOnHover verticalSpacing={"md"}>
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>#</Table.Th>
@@ -409,10 +402,7 @@ const EmployeeDetailPage = () => {
             </Table.ScrollContainer>
           )}
         </Box>
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}
@@ -429,12 +419,9 @@ const EmployeeDetailPage = () => {
             Confirm delete <Mark>{employeeData?.name}</Mark> employee?
           </Text>
         }
-      // centered
+        // centered
       >
-        <Group
-          justify="flex-end"
-          mt="md"
-        >
+        <Group justify="flex-end" mt="md">
           <Button
             loading={isDeleteEmployeeLoading}
             onClick={() => {
@@ -461,12 +448,7 @@ const EmployeeDetailPage = () => {
           >
             Yes
           </Button>
-          <Button
-            onClick={close}
-            color={"red"}
-            variant="outline"
-            size="xs"
-          >
+          <Button onClick={close} color={"red"} variant="outline" size="xs">
             No
           </Button>
         </Group>

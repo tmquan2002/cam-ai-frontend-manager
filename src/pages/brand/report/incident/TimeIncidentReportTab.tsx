@@ -1,10 +1,30 @@
 import { useForm } from "@mantine/form";
-import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
+import {
+  IncidentStatus,
+  IncidentType,
+  ReportInterval,
+} from "../../../../models/CamAIEnum";
 import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import _ from "lodash";
-import { Box, Flex, Group, Skeleton, Text, rem } from "@mantine/core";
+import {
+  Badge,
+  Box,
+  Card,
+  Center,
+  Divider,
+  Flex,
+  Group,
+  Loader,
+  ScrollArea,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Table,
+  Text,
+  rem,
+} from "@mantine/core";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
@@ -22,7 +42,24 @@ import {
 } from "chart.js";
 
 import { Chart } from "react-chartjs-2";
-import LegendCard from "../../../../components/card/LegendCard";
+import LegendCard, {
+  LEGEND_TYPES,
+} from "../../../../components/card/LegendCard";
+import {
+  IncidentDetail,
+  IncidentPercentStatusDetail,
+  IncidentPercentTypeDetail,
+} from "../../../../models/Incident";
+import {
+  addDaysBaseOnReportInterval,
+  differentDateReturnFormattedString,
+} from "../../../../utils/helperFunction";
+import { DonutChart } from "@mantine/charts";
+import { useGetIncidentPercent } from "../../../../hooks/useGetIncidentPercent";
+import LoadingImage from "../../../../components/image/LoadingImage";
+import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
+import { useScrollIntoView } from "@mantine/hooks";
+import classes from "./TimeIncidentReport.module.scss";
 
 ChartJS.register(
   CategoryScale,
@@ -42,15 +79,55 @@ type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;
   interval: ReportInterval;
+  type: IncidentType;
+};
+
+const renderIncidentStatusLegendTitle = (
+  details: IncidentPercentStatusDetail[],
+  status: IncidentStatus
+) => {
+  const detail = details.find((i) => i.status == status);
+
+  return `${status} incident (${detail?.total}) - ${(detail?.percent
+    ? detail.percent * 100
+    : 0
+  ).toFixed(2)}%`;
+};
+
+const renderIncidentTypeLegendTitle = (
+  details: IncidentPercentTypeDetail[],
+  type: IncidentType
+) => {
+  const detail = details.find((i) => i.type == type);
+
+  return `${type} incident (${detail?.total}) - ${(detail?.percent
+    ? detail.percent * 100
+    : 0
+  ).toFixed(2)}%`;
 };
 
 const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
+  const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
+    offset: 60,
+  });
+  const {
+    scrollIntoView: scrollIntoIncidentDetail,
+    targetRef: incidentDetailRef,
+  } = useScrollIntoView<HTMLDivElement>();
+  const [selectedIncidentItem, setSelectedIncidentItem] =
+    useState<IncidentDetail | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<{
+    startTime: string;
+    endTime: string;
+  } | null>(null);
+
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
       startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
       interval: ReportInterval.HalfDay,
+      type: IncidentType.Incident,
     },
     validate: (values) => ({
       toDate:
@@ -75,7 +152,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           enabled: false,
           interval: form.values.interval,
           shopId: shopId ?? undefined,
-          type: IncidentType.Incident,
+          type: form.values.type,
         };
 
       if (form.isValid() && form.values.startDate && form.values.toDate) {
@@ -89,7 +166,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           interval: form.values.interval,
           enabled: true,
           shopId: shopId ?? undefined,
-          type: IncidentType.Incident,
+          type: form.values.type,
         };
         sb = _.omitBy(sb, _.isNil) as GetIncidentReportByTimeParams & {
           enabled: boolean;
@@ -100,7 +177,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           enabled: true,
           interval: form.values.interval,
           shopId: shopId ?? undefined,
-          type: IncidentType.Incident,
+          type: form?.values.type,
         };
       }
     }, [
@@ -113,6 +190,30 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
     data: incidentReportByTimeData,
     isLoading: isGetIncidentReportByTimeDataLoading,
   } = useGetIncidentReportByTime(searchParams);
+
+  const { data: incidentPercent, isLoading: isGetIncidentPercentLoading } =
+    useGetIncidentPercent({
+      startDate: form.values.startDate
+        ? dayjs(form.values.startDate).format("YYYY-MM-DD")
+        : dayjs().format("YYYY-MM-DD"),
+      endDate: form.values.startDate
+        ? dayjs(form.values.toDate).format("YYYY-MM-DD")
+        : dayjs().format("YYYY-MM-DD"),
+      enabled: !!shopId,
+      shopId: shopId ?? "",
+    });
+
+  const { data: incidentList, isLoading: isGetIncidentListLoading } =
+    useGetIncidentList({
+      enabled:
+        !!selectedDuration?.startTime &&
+        !!selectedDuration?.endTime &&
+        !!shopId,
+      fromTime: selectedDuration?.startTime,
+      toTime: selectedDuration?.endTime,
+      size: 999,
+      shopId: shopId,
+    });
 
   const data = useMemo(() => {
     if (isGetIncidentReportByTimeDataLoading) {
@@ -137,7 +238,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           fontWeight: 500,
           radius: rem(8),
         },
-        spans: 4,
+        spans: 3,
       },
       {
         type: FIELD_TYPES.DATE,
@@ -148,7 +249,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           fontWeight: 500,
           radius: rem(8),
         },
-        spans: 4,
+        spans: 3,
       },
       {
         type: FIELD_TYPES.SELECT,
@@ -181,10 +282,132 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
             },
           ],
         },
-        spans: 4,
+        spans: 3,
+      },
+      {
+        type: FIELD_TYPES.SELECT,
+        fieldProps: {
+          form,
+          name: "type",
+          placeholder: "Incident type",
+          fontWeight: 500,
+          radius: rem(8),
+
+          data: [
+            {
+              value: IncidentType.Phone,
+              label: "Phone incident",
+            },
+            {
+              value: IncidentType.Uniform,
+              label: "Uniform incident",
+            },
+            {
+              value: IncidentType.Incident,
+              label: "All incident",
+            },
+          ],
+        },
+        spans: 3,
       },
     ];
   }, [form]);
+
+  useEffect(() => {
+    if (incidentList) {
+      scrollIntoView();
+    }
+  }, [incidentList]);
+  useEffect(() => {
+    if (selectedIncidentItem) {
+      scrollIntoIncidentDetail();
+    }
+  }, [selectedIncidentItem]);
+
+  const rows = isGetIncidentListLoading ? (
+    <Table.Tr>
+      <Table.Td>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+    </Table.Tr>
+  ) : (
+    incidentList?.values.map((item) => (
+      <Table.Tr
+        key={item.id}
+        style={{
+          cursor: "pointer",
+        }}
+        onClick={() => {
+          setSelectedIncidentItem(item);
+        }}
+        className={
+          item?.id == selectedIncidentItem?.id
+            ? classes["selectedInteraction"]
+            : ""
+        }
+      >
+        <Table.Td>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item.incidentType}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.startTime
+                ? dayjs(item.startTime).format("HH:mm | DD-MM")
+                : "Empty"}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.endTime
+                ? dayjs(item.endTime).format("HH:mm | DD-MM")
+                : "Empty"}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.evidences.length}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.employee?.name ?? "Empty"}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item.status}
+            </Text>
+          </Center>
+        </Table.Td>
+      </Table.Tr>
+    ))
+  );
 
   return (
     <Box pb={rem(40)}>
@@ -379,18 +602,18 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                         },
                         onClick(_event, elements, _chart) {
                           if (elements.length > 0) {
-                            // const selectedData =
-                            //   incidentReportByTimeData?.data?.[
-                            //     elements[0].index
-                            //   ];
-                            // setSelectedIncidentItem(null);
-                            // setSelectedDuration({
-                            //   startTime: selectedData?.time,
-                            //   endTime: addDaysBaseOnReportInterval(
-                            //     selectedData?.time,
-                            //     form.values.interval
-                            //   ),
-                            // });
+                            const selectedData =
+                              incidentReportByTimeData?.data?.[
+                                elements[0].index
+                              ];
+                            setSelectedIncidentItem(null);
+                            setSelectedDuration({
+                              startTime: selectedData?.time,
+                              endTime: addDaysBaseOnReportInterval(
+                                selectedData?.time,
+                                form.values.interval
+                              ),
+                            });
                           }
                         },
                       }}
@@ -424,10 +647,399 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                   </Box>
                 </Box>
               </Flex>
+
+              {isGetIncidentPercentLoading ? (
+                <Loader></Loader>
+              ) : incidentPercent?.total != 0 ? (
+                <SimpleGrid cols={2} px={rem(32)} mb={rem(32)} spacing={"xl"}>
+                  <Box
+                    flex={1}
+                    style={{
+                      borderRadius: rem(12),
+                      border: "1px solid #ccc",
+                    }}
+                  >
+                    <Text
+                      py={rem(20)}
+                      ta={"center"}
+                      c={"rgb(17, 24, 39)"}
+                      fw={500}
+                      bg={"#f9fafb"}
+                      style={{
+                        borderTopLeftRadius: rem(12),
+                        borderTopRightRadius: rem(12),
+                      }}
+                    >
+                      Incident type ratio
+                    </Text>
+                    <Divider />
+                    <Flex justify={"center"} mt={rem(12)}>
+                      <DonutChart
+                        withLabelsLine
+                        withLabels
+                        thickness={30}
+                        data={
+                          incidentPercent
+                            ? incidentPercent?.types?.map((i) => {
+                                return {
+                                  name: i.type + " incident",
+                                  color:
+                                    i.type == IncidentType.Phone
+                                      ? "indigo.6"
+                                      : "yellow.6",
+                                  value: i.total,
+                                };
+                              })
+                            : []
+                        }
+                      />
+                      <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
+                        <LegendCard
+                          color="#4c6ef5"
+                          title={renderIncidentTypeLegendTitle(
+                            incidentPercent?.types ?? [],
+                            IncidentType.Phone
+                          )}
+                          type={LEGEND_TYPES.CIRCLE}
+                        />
+                        <LegendCard
+                          color="#fab005"
+                          title={renderIncidentTypeLegendTitle(
+                            incidentPercent?.types ?? [],
+                            IncidentType.Uniform
+                          )}
+                          type={LEGEND_TYPES.CIRCLE}
+                        />
+                      </Stack>
+                    </Flex>
+                  </Box>
+
+                  <Box
+                    flex={1}
+                    style={{
+                      borderRadius: rem(12),
+                      border: "1px solid #ccc",
+                    }}
+                  >
+                    <Text
+                      py={rem(20)}
+                      ta={"center"}
+                      c={"rgb(17, 24, 39)"}
+                      fw={500}
+                      bg={"#f9fafb"}
+                      style={{
+                        borderTopLeftRadius: rem(12),
+                        borderTopRightRadius: rem(12),
+                      }}
+                    >
+                      Incident status ratio
+                    </Text>
+                    <Divider />
+                    <Flex justify={"center"} mt={rem(12)}>
+                      <DonutChart
+                        withLabelsLine
+                        withLabels
+                        thickness={30}
+                        data={
+                          incidentPercent
+                            ? incidentPercent?.statuses.map((i) => {
+                                return {
+                                  color:
+                                    i.status == IncidentStatus.Accepted
+                                      ? "#12b886"
+                                      : i.status == IncidentStatus.New
+                                      ? "#4c6ef5"
+                                      : "#fa5252",
+                                  name: i.status,
+                                  value: i.total,
+                                };
+                              })
+                            : []
+                        }
+                      />
+                      <Stack mt={rem(52)} ml={rem(20)} gap={rem(16)}>
+                        <LegendCard
+                          color="#4c6ef5"
+                          title={renderIncidentStatusLegendTitle(
+                            incidentPercent?.statuses ?? [],
+                            IncidentStatus.New
+                          )}
+                          type={LEGEND_TYPES.CIRCLE}
+                        />
+                        <LegendCard
+                          color="#12b886"
+                          title={renderIncidentStatusLegendTitle(
+                            incidentPercent?.statuses ?? [],
+                            IncidentStatus.Accepted
+                          )}
+                          type={LEGEND_TYPES.CIRCLE}
+                        />
+                        <LegendCard
+                          color="#fa5252"
+                          title={renderIncidentStatusLegendTitle(
+                            incidentPercent?.statuses ?? [],
+                            IncidentStatus.Rejected
+                          )}
+                          type={LEGEND_TYPES.CIRCLE}
+                        />
+                      </Stack>
+                    </Flex>
+                  </Box>
+                </SimpleGrid>
+              ) : (
+                <></>
+              )}
             </Box>
           )}
         </Box>
       </Skeleton>
+
+      <Group align="flex-start" mt={rem(40)}>
+        {incidentList ? (
+          <Card
+            radius={8}
+            w={"100%"}
+            mb={rem(40)}
+            ref={targetRef}
+            style={{
+              border: "1px solid #ccc",
+            }}
+          >
+            <Card.Section
+              style={{
+                borderBottom: "1px solid #ccc",
+              }}
+              bg={"#f9fafb"}
+              py={rem(16)}
+              px={rem(12)}
+            >
+              <Group justify="space-between">
+                <Text size="md" fw={600}>
+                  Incident list
+                </Text>
+                <Group gap={rem(6)}>
+                  <Text fw={500} size="sm">
+                    From
+                  </Text>
+                  <Badge
+                    radius={"sm"}
+                    color={"green"}
+                    style={{
+                      border: "1px solid green",
+                    }}
+                    variant="light"
+                    c={"#000"}
+                    mr={rem(10)}
+                  >
+                    {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
+                  </Badge>
+                  <Text fw={500} size="sm">
+                    to
+                  </Text>
+                  <Badge
+                    radius={"sm"}
+                    color={"green"}
+                    style={{
+                      border: "1px solid green",
+                    }}
+                    variant="light"
+                    c={"#000"}
+                    mr={rem(16)}
+                  >
+                    {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
+                  </Badge>
+                </Group>
+              </Group>
+            </Card.Section>
+
+            <Card.Section>
+              <ScrollArea.Autosize mah={700}>
+                <Table striped highlightOnHover>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Type
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Start time
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            End time
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Evidences
+                          </Text>
+                        </Center>
+                      </Table.Th>
+
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Assigned to
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text
+                            size={rem(13)}
+                            lh={rem(24)}
+                            c={"rgb(55 65 81)"}
+                            fw={600}
+                          >
+                            Status
+                          </Text>
+                        </Center>
+                      </Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>{rows}</Table.Tbody>
+                </Table>
+              </ScrollArea.Autosize>
+            </Card.Section>
+          </Card>
+        ) : (
+          <></>
+        )}
+        {selectedIncidentItem ? (
+          <Card
+            radius={8}
+            w={"100%"}
+            ref={incidentDetailRef}
+            style={{
+              border: "1px solid rgb(229 231 235)",
+            }}
+          >
+            <Card.Section>
+              <Box
+                style={{
+                  borderBottom: "1px solid #ccc",
+                }}
+                bg={"#f9fafb"}
+                py={rem(16)}
+                px={rem(24)}
+              >
+                <Group justify="space-between">
+                  <Text size="md" fw={600}>
+                    Incident detail
+                  </Text>
+                  <Group gap={rem(8)}>
+                    <Text fw={500} size="sm">
+                      Total time:
+                    </Text>
+                    <Badge radius={"sm"} color={"green"} c={"#fff"}>
+                      {selectedIncidentItem?.startTime &&
+                      selectedIncidentItem.endTime
+                        ? differentDateReturnFormattedString(
+                            selectedIncidentItem?.startTime,
+                            selectedIncidentItem?.endTime
+                          )
+                        : "undefined"}
+                    </Badge>
+                  </Group>
+                </Group>
+              </Box>
+              <ScrollArea.Autosize mah={1000} my={rem(12)}>
+                <Box px={rem(24)}>
+                  <Box>
+                    <Group
+                      justify="space-between"
+                      style={{
+                        borderBottom: "1px solid #e5e7eb",
+                      }}
+                      pb={rem(8)}
+                      mb={rem(10)}
+                    >
+                      <Text
+                        c={"rgb(107 114 128"}
+                        size={rem(14)}
+                        lh={rem(24)}
+                        fw={500}
+                      >
+                        {dayjs(
+                          selectedIncidentItem?.evidences?.[0]?.createdDate
+                        ).format("LL")}
+                      </Text>
+                      <Text
+                        c={"rgb(107 114 128"}
+                        size={rem(14)}
+                        lh={rem(24)}
+                        fw={500}
+                      >
+                        Assigned to :{" "}
+                        <Text
+                          span
+                          c="blue"
+                          inherit
+                          style={{
+                            cursor: "pointer",
+                          }}
+                        >
+                          {selectedIncidentItem?.employee?.name ?? "(Empty)"}
+                        </Text>
+                      </Text>
+                    </Group>
+                    {selectedIncidentItem?.evidences?.length == 0 ? (
+                      <NoImage type="NO_DATA" />
+                    ) : (
+                      selectedIncidentItem?.evidences.map((i) => (
+                        <LoadingImage
+                          mb={rem(12)}
+                          fit="contain"
+                          radius={"md"}
+                          key={i.id}
+                          imageId={i?.imageId ?? ""}
+                        />
+                      ))
+                    )}
+                  </Box>
+                </Box>
+              </ScrollArea.Autosize>
+            </Card.Section>
+          </Card>
+        ) : (
+          <></>
+        )}
+      </Group>
     </Box>
   );
 };
