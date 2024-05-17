@@ -36,6 +36,7 @@ import { InteractionReportPage } from "../pages/shop/report/interaction/Interact
 import BrandRoute from "./BrandRoute";
 import CommonRoute from "./CommonRoute";
 import ShopRoute from "./ShopRoute";
+import ShopImportResultPage from "../pages/shop/ShopImportResultPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -114,6 +115,10 @@ const AppRoute = () => {
           path: "calendar/setting",
           element: <ShopCalendarSetting />,
         },
+        {
+          path: "import/:id",
+          element: <ShopImportResultPage />
+        }
       ],
     },
     {
