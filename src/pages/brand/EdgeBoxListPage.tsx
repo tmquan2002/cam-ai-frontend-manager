@@ -78,11 +78,11 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
 const EdgeBoxListPage = () => {
   const [opened] = useDisclosure(false);
   const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
-    { size: 1 },
+    { size: 1 }
   );
   const { data: edgeBoxList, isLoading: isGetEdgeBoxListLoading } =
     useGetEdgeBoxInstallByBrandId(
-      brandList ? brandList?.values?.[0]?.id : null,
+      brandList ? brandList?.values?.[0]?.id : null
     );
 
   const items = edgeBoxList?.values
@@ -105,7 +105,7 @@ const EdgeBoxListPage = () => {
       {" "}
       <Group mb={rem(20)} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          EdgeBox List
+          Edge box List
         </Text>
       </Group>
       <Collapse in={opened}>

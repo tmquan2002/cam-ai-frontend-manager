@@ -6,6 +6,7 @@ import {
   Button,
   Card,
   Center,
+  Collapse,
   Divider,
   Flex,
   Group,
@@ -39,8 +40,9 @@ import {
   IconChevronLeft,
   IconChevronRight,
   IconExclamationCircle,
+  IconSettings,
 } from "@tabler/icons-react";
-import { useScrollIntoView } from "@mantine/hooks";
+import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import dayjs from "dayjs";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
@@ -55,7 +57,10 @@ import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorA
 import { modals } from "@mantine/modals";
 import _ from "lodash";
 import { SuperVisorAssignmentDetail } from "../../models/Shop";
-
+import { useDeleteHeadSupervisor } from "../../hooks/useDeleteHeadSupervisor";
+import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
 interface Event {
@@ -68,6 +73,7 @@ interface ShopCalendarProps {
 }
 
 const ShopCalendar = ({ events }: ShopCalendarProps) => {
+  const [opened, { toggle }] = useDisclosure(false);
   const [scrolled, setScrolled] = useState(false);
   const {
     scrollIntoView: scrollIntoIncidentDetail,
@@ -101,6 +107,14 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
   } = useGetSupervisorAssignmentHistory({
     date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
   });
+
+  const {
+    mutate: deleteHeadSupervisor,
+    isLoading: isDeleteHeadSupervisorLoading,
+  } = useDeleteHeadSupervisor();
+
+  const { mutate: deleteSupervisor, isLoading: isDeleteSupervisorLoading } =
+    useDeleteSupervisor();
 
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
@@ -157,10 +171,11 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
               });
               refetchSupervisorList();
             },
-            onError() {
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
               notifications.show({
                 title: "Failed",
-                message: "Assign head supervisor failed!",
+                message: error?.message ?? "Assign head supervisor failed!",
                 autoClose: 6000,
                 c: NotificationColorPalette.ALERT_MESSAGE,
               });
@@ -203,10 +218,11 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
               });
               refetchSupervisorList();
             },
-            onError() {
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
               notifications.show({
                 title: "Failed",
-                message: "Assign supervisor failed!",
+                message: error?.message ?? "Assign supervisor failed!",
                 autoClose: 6000,
                 c: NotificationColorPalette.ALERT_MESSAGE,
               });
@@ -215,6 +231,70 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         );
       },
     });
+
+  const openConfirmDeleteHeadSupervisorModal = () => {
+    modals.openConfirmModal({
+      title: "Please confirm delete head supervisor",
+      children: <Text size="sm">Confirm delete head supervisor?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        deleteHeadSupervisor(
+          {},
+          {
+            onSuccess() {
+              notifications.show({
+                message: "Remove head supervisor successfully!",
+                title: "Success",
+              });
+              refetchSupervisorList();
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                title: "Failed",
+                message: error?.message ?? "Remove head supervisor failed!",
+                autoClose: 6000,
+                c: NotificationColorPalette.ALERT_MESSAGE,
+              });
+            },
+          }
+        );
+      },
+    });
+  };
+
+  const openConfirmDeleteSupervisorModal = () => {
+    modals.openConfirmModal({
+      title: "Please confirm modify supervisor",
+      children: <Text size="sm">Confirm delete supervisor?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        deleteSupervisor(
+          {},
+          {
+            onSuccess() {
+              notifications.show({
+                message: "Remove supervisor successfully!",
+                title: "Success",
+              });
+              refetchSupervisorList();
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                title: "Failed",
+                message: error?.message ?? "Remove supervisor failed!",
+                autoClose: 6000,
+                c: NotificationColorPalette.ALERT_MESSAGE,
+              });
+            },
+          }
+        );
+      },
+    });
+  };
 
   // useEffect(() => {
   //   if (incidentList) {
@@ -366,360 +446,431 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
     <>
       <Flex
         px={rem(60)}
-        pt={rem(60)}
+        pt={rem(40)}
         bg={"#fff"}
         flex={1}
         pb={rem(40)}
         direction={"column"}
       >
-        {/* <Text
-          size={rem(24)}
-          fw={700}
-          my={rem(20)}
-          c={"light-blue.4"}
-          mb={rem(28)}
-        >
-          Supervisor calendar
-        </Text> */}
-
         <Group align="flex-start" gap={rem(60)}>
           <Box flex={4}>
-            <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(16)}>
-              In charge
-            </Text>
-            <>
-              {isEmployeeListLoading ||
-              isAssignSupervisorLoading ||
-              isGetSupervisorListLoading ? (
-                <Loader />
-              ) : (
-                <>
-                  <Stack
-                    gap={0}
-                    px={rem(20)}
+            <Group justify="space-between" align="center">
+              <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} lh={rem(36)}>
+                Supervisor shift
+              </Text>
+              <ActionIcon
+                variant="light"
+                aria-label="Settings"
+                onClick={toggle}
+                color="rgb(79, 70, 229)"
+                size={"lg"}
+              >
+                <IconSettings
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Group>
+            <Collapse in={opened}>
+              <Group
+                style={{
+                  paddingTop: rem(20),
+                  marginTop: rem(12),
+                  borderTop: "1px solid #ccc",
+                }}
+              >
+                {isEmployeeListLoading ||
+                isDeleteHeadSupervisorLoading ||
+                isGetSupervisorListLoading ? (
+                  <Loader />
+                ) : (
+                  <Select
+                    radius={rem(8)}
+                    size={"sm"}
+                    flex={1}
                     style={{
-                      borderRadius: rem(8),
-                      backgroundColor: "#fefefe",
-                      border: "1px solid #ccc",
+                      fontWeight: 500,
+                      fontSize: rem(14),
                     }}
-                  >
-                    <Group
-                      justify="space-between"
-                      align="center"
-                      py={rem(16)}
-                      style={{
-                        borderBottom: "1px solid #ccc",
-                      }}
-                    >
-                      <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
-                        Head supervisor
-                      </Text>
-                      <Select
-                        radius={rem(8)}
-                        size={"sm"}
-                        style={{
-                          fontWeight: 500,
-                          fontSize: rem(14),
-                        }}
-                        clearable
-                        disabled={!!selectedDate && !isToday(selectedDate)}
-                        allowDeselect
-                        onChange={(_value, option) => {
-                          handleSetSuperVisor({
-                            id: _value ?? "",
-                            role: Role.ShopHeadSupervisor,
-                            name: option?.label,
-                          });
-                        }}
-                        placeholder="Head supervisor is empty"
-                        p={0}
-                        value={selectedShift?.headSupervisorId}
-                        searchable
-                        nothingFoundMessage="Nothing found..."
-                        data={[
-                          {
-                            group: "Head supervisor",
-                            items: employeeStatisticData
-                              ? employeeStatisticData?.HeadSupervisor.map(
-                                  (i) => {
-                                    return {
-                                      value: i.id,
-                                      label: i.name,
-                                    };
-                                  }
-                                )
-                              : [],
-                          },
-                          {
-                            group: "Supervisor",
-                            items: employeeStatisticData
-                              ? employeeStatisticData?.Supervisor.map((i) => {
-                                  return {
-                                    value: i.id,
-                                    label: i.name,
-                                  };
-                                })
-                              : [],
-                          },
-                          {
-                            group: "Employee",
-                            items: employeeStatisticData
-                              ? employeeStatisticData?.Employee.map((i) => {
-                                  return {
-                                    value: i.id,
-                                    label: i.name,
-                                  };
-                                })
-                              : [],
-                          },
-                        ]}
-                      />
-                    </Group>
-
-                    <Group
-                      justify="space-between"
-                      align="center"
-                      py={rem(16)}
-                      style={{
-                        borderBottom: "1px solid #ccc",
-                      }}
-                    >
-                      <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
-                        Supervisor
-                      </Text>
-                      <Select
-                        radius={rem(8)}
-                        style={{
-                          fontWeight: 500,
-                          fontSize: rem(14),
-                        }}
-                        clearable
-                        allowDeselect
-                        p={0}
-                        disabled={!!selectedDate && !isToday(selectedDate)}
-                        placeholder="Supervisor is empty"
-                        onChange={(_value, option) => {
-                          handleSetSuperVisor({
-                            id: _value ?? "",
-                            role: Role.ShopSupervisor,
-                            name: option?.label,
-                          });
-                        }}
-                        value={selectedShift?.supervisorId}
-                        searchable
-                        nothingFoundMessage="Nothing found..."
-                        data={[
-                          {
-                            group: "Head supervisor",
-                            items: employeeStatisticData
-                              ? employeeStatisticData?.HeadSupervisor.map(
-                                  (i) => {
-                                    return {
-                                      value: i.id,
-                                      label: i.name,
-                                    };
-                                  }
-                                )
-                              : [],
-                          },
-                          {
-                            group: "Supervisor",
-                            items: employeeStatisticData
-                              ? employeeStatisticData?.Supervisor.map((i) => {
-                                  return {
-                                    value: i.id,
-                                    label: i.name,
-                                  };
-                                })
-                              : [],
-                          },
-                          {
-                            group: "Employee",
-                            items: employeeStatisticData
-                              ? employeeStatisticData?.Employee.map((i) => {
-                                  return {
-                                    value: i.id,
-                                    label: i.name,
-                                  };
-                                })
-                              : [],
-                          },
-                        ]}
-                      />
-                    </Group>
-
-                    <Group justify="space-between" align="center" py={rem(24)}>
-                      <Text c={"rgb(17, 24, 39)"} size={rem(14)} fw={500}>
-                        Currently in charge
-                      </Text>
-                      <Group
-                        justify="space-between"
-                        align="center"
-                        gap={rem(6)}
-                      >
-                        <Text c={"rgb(79, 70, 229)"} fw={500} size={rem(14)}>
-                          {selectedShift?.inChargeAccount.name}
-                        </Text>
-
-                        <Text
-                          py={rem(4)}
-                          px={rem(7)}
-                          bg={"rgb(240 253 244)"}
-                          c={"rgb(21 128 61)"}
-                          size={rem(12)}
-                          fw={500}
-                          style={{
-                            borderRadius: 999,
-                            border: "1px solid #e5e7eb",
-                          }}
-                        >
-                          {selectedShift?.inChargeAccountRole
-                            .match(/[A-Z][a-z]*|[0-9]+/g)
-                            ?.join(" ")}
-                        </Text>
-                      </Group>
-                    </Group>
-                  </Stack>
-                </>
-              )}
-            </>
-
-            <Text
-              c={"rgb(17, 24, 39)"}
-              fw={600}
-              size={rem(17)}
-              mb={rem(16)}
-              mt={rem(32)}
-            >
-              Supervisor shift
-            </Text>
+                    label="Head supervisor"
+                    clearable
+                    disabled={!!selectedDate && !isToday(selectedDate)}
+                    allowDeselect
+                    styles={{
+                      label: {
+                        marginBottom: rem(4),
+                      },
+                    }}
+                    onChange={(_value, option) => {
+                      if (option) {
+                        handleSetSuperVisor({
+                          id: _value ?? "",
+                          role: Role.ShopHeadSupervisor,
+                          name: option?.label,
+                        });
+                      }
+                    }}
+                    placeholder="Head supervisor is empty"
+                    p={0}
+                    value={selectedShift?.headSupervisorId}
+                    searchable
+                    rightSectionPointerEvents={"inherit"}
+                    onClear={() => {
+                      openConfirmDeleteHeadSupervisorModal();
+                    }}
+                    onClick={(e) => e.preventDefault()}
+                    nothingFoundMessage="Nothing found..."
+                    data={[
+                      {
+                        group: "Head supervisor",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.HeadSupervisor.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                      {
+                        group: "Supervisor",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.Supervisor.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                      {
+                        group: "Employee",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.Employee.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                    ]}
+                  />
+                )}
+                {isEmployeeListLoading ||
+                isDeleteSupervisorLoading ||
+                isGetSupervisorListLoading ? (
+                  <Loader />
+                ) : (
+                  <Select
+                    radius={rem(8)}
+                    flex={1}
+                    style={{
+                      fontWeight: 500,
+                      fontSize: rem(14),
+                    }}
+                    styles={{
+                      label: {
+                        marginBottom: rem(4),
+                      },
+                    }}
+                    clearable
+                    allowDeselect
+                    label="Supervisor"
+                    p={0}
+                    disabled={!!selectedDate && !isToday(selectedDate)}
+                    placeholder="Supervisor is empty"
+                    onClear={openConfirmDeleteSupervisorModal}
+                    onChange={(_value, option) => {
+                      handleSetSuperVisor({
+                        id: _value ?? "",
+                        role: Role.ShopSupervisor,
+                        name: option?.label,
+                      });
+                    }}
+                    value={selectedShift?.supervisorId}
+                    searchable
+                    nothingFoundMessage="Nothing found..."
+                    data={[
+                      {
+                        group: "Head supervisor",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.HeadSupervisor.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                      {
+                        group: "Supervisor",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.Supervisor.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                      {
+                        group: "Employee",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.Employee.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                    ]}
+                  />
+                )}
+              </Group>
+            </Collapse>
 
             <Accordion
               variant="separated"
               radius="md"
-              mt={rem(12)}
-              disableChevronRotation
-              chevron={<IconChevronRight />}
+              mt={rem(20)}
+              defaultValue={"0"}
             >
-              {reverseSupervisorList?.map((i) => (
-                <Accordion.Item
-                  style={{
-                    backgroundColor: "#fefefe",
-                    border: "1px solid #ccc",
-                  }}
-                  key={i.id}
-                  value={i.id}
-                  className={
-                    i.id == selectedShift?.id ? classes["activeAccordion"] : ""
-                  }
-                  onClick={() => {
-                    setSelectedShift({
-                      ...i,
-                      startTime: dayjs(i?.startTime).format(
-                        "YYYY-MM-DDTHH:mm:ss"
-                      ),
-                      endTime: dayjs(i?.endTime).format("YYYY-MM-DDTHH:mm:ss"),
-                    });
-                  }}
-                >
-                  <Accordion.Control>
-                    <Group
-                      key={i.id}
-                      justify="space-between"
-                      py={rem(8)}
-                      px={rem(12)}
-                    >
-                      <Box>
-                        <Text
-                          c={"rgb(17, 24, 39)"}
-                          lh={rem(26)}
-                          fw={500}
-                          size={rem(16)}
-                          mb={rem(4)}
-                        >
-                          {i?.inChargeAccount?.name}
-                        </Text>
-                        <Group gap={0}>
-                          <IconCalendarTime
-                            style={{
-                              width: rem(20),
-                              aspectRatio: 1,
-                            }}
-                            color={"rgb(107, 114, 128)"}
-                          />
-
+              {reverseSupervisorList?.map((i, index) => {
+                return (
+                  <Accordion.Item
+                    style={{
+                      backgroundColor: "#fefefe",
+                      border: "1px solid #ccc",
+                    }}
+                    key={index.toString()}
+                    value={index.toString()}
+                    className={
+                      i.id == selectedShift?.id
+                        ? classes["activeAccordion"]
+                        : ""
+                    }
+                    onClick={() => {
+                      setSelectedShift({
+                        ...i,
+                        startTime: dayjs(i?.startTime).format(
+                          "YYYY-MM-DDTHH:mm:ss"
+                        ),
+                        endTime: dayjs(i?.endTime).format(
+                          "YYYY-MM-DDTHH:mm:ss"
+                        ),
+                      });
+                    }}
+                  >
+                    <Accordion.Control>
+                      <Group
+                        key={i.id}
+                        justify="space-between"
+                        py={rem(8)}
+                        px={rem(12)}
+                      >
+                        <Box>
                           <Text
-                            ml={rem(10)}
-                            c={"rgb(107, 114, 128)"}
+                            c={"rgb(17, 24, 39)"}
                             lh={rem(26)}
-                            size={rem(14)}
+                            fw={500}
+                            size={rem(16)}
+                            mb={rem(4)}
                           >
-                            {format(
-                              i.startTime ?? new Date(),
-                              "MMMM do, yyyy "
-                            )}
-                            from {format(i?.startTime ?? new Date(), "hh:mm a")}{" "}
-                            to{" "}
-                            {i?.endTime
-                              ? format(i?.endTime ?? new Date(), "hh:mm a")
-                              : "Now"}
+                            {i?.inChargeAccount?.name}
                           </Text>
-                          {i.incidents.length != 0 && (
-                            <>
-                              <Divider
-                                mx={rem(16)}
-                                color="rgb(107,114,128,.5)"
-                                orientation="vertical"
-                              />
-                              <IconExclamationCircle
+                          <Group gap={0}>
+                            <IconCalendarTime
+                              style={{
+                                width: rem(20),
+                                aspectRatio: 1,
+                              }}
+                              color={"rgb(107, 114, 128)"}
+                            />
+
+                            <Text
+                              ml={rem(10)}
+                              c={"rgb(107, 114, 128)"}
+                              lh={rem(26)}
+                              size={rem(14)}
+                            >
+                              {format(
+                                i.startTime ?? new Date(),
+                                "MMMM do, yyyy "
+                              )}
+                              from{" "}
+                              {format(i?.startTime ?? new Date(), "hh:mm a")} to{" "}
+                              {i?.endTime
+                                ? format(i?.endTime ?? new Date(), "hh:mm a")
+                                : "Now"}
+                            </Text>
+                            {i.incidents.length != 0 && (
+                              <>
+                                <Divider
+                                  mx={rem(16)}
+                                  color="rgb(107,114,128,.5)"
+                                  orientation="vertical"
+                                />
+                                <IconExclamationCircle
+                                  style={{
+                                    width: rem(20),
+                                    aspectRatio: 1,
+                                  }}
+                                  color={"#c92a2a"}
+                                />
+                                <Text
+                                  ml={rem(6)}
+                                  c={"#c92a2a"}
+                                  lh={rem(26)}
+                                  size={rem(14)}
+                                >
+                                  {i.incidents.length + " "}
+                                  incident(s)
+                                </Text>
+                              </>
+                            )}
+                            {i.interactions.length != 0 && (
+                              <>
+                                <Divider
+                                  mx={rem(16)}
+                                  color="rgb(107,114,128,.5)"
+                                  orientation="vertical"
+                                />
+                                <IconBrandHipchat
+                                  style={{
+                                    width: rem(20),
+                                    aspectRatio: 1,
+                                  }}
+                                  color={"#198754"}
+                                />
+                                <Text
+                                  ml={rem(6)}
+                                  c={"#198754"}
+                                  lh={rem(26)}
+                                  size={rem(14)}
+                                >
+                                  {i.interactions.length + " "}
+                                  interaction(s)
+                                </Text>
+                              </>
+                            )}
+                          </Group>
+                        </Box>
+                      </Group>
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                      <>
+                        {isEmployeeListLoading ||
+                        isAssignSupervisorLoading ||
+                        isGetSupervisorListLoading ? (
+                          <Loader />
+                        ) : (
+                          <>
+                            <Stack
+                              gap={0}
+                              px={rem(12)}
+                              style={{
+                                borderRadius: rem(8),
+                                backgroundColor: "#fefefe",
+                                // border: "1px solid #ccc",
+                              }}
+                            >
+                              <Group
+                                justify="space-between"
+                                align="center"
+                                pb={rem(24)}
                                 style={{
-                                  width: rem(20),
-                                  aspectRatio: 1,
+                                  borderBottom: "1px solid #ccc",
                                 }}
-                                color={"#c92a2a"}
-                              />
-                              <Text
-                                ml={rem(6)}
-                                c={"#c92a2a"}
-                                lh={rem(26)}
-                                size={rem(14)}
                               >
-                                {i.incidents.length + " "}
-                                incident(s)
-                              </Text>
-                            </>
-                          )}
-                          {i.interactions.length != 0 && (
-                            <>
-                              <Divider
-                                mx={rem(16)}
-                                color="rgb(107,114,128,.5)"
-                                orientation="vertical"
-                              />
-                              <IconBrandHipchat
+                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                                  Head supervisor
+                                </Text>
+                                <Text
+                                  c={"rgb(17, 24, 39)"}
+                                  size={rem(14)}
+                                  fw={500}
+                                >
+                                  {i?.headSupervisor?.name ?? "Empty"}
+                                </Text>
+                              </Group>
+
+                              <Group
+                                justify="space-between"
+                                align="center"
+                                py={rem(24)}
                                 style={{
-                                  width: rem(20),
-                                  aspectRatio: 1,
+                                  borderBottom: "1px solid #ccc",
                                 }}
-                                color={"#198754"}
-                              />
-                              <Text
-                                ml={rem(6)}
-                                c={"#198754"}
-                                lh={rem(26)}
-                                size={rem(14)}
                               >
-                                {i.interactions.length + " "}
-                                interaction(s)
-                              </Text>
-                            </>
-                          )}
-                        </Group>
-                      </Box>
-                    </Group>
-                  </Accordion.Control>
-                </Accordion.Item>
-              ))}
+                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                                  Supervisor
+                                </Text>
+                                <Text
+                                  c={"rgb(17, 24, 39)"}
+                                  size={rem(14)}
+                                  fw={500}
+                                >
+                                  {i?.supervisor?.name ?? (
+                                    <Text span inherit c={"#ccc"}>
+                                      Supervisor is empty
+                                    </Text>
+                                  )}
+                                </Text>
+                              </Group>
+
+                              <Group
+                                justify="space-between"
+                                align="center"
+                                py={rem(24)}
+                              >
+                                <Text
+                                  c={"rgb(17, 24, 39)"}
+                                  size={rem(14)}
+                                  fw={500}
+                                >
+                                  In charge
+                                </Text>
+                                <Group
+                                  justify="space-between"
+                                  align="center"
+                                  gap={rem(8)}
+                                >
+                                  <Text
+                                    c={"rgb(79, 70, 229)"}
+                                    fw={500}
+                                    size={rem(14)}
+                                  >
+                                    {selectedShift?.inChargeAccount.name}
+                                  </Text>
+
+                                  <Text
+                                    py={rem(4)}
+                                    px={rem(7)}
+                                    bg={"rgb(240 253 244)"}
+                                    c={"rgb(21 128 61)"}
+                                    size={rem(12)}
+                                    fw={500}
+                                    style={{
+                                      borderRadius: 999,
+                                      border: "1px solid #e5e7eb",
+                                    }}
+                                  >
+                                    {selectedShift?.inChargeAccountRole
+                                      .match(/[A-Z][a-z]*|[0-9]+/g)
+                                      ?.join(" ")}
+                                  </Text>
+                                </Group>
+                              </Group>
+                            </Stack>
+                          </>
+                        )}
+                      </>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                );
+              })}
             </Accordion>
           </Box>
 
@@ -887,7 +1038,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
               >
                 <Group justify="space-between">
                   <Text size="md" fw={600} ml={rem(12)}>
-                    Incident list
+                    Incidents & Interactions
                   </Text>
                   <Group gap={rem(6)}>
                     <Text fw={500} size="sm">

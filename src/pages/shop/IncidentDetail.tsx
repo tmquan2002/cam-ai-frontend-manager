@@ -16,9 +16,10 @@ import { useForm } from "@mantine/form";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
 import {
-  IconAlbum,
-  IconCalendarMonth,
-  IconIdBadge,
+  IconClock,
+  IconPictureInPicture,
+  IconReport,
+  IconRobot,
   IconUserCircle,
   IconX,
 } from "@tabler/icons-react";
@@ -371,7 +372,7 @@ const IncidentDetail = () => {
                 )}
 
                 <Group>
-                  <IconCalendarMonth
+                  <IconClock
                     style={{
                       width: rem(22),
                       color: "rgb(156,163,175)",
@@ -384,8 +385,26 @@ const IncidentDetail = () => {
                     )}
                   </Text>
                 </Group>
+                {incidentData?.assigningAccount && (
+                  <Group>
+                    <IconUsers
+                      style={{
+                        width: rem(22),
+                        color: "rgba(156,163,175)",
+                        aspectRatio: 1,
+                      }}
+                    />
+                    <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
+                      Assigned by{" "}
+                      <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
+                        {incidentData?.assigningAccount?.name}
+                      </Text>
+                    </Text>
+                  </Group>
+                )}
+
                 <Group>
-                  <IconUsers
+                  <IconPictureInPicture
                     style={{
                       width: rem(22),
                       color: "rgba(156,163,175)",
@@ -393,14 +412,14 @@ const IncidentDetail = () => {
                     }}
                   />
                   <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
-                    Assign by{" "}
+                    Evidences :
                     <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
-                      Someone
+                      {" " + incidentData?.evidences.length}
                     </Text>
                   </Text>
                 </Group>
                 <Group>
-                  <IconAlbum
+                  <IconReport
                     style={{
                       width: rem(22),
                       color: "rgba(156,163,175)",
@@ -408,11 +427,14 @@ const IncidentDetail = () => {
                     }}
                   />
                   <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
-                    {incidentData?.evidences.length} evidences
+                    In charge :
+                    <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
+                      {" " + incidentData?.inChargeAccount?.name}
+                    </Text>
                   </Text>
                 </Group>
                 <Group>
-                  <IconIdBadge
+                  <IconRobot
                     style={{
                       width: rem(22),
                       color: "rgba(156,163,175)",
@@ -420,7 +442,10 @@ const IncidentDetail = () => {
                     }}
                   />
                   <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
-                    AI identity : {incidentData?.aiId}
+                    AI identity :
+                    <Text span inherit fw={500} c={"rgb(17, 24, 39)"}>
+                      {" " + incidentData?.aiId}
+                    </Text>
                   </Text>
                 </Group>
               </Stack>

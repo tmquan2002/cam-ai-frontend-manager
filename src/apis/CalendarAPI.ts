@@ -58,4 +58,26 @@ export const CalendarAPI = {
 
     return res?.data;
   },
+  _deleteHeadSupervisor: async () => {
+    const access_token = getAccessToken();
+
+    const res = await http.delete(`/api/shops/headsupervisor`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+  _deleteSupervisor: async () => {
+    const access_token = getAccessToken();
+
+    const res = await http.delete(`/api/shops/supervisor`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
 };

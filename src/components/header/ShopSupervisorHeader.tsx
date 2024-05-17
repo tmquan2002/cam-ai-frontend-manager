@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/AuthContext";
 import { useNotification } from "../../hooks/useNotification";
 import { useGetNotificationList } from "../../hooks/useGetNotificationList";
@@ -8,22 +7,43 @@ import {
   Group,
   Indicator,
   Popover,
+  Stack,
   Text,
-  Tooltip,
   rem,
 } from "@mantine/core";
-import { NotificationStatus } from "../../models/CamAIEnum";
-import { MdLogout, MdNotifications } from "react-icons/md";
+import { NotificationStatus, Role } from "../../models/CamAIEnum";
+import { MdLogout } from "react-icons/md";
 import { IconUser } from "@tabler/icons-react";
 import Notification from "../notification/Notification";
 import { useEffect } from "react";
 import { ReadyState } from "react-use-websocket";
 import { notifications } from "@mantine/notifications";
 import _ from "lodash";
+import { useGetProfile } from "../../hooks/useGetProfile";
+import { IconBell } from "@tabler/icons-react";
+
+const convertRoleString = (role: Role | null | undefined): string => {
+  switch (role) {
+    case Role.Admin:
+      return "Admin";
+    case Role.BrandManager:
+      return "Brand manager";
+    case Role.ShopHeadSupervisor:
+      return "Head supervisor";
+    case Role.ShopManager:
+      return "Shop manager";
+    case Role.ShopSupervisor:
+      return "Shop supervisor";
+    case Role.SystemHandler:
+      return "System handler";
+    default:
+      return "";
+  }
+};
 
 const ShopSupervisorHeader = () => {
   const session = useSession();
-  const navigate = useNavigate();
+  const { data: profile } = useGetProfile();
   const { lastJsonMessage, readyState } = useNotification();
   const {
     data: notificationList,
@@ -49,20 +69,46 @@ const ShopSupervisorHeader = () => {
       <Group>
         <Text fw={600}>CAMAI</Text>
       </Group>
-      <Group gap={5}>
+      <Group gap={6}>
+        <Group
+          gap={8}
+          py={rem(4)}
+          px={rem(8)}
+          pr={rem(12)}
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: rem(6),
+            cursor: "default",
+          }}
+        >
+          <IconUser style={{ width: rem(20), height: rem(20) }} stroke={1.5} />
+
+          <Stack gap={2}>
+            <Text c={"rgb(17, 24, 39)"} size={rem(14)} fw={500} style={{}}>
+              {profile?.name}
+            </Text>
+            <Text c={"rgb(100, 116, 139)"} size={rem(12)} fw={400}>
+              {convertRoleString(profile?.role)}
+            </Text>
+          </Stack>
+        </Group>
+
         <Popover position="bottom-end" withArrow shadow="md">
-          <Tooltip label="Notification" withArrow>
-            <Popover.Target>
+          <Popover.Target>
+            <ActionIcon
+              size={rem(36)}
+              variant="transparent"
+              aria-label="Notifications"
+              c={"#000"}
+            >
               <Indicator
                 size={isNotificationAllRead ? 5 : 0}
                 color="pale-red.6"
               >
-                <ActionIcon variant="default" aria-label="Notifications">
-                  <MdNotifications style={{ width: 18, height: 18 }} />
-                </ActionIcon>
+                <IconBell style={{ width: 20, height: 20 }} />
               </Indicator>
-            </Popover.Target>
-          </Tooltip>
+            </ActionIcon>
+          </Popover.Target>
 
           <Popover.Dropdown p={0}>
             <Notification
@@ -73,27 +119,17 @@ const ShopSupervisorHeader = () => {
           </Popover.Dropdown>
         </Popover>
 
-        <Tooltip label="Profile" withArrow>
-          <ActionIcon
-            variant="default"
-            aria-label="Profile"
-            onClick={() => navigate("/shop/profile")}
-          >
-            <IconUser style={{ width: "70%", height: "70%" }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-
-        <Tooltip label="Logout" withArrow>
-          <ActionIcon
-            variant="default"
-            aria-label="Logout"
-            onClick={() => {
-              session?.signOut();
-            }}
-          >
-            <MdLogout style={{ width: 18, height: 18 }} />
-          </ActionIcon>
-        </Tooltip>
+        <ActionIcon
+          variant="transparent"
+          size={rem(36)}
+          aria-label="Logout"
+          c={"#000"}
+          onClick={() => {
+            session?.signOut();
+          }}
+        >
+          <MdLogout style={{ width: 20, height: 20 }} />
+        </ActionIcon>
       </Group>
     </Flex>
   );

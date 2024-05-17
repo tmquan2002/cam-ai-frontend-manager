@@ -6,18 +6,27 @@ import {
   Button,
   Card,
   Center,
+  Collapse,
   Divider,
   Flex,
   Group,
+  Loader,
   ScrollArea,
+  Select,
   SimpleGrid,
   Skeleton,
+  Stack,
   Table,
   Text,
   rem,
 } from "@mantine/core";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { IconChevronRight, IconExclamationCircle } from "@tabler/icons-react";
+import {
+  IconBrandHipchat,
+  IconChevronRight,
+  IconExclamationCircle,
+  IconSettings,
+} from "@tabler/icons-react";
 import { IconCalendarTime } from "@tabler/icons-react";
 import {
   eachDayOfInterval,
@@ -27,21 +36,33 @@ import {
   isToday,
   startOfMonth,
 } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IconChevronLeft } from "@tabler/icons-react";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import classes from "./HeadSupervisorCalendar.module.scss";
-import { useScrollIntoView } from "@mantine/hooks";
+import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { IncidentDetail } from "../../models/Incident";
 import { differentDateReturnFormattedString } from "../../utils/helperFunction";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
 import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
+import { Role } from "../../models/CamAIEnum";
+import { modals } from "@mantine/modals";
+import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
+import { notifications } from "@mantine/notifications";
+import { NotificationColorPalette } from "../../types/constant";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
+import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
+import _ from "lodash";
+import { SuperVisorAssignmentDetail } from "../../models/Shop";
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
 const HeadSupervisorCalendar = () => {
+  const [opened, { toggle }] = useDisclosure(false);
+
   const [scrolled, setScrolled] = useState(false);
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
@@ -54,12 +75,14 @@ const HeadSupervisorCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedIncidentItem, setSelectedIncidentItem] =
     useState<IncidentDetail | null>(null);
+  const [selectedShift, setSelectedShift] =
+    useState<SuperVisorAssignmentDetail | null>(null);
 
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList({
-      enabled: true,
-      fromTime: "2024-04-10T00:00:00",
-      toTime: "2024-04-16T00:00:00",
+      enabled: !!selectedShift,
+      fromTime: selectedShift?.startTime,
+      toTime: selectedShift?.endTime,
     });
 
   const { data: employeeList, isLoading: isEmployeeListLoading } =
@@ -71,6 +94,12 @@ const HeadSupervisorCalendar = () => {
   } = useGetSupervisorAssignmentHistory({
     date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
   });
+
+  const { mutate: deleteSupervisor, isLoading: isDeleteSupervisorLoading } =
+    useDeleteSupervisor();
+
+  const { mutate: assignSuperVisor, isLoading: isAssignSupervisorLoading } =
+    useAssignSupervisor();
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
 
@@ -82,11 +111,91 @@ const HeadSupervisorCalendar = () => {
   const startingDayIndex = getDay(firstDayOfMonth);
   const endDayIndex = getDay(lastDayOfMonth);
 
+  const openConfirmSupervisorModal = ({
+    id,
+    supervisorName,
+  }: {
+    id: string;
+    supervisorName: string;
+  }) =>
+    modals.openConfirmModal({
+      title: "Please confirm modify supervisor",
+      children: (
+        <Text size="sm">
+          Confirm modify{" "}
+          <Text inherit span fw={600}>
+            {supervisorName}
+          </Text>{" "}
+          as new supervisor
+        </Text>
+      ),
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        assignSuperVisor(
+          { employeeId: id, role: Role.ShopSupervisor },
+          {
+            onSuccess() {
+              notifications.show({
+                title: "Success",
+                message: "Assign supervisor successfully!",
+                autoClose: 6000,
+                c: NotificationColorPalette.UP_COMING,
+              });
+              refetchSupervisorList();
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                title: "Failed",
+                message: error?.message ?? "Assign supervisor failed!",
+                autoClose: 6000,
+                c: NotificationColorPalette.ALERT_MESSAGE,
+              });
+            },
+          }
+        );
+      },
+    });
+
+  const openConfirmDeleteSupervisorModal = () => {
+    modals.openConfirmModal({
+      title: "Please confirm modify supervisor",
+      children: <Text size="sm">Confirm delete supervisor?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        deleteSupervisor(
+          {},
+          {
+            onSuccess() {
+              notifications.show({
+                message: "Remove supervisor successfully!",
+                title: "Success",
+              });
+              refetchSupervisorList();
+            },
+            onError(data) {
+              const error = data as AxiosError<ResponseErrorDetail>;
+              notifications.show({
+                title: "Failed",
+                message: error?.message ?? "Remove supervisor failed!",
+                autoClose: 6000,
+                c: NotificationColorPalette.ALERT_MESSAGE,
+              });
+            },
+          }
+        );
+      },
+    });
+  };
+
   useEffect(() => {
     if (incidentList) {
       scrollIntoView();
     }
   }, [incidentList]);
+
   useEffect(() => {
     if (selectedIncidentItem) {
       scrollIntoIncidentDetail();
@@ -178,195 +287,389 @@ const HeadSupervisorCalendar = () => {
     ))
   );
 
+  const employeeStatisticData = useMemo(() => {
+    if (employeeList) {
+      return _.groupBy(employeeList?.values, (i) => {
+        return i.employeeRole;
+      });
+    }
+  }, [employeeList]);
+
+  const reverseSupervisorList = useMemo(() => {
+    return supervisorList?.reverse();
+  }, [supervisorList]);
+
+  useEffect(() => {
+    if (reverseSupervisorList && reverseSupervisorList.length > 0) {
+      const lastShiftItem = reverseSupervisorList?.[0];
+      setSelectedShift({
+        ...lastShiftItem,
+        startTime: dayjs(lastShiftItem?.startTime).format(
+          "YYYY-MM-DDTHH:mm:ss"
+        ),
+        endTime: dayjs(lastShiftItem?.endTime).format("YYYY-MM-DDTHH:mm:ss"),
+      });
+    }
+  }, [reverseSupervisorList]);
+
   return (
     <>
       <Flex
         px={rem(60)}
-        pt={rem(20)}
+        pt={rem(40)}
         bg={"#fff"}
         flex={1}
         pb={rem(40)}
         direction={"column"}
       >
-        <Text
-          size={rem(24)}
-          fw={700}
-          my={rem(20)}
-          c={"light-blue.4"}
-          mb={rem(28)}
-        >
-          {format(selectedDate ?? new Date(), "MMMM do, yyyy ")}
-        </Text>
-
         <Group align="flex-start" gap={rem(60)}>
           <Box flex={4}>
-            {/* {false ? (
-              <Loader />
-            ) : (
-              <>
-                <Stack
-                  gap={0}
-                  px={rem(20)}
-                  py={rem(10)}
-                  style={{
-                    borderRadius: rem(8),
-                    backgroundColor: "rgb(243, 244, 246)",
-                    border: "1px solid #ccc",
-                  }}
-                >
-                  <Group
-                    justify="space-between"
-                    align="center"
-                    py={rem(16)}
+            <Group justify="space-between" align="center">
+              <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} lh={rem(36)}>
+                Supervisor shift
+              </Text>
+              <ActionIcon
+                variant="light"
+                aria-label="Settings"
+                onClick={toggle}
+                color="rgb(79, 70, 229)"
+                size={"lg"}
+              >
+                <IconSettings
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Group>
+
+            <Collapse in={opened}>
+              <Group
+                style={{
+                  paddingTop: rem(20),
+                  marginTop: rem(12),
+                  paddingBottom: rem(8),
+                  borderTop: "1px solid #ccc",
+                }}
+              >
+                {isEmployeeListLoading ||
+                isDeleteSupervisorLoading ||
+                isAssignSupervisorLoading ||
+                isGetSupervisorListLoading ? (
+                  <Loader />
+                ) : (
+                  <Select
+                    radius={rem(8)}
+                    flex={1}
                     style={{
-                      borderBottom: "1px solid #ccc",
+                      fontWeight: 500,
+                      fontSize: rem(14),
                     }}
-                  >
-                    <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
-                      Head supervisor
-                    </Text>
-                    <Text c={"rgb(17, 24, 39)"} size={rem(14)} fw={500}>
-                      Nguyen Quang Huy
-                    </Text>
-                  </Group>
-
-                  <Group
-                    justify="space-between"
-                    align="center"
-                    py={rem(16)}
-                    style={{
-                      borderBottom: "1px solid #ccc",
+                    styles={{
+                      label: {
+                        marginBottom: rem(4),
+                      },
                     }}
-                  >
-                    <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
-                      Supervisor
-                    </Text>
-                    <Select
-                      radius={rem(8)}
-                      size={"sm"}
-                      style={{
-                        fontWeight: 500,
-                        fontSize: rem(14),
-                      }}
-                      clearable
-                      allowDeselect
-                      p={0}
-                      value={supervisorList?.[0]?.headSupervisorId}
-                      searchable
-                      nothingFoundMessage="Nothing found..."
-                      data={employeeList?.values?.map((i: EmployeeDetail) => {
-                        return { value: i.id, label: i.name };
-                      })}
-                    />
-                  </Group>
-
-                  <Group justify="space-between" align="center" py={rem(16)}>
-                    <Text c={"rgb(17, 24, 39)"} size={rem(14)} fw={500}>
-                      Currently in charge
-                    </Text>
-                    <Group justify="space-between" align="center" gap={rem(6)}>
-                      <Text c={"rgb(79, 70, 229)"} fw={500} size={rem(14)}>
-                        Nguyen Quang Huy
-                      </Text>
-
-                      <Text
-                        py={rem(4)}
-                        px={rem(7)}
-                        bg={"rgb(240 253 244)"}
-                        c={"rgb(21 128 61)"}
-                        size={rem(12)}
-                        fw={500}
-                        style={{
-                          borderRadius: 999,
-                          border: "1px solid #e5e7eb",
-                        }}
-                      >
-                        Admin
-                      </Text>
-                    </Group>
-                  </Group>
-                </Stack>
-              </>
-            )} */}
+                    clearable
+                    allowDeselect
+                    label="Supervisor"
+                    p={0}
+                    disabled={!!selectedDate && !isToday(selectedDate)}
+                    placeholder="Supervisor is empty"
+                    onClear={openConfirmDeleteSupervisorModal}
+                    onChange={(_value, option) => {
+                      openConfirmSupervisorModal({
+                        id: _value ?? "",
+                        supervisorName: option?.label,
+                      });
+                    }}
+                    value={selectedShift?.supervisorId}
+                    searchable
+                    nothingFoundMessage="Nothing found..."
+                    data={[
+                      {
+                        group: "Head supervisor",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.HeadSupervisor.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                      {
+                        group: "Supervisor",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.Supervisor.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                      {
+                        group: "Employee",
+                        items: employeeStatisticData
+                          ? employeeStatisticData?.Employee.map((i) => {
+                              return {
+                                value: i.id,
+                                label: i.name,
+                              };
+                            })
+                          : [],
+                      },
+                    ]}
+                  />
+                )}
+              </Group>
+            </Collapse>
 
             <Accordion
-              variant="contained"
+              variant="separated"
               radius="md"
-              mt={rem(12)}
-              disableChevronRotation
-              chevron={<IconChevronRight />}
+              mt={rem(20)}
+              defaultValue={"0"}
             >
-              {[1, 2, 3, 4, 5, 6, 7]?.map((i) => (
-                <Accordion.Item key={i} value={i.toString()}>
-                  <Accordion.Control>
-                    <Group
-                      key={i}
-                      justify="space-between"
-                      py={rem(8)}
-                      px={rem(12)}
-                    >
-                      <Box>
-                        <Text
-                          c={"rgb(17, 24, 39)"}
-                          lh={rem(26)}
-                          fw={500}
-                          size={rem(16)}
-                          mb={rem(4)}
-                        >
-                          Nguyen Quang Huy
-                        </Text>
-                        <Group gap={0}>
-                          <IconCalendarTime
-                            style={{
-                              width: rem(20),
-                              aspectRatio: 1,
-                            }}
-                            color={"rgb(107, 114, 128)"}
-                          />
-
+              {reverseSupervisorList?.map((i, index) => {
+                return (
+                  <Accordion.Item
+                    style={{
+                      backgroundColor: "#fefefe",
+                      border: "1px solid #ccc",
+                    }}
+                    key={index.toString()}
+                    value={index.toString()}
+                    className={
+                      i.id == selectedShift?.id
+                        ? classes["activeAccordion"]
+                        : ""
+                    }
+                    onClick={() => {
+                      setSelectedShift({
+                        ...i,
+                        startTime: dayjs(i?.startTime).format(
+                          "YYYY-MM-DDTHH:mm:ss"
+                        ),
+                        endTime: dayjs(i?.endTime).format(
+                          "YYYY-MM-DDTHH:mm:ss"
+                        ),
+                      });
+                    }}
+                  >
+                    <Accordion.Control>
+                      <Group
+                        key={i.id}
+                        justify="space-between"
+                        py={rem(8)}
+                        px={rem(12)}
+                      >
+                        <Box>
                           <Text
-                            ml={rem(10)}
-                            c={"rgb(107, 114, 128)"}
+                            c={"rgb(17, 24, 39)"}
                             lh={rem(26)}
-                            size={rem(14)}
+                            fw={500}
+                            size={rem(16)}
+                            mb={rem(4)}
                           >
-                            {format(new Date(), "MMMM do, yyyy ")}
-                            from {format(new Date(), "hh:mm a")} to{" "}
-                            {format(new Date(), "hh:mm a")}
+                            {i?.inChargeAccount?.name}
                           </Text>
-                          <>
-                            <Divider
-                              mx={rem(16)}
-                              color="rgb(107,114,128,.5)"
-                              orientation="vertical"
-                            />
-                            <IconExclamationCircle
+                          <Group gap={0}>
+                            <IconCalendarTime
                               style={{
                                 width: rem(20),
                                 aspectRatio: 1,
                               }}
-                              color={"#c92a2a"}
+                              color={"rgb(107, 114, 128)"}
                             />
+
                             <Text
                               ml={rem(10)}
-                              c={"#c92a2a"}
+                              c={"rgb(107, 114, 128)"}
                               lh={rem(26)}
                               size={rem(14)}
                             >
-                              20 incident(s)
+                              {format(
+                                i.startTime ?? new Date(),
+                                "MMMM do, yyyy "
+                              )}
+                              from{" "}
+                              {format(i?.startTime ?? new Date(), "hh:mm a")} to{" "}
+                              {i?.endTime
+                                ? format(i?.endTime ?? new Date(), "hh:mm a")
+                                : "Now"}
                             </Text>
+                            {i.incidents.length != 0 && (
+                              <>
+                                <Divider
+                                  mx={rem(16)}
+                                  color="rgb(107,114,128,.5)"
+                                  orientation="vertical"
+                                />
+                                <IconExclamationCircle
+                                  style={{
+                                    width: rem(20),
+                                    aspectRatio: 1,
+                                  }}
+                                  color={"#c92a2a"}
+                                />
+                                <Text
+                                  ml={rem(6)}
+                                  c={"#c92a2a"}
+                                  lh={rem(26)}
+                                  size={rem(14)}
+                                >
+                                  {i.incidents.length + " "}
+                                  incident(s)
+                                </Text>
+                              </>
+                            )}
+                            {i.interactions.length != 0 && (
+                              <>
+                                <Divider
+                                  mx={rem(16)}
+                                  color="rgb(107,114,128,.5)"
+                                  orientation="vertical"
+                                />
+                                <IconBrandHipchat
+                                  style={{
+                                    width: rem(20),
+                                    aspectRatio: 1,
+                                  }}
+                                  color={"#198754"}
+                                />
+                                <Text
+                                  ml={rem(6)}
+                                  c={"#198754"}
+                                  lh={rem(26)}
+                                  size={rem(14)}
+                                >
+                                  {i.interactions.length + " "}
+                                  interaction(s)
+                                </Text>
+                              </>
+                            )}
+                          </Group>
+                        </Box>
+                      </Group>
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                      <>
+                        {isEmployeeListLoading ||
+                        isAssignSupervisorLoading ||
+                        isGetSupervisorListLoading ? (
+                          <Loader />
+                        ) : (
+                          <>
+                            <Stack
+                              gap={0}
+                              px={rem(12)}
+                              style={{
+                                borderRadius: rem(8),
+                                backgroundColor: "#fefefe",
+                                // border: "1px solid #ccc",
+                              }}
+                            >
+                              <Group
+                                justify="space-between"
+                                align="center"
+                                pb={rem(24)}
+                                style={{
+                                  borderBottom: "1px solid #ccc",
+                                }}
+                              >
+                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                                  Head supervisor
+                                </Text>
+                                <Text
+                                  c={"rgb(17, 24, 39)"}
+                                  size={rem(14)}
+                                  fw={500}
+                                >
+                                  {i?.headSupervisor?.name ?? "Empty"}
+                                </Text>
+                              </Group>
+
+                              <Group
+                                justify="space-between"
+                                align="center"
+                                py={rem(24)}
+                                style={{
+                                  borderBottom: "1px solid #ccc",
+                                }}
+                              >
+                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                                  Supervisor
+                                </Text>
+                                <Text
+                                  c={"rgb(17, 24, 39)"}
+                                  size={rem(14)}
+                                  fw={500}
+                                >
+                                  {i?.supervisor?.name ?? (
+                                    <Text span inherit c={"#ccc"}>
+                                      Supervisor is empty
+                                    </Text>
+                                  )}
+                                </Text>
+                              </Group>
+
+                              <Group
+                                justify="space-between"
+                                align="center"
+                                py={rem(24)}
+                              >
+                                <Text
+                                  c={"rgb(17, 24, 39)"}
+                                  size={rem(14)}
+                                  fw={500}
+                                >
+                                  In charge
+                                </Text>
+                                <Group
+                                  justify="space-between"
+                                  align="center"
+                                  gap={rem(8)}
+                                >
+                                  <Text
+                                    c={"rgb(79, 70, 229)"}
+                                    fw={500}
+                                    size={rem(14)}
+                                  >
+                                    {selectedShift?.inChargeAccount.name}
+                                  </Text>
+
+                                  <Text
+                                    py={rem(4)}
+                                    px={rem(7)}
+                                    bg={"rgb(240 253 244)"}
+                                    c={"rgb(21 128 61)"}
+                                    size={rem(12)}
+                                    fw={500}
+                                    style={{
+                                      borderRadius: 999,
+                                      border: "1px solid #e5e7eb",
+                                    }}
+                                  >
+                                    {selectedShift?.inChargeAccountRole
+                                      .match(/[A-Z][a-z]*|[0-9]+/g)
+                                      ?.join(" ")}
+                                  </Text>
+                                </Group>
+                              </Group>
+                            </Stack>
                           </>
-                        </Group>
-                      </Box>
-                    </Group>
-                  </Accordion.Control>
-                </Accordion.Item>
-              ))}
+                        )}
+                      </>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                );
+              })}
             </Accordion>
           </Box>
 
           <Box flex={3}>
-            <Box pb={rem(12)}>
+            <Box pb={rem(4)}>
               <Group justify="space-between" align="center">
                 <Text size={rem(17)} fw={600}>
                   {format(currentDate, "MMMM yyy")}

@@ -101,8 +101,14 @@ const LoginPage = () => {
               withAsterisk
               label="Email"
               placeholder="your@email.com"
-              mt={10}
+              mt={20}
               leftSection={<MdEmail />}
+              styles={{
+                label: {
+                  marginBottom: rem(4),
+                },
+              }}
+              radius={rem(8)}
               size="md"
               {...form.getInputProps("email")}
             />
@@ -112,7 +118,13 @@ const LoginPage = () => {
               label="Password"
               type="password"
               placeholder="Password"
-              mt={20}
+              mt={16}
+              radius={rem(8)}
+              styles={{
+                label: {
+                  marginBottom: rem(4),
+                },
+              }}
               leftSection={<MdLockOutline />}
               size="md"
               {...form.getInputProps("password")}
@@ -124,7 +136,7 @@ const LoginPage = () => {
                 variant="gradient"
                 size="md"
                 loading={isLoading}
-                mt={20}
+                mt={12}
                 gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
               >
                 Login
