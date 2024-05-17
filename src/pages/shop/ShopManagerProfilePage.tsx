@@ -76,8 +76,12 @@ const ShopManagerProfilePage = () => {
       name: isNotEmpty("Name is required"),
       email: isEmail("Invalid email - ex: name@gmail.com"),
       gender: isNotEmpty("Please select gender"),
-      phone: (value) => isEmpty(value) ? null :
-        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
+      phone: (value) =>
+        isEmpty(value)
+          ? null
+          : PHONE_REGEX.test(value)
+          ? null
+          : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -337,10 +341,7 @@ const ShopManagerProfilePage = () => {
 
   if (isAccountLoading)
     return (
-      <Paper
-        style={{ flex: 1, height: "100vh" }}
-        pos={"relative"}
-      >
+      <Paper style={{ flex: 1, height: "100vh" }} pos={"relative"}>
         <LoadingOverlay
           visible={isAccountLoading}
           zIndex={1000}
@@ -362,10 +363,7 @@ const ShopManagerProfilePage = () => {
       >
         <form onSubmit={passwordForm.onSubmit(onSubmitNewPassword)}>
           <EditAndUpdateForm fields={changePasswordFields} />
-          <Group
-            justify="flex-end"
-            mt="md"
-          >
+          <Group justify="flex-end" mt="md">
             <Button
               disabled={!passwordForm.isDirty()}
               type="submit"
@@ -376,30 +374,13 @@ const ShopManagerProfilePage = () => {
           </Group>
         </form>
       </Modal>
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        pb={rem(64)}
-        shadow={"xs"}
-        style={{ flex: 1 }}
-      >
-        <Group
-          mb={rem(20)}
-          justify="space-between"
-        >
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+      <Paper p={rem(40)} pb={rem(64)} shadow={"xs"} style={{ flex: 1 }}>
+        <Group mb={rem(20)} justify="space-between">
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Your profile
           </Text>
 
-          <ActionIcon
-            onClick={open}
-            size={"lg"}
-          >
+          <ActionIcon onClick={open} size={"lg"}>
             <IconKey style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>
         </Group>
@@ -435,11 +416,7 @@ const ShopManagerProfilePage = () => {
           })}
         >
           <EditAndUpdateForm fields={fields} />
-          <Group
-            justify="flex-end"
-            mt="md"
-            pb={rem(10)}
-          >
+          <Group justify="flex-end" mt="md" pb={rem(10)}>
             <Button
               loading={updateProfileLoading}
               type="submit"

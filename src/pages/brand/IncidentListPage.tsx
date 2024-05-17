@@ -12,7 +12,7 @@ import {
   Table,
   Text,
   Tooltip,
-  rem
+  rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -59,7 +59,7 @@ const IncidentListPage = () => {
       fromTime: null,
       status: null,
       toTime: null,
-      incidentType: null,
+      incidentType: IncidentType.Incident,
       pageIndex: activePage - 1,
     },
   });
@@ -84,7 +84,8 @@ const IncidentListPage = () => {
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
     return sb;
   }, [
-    activePage, pageSize,
+    activePage,
+    pageSize,
     form.values.employeeId,
     form.values.fromTime,
     form.values.incidentType,
@@ -93,9 +94,14 @@ const IncidentListPage = () => {
     form.values.shopId,
   ]);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } = useGetIncidentList(searchParams);
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
-  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({ enabled: true, size: 999, });
+  const { data: incidentList, isLoading: isGetIncidentListLoading } =
+    useGetIncidentList(searchParams);
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
+    useGetEmployeeList({});
+  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
+    enabled: true,
+    size: 999,
+  });
 
   const removedInteractionIncident = useMemo(() => {
     if (isGetEmployeeListLoading) {
@@ -206,7 +212,9 @@ const IncidentListPage = () => {
         onClick={() => navigate(`/brand/incident/${row?.id}`)}
       >
         <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
-        <Table.Td><Text>{row?.incidentType}</Text></Table.Td>
+        <Table.Td>
+          <Text>{row?.incidentType}</Text>
+        </Table.Td>
         <Table.Td
           className={classes["pointer-style"]}
           c={"blue"}
@@ -221,7 +229,7 @@ const IncidentListPage = () => {
         </Table.Td>
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
-          {row?.employee ?
+          {row?.employee ? (
             <Tooltip label="View Employee" withArrow position="top-start">
               <Text
                 className={classes["pointer-style"]}
@@ -234,9 +242,9 @@ const IncidentListPage = () => {
                 {row?.employee?.name}
               </Text>
             </Tooltip>
-            :
+          ) : (
             <Text>None</Text>
-          }
+          )}
         </Table.Td>
 
         <Table.Td ta="center">
@@ -321,19 +329,20 @@ const IncidentListPage = () => {
             (incidentList?.totalCount ?? 0) / (Number(pageSize) ?? 5)
           )}
         />
-        {!incidentList?.isValuesEmpty &&
+        {!incidentList?.isValuesEmpty && (
           <Select
             label="Page Size"
             allowDeselect={false}
             placeholder="0"
-            data={PAGE_SIZE_SELECT} defaultValue={"5"}
+            data={PAGE_SIZE_SELECT}
+            defaultValue={"5"}
             value={pageSize}
             onChange={(value) => {
-              setPageSize(value)
-              setPage(1)
+              setPageSize(value);
+              setPage(1);
             }}
           />
-        }
+        )}
       </Group>
     </Paper>
   );

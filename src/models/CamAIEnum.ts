@@ -200,3 +200,9 @@ export enum StatusColorLight {
   IDLE = "#E7E48C",
   NONE = "#c4cbda",
 }
+
+export enum EmployeeRole {
+  HeadSupervisor = "HeadSupervisor",
+  Supervisor = "Supervisor",
+  Employee = "Employee",
+}

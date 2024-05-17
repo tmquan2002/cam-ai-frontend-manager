@@ -186,6 +186,7 @@ const TimeIncidentReport = () => {
       fromTime: selectedDuration?.startTime,
       toTime: selectedDuration?.endTime,
       size: 999,
+      incidentType: IncidentType.Incident,
     });
 
   const { data: incidentPercent, isLoading: isGetIncidentPercentLoading } =
@@ -207,6 +208,7 @@ const TimeIncidentReport = () => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
+        duration: item?.averageDuration ?? 0 * item.count,
       };
     });
   }, [incidentReportByTimeData]);
@@ -617,7 +619,7 @@ const TimeIncidentReport = () => {
                           {
                             type: "bar" as const,
                             label: "Average duration ",
-                            data: data?.map((i) => i.count),
+                            data: data?.map((i) => i.duration),
                             hidden: true,
                           },
                         ],

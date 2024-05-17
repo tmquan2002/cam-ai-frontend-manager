@@ -1,7 +1,7 @@
 import { AccountDetail } from "./Account";
 import { WardDetail } from "./Address";
 import { BrandDetail } from "./Brand";
-import { ShopStatus } from "./CamAIEnum";
+import { Role, ShopStatus } from "./CamAIEnum";
 import { IncidentDetail } from "./Incident";
 
 export type ShopDetail = {
@@ -29,6 +29,10 @@ export type SuperVisorAssignmentDetail = {
   startTime: string;
   endTime: string;
   headSupervisor: AccountDetail;
-  supervisor: AccountDetail;
   incidents: IncidentDetail[];
+  inChargeAccount: AccountDetail;
+  inChargeAccountId: string;
+  inChargeAccountRole: Role;
+  interactions: IncidentDetail[];
+  supervisor: AccountDetail;
 };

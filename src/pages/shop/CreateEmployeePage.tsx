@@ -4,7 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import _, { isEmpty } from "lodash";
+import _ from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
@@ -23,7 +23,10 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { EMAIL_REGEX } from "../../types/constant";
-import { getDateFromSetYear, mapLookupToArray } from "../../utils/helperFunction";
+import {
+  getDateFromSetYear,
+  mapLookupToArray,
+} from "../../utils/helperFunction";
 import { useTaskShop } from "../../routes/ShopRoute";
 import { IconCheck, IconX } from "@tabler/icons-react";
 
@@ -49,7 +52,8 @@ export type CreateEmployeeField = {
 };
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
-  const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
+    useDisclosure(false);
   const { setTaskId } = useTaskShop();
 
   const createEmployeeForm = useForm<CreateEmployeeField>({
@@ -66,8 +70,8 @@ const CreateEmployeePage = () => {
     },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: (value) => isEmpty(value) ? null
-        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      email: (value) =>
+        EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -78,11 +82,18 @@ const CreateEmployeePage = () => {
     },
   });
 
-  const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
-  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createEmployeeForm.values.province ?? 0));
-  const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createEmployeeForm.values.district ?? 0));
-  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } = useCreateEmployee();
-  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } = useUploadEmployeeFile();
+  const { data: provinces, isLoading: isProvicesLoading } =
+    useGetProvinceList();
+  const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
+    +(createEmployeeForm.values.province ?? 0)
+  );
+  const { data: wards, isLoading: isWardsLoading } = useGetWardList(
+    +(createEmployeeForm.values.district ?? 0)
+  );
+  const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
+    useCreateEmployee();
+  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } =
+    useUploadEmployeeFile();
 
   const createEmployeeFields = useMemo(() => {
     return [
@@ -94,6 +105,7 @@ const CreateEmployeePage = () => {
           placeholder: "Name",
           label: "Name",
           required: true,
+          radius: "md",
         },
       },
       {
@@ -103,6 +115,8 @@ const CreateEmployeePage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
+          required: true,
+          radius: "md",
         },
       },
       {
@@ -114,6 +128,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "gender",
           required: true,
+          radius: "md",
         },
         spans: 6,
       },
@@ -126,6 +141,7 @@ const CreateEmployeePage = () => {
           type: "number",
           placeholder: "Phone",
           label: "Phone",
+          radius: "md",
         },
         spans: 6,
       },
@@ -137,6 +153,7 @@ const CreateEmployeePage = () => {
           placeholder: "Birthday",
           label: "Birthday",
           maxDate: getDateFromSetYear(18),
+          radius: "md",
         },
       },
       {
@@ -149,6 +166,8 @@ const CreateEmployeePage = () => {
           }),
           form: createEmployeeForm,
           name: "province",
+          radius: "md",
+
           loading: isProvicesLoading,
         },
         spans: 4,
@@ -164,6 +183,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "district",
           loading: isDistrictsLoading,
+          radius: "md",
         },
         spans: 4,
       },
@@ -178,6 +198,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "wardId",
           loading: isWardsLoading,
+          radius: "md",
         },
         spans: 4,
       },
@@ -188,6 +209,7 @@ const CreateEmployeePage = () => {
           name: "addressLine",
           placeholder: "Employee address",
           label: "Employee address",
+          radius: "md",
         },
       },
     ];
@@ -284,37 +306,54 @@ const CreateEmployeePage = () => {
       </Paper>
 
       {/* Mass import modal section */}
-      <Modal opened={openedMassImport} onClose={closeMassImport} size="lg" title="Import Multiple Employees" centered closeOnClickOutside={false}>
-        <form autoComplete="off" onSubmit={massImportForm.onSubmit(({ file }) => {
-          // console.log(file)
-          uploadEmployee({ file }, {
-            onSuccess(data) {
-              closeMassImport();
-              notifications.show({
-                id: "uploadEmployeeProgress",
-                title: "Notice",
-                message: "Import in progress",
-                autoClose: false,
-                withCloseButton: false,
-                icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-                loading: true,
-              });
-              setTaskId(data.taskId)
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                id: "uploadEmployeeProgress",
-                color: "red",
-                title: "Failed",
-                message: error.response?.data?.message || "Something wrong happen trying to upload the file",
-                autoClose: 5000,
-                icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
-                loading: false,
-              });
-            },
-          })
-        })}>
+      <Modal
+        opened={openedMassImport}
+        onClose={closeMassImport}
+        size="lg"
+        title="Import Multiple Employees"
+        centered
+        closeOnClickOutside={false}
+      >
+        <form
+          autoComplete="off"
+          onSubmit={massImportForm.onSubmit(({ file }) => {
+            // console.log(file)
+            uploadEmployee(
+              { file },
+              {
+                onSuccess(data) {
+                  closeMassImport();
+                  notifications.show({
+                    id: "uploadEmployeeProgress",
+                    title: "Notice",
+                    message: "Import in progress",
+                    autoClose: false,
+                    withCloseButton: false,
+                    icon: (
+                      <IconCheck style={{ width: rem(18), height: rem(18) }} />
+                    ),
+                    loading: true,
+                  });
+                  setTaskId(data.taskId);
+                },
+                onError(data) {
+                  const error = data as AxiosError<ResponseErrorDetail>;
+                  notifications.show({
+                    id: "uploadEmployeeProgress",
+                    color: "red",
+                    title: "Failed",
+                    message:
+                      error.response?.data?.message ||
+                      "Something wrong happen trying to upload the file",
+                    autoClose: 5000,
+                    icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                    loading: false,
+                  });
+                },
+              }
+            );
+          })}
+        >
           <Group align="end">
             <EditAndUpdateForm fields={massImportFields} />
             <DownloadButton type="employee" />

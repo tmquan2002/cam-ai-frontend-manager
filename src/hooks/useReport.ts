@@ -22,6 +22,7 @@ export const useReports = () => {
     webSocketUrl + "/api/shops/chart/customer",
     {
       protocols: ["Bearer", `${getAccessToken()}`],
+      shouldReconnect: () => true,
     },
     !!getAccessToken()
   );
@@ -38,6 +39,7 @@ export const useReportByShop = (shopId: string) => {
     webSocketUrl + `/api/shops/${shopId}/chart/customer`,
     {
       protocols: ["Bearer", `${getAccessToken()}`],
+      shouldReconnect: () => true,
     }
   );
 
@@ -119,6 +121,7 @@ export const useGetNewIncident = () => {
       webSocketUrl + `/api/incidents/new`,
       {
         protocols: ["Bearer", `${getAccessToken()}`],
+        shouldReconnect: () => true,
       },
       !!getAccessToken()
     );
@@ -132,7 +135,7 @@ export const useGetNewIncident = () => {
   }, [lastJsonMessage]);
 
   useEffect(() => {
-    if (readyState == ReadyState.CLOSED) {
+    if (readyState == ReadyState.CLOSED || readyState == ReadyState.CLOSING) {
       sendMessage("");
     }
   }, [readyState]);
