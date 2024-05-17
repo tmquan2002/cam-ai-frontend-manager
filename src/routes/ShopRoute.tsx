@@ -28,11 +28,11 @@ const ShopRoute = () => {
 
   useEffect(() => {
     console.log(dataProgress)
-    if (dataProgress?.percent !== 100) {
+    if (dataProgress?.percents !== 100) {
       notifications.update({
         id: "uploadEmployeeProgress",
         title: "Import in progress",
-        message: `${dataProgress?.detailed?.currentFinishedRecord}/${dataProgress?.detailed?.total} Done (${dataProgress?.percent ? Math.round(dataProgress?.percent) : 0} %)`,
+        message: `${dataProgress?.detailed?.currentFinishedRecord}/${dataProgress?.detailed?.total} Done (${dataProgress?.percents ? Math.round(dataProgress?.percents) : 0} %)`,
         autoClose: false,
         loading: true,
       });

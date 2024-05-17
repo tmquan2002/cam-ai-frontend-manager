@@ -1,6 +1,5 @@
 export type Progress = {
     percents: number,
-    percent: number,
     detailed: {
         currentFinishedRecord: number,
         total: number
