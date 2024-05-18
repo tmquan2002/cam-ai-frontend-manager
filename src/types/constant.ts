@@ -4,6 +4,7 @@ export enum CommonConstant {
   SESSION = "session",
   USER_ACCESS_TOKEN = "user_access_token",
   USER_REFRESH_TOKEN = "user_refresh_token",
+  TASK_ID = "task_id"
 }
 
 //Tips: Install "Colorize" extention and Add Typescript file in settings.json for easier to see color

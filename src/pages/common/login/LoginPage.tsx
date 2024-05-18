@@ -1,19 +1,20 @@
-import styled from "./login.module.scss";
-import AuthImage from "../../../assets/images/login_signup_main.png";
 import { Box, Button, Group, Modal, Text, TextInput, rem } from "@mantine/core";
-import { useState } from "react";
-import { ChangePasswordForm } from "./ChangePasswordForm";
-import { useLogin } from "../../../hooks/useLogin";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { LoginParams } from "../../../apis/LoginAPI";
-import { getStatusFromToken } from "../../../utils/jwt";
-import { MdEmail, MdLockOutline } from "react-icons/md";
-import { AuthToken } from "../../../models/Auth";
-import { useSession } from "../../../context/AuthContext";
-import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
-import { AccountStatus } from "../../../models/CamAIEnum";
-import axios from "axios";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import axios from "axios";
+import { isEmpty } from "lodash";
+import { useState } from "react";
+import { MdEmail, MdLockOutline } from "react-icons/md";
+import { LoginParams } from "../../../apis/LoginAPI";
+import AuthImage from "../../../assets/images/login_signup_main.png";
+import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
+import { useSession } from "../../../context/AuthContext";
+import { useLogin } from "../../../hooks/useLogin";
+import { AuthToken } from "../../../models/Auth";
+import { AccountStatus } from "../../../models/CamAIEnum";
+import { getStatusFromToken } from "../../../utils/jwt";
+import { ChangePasswordForm } from "./ChangePasswordForm";
+import styled from "./login.module.scss";
 
 const LoginPage = () => {
   const { mutate: login, isLoading } = useLogin();
@@ -28,7 +29,8 @@ const LoginPage = () => {
     },
 
     validate: {
-      email: isEmail("Invalid email - ex: name@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
       password: isNotEmpty("Password is required"),
     },
   });

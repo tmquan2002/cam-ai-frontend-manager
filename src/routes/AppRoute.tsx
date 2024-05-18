@@ -28,7 +28,7 @@ import ShopCalendar from "../pages/shop/ShopCalendar";
 import ShopCalendarSetting from "../pages/shop/ShopCalendarSetting";
 import ShopDetailPage from "../pages/shop/ShopDetailPage";
 import ShopHomePage from "../pages/shop/ShopHomePage";
-import ShopImportResultPage from "../pages/shop/ShopImportResultPage";
+import EmployeeImportResultPage from "../pages/shop/EmployeeImportResultPage";
 import ShopIncidentListPage from "../pages/shop/ShopIncidentListPage";
 import ShopInteractionPage from "../pages/shop/ShopInteractionPage";
 import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
@@ -40,6 +40,7 @@ import CommonRoute from "./CommonRoute";
 import HeadSupervisorRoute from "./HeadSupervisorRoute";
 import ShopRoute from "./ShopRoute";
 import SupervisorRoute from "./SupervisorRoute";
+import ShopImportResultPage from "../pages/brand/ShopImportResultPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -120,7 +121,7 @@ const AppRoute = () => {
         },
         {
           path: "import/:id",
-          element: <ShopImportResultPage />
+          element: <EmployeeImportResultPage />
         }
       ],
     },
@@ -195,6 +196,10 @@ const AppRoute = () => {
           path: "report/interaction",
           element: <InteractionReportPageManager />,
         },
+        {
+          path: "import/:id",
+          element: <ShopImportResultPage />
+        }
       ],
     },
     {

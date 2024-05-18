@@ -2,9 +2,10 @@ import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import _ from "lodash";
+import _, { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
@@ -22,13 +23,12 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { EMAIL_REGEX } from "../../types/constant";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { CommonConstant } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
 } from "../../utils/helperFunction";
-import { useTaskShop } from "../../routes/ShopRoute";
-import { IconCheck, IconX } from "@tabler/icons-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -70,8 +70,8 @@ const CreateEmployeePage = () => {
     },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: (value) =>
-        EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      email: (value: string) => isEmpty(value) ? "Email is required"
+      : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -332,7 +332,6 @@ const CreateEmployeePage = () => {
               title: "Notice",
               color: "light-blue.4",
               message: "Import in progress",
-              children: <Text>Thingy</Text>,
               autoClose: false,
               withCloseButton: false,
               icon: (
@@ -348,6 +347,7 @@ const CreateEmployeePage = () => {
                 // console.log(data.taskId)
 
                 setTaskId(data.taskId);
+                localStorage.setItem(CommonConstant.TASK_ID, data?.taskId)
                 notifications.show({
                   id: "uploadEmployeeProgress",
                   title: "Notice",

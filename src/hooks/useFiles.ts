@@ -4,7 +4,7 @@ import { UseQueryResult, useMutation, useQuery } from "react-query";
 import { EmployeeApi } from "../apis/EmployeeAPI";
 import { FilesAPI } from "../apis/FilesAPI";
 import { ShopAPI } from "../apis/ShopAPI";
-import { Progress } from "../models/Progress";
+import { Progress } from "../models/Task";
 import { ResponseErrorDetail } from "../models/Response";
 import { v4 as uuidv4 } from 'uuid';
 

@@ -2,7 +2,7 @@ import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import { isEmpty } from "lodash";
 import { useMemo } from "react";
@@ -21,7 +21,7 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useTaskBrand } from "../../routes/BrandRoute";
-import { PHONE_REGEX } from "../../types/constant";
+import { CommonConstant } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -54,7 +54,7 @@ const CreateShop = () => {
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) => isEmpty(value) ? null :
-        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
+        /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Province is required"),
@@ -322,14 +322,14 @@ const CreateShop = () => {
             onSuccess(data) {
               closeMassImport();
               massImportForm.reset();
-              setTaskId(data.taskId);
+              setTaskId(data?.taskId);
+              localStorage.setItem(CommonConstant.TASK_ID, data?.taskId)
               notifications.show({
                 id: "uploadShopProgress",
                 title: "Notice",
                 message: "Import in progress",
                 autoClose: false,
                 withCloseButton: false,
-                icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
                 loading: true,
                 color: "light-blue.4"
               });

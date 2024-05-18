@@ -15,7 +15,7 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
@@ -41,13 +41,13 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { IMAGE_CONSTANT } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
 } from "../../utils/helperFunction";
 import classes from "./EmployeeDetailPage.module.scss";
-import { useTaskShop } from "../../routes/ShopRoute";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -92,12 +92,13 @@ const EmployeeDetailPage = () => {
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         isEmpty(value)
           ? null
-          : PHONE_REGEX.test(value)
+          : /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
             ? null
             : "A phone number should have a length of 10-12 characters",
     },

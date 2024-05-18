@@ -1,7 +1,7 @@
 import { getAccessToken } from "../context/AuthContext";
 import { ShopStatus } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
-import { Progress } from "../models/Progress";
+import { Progress } from "../models/Task";
 import { ShopDetail } from "../models/Shop";
 import http, { toQueryParams } from "../utils/http";
 

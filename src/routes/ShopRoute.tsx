@@ -8,10 +8,11 @@ import ShopHeader from "../components/header/ShopHeader";
 import { Role } from "../models/CamAIEnum";
 import { useGetEmployeeProgress } from "../hooks/useFiles";
 import { notifications } from "@mantine/notifications";
-import { ProgressTask } from "../models/Progress";
+import { ProgressTask } from "../models/Task";
+import { CommonConstant } from "../types/constant";
 
 const ShopRoute = () => {
-  const [taskId, setTaskId] = useState<string | undefined>(undefined);
+  const [taskId, setTaskId] = useState<string | undefined>(localStorage.getItem(CommonConstant.TASK_ID) ?? undefined);
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.ShopManager);
