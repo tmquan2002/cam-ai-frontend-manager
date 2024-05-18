@@ -1,11 +1,11 @@
 import { ScrollArea } from "@mantine/core";
 import {
+  IconBriefcase,
   IconExclamationCircle,
   IconFileAnalytics,
-  IconHome,
   IconMan,
   IconNotes,
-  IconRouter,
+  IconRouter
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import classes from "./Sidebar.module.scss";
@@ -17,12 +17,9 @@ const mockdata = [
     path: "/brand",
   },
   {
-    label: "Shops",
-    icon: IconHome,
-    links: [
-      { label: "Shop details", link: "/brand/shop" },
-      { label: "Shop managers", link: "/brand/account" },
-    ],
+    label: "Shop Manager",
+    icon: IconBriefcase,
+    path: "/brand/account",
   },
   {
     label: "Employees",

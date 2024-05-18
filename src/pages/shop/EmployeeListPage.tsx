@@ -39,6 +39,7 @@ import { EmployeeStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import * as _ from "lodash";
+import { useTaskShop } from "../../routes/ShopRoute";
 
 type SearchShopField = {
   employeeStatus: string | null;
@@ -57,6 +58,7 @@ const EmployeeListPage = () => {
     },
   });
 
+  const { taskId } = useTaskShop();
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
@@ -123,7 +125,7 @@ const EmployeeListPage = () => {
         <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
         <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
         <Table.Td ta={"center"}>
-          <StatusBadge statusName={row?.employeeStatus || "None"} padding={10} size="sm"/>
+          <StatusBadge statusName={row?.employeeStatus || "None"} padding={10} size="sm" />
         </Table.Td>
       </Table.Tr>
     </Tooltip>
@@ -193,6 +195,7 @@ const EmployeeListPage = () => {
         <Button
           onClick={() => navigate("/shop/employee/create")}
           leftSection={<IconPlus size={14} />}
+          disabled={taskId != undefined}
         >
           Add Employee
         </Button>

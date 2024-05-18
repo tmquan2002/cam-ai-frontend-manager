@@ -47,6 +47,7 @@ import {
   mapLookupToArray,
 } from "../../utils/helperFunction";
 import classes from "./EmployeeDetailPage.module.scss";
+import { useTaskShop } from "../../routes/ShopRoute";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -73,6 +74,7 @@ const EmployeeDetailPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [activePage, setPage] = useState(1);
+  const { taskId } = useTaskShop();
 
   const [opened, { open, close }] = useDisclosure(false);
   const {
@@ -96,8 +98,8 @@ const EmployeeDetailPage = () => {
         isEmpty(value)
           ? null
           : PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+            ? null
+            : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
@@ -164,6 +166,7 @@ const EmployeeDetailPage = () => {
           label: "Name",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -175,6 +178,7 @@ const EmployeeDetailPage = () => {
           label: "Email",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -187,6 +191,7 @@ const EmployeeDetailPage = () => {
           name: "gender",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -200,6 +205,7 @@ const EmployeeDetailPage = () => {
           placeholder: "Phone",
           label: "Phone",
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -212,6 +218,7 @@ const EmployeeDetailPage = () => {
           label: "Birthday",
           maxDate: getDateFromSetYear(18),
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -226,6 +233,7 @@ const EmployeeDetailPage = () => {
           name: "province",
           loading: isProvicesLoading,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -241,6 +249,7 @@ const EmployeeDetailPage = () => {
           name: "district",
           loading: isDistrictsLoading,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -255,7 +264,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "wardId",
           radius: "md",
-
+          disabled: taskId !== undefined,
           loading: isWardsLoading,
         },
         spans: 4,
@@ -267,7 +276,7 @@ const EmployeeDetailPage = () => {
           name: "addressLine",
           placeholder: "Employee address",
           radius: "md",
-
+          disabled: taskId !== undefined,
           label: "Employee address",
         },
       },
@@ -295,7 +304,7 @@ const EmployeeDetailPage = () => {
             </Text>
           </Group>
 
-          <ActionIcon color="red" onClick={open} size={"lg"}>
+          <ActionIcon color="red" onClick={open} size={"lg"} disabled={taskId !== undefined}>
             <IconTrash style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>
         </Group>
@@ -419,7 +428,7 @@ const EmployeeDetailPage = () => {
             Confirm delete <Mark>{employeeData?.name}</Mark> employee?
           </Text>
         }
-        // centered
+      // centered
       >
         <Group justify="flex-end" mt="md">
           <Button

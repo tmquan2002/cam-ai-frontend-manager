@@ -66,6 +66,7 @@ import {
   mapLookupToArray,
 } from "../../utils/helperFunction";
 import classes from "./BrandMainPage.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
 
 type SearchShopField = {
   status: string | null;
@@ -83,6 +84,7 @@ const BrandMainPage = () => {
     },
   });
 
+  const { taskId } = useTaskBrand();
   const [search, setSearch] = useState<string | number>("");
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
@@ -374,7 +376,7 @@ const BrandMainPage = () => {
               <Text size="xl" fw={500} mb={rem(8)} ta="center">
                 {data?.values[0]?.name}
               </Text>
-              
+
               <Box mb={20}>
                 <Flex mt={20}>
                   <Box mr={rem(8)}>
@@ -419,7 +421,7 @@ const BrandMainPage = () => {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, lg: 8 }} mr={rem(32)}>
-            <Text size="xl" fw={'bold'} c={"grey"} mb={rem(20)} >
+            <Text size="xl" fw={'bold'} c={"light-blue.4"} mb={rem(20)}>
               Shop List
             </Text>
             {/* Input and filter section */}
@@ -476,6 +478,7 @@ const BrandMainPage = () => {
                 }}
                 ml={rem(12)}
                 radius={"20%/50%"}
+                disabled={taskId != undefined}
               >
                 Add shop
               </Button>

@@ -25,9 +25,11 @@ import { AccountDetail } from "../../models/Account";
 import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
 
 const BrandShopManagerListPage = () => {
   const navigate = useNavigate();
+  const { taskId } = useTaskBrand();
   const [search, setSearch] = useState<string>("");
   const [debounced] = useDebouncedValue(search, 400);
   const [activePage, setPage] = useState(1);
@@ -111,6 +113,7 @@ const BrandShopManagerListPage = () => {
           ml={rem(20)}
           leftSection={<IconPlus size={14} />}
           onClick={() => navigate("/brand/create/manager")}
+          disabled={taskId != undefined}
         >
           Add manager
         </Button>

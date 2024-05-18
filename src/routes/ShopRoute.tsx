@@ -11,11 +11,11 @@ import { notifications } from "@mantine/notifications";
 import { ProgressTask } from "../models/Progress";
 
 const ShopRoute = () => {
-  const [taskId, setTaskId] = useState<string | null>(null);
+  const [taskId, setTaskId] = useState<string | undefined>(undefined);
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.ShopManager);
-  const { data: dataProgress } = useGetEmployeeProgress(taskId, 1000);
+  const { data: dataProId } = useGetEmployeeProgress(taskId, 1000);
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -27,12 +27,12 @@ const ShopRoute = () => {
   }, []);
 
   useEffect(() => {
-    console.log(dataProgress)
-    if (dataProgress?.percents !== 100) {
+    // console.log("in use effect")
+    if (dataProId?.dataProgress?.percents !== 100) {
       notifications.update({
         id: "uploadEmployeeProgress",
         title: "Import in progress",
-        message: `${dataProgress?.detailed?.currentFinishedRecord}/${dataProgress?.detailed?.total} Done (${dataProgress?.percents ? Math.round(dataProgress?.percents) : 0} %)`,
+        message: `${dataProId?.dataProgress?.detailed?.currentFinishedRecord}/${dataProId?.dataProgress?.detailed?.total} Done (${dataProId?.dataProgress?.percents ? Math.round(dataProId?.dataProgress?.percents) : 0} %)`,
         autoClose: false,
         loading: true,
       });
@@ -45,9 +45,9 @@ const ShopRoute = () => {
         loading: false,
         autoClose: 5000,
       });
-      setTaskId(null)
+      setTaskId(undefined)
     }
-  }, [dataProgress, taskId])
+  }, [dataProId])
 
   switch (userRole) {
     case Role.ShopManager:

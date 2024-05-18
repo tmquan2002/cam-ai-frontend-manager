@@ -27,7 +27,7 @@ import CreateShopManagerForm from "./manager/CreateShopManagerForm";
 const breadcrumbs: BreadcrumbItem[] = [
   {
     title: "Shop",
-    link: "/brand/shop"
+    link: "/brand"
   },
   {
     title: "Add"
@@ -48,7 +48,7 @@ export type CreateShopField = {
 const CreateShop = () => {
   const [openedCreateManager, { open: openCreateManager, close: closeCreateManager }] = useDisclosure(false);
   const [openedMassImport, { open: openMassImport, close: closeMassImport }] = useDisclosure(false);
-  const { setTaskId } = useTaskBrand();
+  const { taskId, setTaskId } = useTaskBrand();
 
   const createShopForm = useForm<CreateShopField>({
     validate: {
@@ -89,6 +89,7 @@ const CreateShop = () => {
           placeholder: "Shop name",
           label: "Shop name",
           required: true,
+          disabled: taskId != undefined,
         },
       },
       {
@@ -99,6 +100,7 @@ const CreateShop = () => {
           type: "number",
           placeholder: "Shop phone",
           label: "Shop phone",
+          disabled: taskId != undefined,
         },
       },
 
@@ -124,6 +126,7 @@ const CreateShop = () => {
               New
             </Button>
           ),
+          disabled: taskId != undefined,
           // searchable: true,
         },
       },
@@ -131,7 +134,7 @@ const CreateShop = () => {
         type: FIELD_TYPES.TIME,
         fieldProps: {
           form: createShopForm,
-
+          disabled: taskId != undefined,
           name: "openTime",
           placeholder: "Open Time",
           label: "Open time",
@@ -148,6 +151,7 @@ const CreateShop = () => {
           placeholder: "Close Time",
           label: "Close time",
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 6,
       },
@@ -163,6 +167,7 @@ const CreateShop = () => {
           name: "province",
           loading: isProvicesLoading,
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 4,
       },
@@ -178,6 +183,7 @@ const CreateShop = () => {
           name: "district",
           loading: isDistrictsLoading,
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 4,
       },
@@ -193,6 +199,7 @@ const CreateShop = () => {
           name: "wardId",
           loading: isWardsLoading,
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 4,
       },
@@ -204,6 +211,7 @@ const CreateShop = () => {
           placeholder: "Shop address",
           label: "Shop address",
           required: true,
+          disabled: taskId != undefined,
         },
       },
     ];
@@ -233,6 +241,7 @@ const CreateShop = () => {
           accept: ".csv",
           width: 300,
           required: true,
+          disabled: taskId !== undefined,
         },
       }
     ];
@@ -250,7 +259,7 @@ const CreateShop = () => {
               Create shop
             </Text>
           </Group>
-          <Button onClick={openMassImport}>Import File</Button>
+          <Button onClick={openMassImport} disabled={taskId !== undefined}>Import File</Button>
         </Group>
 
         <form
@@ -290,7 +299,7 @@ const CreateShop = () => {
 
           <Group justify="flex-end" mt="md">
             <Button
-              disabled={!createShopForm.isDirty()}
+              disabled={!createShopForm.isDirty() || taskId != undefined}
               type="submit"
               loading={isCreateShopLoading}
             >
@@ -312,6 +321,8 @@ const CreateShop = () => {
           uploadShop({ file }, {
             onSuccess(data) {
               closeMassImport();
+              massImportForm.reset();
+              setTaskId(data.taskId);
               notifications.show({
                 id: "uploadShopProgress",
                 title: "Notice",
@@ -320,8 +331,8 @@ const CreateShop = () => {
                 withCloseButton: false,
                 icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
                 loading: true,
+                color: "light-blue.4"
               });
-              setTaskId(data.taskId)
             },
             onError(data) {
               const error = data as AxiosError<ResponseErrorDetail>;
@@ -342,7 +353,7 @@ const CreateShop = () => {
             <DownloadButton type="shop" />
           </Group>
           <Group mt="md">
-            <Button type="submit" loading={isUploadShopLoading}>
+            <Button type="submit" loading={isUploadShopLoading} disabled={taskId !== undefined}>
               Import
             </Button>
             <Button type="submit" variant="outline" onClick={closeMassImport} loading={isUploadShopLoading}>

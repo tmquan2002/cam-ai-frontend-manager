@@ -6,6 +6,7 @@ import { FilesAPI } from "../apis/FilesAPI";
 import { ShopAPI } from "../apis/ShopAPI";
 import { Progress } from "../models/Progress";
 import { ResponseErrorDetail } from "../models/Response";
+import { v4 as uuidv4 } from 'uuid';
 
 export const useGetShopTemplate = () => {
     const downloadFile = async () => {
@@ -182,30 +183,38 @@ export const useGetEmployeeUpsertTaskResult = (taskId: string, delay: number) =>
     return { isError, isLoading, data, error };
 };
 
-export const useGetShopProgress = (taskId: string | null, delay: number) => {
-    const { isError, isLoading, data, error, refetch }: UseQueryResult<Progress, Error> = useQuery({
+export const useGetShopProgress = (taskId: string | undefined, delay: number) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<{ id: string, dataProgress: Progress }, Error> = useQuery({
         queryKey: ["getShopProgress"],
         queryFn: async () => {
-            return await ShopAPI._getShopProgress(taskId);
+            const res = await ShopAPI._getShopProgress(taskId);
+            return {
+                id: uuidv4(),
+                dataProgress: res
+            }
         },
-        enabled: !!taskId,
-        refetchInterval: query => query?.percents == 100 ? false : delay,
+        enabled: taskId != undefined,
+        refetchInterval: query => query?.dataProgress?.percents == 100 ? false : delay,
         refetchIntervalInBackground: true
     });
 
     return { isError, isLoading, data, error, refetch };
 };
 
-export const useGetEmployeeProgress = (taskId: string | null, delay: number) => {
-    const { isError, isLoading, data, error, refetch }: UseQueryResult<Progress, Error> = useQuery({
+export const useGetEmployeeProgress = (taskId: string | undefined, delay: number) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<{ id: string, dataProgress: Progress }, Error> = useQuery({
         queryKey: ["getEmployeeProgress"],
         queryFn: async () => {
-            return await EmployeeApi._getEmployeeProgress(taskId);
+            // console.log("in use get empl request")
+            const res = await EmployeeApi._getEmployeeProgress(taskId);
+            return {
+                id: uuidv4(),
+                dataProgress: res
+            }
         },
-        refetchInterval: query => query?.percents == 100 ? false : delay,
-        enabled: !!taskId,
+        refetchInterval: query => query?.dataProgress?.percents == 100 ? false : delay,
+        enabled: taskId != undefined,
         refetchIntervalInBackground: true,
     });
-
     return { isError, isLoading, data, error, refetch };
 };

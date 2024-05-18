@@ -16,6 +16,7 @@ import { ShopStatus } from "../../models/CamAIEnum";
 import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { formatTime, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopListPage.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
 
 type SearchShopField = {
   status: string | null;
@@ -30,6 +31,7 @@ const ShopListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
 
+  const { taskId } = useTaskBrand();
   const [activePage, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<string | null>("5");
   const form = useForm<SearchShopField>({
@@ -201,6 +203,7 @@ const ShopListPage = () => {
           onClick={() => {
             navigate("/brand/create/shop");
           }}
+          disabled={taskId !== undefined}
         >
           Add shop
         </Button>
