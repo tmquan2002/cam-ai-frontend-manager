@@ -68,7 +68,7 @@ const BrandShopManagerListPage = () => {
       <Table.Td ta="center">
         <StatusBadge statusName={row?.accountStatus} size="sm" padding={10} />
       </Table.Td>
-      <Table.Td ta="right">
+      <Table.Td ta="left">
         {row?.managingShop ? (
           <Tooltip label="View Shop" withArrow position="top-end">
             <Text
@@ -90,7 +90,7 @@ const BrandShopManagerListPage = () => {
     <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Group pb={12} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Shop manager list
+          Shop Managers
         </Text>
       </Group>
 
@@ -150,7 +150,7 @@ const BrandShopManagerListPage = () => {
                   <Table.Th>Birthday</Table.Th>
                   <Table.Th>Gender</Table.Th>
                   <Table.Th ta="center">Status</Table.Th>
-                  <Table.Th ta="right">Managing shop</Table.Th>
+                  <Table.Th ta="left">Managing shop</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>

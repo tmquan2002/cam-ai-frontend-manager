@@ -28,7 +28,7 @@ import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopEmployeeDetailPage.module.scss";
 
@@ -84,12 +84,12 @@ const ShopEmployeeDetailPage = () => {
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value: string) => isEmpty(value) ? "Email is required"
-        : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == undefined ||
           value == "" ||
-          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+          PHONE_REGEX.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
     },

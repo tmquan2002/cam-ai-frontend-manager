@@ -10,7 +10,7 @@ import { Role } from "../models/CamAIEnum";
 import { useGetShopProgress } from "../hooks/useFiles";
 import { notifications } from "@mantine/notifications";
 import { ProgressTask } from "../models/Task";
-import { CommonConstant } from "../types/constant";
+import { CommonConstant, POLLING_INTERVAL } from "../types/constant";
 import { IconCheck } from "@tabler/icons-react";
 
 const BrandRoute = () => {
@@ -18,7 +18,7 @@ const BrandRoute = () => {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.BrandManager);
-  const { data: dataProId } = useGetShopProgress(taskId, 500);
+  const { data: dataProId } = useGetShopProgress(taskId, POLLING_INTERVAL);
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });

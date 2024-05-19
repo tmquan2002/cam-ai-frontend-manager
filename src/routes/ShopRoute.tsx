@@ -9,14 +9,14 @@ import { Role } from "../models/CamAIEnum";
 import { useGetEmployeeProgress } from "../hooks/useFiles";
 import { notifications } from "@mantine/notifications";
 import { ProgressTask } from "../models/Task";
-import { CommonConstant } from "../types/constant";
+import { CommonConstant, POLLING_INTERVAL } from "../types/constant";
 
 const ShopRoute = () => {
   const [taskId, setTaskId] = useState<string | undefined>(localStorage.getItem(CommonConstant.TASK_ID) ?? undefined);
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.ShopManager);
-  const { data: dataProId } = useGetEmployeeProgress(taskId, 1000);
+  const { data: dataProId } = useGetEmployeeProgress(taskId, POLLING_INTERVAL);
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });

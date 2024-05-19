@@ -471,7 +471,7 @@ const BrandMainPage = () => {
               </Button>
               <Button
                 leftSection={<IconPlus size={14} />}
-                variant="outline"
+                
                 h={rem(48)}
                 onClick={() => {
                   navigate("/brand/create/shop");

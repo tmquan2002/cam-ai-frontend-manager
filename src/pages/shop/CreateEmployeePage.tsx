@@ -24,7 +24,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useTaskShop } from "../../routes/ShopRoute";
-import { CommonConstant } from "../../types/constant";
+import { CommonConstant, EMAIL_REGEX } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
@@ -71,7 +71,7 @@ const CreateEmployeePage = () => {
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value: string) => isEmpty(value) ? "Email is required"
-      : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });

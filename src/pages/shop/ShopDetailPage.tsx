@@ -42,6 +42,7 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeboxInstallStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
+import { PHONE_REGEX } from "../../types/constant";
 
 export type FormFieldValue = {
   name: string;
@@ -64,7 +65,7 @@ const ShopDetailPage = () => {
       phone: (value) =>
         isEmpty(value)
           ? null
-          : /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+          : PHONE_REGEX.test(value)
             ? null
             : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),

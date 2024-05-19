@@ -100,120 +100,108 @@ export const EdgeBoxInstallDetailComp = ({
   }
 
   return (
-    <>
-      <Group
-        justify="space-between"
-        align="center"
-        pb={rem(20)}
-        gap={"sm"}
-      >
-        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Edge box
-        </Text>
-      </Group>
-      <Flex>
-        <Image
-          radius={"md"}
-          src={
-            "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
-          }
-        />
-        <Box ml={rem(40)} style={{ flex: 1 }}>
-          <Group gap={rem(40)}>
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Name
-              </Text>
-              <Text fw={500}>{edgeBox.name}</Text>
-            </Box>
+    <Flex>
+      <Image
+        radius={"md"}
+        src={
+          "https://cdn.dribbble.com/users/40756/screenshots/2917981/media/56fae174592893d88f6ca1be266aaaa6.png?resize=450x338&vertical=center"
+        }
+      />
+      <Box ml={rem(40)} style={{ flex: 1 }}>
+        <Group gap={rem(40)}>
+          <Box>
+            <Text fw={500} c={"dimmed"}>
+              Name
+            </Text>
+            <Text fw={500}>{edgeBox.name}</Text>
+          </Box>
 
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Edgebox status
-              </Text>
-              <EdgeboxStatusBadge status={edgeBox.edgeBoxStatus} />
-            </Box>
+          <Box>
+            <Text fw={500} c={"dimmed"}>
+              Edgebox status
+            </Text>
+            <EdgeboxStatusBadge status={edgeBox.edgeBoxStatus} />
+          </Box>
 
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Edgebox location
-              </Text>
-              <EdgeboxLocationBadge location={edgeBox.edgeBoxLocation} />
-            </Box>
+          <Box>
+            <Text fw={500} c={"dimmed"}>
+              Edgebox location
+            </Text>
+            <EdgeboxLocationBadge location={edgeBox.edgeBoxLocation} />
+          </Box>
 
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Activation status
-              </Text>
-              <EdgeBoxActivationStatusBadge
-                activationStatus={edgeBoxInstall.activationStatus}
-              />
-            </Box>
+          <Box>
+            <Text fw={500} c={"dimmed"}>
+              Activation status
+            </Text>
+            <EdgeBoxActivationStatusBadge
+              activationStatus={edgeBoxInstall.activationStatus}
+            />
+          </Box>
 
-            <Box>
-              <Text fw={500} c={"dimmed"}>
-                Install status
-              </Text>
-              <EdgeboxInstallStatusBadge
-                installStatus={edgeBoxInstall.edgeBoxInstallStatus}
-              />
-            </Box>
-          </Group>
-          <Divider my={rem(20)} />
+          <Box>
+            <Text fw={500} c={"dimmed"}>
+              Install status
+            </Text>
+            <EdgeboxInstallStatusBadge
+              installStatus={edgeBoxInstall.edgeBoxInstallStatus}
+            />
+          </Box>
+        </Group>
+        <Divider my={rem(20)} />
+        <Group>
+          <Text miw={rem(120)} fw={600}>
+            Description :
+          </Text>
+          <Text>{edgeBox.edgeBoxModel?.description}</Text>
+        </Group>
+        <Divider my={rem(20)} />
+        <SimpleGrid cols={2}>
           <Group>
             <Text miw={rem(120)} fw={600}>
-              Description :
+              Model name :
             </Text>
-            <Text>{edgeBox.edgeBoxModel?.description}</Text>
+            <Text>{edgeBox.edgeBoxModel?.name}</Text>
           </Group>
-          <Divider my={rem(20)} />
-          <SimpleGrid cols={2}>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Model name :
-              </Text>
-              <Text>{edgeBox.edgeBoxModel?.name}</Text>
-            </Group>
 
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Model code :
-              </Text>
-              <Text>{edgeBox?.edgeBoxModel?.modelCode}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Manufacturer :
-              </Text>
-              <Text>{edgeBox?.edgeBoxModel?.manufacturer}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                CPU :
-              </Text>
-              <Text>{edgeBox?.edgeBoxModel?.cpu}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                RAM :
-              </Text>
-              <Text>{edgeBox?.edgeBoxModel?.ram}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                Storage :
-              </Text>
-              <Text>{edgeBox?.edgeBoxModel?.storage}</Text>
-            </Group>
-            <Group>
-              <Text miw={rem(120)} fw={600}>
-                OS :
-              </Text>
-              <Text>{edgeBox?.edgeBoxModel?.os}</Text>
-            </Group>
-          </SimpleGrid>
-        </Box>
-      </Flex>
-    </>
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              Model code :
+            </Text>
+            <Text>{edgeBox?.edgeBoxModel?.modelCode}</Text>
+          </Group>
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              Manufacturer :
+            </Text>
+            <Text>{edgeBox?.edgeBoxModel?.manufacturer}</Text>
+          </Group>
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              CPU :
+            </Text>
+            <Text>{edgeBox?.edgeBoxModel?.cpu}</Text>
+          </Group>
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              RAM :
+            </Text>
+            <Text>{edgeBox?.edgeBoxModel?.ram}</Text>
+          </Group>
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              Storage :
+            </Text>
+            <Text>{edgeBox?.edgeBoxModel?.storage}</Text>
+          </Group>
+          <Group>
+            <Text miw={rem(120)} fw={600}>
+              OS :
+            </Text>
+            <Text>{edgeBox?.edgeBoxModel?.os}</Text>
+          </Group>
+        </SimpleGrid>
+      </Box>
+    </Flex>
   );
 };

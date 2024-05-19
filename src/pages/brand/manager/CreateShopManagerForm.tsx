@@ -17,6 +17,7 @@ import { Gender, Role } from "../../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../../models/Response";
 import { useTaskBrand } from "../../../routes/BrandRoute";
 import { getDateFromSetYear, mapLookupToArray } from "../../../utils/helperFunction";
+import { EMAIL_REGEX, PHONE_REGEX } from "../../../types/constant";
 
 export type CreateAccountField = {
     email: string;
@@ -56,10 +57,10 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
         validate: {
             name: isNotEmpty("Name is required"),
             email: (value: string) => isEmpty(value) ? "Email is required"
-                : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
+                : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
             gender: isNotEmpty("Please select gender"),
             phone: (value) => isEmpty(value) ? null :
-                /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value) ? null : "A phone number should have a length of 10-12 characters",
+                PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
         },
     });
 

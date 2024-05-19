@@ -15,6 +15,7 @@ import { AccountStatus } from "../../../models/CamAIEnum";
 import { getStatusFromToken } from "../../../utils/jwt";
 import { ChangePasswordForm } from "./ChangePasswordForm";
 import styled from "./login.module.scss";
+import { EMAIL_REGEX } from "../../../types/constant";
 
 const LoginPage = () => {
   const { mutate: login, isLoading } = useLogin();
@@ -30,7 +31,7 @@ const LoginPage = () => {
 
     validate: {
       email: (value: string) => isEmpty(value) ? "Email is required"
-        : /^\S+@(\S+\.)+\S{2,4}$/g.test(value) ? null : "Invalid email - ex: name@gmail.com",
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       password: isNotEmpty("Password is required"),
     },
   });
