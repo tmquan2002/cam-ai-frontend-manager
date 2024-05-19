@@ -52,7 +52,7 @@ const renderCircleLegend = ({ color, title }: LegendCardProps) => {
           backgroundColor: color,
         }}
       />
-      <Text size={rem(14)} fw={500} c={"rgb(17, 24, 39)"}>
+      <Text size={rem(14)} fw={500}>
         {title}
       </Text>
     </>

@@ -8,11 +8,7 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { useGetBrandList } from "../../hooks/useGetBrandList";
-import { useGetEdgeBoxInstallByBrandId } from "../../hooks/useGetEdgeBoxInstallByBrandId";
 import { useDisclosure } from "@mantine/hooks";
-import { EdgeBoxInstallDetail } from "../../models/Edgebox";
-import classes from "./EdgeBoxListPage.module.scss";
 import {
   IconChevronDown,
   IconHome2,
@@ -22,7 +18,11 @@ import {
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
+import { useGetBrandList } from "../../hooks/useGetBrandList";
+import { useGetEdgeBoxInstallByBrandId } from "../../hooks/useGetEdgeBoxInstallByBrandId";
 import { EdgeboxInstallStatus } from "../../models/CamAIEnum";
+import { EdgeBoxInstallDetail } from "../../models/Edgebox";
+import classes from "./EdgeBoxListPage.module.scss";
 
 const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
   const [opened, { toggle }] = useDisclosure(false);
@@ -36,8 +36,8 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
         className={
           opened ? classes["edgeBox-button-active"] : classes["edgeBox-button"]
         }
-        px={rem(20)}
-        py={rem(12)}
+        px={rem(32)}
+        py={rem(20)}
         onClick={toggle}
       >
         <Stack gap={"xs"}>
@@ -62,8 +62,8 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
       <Collapse in={opened}>
         <Box
           pt={rem(12)}
-          pb={rem(20)}
-          px={rem(20)}
+          pb={rem(32)}
+          px={rem(32)}
           mb={rem(12)}
           onClick={toggle}
           className={classes["edgeBox-collapse"]}
@@ -76,7 +76,7 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
 };
 
 const EdgeBoxListPage = () => {
-  const [opened] = useDisclosure(false);
+  // const [opened] = useDisclosure(false);
   const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
     { size: 1 }
   );
@@ -105,12 +105,12 @@ const EdgeBoxListPage = () => {
       {" "}
       <Group mb={rem(20)} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Edge box List
+          Edge Box List
         </Text>
       </Group>
-      <Collapse in={opened}>
+      {/* <Collapse in={opened}>
         <form></form>
-      </Collapse>
+      </Collapse> */}
       {items}
     </Paper>
   );
