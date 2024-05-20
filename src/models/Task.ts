@@ -19,11 +19,11 @@ export type TaskError = {
 }
 export type TaskResult = {
     status: TaskStatus,
-    inserted: number,
-    updated: number,
-    failed: number,
-    description: string,
-    metadata: [
+    inserted?: number,
+    updated?: number,
+    failed?: number,
+    description?: string,
+    metadata?: [
         { shopInserted: string[] },
         { accountInserted: string[] },
         { shopUpdated: string[] },

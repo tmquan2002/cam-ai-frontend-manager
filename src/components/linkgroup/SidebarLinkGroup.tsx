@@ -48,7 +48,12 @@ export function SidebarLinksGroup({
   return (
     <Box>
       <UnstyledButton
-        onClick={() => setOpened((o) => !o)}
+        onClick={() => {
+          setOpened((o) => !o)
+          if (path) {
+            navigate(path);
+          }
+        }}
         className={
           (hasLinks && links.some((e) => location.pathname === e.link)) ||
             location.pathname === path!
@@ -57,11 +62,6 @@ export function SidebarLinksGroup({
         }
       >
         <Group
-          onClick={() => {
-            if (path) {
-              navigate(path);
-            }
-          }}
           justify="space-between"
           gap={0}
         >

@@ -462,9 +462,9 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                 <Group gap={"sm"} align="center">
                   <Box
                     style={{
-                      borderRadius: "999px",
-                      width: rem(20),
-                      aspectRatio: 5,
+                      borderRadius: "2px",
+                      width: rem(10),
+                      aspectRatio: 1,
                       backgroundColor: "rgba(255, 99, 132, 1)",
                     }}
                   />
