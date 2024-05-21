@@ -36,6 +36,7 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   GetIncidentParams,
   MassRejectIncidentParams,
@@ -65,7 +66,6 @@ import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopIncidentListPage.module.scss";
-import { Link } from "react-router-dom";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -87,7 +87,6 @@ type IncidentFormField = {
 const ShopIncidentListPage = () => {
   const [openedFilter, { toggle: toggleFilter }] = useDisclosure(false);
   const [selectedPopoverOpened, { toggle: toggleSelectedPopover, close: closeSelectedPopover }] = useDisclosure(false);
-  const [assignPopoverOpened, { toggle: toggleAssignPopover, close: closeAssignPopover }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
@@ -130,7 +129,6 @@ const ShopIncidentListPage = () => {
           });
           refetchIncident();
           refetchIncidentList();
-          closeAssignPopover();
         },
         onError(data) {
           const error = data as AxiosError<ResponseErrorDetail>;
@@ -413,9 +411,7 @@ const ShopIncidentListPage = () => {
 
   const renderIncidentList = incidentCheckBoxList?.map((row, index) => (
     <Box
-      w={rem(350)}
-      py={rem(14)}
-      px={rem(18)}
+      w={rem(350)} pl={rem(18)}
       key={row?.id}
       className={
         row?.id == selectedIncident?.id
@@ -429,16 +425,12 @@ const ShopIncidentListPage = () => {
           checked={row.checked}
           disabled={row.disabled}
           onChange={(event) =>
-            handlers.setItemProp(
-              index,
-              "checked",
-              event.currentTarget.checked
-            )
+            handlers.setItemProp(index, "checked", event.currentTarget.checked)
           }
         />
         <Group
           justify="space-between"
-          w={260}
+          w={260} py={rem(14)} pr={rem(18)}
           onClick={() => {
             setSelectedIncident({ id: row?.id });
           }}
@@ -695,59 +687,40 @@ const ShopIncidentListPage = () => {
 
                   {/* Single assign form */}
                   <Group>
-                    <Popover trapFocus position="bottom" withArrow shadow="md" opened={assignPopoverOpened}>
-                      <Popover.Target>
-                        <Tooltip label="Assign selected" withArrow>
-                          <ActionIcon
-                            variant="gradient"
-                            gradient={{
-                              from: "light-blue.5",
-                              to: "light-blue.7",
-                              deg: 90,
-                            }}
-                            onClick={toggleAssignPopover}
-                          >
-                            <IconUserUp style={{ width: "70%", height: "70%" }} stroke={1.5} />
-                          </ActionIcon>
-                        </Tooltip>
-                      </Popover.Target>
-                      <Popover.Dropdown>
-                        <form onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}>
-                          <Group align="baseline">
-                            {isGetEmployeeListLoading ? (
-                              <Loader mt={rem(30)} />
-                            ) : (
-                              <Select
-                                size="xs"
-                                {...assignIncidentForm.getInputProps("employeeId")}
-                                placeholder="Assign to.."
-                                data={employeeList?.values?.map((item) => {
-                                  return {
-                                    value: item?.id,
-                                    label: item?.name,
-                                  };
-                                })}
-                                nothingFoundMessage="Nothing found..."
-                              />
-                            )}
-                            <Button
-                              variant="gradient"
-                              size="xs"
-                              type="submit"
-                              loading={isAssignIncidentLoading}
-                              gradient={{
-                                from: "light-blue.5",
-                                to: "light-blue.7",
-                                deg: 90,
-                              }}
-                            >
-                              Assign
-                            </Button>
-                          </Group>
-                        </form>
-                      </Popover.Dropdown>
-                    </Popover>
-
+                    <form onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}>
+                      <Group align="baseline">
+                        {isGetEmployeeListLoading ? (
+                          <Loader mt={rem(30)} />
+                        ) : (
+                          <Select
+                            size="xs"
+                            {...assignIncidentForm.getInputProps("employeeId")}
+                            placeholder="Assign to.."
+                            data={employeeList?.values?.map((item) => {
+                              return {
+                                value: item?.id,
+                                label: item?.name,
+                              };
+                            })}
+                            nothingFoundMessage="Nothing found..."
+                          />
+                        )}
+                        <Button
+                          variant="gradient"
+                          size="xs"
+                          type="submit"
+                          loading={isAssignIncidentLoading}
+                          gradient={{
+                            from: "light-blue.5",
+                            to: "light-blue.7",
+                            deg: 90,
+                          }}
+                        >
+                          Assign
+                        </Button>
+                      </Group>
+                    </form>
+                    <Text>|</Text>
                     <Tooltip label="Reject incident">
                       <ActionIcon
                         variant="gradient"
