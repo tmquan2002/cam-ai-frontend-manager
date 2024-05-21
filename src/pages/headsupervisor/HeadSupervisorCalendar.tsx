@@ -52,7 +52,7 @@ import { Role } from "../../models/CamAIEnum";
 import { modals } from "@mantine/modals";
 import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
 import { notifications } from "@mantine/notifications";
-import { NotificationColorPalette } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, NotificationColorPalette } from "../../types/constant";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
@@ -429,7 +429,7 @@ const HeadSupervisorCalendar = () => {
               variant="separated"
               radius="md"
               mt={rem(20)}
-              defaultValue={"0"}
+              defaultValue={DEFAULT_PAGE_SIZE}
             >
               {reverseSupervisorList?.map((i, index) => {
                 return (

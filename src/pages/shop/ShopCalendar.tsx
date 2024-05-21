@@ -31,7 +31,7 @@ import {
   startOfMonth,
 } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
-import { NotificationColorPalette } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, NotificationColorPalette } from "../../types/constant";
 import classes from "./ShopCalendar.module.scss";
 import clsx from "clsx";
 import {
@@ -635,7 +635,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
               variant="separated"
               radius="md"
               mt={rem(20)}
-              defaultValue={"0"}
+              defaultValue={DEFAULT_PAGE_SIZE}
             >
               {reverseSupervisorList?.map((i, index) => {
                 return (

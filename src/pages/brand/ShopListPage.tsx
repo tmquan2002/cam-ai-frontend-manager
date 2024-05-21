@@ -13,7 +13,7 @@ import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
 import { GetShopListHookParams, useGetShopList, } from "../../hooks/useGetShopList";
 import { ShopStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { formatTime, mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopListPage.module.scss";
 import { useTaskBrand } from "../../routes/BrandRoute";
@@ -33,7 +33,7 @@ const ShopListPage = () => {
 
   const { taskId } = useTaskBrand();
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
   const form = useForm<SearchShopField>({
     initialValues: {
       status: null,
@@ -48,7 +48,7 @@ const ShopListPage = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: Number(pageSize),
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       pageIndex: activePage - 1,
       status: form.values.status ?? null,
       enabled: true,
@@ -272,7 +272,7 @@ const ShopListPage = () => {
             label="Page Size"
             allowDeselect={false}
             placeholder="0"
-            data={PAGE_SIZE_SELECT} defaultValue={"5"}
+            data={PAGE_SIZE_SELECT} defaultValue={DEFAULT_PAGE_SIZE}
             value={pageSize}
             onChange={(value) => {
               setPageSize(value)

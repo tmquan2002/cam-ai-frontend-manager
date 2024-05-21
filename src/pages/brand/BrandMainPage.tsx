@@ -59,7 +59,7 @@ import {
 import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import {
   formatTime,
   isEmpty,
@@ -88,7 +88,7 @@ const BrandMainPage = () => {
   const [search, setSearch] = useState<string | number>("");
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
@@ -102,7 +102,7 @@ const BrandMainPage = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: Number(pageSize),
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       enabled: !isEmpty(data?.values?.[0]?.id),
       brandId: data?.values[0]?.id,
       pageIndex: activePage - 1,
@@ -543,7 +543,7 @@ const BrandMainPage = () => {
                   label="Page Size"
                   allowDeselect={false}
                   placeholder="0"
-                  data={PAGE_SIZE_SELECT} defaultValue={"5"}
+                  data={PAGE_SIZE_SELECT} defaultValue={DEFAULT_PAGE_SIZE}
                   value={pageSize}
                   onChange={(value) => {
                     setPageSize(value)

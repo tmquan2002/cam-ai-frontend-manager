@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/badge/StatusBadge";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { AccountDetail } from "../../models/Account";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
 import { useTaskBrand } from "../../routes/BrandRoute";
@@ -34,10 +34,10 @@ const BrandShopManagerListPage = () => {
   const [search, setSearch] = useState<string>("");
   const [debounced] = useDebouncedValue(search, 400);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
 
   const { data, isLoading } = useGetAccountList({
-    size: Number(pageSize),
+    size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
     pageIndex: activePage - 1,
     name: debounced,
     role: Role.ShopManager,
@@ -171,7 +171,7 @@ const BrandShopManagerListPage = () => {
               allowDeselect={false}
               placeholder="0"
               data={PAGE_SIZE_SELECT}
-              defaultValue={"5"}
+              defaultValue={DEFAULT_PAGE_SIZE}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value);

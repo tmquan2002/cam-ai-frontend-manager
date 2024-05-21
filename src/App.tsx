@@ -34,8 +34,6 @@ const theme = createTheme({
 });
 
 //TODO: Add a new page to show import result for notification button and notification progress bar
-//TODO: Fix Create Shop, filter shop manager. Fix Update Shop
-//TODO: Shop Manager list, filter just shop manager
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">

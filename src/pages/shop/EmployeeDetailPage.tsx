@@ -42,7 +42,7 @@ import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useTaskShop } from "../../routes/ShopRoute";
-import { EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
@@ -144,7 +144,7 @@ const EmployeeDetailPage = () => {
         className={classes["clickable"]}
         onClick={() => navigate(`/shop/incident/${row.id}`)}
       >
-        <Table.Td>{index + 1 + Number(12) * (activePage - 1)}</Table.Td>
+        <Table.Td>{index + 1 + Number(DEFAULT_PAGE_SIZE) * (activePage - 1)}</Table.Td>
         <Table.Td>
           <Text>{row.incidentType}</Text>
         </Table.Td>
@@ -416,7 +416,7 @@ const EmployeeDetailPage = () => {
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((incidentList?.totalCount ?? 0) / 12)}
+            total={Math.ceil((incidentList?.totalCount ?? 0) / Number(DEFAULT_PAGE_SIZE))}
           />
         </Group>
       </Paper>
