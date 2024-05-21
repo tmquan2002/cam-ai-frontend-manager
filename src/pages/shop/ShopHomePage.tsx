@@ -10,6 +10,7 @@ import {
   Text,
   Transition,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import * as _ from "lodash";
 import classes from "./ShopHomePage.module.scss";
@@ -122,8 +123,8 @@ const IncidentCard = ({
                     status == IncidentStatus.Accepted
                       ? NotificationColorPalette.UP_COMING
                       : status == IncidentStatus.New
-                      ? NotificationColorPalette.UNAPPROVED
-                      : NotificationColorPalette.ALERT_MESSAGE
+                        ? NotificationColorPalette.UNAPPROVED
+                        : NotificationColorPalette.ALERT_MESSAGE
                   }
                 >
                   {status}
@@ -148,6 +149,7 @@ const IncidentCard = ({
 const ShopHomePage = () => {
   const { lastJsonMessage: humanCountData } = useReports();
   const { lastJsonMessage, readyState } = useGetNewIncident();
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
   const [incidentList, setIncidentList] = useState<IncidentDetail[]>([]);
   const { data: currentIncidentData, isLoading: isGetCurrentIncidentListData } =
@@ -312,18 +314,14 @@ const ShopHomePage = () => {
 
   return (
     <Box m={rem(32)}>
-      <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(24)}>
+      <Text c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"} fw={600} size={rem(17)} mb={rem(24)}>
         Current statistic
       </Text>
       <Box>{renderStatisticContent()}</Box>
 
       <Text
-        c={"rgb(17, 24, 39)"}
-        fw={600}
-        size={rem(17)}
-        mb={rem(24)}
-        mt={rem(32)}
-      >
+        c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+        fw={600} size={rem(17)} mb={rem(24)} mt={rem(32)}>
         Shop live camera
       </Text>
       {renderCameraContent()}

@@ -15,7 +15,7 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
@@ -41,7 +41,8 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { DEFAULT_PAGE_SIZE, EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
@@ -73,6 +74,7 @@ const EmployeeDetailPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [activePage, setPage] = useState(1);
+  const { taskId } = useTaskShop();
 
   const [opened, { open, close }] = useDisclosure(false);
   const {
@@ -90,14 +92,15 @@ const EmployeeDetailPage = () => {
   const updateEmployeeForm = useForm<CreateEmployeeField>({
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         isEmpty(value)
           ? null
           : PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+            ? null
+            : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
@@ -141,7 +144,7 @@ const EmployeeDetailPage = () => {
         className={classes["clickable"]}
         onClick={() => navigate(`/shop/incident/${row.id}`)}
       >
-        <Table.Td>{index + 1 + Number(12) * (activePage - 1)}</Table.Td>
+        <Table.Td>{index + 1 + Number(DEFAULT_PAGE_SIZE) * (activePage - 1)}</Table.Td>
         <Table.Td>
           <Text>{row.incidentType}</Text>
         </Table.Td>
@@ -164,6 +167,7 @@ const EmployeeDetailPage = () => {
           label: "Name",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -175,6 +179,7 @@ const EmployeeDetailPage = () => {
           label: "Email",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -187,6 +192,7 @@ const EmployeeDetailPage = () => {
           name: "gender",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -200,6 +206,7 @@ const EmployeeDetailPage = () => {
           placeholder: "Phone",
           label: "Phone",
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -212,6 +219,7 @@ const EmployeeDetailPage = () => {
           label: "Birthday",
           maxDate: getDateFromSetYear(18),
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -226,6 +234,7 @@ const EmployeeDetailPage = () => {
           name: "province",
           loading: isProvicesLoading,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -241,6 +250,7 @@ const EmployeeDetailPage = () => {
           name: "district",
           loading: isDistrictsLoading,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -255,7 +265,7 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "wardId",
           radius: "md",
-
+          disabled: taskId !== undefined,
           loading: isWardsLoading,
         },
         spans: 4,
@@ -267,7 +277,7 @@ const EmployeeDetailPage = () => {
           name: "addressLine",
           placeholder: "Employee address",
           radius: "md",
-
+          disabled: taskId !== undefined,
           label: "Employee address",
         },
       },
@@ -295,7 +305,7 @@ const EmployeeDetailPage = () => {
             </Text>
           </Group>
 
-          <ActionIcon color="red" onClick={open} size={"lg"}>
+          <ActionIcon color="red" onClick={open} size={"lg"} disabled={taskId !== undefined}>
             <IconTrash style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>
         </Group>
@@ -406,7 +416,7 @@ const EmployeeDetailPage = () => {
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((incidentList?.totalCount ?? 0) / 12)}
+            total={Math.ceil((incidentList?.totalCount ?? 0) / Number(DEFAULT_PAGE_SIZE))}
           />
         </Group>
       </Paper>
@@ -419,7 +429,7 @@ const EmployeeDetailPage = () => {
             Confirm delete <Mark>{employeeData?.name}</Mark> employee?
           </Text>
         }
-        // centered
+      // centered
       >
         <Group justify="flex-end" mt="md">
           <Button

@@ -29,7 +29,7 @@ import EditAndUpdateForm, {
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import classes from "./BrandInteractionList.module.scss";
 
 type SearchIncidentField = {
@@ -49,7 +49,7 @@ const BrandInteractionList = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("20");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
@@ -76,7 +76,7 @@ const BrandInteractionList = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: Number(pageSize),
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       pageIndex: activePage - 1,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
@@ -246,7 +246,7 @@ const BrandInteractionList = () => {
             label="Page Size"
             allowDeselect={false}
             placeholder="0"
-            data={PAGE_SIZE_SELECT} defaultValue={"20"}
+            data={PAGE_SIZE_SELECT} defaultValue={DEFAULT_PAGE_SIZE}
             value={pageSize}
             onChange={(value) => {
               setPageSize(value)

@@ -36,9 +36,10 @@ import EditAndUpdateForm, {
 } from "../../components/form/EditAndUpdateForm";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import * as _ from "lodash";
+import { useTaskShop } from "../../routes/ShopRoute";
 
 type SearchShopField = {
   employeeStatus: string | null;
@@ -57,10 +58,11 @@ const EmployeeListPage = () => {
     },
   });
 
+  const { taskId } = useTaskShop();
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
   const [search, setSearch] = useState<string>("");
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
     SearchCategory.NAME
@@ -85,7 +87,7 @@ const EmployeeListPage = () => {
 
   const searchParams: GetEmployeeListParams = useMemo(() => {
     let sb: GetEmployeeListParams = {
-      size: Number(pageSize),
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       pageIndex: activePage - 1,
       // employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
       search: debounced.toString() || "",
@@ -123,7 +125,7 @@ const EmployeeListPage = () => {
         <Table.Td>{replaceIfNun(row.birthday)}</Table.Td>
         <Table.Td>{replaceIfNun(row.gender)}</Table.Td>
         <Table.Td ta={"center"}>
-          <StatusBadge statusName={row?.employeeStatus || "None"} padding={10} size="sm"/>
+          <StatusBadge statusName={row?.employeeStatus || "None"} padding={10} size="sm" />
         </Table.Td>
       </Table.Tr>
     </Tooltip>
@@ -193,6 +195,7 @@ const EmployeeListPage = () => {
         <Button
           onClick={() => navigate("/shop/employee/create")}
           leftSection={<IconPlus size={14} />}
+          disabled={taskId != undefined}
         >
           Add Employee
         </Button>
@@ -283,7 +286,7 @@ const EmployeeListPage = () => {
               allowDeselect={false}
               placeholder="0"
               data={PAGE_SIZE_SELECT}
-              defaultValue={"5"}
+              defaultValue={DEFAULT_PAGE_SIZE}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value);

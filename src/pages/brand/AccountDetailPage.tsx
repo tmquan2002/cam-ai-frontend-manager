@@ -10,7 +10,7 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
@@ -26,6 +26,7 @@ import CustomBreadcrumb, {
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
+import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
 import { useGetAccountById } from "../../hooks/useGetAccountById";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
@@ -33,9 +34,8 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateAccount } from "../../hooks/useUpdateAccount";
 import { AccountStatus, Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { PHONE_REGEX } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
-import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
+import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -75,14 +75,15 @@ const AccountDetailPage = () => {
     },
     validate: {
       name: isNotEmpty("Name is required"),
-      email: isEmail("Invalid email - ex: name@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         isEmpty(value)
           ? null
           : PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+            ? null
+            : "A phone number should have a length of 10-12 characters",
     },
   });
   const { data: provinces, isLoading: isProvicesLoading } =
@@ -321,7 +322,7 @@ const AccountDetailPage = () => {
                 Confirm delete <Mark>{accountData?.name}</Mark> account?
               </Text>
             }
-            // centered
+          // centered
           >
             <Group justify="flex-end" mt="md">
               <Button

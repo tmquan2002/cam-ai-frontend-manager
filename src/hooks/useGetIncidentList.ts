@@ -1,9 +1,8 @@
-import { UseQueryResult, useQuery } from "react-query";
-import { CommonResponse } from "../models/Common";
-import { GetIncidentParams, IncidentApi } from "../apis/IncidentAPI";
-import { IncidentDetail } from "../models/Incident";
-import { IncidentType } from "../models/CamAIEnum";
 import _ from "lodash";
+import { UseQueryResult, useQuery } from "react-query";
+import { GetIncidentParams, IncidentApi } from "../apis/IncidentAPI";
+import { CommonResponse } from "../models/Common";
+import { IncidentDetail } from "../models/Incident";
 
 
 export type IncidentDetailWithChecked = IncidentDetail & {
@@ -44,12 +43,11 @@ export const useGetOrderedIncidentListChecked = (params: GetIncidentParams) => {
         response?.values || [],
         ["startTime"],
         ["desc"]
-      ).filter((i) => i.incidentType != IncidentType.Interaction)
-        .map((item) => ({
-          ...item,
-          checked: false,
-          disabled: false,
-        }))
+      ).map((item) => ({
+        ...item,
+        checked: false,
+        disabled: false,
+      }))
       return { ...response, values: orderedCheckedResponse }
     },
   });

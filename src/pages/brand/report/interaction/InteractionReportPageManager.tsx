@@ -1,4 +1,4 @@
-import { Box, Card, Group, Loader, Select, Text, rem } from "@mantine/core";
+import { Box, Card, Group, Loader, Select, Text, rem, useComputedColorScheme } from "@mantine/core";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -41,6 +41,7 @@ type SearchIncidentField = {
   interval: ReportInterval;
 };
 const InteractionReportPageManager = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
     enabled: true,
     size: 999,
@@ -58,14 +59,14 @@ const InteractionReportPageManager = () => {
     validate: (values) => ({
       toDate:
         values.startDate &&
-        values?.toDate &&
-        values?.toDate?.getTime() < values?.startDate?.getTime()
+          values?.toDate &&
+          values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toDate &&
-        values?.startDate &&
-        values?.toDate?.getTime() < values?.startDate?.getTime()
+          values?.startDate &&
+          values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -178,10 +179,11 @@ const InteractionReportPageManager = () => {
   }, [form]);
 
   return (
-    <Box pb={rem(40)} mx={rem(20)} mt={rem(12)}>
-      <Group my={rem(20)} justify="space-between">
+    <Box px={rem(40)} flex={1} pt={rem(20)}
+      bg={computedColorScheme == "light" ? "#f6f8fc" : "#1a1a1a"}>
+      <Group align="center" my={rem(20)} justify="space-between">
         <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
-          INTERACTION REPORT
+          Interaction Report
         </Text>
         {isGetShopListLoading ? (
           <Loader />
@@ -189,16 +191,25 @@ const InteractionReportPageManager = () => {
           <Select
             value={selectedShop}
             onChange={setSelectedShop}
-            size="md"
+            size="sm"
+            radius={rem(8)}
             w={rem(320)}
+            style={{
+              fontWeight: 500,
+            }}
+            styles={{
+              dropdown: {
+                fontWeight: 500,
+              },
+            }}
             data={
               shopList
                 ? shopList?.values.map((item) => {
-                    return {
-                      value: item?.id,
-                      label: item?.name,
-                    };
-                  })
+                  return {
+                    value: item?.id,
+                    label: item?.name,
+                  };
+                })
                 : []
             }
             placeholder={"Select a shop"}
@@ -206,9 +217,10 @@ const InteractionReportPageManager = () => {
         )}
       </Group>
 
-      <Card shadow="xs" pb={rem(40)}>
-        <Card.Section withBorder inheritPadding mb={rem(32)}>
-          <Group justify="space-between" my={rem(20)}>
+      <Card shadow="xs" pb={rem(20)}
+        bg={computedColorScheme == "light" ? "white" : "#242424"}>
+        <Card.Section withBorder inheritPadding mb={rem(16)}>
+          <Group justify="space-between" my={rem(20)} mx={rem(32)}>
             <Text size="lg" fw={500}>
               Interaction count indicators
             </Text>
@@ -229,8 +241,8 @@ const InteractionReportPageManager = () => {
         </Card.Section>
 
         {!selectedShop ? (
-          <Text c={"blue"} size="xl" fw={700}>
-            Please select shop
+          <Text size="md" fw={500} ta="center">
+            No Shop Selected
           </Text>
         ) : !incidentReportByTimeData ||
           incidentReportByTimeData?.data?.length == 0 ? (
@@ -248,12 +260,12 @@ const InteractionReportPageManager = () => {
               style={
                 data && data?.length > 7
                   ? {
-                      width: `${1500 + (data?.length - 7) * 30}px`,
-                      height: "600px",
-                    }
+                    width: `${1500 + (data?.length - 7) * 30}px`,
+                    height: "600px",
+                  }
                   : {
-                      height: "600px",
-                    }
+                    height: "600px",
+                  }
               }
             >
               <Line

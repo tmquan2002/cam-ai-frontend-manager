@@ -1,21 +1,23 @@
-import { Navigate, Outlet, useOutletContext } from "react-router-dom";
+import { Link, Navigate, Outlet, useOutletContext } from "react-router-dom";
 import { getUserRole } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { ShopNavbar } from "../components/navbar/ShopNavbar";
-import { AppShell, useComputedColorScheme } from "@mantine/core";
+import { AppShell, Text, rem, useComputedColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import ShopHeader from "../components/header/ShopHeader";
 import { Role } from "../models/CamAIEnum";
 import { useGetEmployeeProgress } from "../hooks/useFiles";
 import { notifications } from "@mantine/notifications";
-import { ProgressTask } from "../models/Progress";
+import { ProgressTask } from "../models/Task";
+import { CommonConstant, POLLING_INTERVAL } from "../types/constant";
+import { IconCheck } from "@tabler/icons-react";
 
 const ShopRoute = () => {
-  const [taskId, setTaskId] = useState<string | null>(null);
+  const [taskId, setTaskId] = useState<string | undefined>(localStorage.getItem(CommonConstant.TASK_ID) ?? undefined);
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.ShopManager);
-  const { data: dataProgress } = useGetEmployeeProgress(taskId, 1000);
+  const { data: dataProId } = useGetEmployeeProgress(taskId, POLLING_INTERVAL);
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -27,12 +29,12 @@ const ShopRoute = () => {
   }, []);
 
   useEffect(() => {
-    console.log(dataProgress)
-    if (dataProgress?.percents !== 100) {
+    // console.log("in use effect")
+    if (dataProId?.dataProgress?.percents !== 100) {
       notifications.update({
         id: "uploadEmployeeProgress",
         title: "Import in progress",
-        message: `${dataProgress?.detailed?.currentFinishedRecord}/${dataProgress?.detailed?.total} Done (${dataProgress?.percents ? Math.round(dataProgress?.percents) : 0} %)`,
+        message: `${dataProId?.dataProgress?.detailed?.currentFinishedRecord}/${dataProId?.dataProgress?.detailed?.total} Done (${dataProId?.dataProgress?.percents ? Math.round(dataProId?.dataProgress?.percents) : 0} %)`,
         autoClose: false,
         loading: true,
       });
@@ -41,13 +43,14 @@ const ShopRoute = () => {
         color: 'teal',
         id: "uploadEmployeeProgress",
         title: "Import Finished",
-        message: "Upload Complete",
+        message: <Link to={`/shop/import/${taskId}`} style={{ textDecoration: 'none' }}><Text >View Import Detail</Text></Link>,
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
         loading: false,
         autoClose: 5000,
       });
-      setTaskId(null)
+      setTaskId(undefined)
     }
-  }, [dataProgress, taskId])
+  }, [dataProId])
 
   switch (userRole) {
     case Role.ShopManager:

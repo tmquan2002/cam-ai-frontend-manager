@@ -17,7 +17,13 @@
 }
 
 .static-card-title {
-  color: #5f6980;
+  @include light {
+    color: #5f6980;
+  }
+
+  @include dark {
+    color: white;
+  }
   font-size: rem(15);
   font-style: normal;
   font-weight: 500;

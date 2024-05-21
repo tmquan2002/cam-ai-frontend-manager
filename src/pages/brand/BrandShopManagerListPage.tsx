@@ -22,21 +22,25 @@ import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/badge/StatusBadge";
 import { useGetAccountList } from "../../hooks/useGetAccounts";
 import { AccountDetail } from "../../models/Account";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
+import { Role } from "../../models/CamAIEnum";
 
 const BrandShopManagerListPage = () => {
   const navigate = useNavigate();
+  const { taskId } = useTaskBrand();
   const [search, setSearch] = useState<string>("");
   const [debounced] = useDebouncedValue(search, 400);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
 
   const { data, isLoading } = useGetAccountList({
-    size: Number(pageSize),
+    size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
     pageIndex: activePage - 1,
     name: debounced,
+    role: Role.ShopManager,
   });
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +70,7 @@ const BrandShopManagerListPage = () => {
       <Table.Td ta="center">
         <StatusBadge statusName={row?.accountStatus} size="sm" padding={10} />
       </Table.Td>
-      <Table.Td ta="right">
+      <Table.Td ta="left">
         {row?.managingShop ? (
           <Tooltip label="View Shop" withArrow position="top-end">
             <Text
@@ -88,7 +92,7 @@ const BrandShopManagerListPage = () => {
     <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Group pb={12} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Shop manager list
+          Shop Managers
         </Text>
       </Group>
 
@@ -111,6 +115,7 @@ const BrandShopManagerListPage = () => {
           ml={rem(20)}
           leftSection={<IconPlus size={14} />}
           onClick={() => navigate("/brand/create/manager")}
+          disabled={taskId != undefined}
         >
           Add manager
         </Button>
@@ -147,7 +152,7 @@ const BrandShopManagerListPage = () => {
                   <Table.Th>Birthday</Table.Th>
                   <Table.Th>Gender</Table.Th>
                   <Table.Th ta="center">Status</Table.Th>
-                  <Table.Th ta="right">Managing shop</Table.Th>
+                  <Table.Th ta="left">Managing shop</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>{rows}</Table.Tbody>
@@ -166,7 +171,7 @@ const BrandShopManagerListPage = () => {
               allowDeselect={false}
               placeholder="0"
               data={PAGE_SIZE_SELECT}
-              defaultValue={"5"}
+              defaultValue={DEFAULT_PAGE_SIZE}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value);

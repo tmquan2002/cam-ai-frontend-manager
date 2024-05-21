@@ -2,9 +2,10 @@ import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
-import _ from "lodash";
+import _, { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
@@ -22,13 +23,12 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { EMAIL_REGEX } from "../../types/constant";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { CommonConstant, EMAIL_REGEX } from "../../types/constant";
 import {
   getDateFromSetYear,
   mapLookupToArray,
 } from "../../utils/helperFunction";
-import { useTaskShop } from "../../routes/ShopRoute";
-import { IconCheck, IconX } from "@tabler/icons-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -54,7 +54,7 @@ const CreateEmployeePage = () => {
   const navigate = useNavigate();
   const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
     useDisclosure(false);
-  const { setTaskId } = useTaskShop();
+  const { taskId, setTaskId } = useTaskShop();
 
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
@@ -70,8 +70,8 @@ const CreateEmployeePage = () => {
     },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: (value) =>
-        EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      email: (value: string) => isEmpty(value) ? "Email is required"
+      : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -106,6 +106,7 @@ const CreateEmployeePage = () => {
           label: "Name",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -117,6 +118,7 @@ const CreateEmployeePage = () => {
           label: "Email",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -129,6 +131,7 @@ const CreateEmployeePage = () => {
           name: "gender",
           required: true,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -142,6 +145,7 @@ const CreateEmployeePage = () => {
           placeholder: "Phone",
           label: "Phone",
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -154,6 +158,7 @@ const CreateEmployeePage = () => {
           label: "Birthday",
           maxDate: getDateFromSetYear(18),
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -167,7 +172,7 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "province",
           radius: "md",
-
+          disabled: taskId !== undefined,
           loading: isProvicesLoading,
         },
         spans: 4,
@@ -184,6 +189,7 @@ const CreateEmployeePage = () => {
           name: "district",
           loading: isDistrictsLoading,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -199,6 +205,7 @@ const CreateEmployeePage = () => {
           name: "wardId",
           loading: isWardsLoading,
           radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -210,6 +217,7 @@ const CreateEmployeePage = () => {
           placeholder: "Employee address",
           label: "Employee address",
           radius: "md",
+          disabled: taskId !== undefined,
         },
       },
     ];
@@ -237,6 +245,7 @@ const CreateEmployeePage = () => {
           accept: ".csv",
           width: 300,
           required: true,
+          disabled: taskId !== undefined,
         },
       },
     ];
@@ -254,7 +263,7 @@ const CreateEmployeePage = () => {
               New employee
             </Text>
           </Group>
-          <Button onClick={openMassImport}>Import File</Button>
+          <Button onClick={openMassImport} disabled={taskId !== undefined}>Import File</Button>
         </Group>
 
         <form
@@ -296,7 +305,7 @@ const CreateEmployeePage = () => {
           <Group justify="flex-end" mt="md">
             <Button
               type="submit"
-              disabled={!createEmployeeForm.isDirty()}
+              disabled={!createEmployeeForm.isDirty() || taskId !== undefined}
               loading={isCreateEmployeeLoading}
             >
               Create
@@ -318,39 +327,55 @@ const CreateEmployeePage = () => {
           autoComplete="off"
           onSubmit={massImportForm.onSubmit(({ file }) => {
             // console.log(file)
+            notifications.show({
+              id: "uploadEmployeeProgress",
+              title: "Notice",
+              color: "light-blue.4",
+              message: "Import in progress",
+              autoClose: false,
+              withCloseButton: false,
+              icon: (
+                <IconCheck style={{ width: rem(18), height: rem(18) }} />
+              ),
+              loading: true,
+            });
             uploadEmployee(
-              { file },
-              {
-                onSuccess(data) {
-                  closeMassImport();
-                  notifications.show({
-                    id: "uploadEmployeeProgress",
-                    title: "Notice",
-                    message: "Import in progress",
-                    autoClose: false,
-                    withCloseButton: false,
-                    icon: (
-                      <IconCheck style={{ width: rem(18), height: rem(18) }} />
-                    ),
-                    loading: true,
-                  });
-                  setTaskId(data.taskId);
-                },
-                onError(data) {
-                  const error = data as AxiosError<ResponseErrorDetail>;
-                  notifications.show({
-                    id: "uploadEmployeeProgress",
-                    color: "red",
-                    title: "Failed",
-                    message:
-                      error.response?.data?.message ||
-                      "Something wrong happen trying to upload the file",
-                    autoClose: 5000,
-                    icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
-                    loading: false,
-                  });
-                },
-              }
+              { file }, {
+              onSuccess(data) {
+                closeMassImport();
+                massImportForm.reset();
+                // console.log(data.taskId)
+
+                setTaskId(data.taskId);
+                localStorage.setItem(CommonConstant.TASK_ID, data?.taskId)
+                notifications.show({
+                  id: "uploadEmployeeProgress",
+                  title: "Notice",
+                  color: "light-blue.4",
+                  message: "Import in progress",
+                  autoClose: false,
+                  withCloseButton: false,
+                  icon: (
+                    <IconCheck style={{ width: rem(18), height: rem(18) }} />
+                  ),
+                  loading: true,
+                });
+              },
+              onError(data) {
+                const error = data as AxiosError<ResponseErrorDetail>;
+                notifications.show({
+                  id: "uploadEmployeeProgress",
+                  color: "red",
+                  title: "Failed",
+                  message:
+                    error.response?.data?.message ||
+                    "Something wrong happen trying to upload the file",
+                  autoClose: 5000,
+                  icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                  loading: false,
+                });
+              },
+            }
             );
           })}
         >
@@ -359,7 +384,7 @@ const CreateEmployeePage = () => {
             <DownloadButton type="employee" />
           </Group>
           <Group mt="md">
-            <Button type="submit" loading={isUploadEmployeeLoading}>
+            <Button type="submit" loading={isUploadEmployeeLoading} disabled={taskId !== undefined}>
               Import
             </Button>
             <Button

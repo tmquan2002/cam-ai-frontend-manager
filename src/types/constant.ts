@@ -4,6 +4,7 @@ export enum CommonConstant {
   SESSION = "session",
   USER_ACCESS_TOKEN = "user_access_token",
   USER_REFRESH_TOKEN = "user_refresh_token",
+  TASK_ID = "task_id"
 }
 
 //Tips: Install "Colorize" extention and Add Typescript file in settings.json for easier to see color
@@ -83,9 +84,10 @@ type RGB = `rgb(${number}, ${number}, ${number})`;
 type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
 type HEX = `#${string}`;
 
-export const PAGE_SIZE_SELECT = ['5', '6', '8', '10', '12', '15', '17', '20']
+export const DEFAULT_PAGE_SIZE = '20'
+export const PAGE_SIZE_SELECT = ['10', '15', '20']
 export type Color = RGB | RGBA | HEX;
-export const PHONE_REGEX = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g;
-export const EMAIL_REGEX = /^\S+@(\S+\.)+\S{2,4}$/g;
+export const PHONE_REGEX = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+export const EMAIL_REGEX = /^\S+@(\S+\.)+\S{2,4}$/;
 export const URL_REGEX = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
-export const POLLING_INTERVAL = 5000
+export const POLLING_INTERVAL = 1000

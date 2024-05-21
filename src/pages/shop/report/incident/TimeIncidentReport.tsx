@@ -643,9 +643,7 @@ const TimeIncidentReport = () => {
                     <Text
                       py={rem(20)}
                       ta={"center"}
-                      c={"rgb(17, 24, 39)"}
                       fw={500}
-                      bg={"#f9fafb"}
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
@@ -705,9 +703,7 @@ const TimeIncidentReport = () => {
                     <Text
                       py={rem(20)}
                       ta={"center"}
-                      c={"rgb(17, 24, 39)"}
                       fw={500}
-                      bg={"#f9fafb"}
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),

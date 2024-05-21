@@ -17,8 +17,7 @@ import {
   Skeleton,
   Text,
   Tooltip,
-  rem,
-  useComputedColorScheme
+  rem
 } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure, useListState } from "@mantine/hooks";
@@ -66,6 +65,7 @@ import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopIncidentListPage.module.scss";
+import { Link } from "react-router-dom";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -89,10 +89,6 @@ const ShopIncidentListPage = () => {
   const [selectedPopoverOpened, { toggle: toggleSelectedPopover, close: closeSelectedPopover }] = useDisclosure(false);
   const [assignPopoverOpened, { toggle: toggleAssignPopover, close: closeAssignPopover }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-
-  const computedColorScheme = useComputedColorScheme("light", {
-    getInitialValueInEffect: true,
-  });
   const [selectedIncident, setSelectedIncident] = useState<{
     id: string;
   } | null>(null);
@@ -195,7 +191,7 @@ const ShopIncidentListPage = () => {
       fromTime: null,
       status: null,
       toTime: null,
-      incidentType: null,
+      incidentType: IncidentType.Incident,
       size: 20,
       pageIndex: activePage - 1,
     },
@@ -526,7 +522,7 @@ const ShopIncidentListPage = () => {
               <Tooltip label="Select All">
                 <ActionIcon
                   variant="subtle"
-                  color={computedColorScheme == "dark" ? "white" : "black"}
+                  color={"gray"}
                   onClick={() => {
                     handlers.setState((current) =>
                       current.map((value) => ({ ...value, checked: !allChecked }))
@@ -547,8 +543,7 @@ const ShopIncidentListPage = () => {
                 <Popover.Target>
                   <Tooltip label="Assign selected" withArrow>
                     <ActionIcon
-                      variant="subtle"
-                      color={computedColorScheme == "dark" ? "white" : "black"}
+                      variant="subtle" color={"gray"}
                       onClick={toggleSelectedPopover}
                     >
                       <IconUserUp size={20} />
@@ -596,8 +591,7 @@ const ShopIncidentListPage = () => {
             {selectedCount > 0 &&
               <Tooltip label="Reject selected" withArrow>
                 <ActionIcon
-                  variant="subtle"
-                  color={computedColorScheme == "dark" ? "white" : "black"}
+                  variant="subtle" color={"gray"}
                   onClick={openMassRejectModal}
                   loading={isMassRejectIncidentLoading}
                 >
@@ -611,10 +605,9 @@ const ShopIncidentListPage = () => {
             }
 
             <Tooltip label="Filter" withArrow>
-              <ActionIcon
+              <ActionIcon color={"gray"}
                 variant={openedFilter ? "filled" : "subtle"}
                 onClick={toggleFilter}
-                color={computedColorScheme == "dark" ? "white" : "black"}
               >
                 <IconFilter size={20} />
               </ActionIcon>
@@ -637,10 +630,9 @@ const ShopIncidentListPage = () => {
       </Group>
 
       {/* Filter collapse section */}
-      <Collapse px={rem(28)} in={openedFilter} mb={"xl"} mt={"md"}>
+      <Collapse px={rem(28)} in={openedFilter} mb={"lg"} mt={"md"}>
         <Divider />
-        <Group mt={20} justify="space-between">
-          <Text fw="bold" size="sm">Filter Incident</Text>
+        <Group mt={10} justify="right">
           {form.isDirty() ? (
             <Button variant="transparent" onClick={form.reset}>
               Clear all filter
@@ -676,23 +668,30 @@ const ShopIncidentListPage = () => {
             <Skeleton visible={isGetIncidentLoading}>
               <Box pl={rem(12)} pr={rem(32)}>
                 <Group justify="space-between" align="center">
-                  <Group py={rem(32)} align="center">
-                    <Text size={rem(20)} fw={500}>
-                      {incidentData?.incidentType} Incident
-                    </Text>
-                    <Text>|</Text>
-                    <Text size={rem(20)} fw={500} c={"dimmed"}>
-                      {" "}
-                      {dayjs(incidentData?.startTime).format(
-                        "DD/MM/YYYY h:mm A"
-                      )}
-                    </Text>
-                    <StatusBadge
-                      statusName={incidentData?.status || "None"}
-                      size="sm"
-                      padding={10}
-                    />
-                  </Group>
+                  <Box py={rem(16)} >
+                    <Group align="center">
+                      <Text size={rem(20)} fw={500}>
+                        {incidentData?.incidentType} Incident
+                      </Text>
+                      <Text>|</Text>
+                      <Text size={rem(20)} fw={500} c={"dimmed"}>
+                        {" "}
+                        {dayjs(incidentData?.startTime).format(
+                          "DD/MM/YYYY h:mm A"
+                        )}
+                      </Text>
+                      <StatusBadge
+                        statusName={incidentData?.status || "None"}
+                        size="sm"
+                        padding={10}
+                      />
+                    </Group>
+                    {incidentData?.employee &&
+                      <Text size={rem(18)} mt={5}>
+                        Employee: <Link to={`/shop/employee/${incidentData?.employee?.id}`} style={{ textDecoration: 'None' }}>{incidentData?.employee?.name}</Link>
+                      </Text>
+                    }
+                  </Box>
 
                   {/* Single assign form */}
                   <Group>
