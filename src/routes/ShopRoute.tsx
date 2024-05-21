@@ -1,8 +1,8 @@
-import { Navigate, Outlet, useOutletContext } from "react-router-dom";
+import { Link, Navigate, Outlet, useOutletContext } from "react-router-dom";
 import { getUserRole } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { ShopNavbar } from "../components/navbar/ShopNavbar";
-import { AppShell, useComputedColorScheme } from "@mantine/core";
+import { AppShell, Text, rem, useComputedColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import ShopHeader from "../components/header/ShopHeader";
 import { Role } from "../models/CamAIEnum";
@@ -10,6 +10,7 @@ import { useGetEmployeeProgress } from "../hooks/useFiles";
 import { notifications } from "@mantine/notifications";
 import { ProgressTask } from "../models/Task";
 import { CommonConstant, POLLING_INTERVAL } from "../types/constant";
+import { IconCheck } from "@tabler/icons-react";
 
 const ShopRoute = () => {
   const [taskId, setTaskId] = useState<string | undefined>(localStorage.getItem(CommonConstant.TASK_ID) ?? undefined);
@@ -42,7 +43,8 @@ const ShopRoute = () => {
         color: 'teal',
         id: "uploadEmployeeProgress",
         title: "Import Finished",
-        message: "Upload Complete",
+        message: <Link to={`/shop/import/${taskId}`} style={{ textDecoration: 'none' }}><Text >View Import Detail</Text></Link>,
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
         loading: false,
         autoClose: 5000,
       });

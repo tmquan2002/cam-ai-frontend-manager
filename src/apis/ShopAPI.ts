@@ -142,7 +142,7 @@ export const ShopAPI = {
     return res?.data;
   },
 
-  _getShopUpsertTaskResult: async (taskId: string) => {
+  _getShopUpsertTaskResult: async (taskId: string | undefined) => {
     const access_token = getAccessToken();
 
     const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/result`, {

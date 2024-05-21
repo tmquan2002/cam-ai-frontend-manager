@@ -26,6 +26,7 @@ import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandShopManagerListPage.module.scss";
 import { useTaskBrand } from "../../routes/BrandRoute";
+import { Role } from "../../models/CamAIEnum";
 
 const BrandShopManagerListPage = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const BrandShopManagerListPage = () => {
     size: Number(pageSize),
     pageIndex: activePage - 1,
     name: debounced,
+    role: Role.ShopManager,
   });
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {

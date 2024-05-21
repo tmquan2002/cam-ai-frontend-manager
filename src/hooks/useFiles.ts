@@ -85,9 +85,9 @@ export const useGetShopUpsertTask = () => {
     return { isError, isLoading, data, error };
 };
 
-export const useGetShopUpsertTaskResult = (taskId: string) => {
+export const useGetShopUpsertTaskResult = (taskId: string | undefined) => {
     const { isError, isLoading, data, error, refetch }: UseQueryResult<TaskResult, Error> = useQuery({
-        queryKey: ["getShopUpsertTaskResult"],
+        queryKey: ["getShopUpsertTaskResult", taskId],
         queryFn: async () => {
             return await ShopAPI._getShopUpsertTaskResult(taskId);
         },

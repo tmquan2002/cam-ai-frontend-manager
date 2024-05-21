@@ -23,6 +23,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { useTaskBrand } from "../../routes/BrandRoute";
 import { CommonConstant, PHONE_REGEX } from "../../types/constant";
 import CreateShopManagerForm from "./manager/CreateShopManagerForm";
+import { Role } from "../../models/CamAIEnum";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -72,7 +73,7 @@ const CreateShop = () => {
   });
 
   const navigate = useNavigate();
-  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({});
+  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({ role: Role.ShopManager, });
   const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(createShopForm.values.province ?? 0));
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(createShopForm.values.district ?? 0));
