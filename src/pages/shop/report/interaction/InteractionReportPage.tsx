@@ -70,7 +70,9 @@ type SearchIncidentField = {
 };
 
 export const InteractionReportPage = () => {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
@@ -97,14 +99,14 @@ export const InteractionReportPage = () => {
     validate: (values) => ({
       toDate:
         values.startDate &&
-          values?.toDate &&
-          values?.toDate?.getTime() < values?.startDate?.getTime()
+        values?.toDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toDate &&
-          values?.startDate &&
-          values?.toDate?.getTime() < values?.startDate?.getTime()
+        values?.startDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -259,14 +261,14 @@ export const InteractionReportPage = () => {
       >
         <Table.Td>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {index + 1}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -275,7 +277,7 @@ export const InteractionReportPage = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -284,14 +286,14 @@ export const InteractionReportPage = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item.evidences.length}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item.incidentType}
             </Text>
           </Center>
@@ -313,8 +315,13 @@ export const InteractionReportPage = () => {
   }, [selectedInteractionItem]);
 
   return (
-    <Flex px={rem(40)} pt={rem(12)} flex={1} direction={"column"}
-      bg={computedColorScheme == "light" ? "#f6f8fc" : "#1a1a1a"}>
+    <Flex
+      px={rem(40)}
+      pt={rem(12)}
+      flex={1}
+      direction={"column"}
+      bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}
+    >
       <Text
         size={rem(24)}
         fw={700}
@@ -334,7 +341,7 @@ export const InteractionReportPage = () => {
       >
         <Card.Section
           style={{
-            borderBottom: "1px solid grey",
+            borderBottom: "1px solid #ccc",
           }}
           py={rem(16)}
           px={rem(24)}
@@ -353,7 +360,7 @@ export const InteractionReportPage = () => {
 
         <Card.Section px={rem(12)}>
           {!incidentReportByTimeData ||
-            incidentReportByTimeData?.data?.length == 0 ? (
+          incidentReportByTimeData?.data?.length == 0 ? (
             <NoImage type="NO_DATA" />
           ) : (
             <Box>
@@ -367,8 +374,11 @@ export const InteractionReportPage = () => {
                       backgroundColor: "rgb(37, 150, 190)",
                     }}
                   />
-                  <Text size={rem(14)} fw={500}
-                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
                     Total employee
                   </Text>
                 </Group>
@@ -381,8 +391,11 @@ export const InteractionReportPage = () => {
                       backgroundColor: "rgba(255, 99, 132, 1)",
                     }}
                   />
-                  <Text size={rem(14)} fw={500}
-                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
                     Total interaction
                   </Text>
                 </Group>
@@ -475,12 +488,12 @@ export const InteractionReportPage = () => {
                     style={
                       data && data?.length > 7
                         ? {
-                          width: `${1500 + (data?.length - 7) * 70}px`,
-                          height: "600px",
-                        }
+                            width: `${1500 + (data?.length - 7) * 70}px`,
+                            height: "600px",
+                          }
                         : {
-                          height: "600px",
-                        }
+                            height: "600px",
+                          }
                     }
                   >
                     <Chart
@@ -562,7 +575,7 @@ export const InteractionReportPage = () => {
                           if (elements.length > 0) {
                             const selectedData =
                               incidentReportByTimeData?.data?.[
-                              elements[0].index
+                                elements[0].index
                               ];
                             setSelectedInteractionItem(null);
                             setSelectedDuration({
@@ -635,13 +648,14 @@ export const InteractionReportPage = () => {
             mb={rem(40)}
             ref={targetRef}
             style={{
-              border: "1px solid grey",
+              border: "1px solid #ccc",
             }}
             bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
-                borderBottom: "1px solid grey",
+                borderBottom: "1px solid #ccc",
+                backgroundColor: "#f9fafb",
               }}
               py={rem(16)}
               px={rem(12)}
@@ -696,55 +710,35 @@ export const InteractionReportPage = () => {
                     <Table.Tr>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Index
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Start time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             End time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Evidences
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Type
                           </Text>
                         </Center>
@@ -766,14 +760,15 @@ export const InteractionReportPage = () => {
             w={"100%"}
             ref={interactionDetailRef}
             style={{
-              border: "1px solid rgb(229 231 235)",
+              border: "1px solid #ccc",
             }}
             bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section>
               <Box
                 style={{
-                  borderBottom: "1px solid grey",
+                  borderBottom: "1px solid #ccc",
+                  backgroundColor: "#f9fafb",
                 }}
                 py={rem(16)}
                 px={rem(24)}
@@ -793,11 +788,11 @@ export const InteractionReportPage = () => {
                       mr={rem(16)}
                     >
                       {selectedInteractionItem?.startTime &&
-                        selectedInteractionItem.endTime
+                      selectedInteractionItem.endTime
                         ? differentDateReturnFormattedString(
-                          selectedInteractionItem?.startTime,
-                          selectedInteractionItem?.endTime
-                        )
+                            selectedInteractionItem?.startTime,
+                            selectedInteractionItem?.endTime
+                          )
                         : "undefined"}
                     </Badge>
                   </Group>
@@ -815,11 +810,7 @@ export const InteractionReportPage = () => {
                       pb={rem(8)}
                       mb={rem(10)}
                     >
-                      <Text
-                        size={rem(14)}
-                        lh={rem(24)}
-                        fw={500}
-                      >
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
                         {dayjs(
                           selectedInteractionItem?.evidences?.[0]?.createdDate
                         ).format("LL")}

@@ -29,7 +29,7 @@ import {
 } from "../../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import { NotificationColorPalette } from "../../types/constant";
-import { useGetNewIncident, useReports } from "../../hooks/useReport";
+import { useGetNewIncident } from "../../hooks/useReport";
 import { ReadyState } from "react-use-websocket";
 import { IconCaretRight } from "@tabler/icons-react";
 import CameraCard from "../../components/card/CameraCard";
@@ -66,7 +66,9 @@ const IncidentCard = ({
 }: IncidentDetail) => {
   const navigate = useNavigate();
   const [mouted, setMouted] = useState(false);
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
 
   useEffect(() => {
     setTimeout(() => {
@@ -107,7 +109,12 @@ const IncidentCard = ({
               <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Evidence(s)
               </Text>
-              <Text fw={600} size={rem(14)} lh={rem(20)} c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}>
+              <Text
+                fw={600}
+                size={rem(14)}
+                lh={rem(20)}
+                c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+              >
                 {evidences ? evidences?.length : 0}
               </Text>
             </div>
@@ -124,8 +131,8 @@ const IncidentCard = ({
                     status == IncidentStatus.Accepted
                       ? NotificationColorPalette.UP_COMING
                       : status == IncidentStatus.New
-                        ? NotificationColorPalette.UNAPPROVED
-                        : NotificationColorPalette.ALERT_MESSAGE
+                      ? NotificationColorPalette.UNAPPROVED
+                      : NotificationColorPalette.ALERT_MESSAGE
                   }
                 >
                   {status}
@@ -136,7 +143,12 @@ const IncidentCard = ({
               <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Time
               </Text>
-              <Text fw={600} size={rem(14)} lh={rem(20)} c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}>
+              <Text
+                fw={600}
+                size={rem(14)}
+                lh={rem(20)}
+                c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+              >
                 {dayjs(startTime).format("HH:mm")}
               </Text>
             </div>
@@ -148,9 +160,7 @@ const IncidentCard = ({
 };
 
 const ShopHomePage = () => {
-  const { lastJsonMessage: humanCountData } = useReports();
   const { lastJsonMessage, readyState } = useGetNewIncident();
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
   const [incidentList, setIncidentList] = useState<IncidentDetail[]>([]);
   const { data: currentIncidentData, isLoading: isGetCurrentIncidentListData } =
@@ -180,9 +190,6 @@ const ShopHomePage = () => {
     });
     setIncidentList([incident, ...incidentList]);
   };
-
-  console.log({ lastJsonMessage, readyState });
-  console.log({ humanCountData, readyState });
 
   const handleMoreInteraction = (incident: IncidentDetail) => {
     notifications.show({
@@ -228,6 +235,8 @@ const ShopHomePage = () => {
     }
   }, [readyState, lastJsonMessage]);
 
+  console.log(readyState, lastJsonMessage);
+
   const renderStatisticContent = () => {
     if (isShopDataLoading || isGetEdgeBoxLoading) {
       return (
@@ -243,28 +252,22 @@ const ShopHomePage = () => {
 
     return (
       <Grid justify="space-between" columns={24} gutter={28}>
-        <Grid.Col span={6}>
+        <Grid.Col span={8}>
           <TitleAndNumberCard
             name={"Phone incident"}
             count={statisticData.Phone ?? 0}
           />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={8}>
           <TitleAndNumberCard
             name={"Uniform incident"}
             count={statisticData.Uniform ?? 0}
           />
         </Grid.Col>
-        <Grid.Col span={6}>
+        <Grid.Col span={8}>
           <TitleAndNumberCard
             name={"Interaction"}
             count={statisticData.Interaction ?? 0}
-          />
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <TitleAndNumberCard
-            name={"Human count"}
-            count={humanCountData?.total ?? 0}
           />
         </Grid.Col>
       </Grid>
@@ -285,47 +288,61 @@ const ShopHomePage = () => {
     }
 
     return (
-      <Flex justify={"space-between"}>
-        <Group align="flex-end">
-          {cameraList?.values?.map((item) =>
-            item?.status == CameraStatus.Connected ? (
-              <CameraCard cameraId={item?.id} key={item?.id} />
-            ) : (
-              <div key={item?.id}></div>
-            )
-          )}
-        </Group>
-
-        <Box maw={420}>
-          <Skeleton visible={isGetCurrentIncidentListData}>
-            <ScrollArea h={"70vh"} scrollbars="y">
-              <Stack gap={"lg"} px={rem(10)}>
-                {incidentList?.map((item) => (
-                  <Box key={item.id}>
-                    <IncidentCard {...item} />
-                  </Box>
-                ))}
-              </Stack>
-            </ScrollArea>
-          </Skeleton>
-        </Box>
-      </Flex>
+      <Group align="flex-start">
+        {cameraList?.values?.map((item) =>
+          item?.status == CameraStatus.Connected ? (
+            <CameraCard cameraId={item?.id} key={item?.id} />
+          ) : (
+            <div key={item?.id}></div>
+          )
+        )}
+      </Group>
     );
   };
 
   return (
     <Box m={rem(32)}>
-      <Text c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"} fw={600} size={rem(17)} mb={rem(24)}>
-        Current statistic
-      </Text>
-      <Box>{renderStatisticContent()}</Box>
+      <Flex justify={"space-between"}>
+        <Box flex={1} mr={rem(40)}>
+          <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(24)}>
+            Current statistic
+          </Text>
+          <Box>
+            {renderStatisticContent()}
+            <Text
+              c={"rgb(17, 24, 39)"}
+              fw={600}
+              size={rem(17)}
+              mb={rem(24)}
+              mt={rem(32)}
+            >
+              Shop live camera
+            </Text>
+            {renderCameraContent()}
+          </Box>
+        </Box>
 
-      <Text
-        c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
-        fw={600} size={rem(17)} mb={rem(24)} mt={rem(32)}>
-        Shop live camera
-      </Text>
-      {renderCameraContent()}
+        <Box w={420} py={rem(10)}>
+          <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(24)}>
+            Live incidents
+          </Text>
+          {incidentList?.length == 0 ? (
+            <Text>No incident found</Text>
+          ) : (
+            <Skeleton visible={isGetCurrentIncidentListData}>
+              <ScrollArea h={"84vh"} scrollbars="y">
+                <Stack gap={"lg"} px={rem(4)}>
+                  {incidentList?.map((item) => (
+                    <Box key={item.id}>
+                      <IncidentCard {...item} />
+                    </Box>
+                  ))}
+                </Stack>
+              </ScrollArea>
+            </Skeleton>
+          )}
+        </Box>
+      </Flex>
     </Box>
   );
 };

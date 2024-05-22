@@ -6,11 +6,11 @@ import {
   Button,
   Card,
   Center,
-  Collapse,
   Divider,
   Flex,
   Group,
   Loader,
+  Popover,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -26,7 +26,7 @@ import {
   IconBrandHipchat,
   IconChevronRight,
   IconExclamationCircle,
-  IconSettings,
+  IconX,
 } from "@tabler/icons-react";
 import { IconCalendarTime } from "@tabler/icons-react";
 import {
@@ -42,28 +42,38 @@ import { IconChevronLeft } from "@tabler/icons-react";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import classes from "./HeadSupervisorCalendar.module.scss";
-import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
+import {
+  useClickOutside,
+  useDisclosure,
+  useScrollIntoView,
+} from "@mantine/hooks";
 import { IncidentDetail } from "../../models/Incident";
 import { differentDateReturnFormattedString } from "../../utils/helperFunction";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
 import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
-import { Role } from "../../models/CamAIEnum";
+import { IncidentType } from "../../models/CamAIEnum";
 import { modals } from "@mantine/modals";
-import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
 import { notifications } from "@mantine/notifications";
-import { DEFAULT_PAGE_SIZE, NotificationColorPalette } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE } from "../../types/constant";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
-import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
 import _ from "lodash";
 import { SuperVisorAssignmentDetail } from "../../models/Shop";
+import { useGetIncidentByAssignmentId } from "../../hooks/useGetIncidentByAssignmentId";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
 const HeadSupervisorCalendar = () => {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
-  const [opened, { toggle }] = useDisclosure(false);
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
+  const [
+    assignPopoverOpened,
+    { toggle: toggleAssignPopover, close: closeAssignPopover },
+  ] = useDisclosure(false);
+  const ref = useClickOutside(closeAssignPopover, ["mouseup", "touchend"]);
 
   const [scrolled, setScrolled] = useState(false);
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
@@ -80,28 +90,28 @@ const HeadSupervisorCalendar = () => {
   const [selectedShift, setSelectedShift] =
     useState<SuperVisorAssignmentDetail | null>(null);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList({
-      enabled: !!selectedShift,
-      fromTime: selectedShift?.startTime,
-      toTime: selectedShift?.endTime,
-    });
+  const {
+    data: incidentList,
+    isLoading: isGetIncidentListLoading,
+    refetch: refetchIncidentList,
+  } = useGetIncidentByAssignmentId({
+    id: selectedShift?.id ?? "",
+    enabled: !!selectedShift,
+  });
 
   const { data: employeeList, isLoading: isEmployeeListLoading } =
     useGetEmployeeList({ size: 999 });
-  const {
-    data: supervisorList,
-    isLoading: isGetSupervisorListLoading,
-    refetch: refetchSupervisorList,
-  } = useGetSupervisorAssignmentHistory({
-    date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
-  });
 
-  const { mutate: deleteSupervisor, isLoading: isDeleteSupervisorLoading } =
-    useDeleteSupervisor();
+  const { data: supervisorList, isLoading: isGetSupervisorListLoading } =
+    useGetSupervisorAssignmentHistory({
+      date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
+    });
 
-  const { mutate: assignSuperVisor, isLoading: isAssignSupervisorLoading } =
-    useAssignSupervisor();
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
+    useAssignIncident();
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
+    useRejectIncidentById();
+
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
 
@@ -113,83 +123,69 @@ const HeadSupervisorCalendar = () => {
   const startingDayIndex = getDay(firstDayOfMonth);
   const endDayIndex = getDay(lastDayOfMonth);
 
-  const openConfirmSupervisorModal = ({
-    id,
-    supervisorName,
-  }: {
-    id: string;
-    supervisorName: string;
-  }) =>
+  const openRejectModal = (incidentId: string) => {
     modals.openConfirmModal({
-      title: "Please confirm modify supervisor",
-      children: (
-        <Text size="sm">
-          Confirm modify{" "}
-          <Text inherit span fw={600}>
-            {supervisorName}
-          </Text>{" "}
-          as new supervisor
-        </Text>
-      ),
+      title: "Reject Incident",
+      confirmProps: { color: "red" },
+      children: <Text size="sm">Reject this incident?</Text>,
       labels: { confirm: "Confirm", cancel: "Cancel" },
+      centered: true,
       onCancel: () => console.log("Cancel"),
       onConfirm: () => {
-        assignSuperVisor(
-          { employeeId: id, role: Role.ShopSupervisor },
-          {
-            onSuccess() {
-              notifications.show({
-                title: "Success",
-                message: "Assign supervisor successfully!",
-                autoClose: 6000,
-                c: NotificationColorPalette.UP_COMING,
-              });
-              refetchSupervisorList();
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                title: "Failed",
-                message: error?.message ?? "Assign supervisor failed!",
-                autoClose: 6000,
-                c: NotificationColorPalette.ALERT_MESSAGE,
-              });
-            },
-          }
-        );
+        rejectIncident(incidentId, {
+          onSuccess() {
+            notifications.show({
+              title: "Successful",
+              message: "Reject successfully!",
+            });
+            refetchIncidentList();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              icon: <IconX />,
+              title: "Reject failed",
+              message: error.response?.data?.message,
+            });
+          },
+        });
       },
     });
+  };
 
-  const openConfirmDeleteSupervisorModal = () => {
-    modals.openConfirmModal({
-      title: "Please confirm modify supervisor",
-      children: <Text size="sm">Confirm delete supervisor?</Text>,
-      labels: { confirm: "Confirm", cancel: "Cancel" },
-      onCancel: () => console.log("Cancel"),
-      onConfirm: () => {
-        deleteSupervisor(
-          {},
-          {
-            onSuccess() {
-              notifications.show({
-                message: "Remove supervisor successfully!",
-                title: "Success",
-              });
-              refetchSupervisorList();
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                title: "Failed",
-                message: error?.message ?? "Remove supervisor failed!",
-                autoClose: 6000,
-                c: NotificationColorPalette.ALERT_MESSAGE,
-              });
-            },
-          }
-        );
+  const onAssignIncident = ({
+    employeeId,
+    incidentId,
+  }: {
+    employeeId: string;
+    incidentId: string;
+  }) => {
+    assignIncident(
+      {
+        employeeId,
+        incidentId,
       },
-    });
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Assign successfully",
+            message: "Incident assign success!",
+          });
+          closeAssignPopover();
+          refetchIncidentList();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            icon: <IconX />,
+            title: "Assign failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
   };
 
   useEffect(() => {
@@ -224,7 +220,7 @@ const HeadSupervisorCalendar = () => {
       </Table.Td>
     </Table.Tr>
   ) : (
-    incidentList?.values.map((item) => (
+    incidentList?.map((item) => (
       <Table.Tr
         key={item.id}
         style={{
@@ -292,13 +288,17 @@ const HeadSupervisorCalendar = () => {
   const employeeStatisticData = useMemo(() => {
     if (employeeList) {
       return _.groupBy(employeeList?.values, (i) => {
-        return i.employeeRole;
+        return i?.employeeRole;
       });
     }
   }, [employeeList]);
 
+  console.log(employeeStatisticData);
+
   const reverseSupervisorList = useMemo(() => {
-    return supervisorList?.reverse();
+    if (supervisorList) {
+      return supervisorList?.reverse();
+    }
   }, [supervisorList]);
 
   useEffect(() => {
@@ -330,102 +330,7 @@ const HeadSupervisorCalendar = () => {
               <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} lh={rem(36)}>
                 Supervisor shift
               </Text>
-              <ActionIcon
-                variant="light"
-                aria-label="Settings"
-                onClick={toggle}
-                color="rgb(79, 70, 229)"
-                size={"lg"}
-              >
-                <IconSettings
-                  style={{ width: "70%", height: "70%" }}
-                  stroke={1.5}
-                />
-              </ActionIcon>
             </Group>
-
-            <Collapse in={opened}>
-              <Group
-                style={{
-                  paddingTop: rem(20),
-                  marginTop: rem(12),
-                  paddingBottom: rem(8),
-                  borderTop: "1px solid #ccc",
-                }}
-              >
-                {isEmployeeListLoading ||
-                isDeleteSupervisorLoading ||
-                isAssignSupervisorLoading ||
-                isGetSupervisorListLoading ? (
-                  <Loader />
-                ) : (
-                  <Select
-                    radius={rem(8)}
-                    flex={1}
-                    style={{
-                      fontWeight: 500,
-                      fontSize: rem(14),
-                    }}
-                    styles={{
-                      label: {
-                        marginBottom: rem(4),
-                      },
-                    }}
-                    clearable
-                    allowDeselect
-                    label="Supervisor"
-                    p={0}
-                    disabled={!!selectedDate && !isToday(selectedDate)}
-                    placeholder="Supervisor is empty"
-                    onClear={openConfirmDeleteSupervisorModal}
-                    onChange={(_value, option) => {
-                      openConfirmSupervisorModal({
-                        id: _value ?? "",
-                        supervisorName: option?.label,
-                      });
-                    }}
-                    value={selectedShift?.supervisorId}
-                    searchable
-                    nothingFoundMessage="Nothing found..."
-                    data={[
-                      {
-                        group: "Head supervisor",
-                        items: employeeStatisticData
-                          ? employeeStatisticData?.HeadSupervisor.map((i) => {
-                              return {
-                                value: i.id,
-                                label: i.name,
-                              };
-                            })
-                          : [],
-                      },
-                      {
-                        group: "Supervisor",
-                        items: employeeStatisticData
-                          ? employeeStatisticData?.Supervisor.map((i) => {
-                              return {
-                                value: i.id,
-                                label: i.name,
-                              };
-                            })
-                          : [],
-                      },
-                      {
-                        group: "Employee",
-                        items: employeeStatisticData
-                          ? employeeStatisticData?.Employee.map((i) => {
-                              return {
-                                value: i.id,
-                                label: i.name,
-                              };
-                            })
-                          : [],
-                      },
-                    ]}
-                  />
-                )}
-              </Group>
-            </Collapse>
 
             <Accordion
               variant="separated"
@@ -450,12 +355,8 @@ const HeadSupervisorCalendar = () => {
                     onClick={() => {
                       setSelectedShift({
                         ...i,
-                        startTime: dayjs(i?.startTime).format(
-                          "YYYY-MM-DDTHH:mm:ss"
-                        ),
-                        endTime: dayjs(i?.endTime).format(
-                          "YYYY-MM-DDTHH:mm:ss"
-                        ),
+                        startTime: i?.startTime,
+                        endTime: i?.endTime,
                       });
                     }}
                   >
@@ -557,9 +458,7 @@ const HeadSupervisorCalendar = () => {
                     </Accordion.Control>
                     <Accordion.Panel>
                       <>
-                        {isEmployeeListLoading ||
-                        isAssignSupervisorLoading ||
-                        isGetSupervisorListLoading ? (
+                        {isEmployeeListLoading || isGetSupervisorListLoading ? (
                           <Loader />
                         ) : (
                           <>
@@ -572,26 +471,6 @@ const HeadSupervisorCalendar = () => {
                                 // border: "1px solid #ccc",
                               }}
                             >
-                              <Group
-                                justify="space-between"
-                                align="center"
-                                pb={rem(24)}
-                                style={{
-                                  borderBottom: "1px solid #ccc",
-                                }}
-                              >
-                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
-                                  Head supervisor
-                                </Text>
-                                <Text
-                                  c={"rgb(17, 24, 39)"}
-                                  size={rem(14)}
-                                  fw={500}
-                                >
-                                  {i?.headSupervisor?.name ?? "Empty"}
-                                </Text>
-                              </Group>
-
                               <Group
                                 justify="space-between"
                                 align="center"
@@ -820,7 +699,7 @@ const HeadSupervisorCalendar = () => {
               >
                 <Group justify="space-between">
                   <Text size="md" fw={600} ml={rem(12)}>
-                    Incident list
+                    Incidents & Interactions {"(" + incidentList?.length + ")"}
                   </Text>
                   <Group gap={rem(6)}>
                     <Text fw={500} size="sm">
@@ -836,7 +715,7 @@ const HeadSupervisorCalendar = () => {
                       c={"#000"}
                       mr={rem(10)}
                     >
-                      {/* {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")} */}
+                      {dayjs(selectedShift?.startTime).format("HH:mm | DD-MM")}
                     </Badge>
                     <Text fw={500} size="sm">
                       to
@@ -851,7 +730,7 @@ const HeadSupervisorCalendar = () => {
                       c={"#000"}
                       mr={rem(16)}
                     >
-                      {/* {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")} */}
+                      {dayjs(selectedShift?.endTime).format("HH:mm | DD-MM")}
                     </Badge>
                   </Group>
                 </Group>
@@ -862,90 +741,96 @@ const HeadSupervisorCalendar = () => {
                   mah={700}
                   onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
                 >
-                  <Table striped highlightOnHover withColumnBorders>
-                    <Table.Thead
-                      className={clsx(classes.header, {
-                        [classes.scrolled]: scrolled,
-                      })}
-                    >
-                      <Table.Tr>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Type
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Start time
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              End time
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Evidences
-                            </Text>
-                          </Center>
-                        </Table.Th>
+                  {incidentList?.length == 0 ? (
+                    <Box mt={rem(10)} mb={rem(16)}>
+                      <NoImage type="NO_DATA" />
+                    </Box>
+                  ) : (
+                    <Table striped highlightOnHover withColumnBorders>
+                      <Table.Thead
+                        className={clsx(classes.header, {
+                          [classes.scrolled]: scrolled,
+                        })}
+                      >
+                        <Table.Tr>
+                          <Table.Th py={rem(16)}>
+                            <Center>
+                              <Text
+                                size={rem(13)}
+                                lh={rem(24)}
+                                c={"rgb(55 65 81)"}
+                                fw={600}
+                              >
+                                Type
+                              </Text>
+                            </Center>
+                          </Table.Th>
+                          <Table.Th py={rem(16)}>
+                            <Center>
+                              <Text
+                                size={rem(13)}
+                                lh={rem(24)}
+                                c={"rgb(55 65 81)"}
+                                fw={600}
+                              >
+                                Start time
+                              </Text>
+                            </Center>
+                          </Table.Th>
+                          <Table.Th py={rem(16)}>
+                            <Center>
+                              <Text
+                                size={rem(13)}
+                                lh={rem(24)}
+                                c={"rgb(55 65 81)"}
+                                fw={600}
+                              >
+                                End time
+                              </Text>
+                            </Center>
+                          </Table.Th>
+                          <Table.Th py={rem(16)}>
+                            <Center>
+                              <Text
+                                size={rem(13)}
+                                lh={rem(24)}
+                                c={"rgb(55 65 81)"}
+                                fw={600}
+                              >
+                                Evidences
+                              </Text>
+                            </Center>
+                          </Table.Th>
 
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Assigned to
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                        <Table.Th py={rem(16)}>
-                          <Center>
-                            <Text
-                              size={rem(13)}
-                              lh={rem(24)}
-                              c={"rgb(55 65 81)"}
-                              fw={600}
-                            >
-                              Status
-                            </Text>
-                          </Center>
-                        </Table.Th>
-                      </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>{rows}</Table.Tbody>
-                  </Table>
+                          <Table.Th py={rem(16)}>
+                            <Center>
+                              <Text
+                                size={rem(13)}
+                                lh={rem(24)}
+                                c={"rgb(55 65 81)"}
+                                fw={600}
+                              >
+                                Assigned to
+                              </Text>
+                            </Center>
+                          </Table.Th>
+                          <Table.Th py={rem(16)}>
+                            <Center>
+                              <Text
+                                size={rem(13)}
+                                lh={rem(24)}
+                                c={"rgb(55 65 81)"}
+                                fw={600}
+                              >
+                                Status
+                              </Text>
+                            </Center>
+                          </Table.Th>
+                        </Table.Tr>
+                      </Table.Thead>
+                      <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
+                  )}
                 </ScrollArea.Autosize>
               </Card.Section>
             </Card>
@@ -972,7 +857,11 @@ const HeadSupervisorCalendar = () => {
                 >
                   <Group justify="space-between">
                     <Text size="md" fw={600}>
-                      Incident detail
+                      {selectedIncidentItem?.incidentType !=
+                      IncidentType.Interaction
+                        ? "Incident "
+                        : "Interaction "}
+                      detail
                     </Text>
                     <Group gap={rem(8)}>
                       <Text fw={500} size="sm">
@@ -1011,29 +900,96 @@ const HeadSupervisorCalendar = () => {
                             selectedIncidentItem?.evidences?.[0]?.createdDate
                           ).format("LL")}
                         </Text>
-                        <Text
-                          c={"rgb(107 114 128"}
-                          size={rem(14)}
-                          lh={rem(24)}
-                          fw={500}
-                        >
-                          Assigned to :{" "}
-                          <Text
-                            span
-                            c="blue"
-                            inherit
-                            style={{
-                              cursor: "pointer",
-                            }}
-                          >
-                            {selectedIncidentItem?.employee?.name ?? "(Empty)"}
-                          </Text>
-                        </Text>
+                        <Group>
+                          {selectedIncidentItem?.incidentType !=
+                            IncidentType.Interaction && (
+                            <>
+                              <Text
+                                c={"rgb(107 114 128"}
+                                size={rem(14)}
+                                lh={rem(24)}
+                                fw={500}
+                                style={{
+                                  paddingRight: rem(12),
+                                  borderRight: "1px solid #ccc",
+                                }}
+                              >
+                                Assigned to :{" "}
+                                <Text span c="rgb(17, 24, 39)" inherit>
+                                  {selectedIncidentItem?.employee?.name ??
+                                    "(Empty)"}
+                                </Text>
+                              </Text>
+
+                              <Popover
+                                position="bottom"
+                                withArrow
+                                shadow="md"
+                                opened={assignPopoverOpened}
+                              >
+                                <Popover.Target>
+                                  <Button
+                                    loading={isAssignIncidentLoading}
+                                    variant="outline"
+                                    color="rgb(79, 70, 229)"
+                                    onClick={toggleAssignPopover}
+                                  >
+                                    Assign
+                                  </Button>
+                                </Popover.Target>
+                                <Popover.Dropdown>
+                                  {isEmployeeListLoading ? (
+                                    <Loader />
+                                  ) : (
+                                    <Select
+                                      ref={ref}
+                                      size="sm"
+                                      style={{
+                                        fontWeight: 500,
+                                        borderRadius: rem(8),
+                                      }}
+                                      onChange={(_value) => {
+                                        console.log(123);
+
+                                        onAssignIncident({
+                                          employeeId: _value ?? "",
+                                          incidentId: selectedIncidentItem.id,
+                                        });
+                                      }}
+                                      placeholder="Assign to.."
+                                      searchable
+                                      value={selectedIncidentItem?.id}
+                                      data={employeeList?.values?.map(
+                                        (item) => {
+                                          return {
+                                            value: item?.id,
+                                            label: item?.name,
+                                          };
+                                        }
+                                      )}
+                                      nothingFoundMessage="Nothing found..."
+                                    />
+                                  )}
+                                </Popover.Dropdown>
+                              </Popover>
+
+                              <Button
+                                color={"red"}
+                                loading={isRejectIncidentLoading}
+                                onClick={() => {
+                                  openRejectModal(selectedIncidentItem.id);
+                                }}
+                              >
+                                Reject
+                              </Button>
+                            </>
+                          )}
+                        </Group>
                       </Group>
                       {selectedIncidentItem?.evidences?.length == 0 ? (
                         <NoImage type="NO_DATA" />
                       ) : (
-                        selectedIncidentItem?.evidences.map((i) => (
+                        selectedIncidentItem?.evidences?.map((i) => (
                           <LoadingImage
                             mb={rem(12)}
                             fit="contain"

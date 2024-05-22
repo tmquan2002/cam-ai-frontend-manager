@@ -118,7 +118,12 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
   const [selectedDuration, setSelectedDuration] = useState<{
     startTime: string;
     endTime: string;
-  } | null>(null);
+  } | null>({
+    startTime: dayjs(new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)).format(
+      "YYYY-MM-DD"
+    ),
+    endTime: dayjs().format("YYYY-MM-DD"),
+  });
 
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
@@ -213,6 +218,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       toTime: selectedDuration?.endTime,
       size: 999,
       shopId: shopId,
+      incidentType: IncidentType.Incident,
     });
 
   const data = useMemo(() => {
@@ -223,6 +229,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
+        totalTime: item.averageDuration ?? 0 * item.count,
       };
     });
   }, [incidentReportByTimeData]);
@@ -653,9 +660,8 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           },
                           {
                             type: "bar" as const,
-                            label: "Average duration ",
-                            data: data?.map((i) => i.count),
-                            hidden: true,
+                            label: "Average duration",
+                            data: data?.map((i) => i.totalTime),
                           },
                         ],
                       }}

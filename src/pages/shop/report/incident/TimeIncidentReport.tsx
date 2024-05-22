@@ -105,7 +105,9 @@ const renderIncidentTypeLegendTitle = (
 };
 
 const TimeIncidentReport = () => {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
@@ -132,14 +134,14 @@ const TimeIncidentReport = () => {
     validate: (values) => ({
       toDate:
         values.startDate &&
-          values?.toDate &&
-          values?.toDate?.getTime() < values?.startDate?.getTime()
+        values?.toDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toDate &&
-          values?.startDate &&
-          values?.toDate?.getTime() < values?.startDate?.getTime()
+        values?.startDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -210,7 +212,7 @@ const TimeIncidentReport = () => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
-        duration: item?.averageDuration ?? 0 * item.count,
+        duration: item?.averageDuration,
       };
     });
   }, [incidentReportByTimeData]);
@@ -349,9 +351,7 @@ const TimeIncidentReport = () => {
       >
         <Table.Td>
           <Center>
-            <Text size={rem(13)}>
-              {item.incidentType}
-            </Text>
+            <Text size={rem(13)}>{item.incidentType}</Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
@@ -374,23 +374,17 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
-              {item?.evidences.length}
-            </Text>
+            <Text size={rem(13)}>{item?.evidences.length}</Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
-              {item?.employee?.name ?? "Empty"}
-            </Text>
+            <Text size={rem(13)}>{item?.employee?.name ?? "Empty"}</Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
-              {item.status}
-            </Text>
+            <Text size={rem(13)}>{item.status}</Text>
           </Center>
         </Table.Td>
       </Table.Tr>
@@ -403,7 +397,7 @@ const TimeIncidentReport = () => {
         <Box
           style={{
             borderRadius: "8px",
-            border: "1px solid grey",
+            border: "1px solid #ccc",
             marginTop: rem(20),
             overflow: "hidden",
           }}
@@ -412,7 +406,7 @@ const TimeIncidentReport = () => {
             mb={rem(32)}
             py={rem(20)}
             style={{
-              borderBottom: "1px solid grey",
+              borderBottom: "1px solid #ccc",
             }}
           >
             <Group justify="flex-end">
@@ -423,7 +417,7 @@ const TimeIncidentReport = () => {
           </Box>
 
           {!incidentReportByTimeData ||
-            incidentReportByTimeData?.data?.length == 0 ? (
+          incidentReportByTimeData?.data?.length == 0 ? (
             <NoImage type="NO_DATA" />
           ) : (
             <Box>
@@ -437,8 +431,11 @@ const TimeIncidentReport = () => {
                       backgroundColor: "rgb(37, 150, 190)",
                     }}
                   />
-                  <Text size={rem(14)} fw={500}
-                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
                     Total incident
                   </Text>
                 </Group>
@@ -451,8 +448,11 @@ const TimeIncidentReport = () => {
                       backgroundColor: "rgba(255, 99, 132, 1)",
                     }}
                   />
-                  <Text size={rem(14)} fw={500}
-                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
                     Average incident time
                   </Text>
                 </Group>
@@ -540,12 +540,12 @@ const TimeIncidentReport = () => {
                     style={
                       data && data?.length > 7
                         ? {
-                          width: `${1500 + (data?.length - 7) * 70}px`,
-                          height: "600px",
-                        }
+                            width: `${1500 + (data?.length - 7) * 70}px`,
+                            height: "600px",
+                          }
                         : {
-                          height: "600px",
-                        }
+                            height: "600px",
+                          }
                     }
                   >
                     <Chart
@@ -603,7 +603,7 @@ const TimeIncidentReport = () => {
                           if (elements.length > 0) {
                             const selectedData =
                               incidentReportByTimeData?.data?.[
-                              elements[0].index
+                                elements[0].index
                               ];
                             setSelectedIncidentItem(null);
                             setSelectedDuration({
@@ -635,9 +635,11 @@ const TimeIncidentReport = () => {
                           },
                           {
                             type: "bar" as const,
-                            label: "Average duration ",
+                            label: "Average duration",
                             data: data?.map((i) => i.duration),
-                            hidden: true,
+                            backgroundColor: "rgba(255, 99, 132, 0.6)",
+                            borderColor: "rgba(255, 99, 132)",
+                            borderRadius: 6,
                           },
                         ],
                       }}
@@ -654,7 +656,7 @@ const TimeIncidentReport = () => {
                     flex={1}
                     style={{
                       borderRadius: rem(12),
-                      border: "1px solid grey",
+                      border: "1px solid #ccc",
                     }}
                   >
                     <Text
@@ -677,15 +679,15 @@ const TimeIncidentReport = () => {
                         data={
                           incidentPercent
                             ? incidentPercent?.types?.map((i) => {
-                              return {
-                                name: i.type + " incident",
-                                color:
-                                  i.type == IncidentType.Phone
-                                    ? "indigo.6"
-                                    : "yellow.6",
-                                value: i.total,
-                              };
-                            })
+                                return {
+                                  name: i.type + " incident",
+                                  color:
+                                    i.type == IncidentType.Phone
+                                      ? "indigo.6"
+                                      : "yellow.6",
+                                  value: i.total,
+                                };
+                              })
                             : []
                         }
                       />
@@ -714,7 +716,7 @@ const TimeIncidentReport = () => {
                     flex={1}
                     style={{
                       borderRadius: rem(12),
-                      border: "1px solid grey",
+                      border: "1px solid #ccc",
                     }}
                   >
                     <Text
@@ -737,17 +739,17 @@ const TimeIncidentReport = () => {
                         data={
                           incidentPercent
                             ? incidentPercent?.statuses.map((i) => {
-                              return {
-                                color:
-                                  i.status == IncidentStatus.Accepted
-                                    ? "#12b886"
-                                    : i.status == IncidentStatus.New
+                                return {
+                                  color:
+                                    i.status == IncidentStatus.Accepted
+                                      ? "#12b886"
+                                      : i.status == IncidentStatus.New
                                       ? "#4c6ef5"
                                       : "#fa5252",
-                                name: i.status,
-                                value: i.total,
-                              };
-                            })
+                                  name: i.status,
+                                  value: i.total,
+                                };
+                              })
                             : []
                         }
                       />
@@ -796,13 +798,13 @@ const TimeIncidentReport = () => {
             mb={rem(40)}
             ref={targetRef}
             style={{
-              border: "1px solid grey",
+              border: "1px solid #ccc",
             }}
             bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
-                borderBottom: "1px solid grey",
+                borderBottom: "1px solid #ccc",
               }}
               py={rem(16)}
               px={rem(12)}
@@ -858,44 +860,28 @@ const TimeIncidentReport = () => {
                     <Table.Tr>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Type
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Start time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             End time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Evidences
                           </Text>
                         </Center>
@@ -903,22 +889,14 @@ const TimeIncidentReport = () => {
 
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Assigned to
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Status
                           </Text>
                         </Center>
@@ -946,7 +924,7 @@ const TimeIncidentReport = () => {
             <Card.Section>
               <Box
                 style={{
-                  borderBottom: "1px solid grey",
+                  borderBottom: "1px solid #ccc",
                 }}
                 py={rem(16)}
                 px={rem(24)}
@@ -961,11 +939,11 @@ const TimeIncidentReport = () => {
                     </Text>
                     <Badge radius={"sm"} color={"green"} c={"#fff"}>
                       {selectedIncidentItem?.startTime &&
-                        selectedIncidentItem.endTime
+                      selectedIncidentItem.endTime
                         ? differentDateReturnFormattedString(
-                          selectedIncidentItem?.startTime,
-                          selectedIncidentItem?.endTime
-                        )
+                            selectedIncidentItem?.startTime,
+                            selectedIncidentItem?.endTime
+                          )
                         : "undefined"}
                     </Badge>
                   </Group>
@@ -982,20 +960,12 @@ const TimeIncidentReport = () => {
                       pb={rem(8)}
                       mb={rem(10)}
                     >
-                      <Text
-                        size={rem(14)}
-                        lh={rem(24)}
-                        fw={500}
-                      >
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
                         {dayjs(
                           selectedIncidentItem?.evidences?.[0]?.createdDate
                         ).format("LL")}
                       </Text>
-                      <Text
-                        size={rem(14)}
-                        lh={rem(24)}
-                        fw={500}
-                      >
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
                         Assigned to :{" "}
                         <Text
                           span

@@ -13,7 +13,9 @@ import { CommonConstant, POLLING_INTERVAL } from "../types/constant";
 import { IconCheck } from "@tabler/icons-react";
 
 const ShopRoute = () => {
-  const [taskId, setTaskId] = useState<string | undefined>(localStorage.getItem(CommonConstant.TASK_ID) ?? undefined);
+  const [taskId, setTaskId] = useState<string | undefined>(
+    localStorage.getItem(CommonConstant.TASK_ID) ?? undefined
+  );
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.ShopManager);
@@ -34,23 +36,36 @@ const ShopRoute = () => {
       notifications.update({
         id: "uploadEmployeeProgress",
         title: "Import in progress",
-        message: `${dataProId?.dataProgress?.detailed?.currentFinishedRecord}/${dataProId?.dataProgress?.detailed?.total} Done (${dataProId?.dataProgress?.percents ? Math.round(dataProId?.dataProgress?.percents) : 0} %)`,
+        message: `${dataProId?.dataProgress?.detailed?.currentFinishedRecord}/${
+          dataProId?.dataProgress?.detailed?.total
+        } Done (${
+          dataProId?.dataProgress?.percents
+            ? Math.round(dataProId?.dataProgress?.percents)
+            : 0
+        } %)`,
         autoClose: false,
         loading: true,
       });
     } else {
       notifications.update({
-        color: 'teal',
+        color: "teal",
         id: "uploadEmployeeProgress",
         title: "Import Finished",
-        message: <Link to={`/shop/import/${taskId}`} style={{ textDecoration: 'none' }}><Text >View Import Detail</Text></Link>,
+        message: (
+          <Link
+            to={`/shop/import/${taskId}`}
+            style={{ textDecoration: "none" }}
+          >
+            <Text>View Import Detail</Text>
+          </Link>
+        ),
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
         loading: false,
         autoClose: 5000,
       });
-      setTaskId(undefined)
+      setTaskId(undefined);
     }
-  }, [dataProId])
+  }, [dataProId]);
 
   switch (userRole) {
     case Role.ShopManager:
@@ -91,6 +106,8 @@ const ShopRoute = () => {
       );
     case Role.BrandManager:
       return <Navigate to={"/brand"} />;
+    case Role.ShopSupervisor:
+      return <Navigate to={"/supervisor"} />;
     default:
       return <Navigate to={"/login"} replace />;
   }

@@ -1,6 +1,6 @@
 .today {
-  border-bottom: 1px solid grey;
-  border-left: 1px solid grey;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
 
   @include light {
     background-color: #eff6ff;
@@ -12,8 +12,8 @@
 }
 
 .selectedDay {
-  border-bottom: 1px solid grey;
-  border-left: 1px solid grey;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
 
   @include light {
     background-color: #d2e3fc;
@@ -25,8 +25,8 @@
 }
 
 .activeCard {
-  border-bottom: 1px solid grey;
-  border-left: 1px solid grey;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
 
   @include light {
     background-color: white;
@@ -65,7 +65,7 @@
   margin: rem(2);
 }
 
-.timelinePrimaryPoint:hover>.innerTimelinePrimaryPoint {
+.timelinePrimaryPoint:hover > .innerTimelinePrimaryPoint {
   background-color: #228be6;
   transition: background-color 400ms ease-in;
 }
@@ -83,7 +83,7 @@
   cursor: pointer;
 }
 
-.timelineWrapper:hover>.divider {
+.timelineWrapper:hover > .divider {
   border-color: #228be6 !important;
   transition: border-color 400ms ease-in;
 }

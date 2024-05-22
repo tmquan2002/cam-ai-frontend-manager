@@ -386,7 +386,7 @@ const ShopDetailPage = () => {
                               "Camera is disconnected, cannot view live stream",
                           });
                         } else {
-                          navigate(`/shop/camera/${item?.id}`);
+                          navigate(`/shop`);
                         }
                       }}
                       rightSection={

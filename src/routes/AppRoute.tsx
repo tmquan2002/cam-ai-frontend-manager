@@ -35,12 +35,10 @@ import ShopInteractionPage from "../pages/shop/ShopInteractionPage";
 import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
 import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
 import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
-import SupervisorMainPage from "../pages/supervisor/SupervisorMainPage";
 import BrandRoute from "./BrandRoute";
 import CommonRoute from "./CommonRoute";
 import HeadSupervisorRoute from "./HeadSupervisorRoute";
 import ShopRoute from "./ShopRoute";
-import SupervisorRoute from "./SupervisorRoute";
 
 const AppRoute = () => {
   return useRoutes([
@@ -121,8 +119,8 @@ const AppRoute = () => {
         },
         {
           path: "import/:id",
-          element: <EmployeeImportResultPage />
-        }
+          element: <EmployeeImportResultPage />,
+        },
       ],
     },
     {
@@ -198,12 +196,12 @@ const AppRoute = () => {
         },
         {
           path: "import/:id",
-          element: <ShopImportResultPage />
-        }
+          element: <ShopImportResultPage />,
+        },
       ],
     },
     {
-      path: "headsupervisor",
+      path: "supervisor",
       element: <HeadSupervisorRoute />,
       children: [
         {
@@ -212,16 +210,7 @@ const AppRoute = () => {
         },
       ],
     },
-    {
-      path: "supervisor",
-      element: <SupervisorRoute />,
-      children: [
-        {
-          path: "",
-          element: <SupervisorMainPage />,
-        },
-      ],
-    },
+
     {
       path: "*",
       element: <NothingFoundBackground />,

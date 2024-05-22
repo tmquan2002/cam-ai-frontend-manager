@@ -441,7 +441,7 @@ const EmployeeDetailPage = () => {
                     title: "Successfully",
                     message: "Delete employee successfully!",
                   });
-                  navigate("/shop/detail");
+                  navigate("/shop/employee");
                 },
                 onError(data) {
                   const error = data as AxiosError<ResponseErrorDetail>;
