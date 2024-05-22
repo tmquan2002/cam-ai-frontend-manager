@@ -23,12 +23,20 @@
 .incident-collapse:hover,
 .incident-button-active:hover {
   cursor: pointer;
-  background-color: #eee;
+
+  @include light {
+    background-color: #f2f7ff;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
 }
 
 .clickable-style {
   cursor: pointer;
 }
+
 .clickable-style:hover,
 .clickable-style:hover p {
   cursor: pointer;

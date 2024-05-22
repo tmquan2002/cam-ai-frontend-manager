@@ -59,13 +59,14 @@ import {
 import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import {
   formatTime,
   isEmpty,
   mapLookupToArray,
 } from "../../utils/helperFunction";
 import classes from "./BrandMainPage.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
 
 type SearchShopField = {
   status: string | null;
@@ -83,10 +84,11 @@ const BrandMainPage = () => {
     },
   });
 
+  const { taskId } = useTaskBrand();
   const [search, setSearch] = useState<string | number>("");
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
   const navigate = useNavigate();
   const [debounced] = useDebouncedValue(search, 400);
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
@@ -100,7 +102,7 @@ const BrandMainPage = () => {
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: Number(pageSize),
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       enabled: !isEmpty(data?.values?.[0]?.id),
       brandId: data?.values[0]?.id,
       pageIndex: activePage - 1,
@@ -374,7 +376,7 @@ const BrandMainPage = () => {
               <Text size="xl" fw={500} mb={rem(8)} ta="center">
                 {data?.values[0]?.name}
               </Text>
-              
+
               <Box mb={20}>
                 <Flex mt={20}>
                   <Box mr={rem(8)}>
@@ -419,7 +421,7 @@ const BrandMainPage = () => {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, lg: 8 }} mr={rem(32)}>
-            <Text size="xl" fw={'bold'} c={"grey"} mb={rem(20)} >
+            <Text size="xl" fw={'bold'} c={"light-blue.4"} mb={rem(20)}>
               Shop List
             </Text>
             {/* Input and filter section */}
@@ -469,13 +471,14 @@ const BrandMainPage = () => {
               </Button>
               <Button
                 leftSection={<IconPlus size={14} />}
-                variant="outline"
+                
                 h={rem(48)}
                 onClick={() => {
                   navigate("/brand/create/shop");
                 }}
                 ml={rem(12)}
                 radius={"20%/50%"}
+                disabled={taskId != undefined}
               >
                 Add shop
               </Button>
@@ -540,7 +543,7 @@ const BrandMainPage = () => {
                   label="Page Size"
                   allowDeselect={false}
                   placeholder="0"
-                  data={PAGE_SIZE_SELECT} defaultValue={"5"}
+                  data={PAGE_SIZE_SELECT} defaultValue={DEFAULT_PAGE_SIZE}
                   value={pageSize}
                   onChange={(value) => {
                     setPageSize(value)

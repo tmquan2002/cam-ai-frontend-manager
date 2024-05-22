@@ -12,11 +12,13 @@ import {
   Tooltip,
   rem
 } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import dayjs from "dayjs";
+import { isEmpty } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import StatusBadge from "../../components/badge/StatusBadge";
+import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
@@ -26,10 +28,9 @@ import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./ShopEmployeeDetailPage.module.scss";
-import CustomBreadcrumb, { BreadcrumbItem } from "../../components/breadcrumbs/CustomBreadcrumb";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -82,12 +83,13 @@ const ShopEmployeeDetailPage = () => {
     },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: isEmail("Invalid email - ex: name@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         value == undefined ||
           value == "" ||
-          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g.test(value)
+          PHONE_REGEX.test(value)
           ? null
           : "A phone number should have a length of 10-12 characters",
     },

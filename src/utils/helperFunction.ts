@@ -273,3 +273,7 @@ export function timeSince(date: Date) {
   }
   return Math.floor(interval) == 1 ? `${Math.floor(interval)} second ago` : `${Math.floor(interval)} seconds ago`;
 }
+
+export function randomInRange(start: number, end: number) {
+  return Math.floor(Math.random() * (end - start + 1) + start);
+}

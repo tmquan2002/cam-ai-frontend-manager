@@ -1,11 +1,9 @@
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
 import { UseQueryResult, useMutation, useQuery } from "react-query";
+import { v4 as uuidv4 } from 'uuid';
 import { EmployeeApi } from "../apis/EmployeeAPI";
 import { FilesAPI } from "../apis/FilesAPI";
 import { ShopAPI } from "../apis/ShopAPI";
-import { Progress } from "../models/Progress";
-import { ResponseErrorDetail } from "../models/Response";
+import { Progress, TaskResult } from "../models/Task";
 
 export const useGetShopTemplate = () => {
     const downloadFile = async () => {
@@ -87,41 +85,16 @@ export const useGetShopUpsertTask = () => {
     return { isError, isLoading, data, error };
 };
 
-export const useGetShopUpsertTaskResult = (taskId: string, delay: number) => {
-    const { isError, isLoading, data, error, }: UseQueryResult<{
-        inserted: number;
-        updated: number;
-        failed: number;
-        metadata: string[];
-    }, Error> = useQuery({
-        queryKey: ["getShopUpsertTaskResult"],
+export const useGetShopUpsertTaskResult = (taskId: string | undefined) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<TaskResult, Error> = useQuery({
+        queryKey: ["getShopUpsertTaskResult", taskId],
         queryFn: async () => {
             return await ShopAPI._getShopUpsertTaskResult(taskId);
         },
-        refetchInterval: delay,
         enabled: !!taskId,
-        onSuccess: (data) => {
-            // Handle successful fetch
-            console.log(data)
-            notifications.update({
-                id: "uploadShopProgress",
-                title: "Notice",
-                message: "Import in progress",
-                autoClose: false,
-            });
-        },
-        onError: (data) => {
-            // Handle error
-            const error = data as AxiosError<ResponseErrorDetail>;
-            notifications.show({
-                color: "red",
-                title: "Failed",
-                message: error.response?.data?.message,
-            });
-        }
     });
 
-    return { isError, isLoading, data, error };
+    return { isError, isLoading, data, error, refetch };
 };
 
 export const useUploadEmployeeFile = () => {
@@ -146,66 +119,50 @@ export const useGetEmployeeUpsertTask = () => {
     return { isError, isLoading, data, error };
 };
 
-export const useGetEmployeeUpsertTaskResult = (taskId: string, delay: number) => {
-    const { isError, isLoading, data, error, }: UseQueryResult<{
-        inserted: number;
-        updated: number;
-        failed: number;
-        metadata: string[];
-    }, Error> = useQuery({
+export const useGetEmployeeUpsertTaskResult = (taskId: string) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<TaskResult, Error> = useQuery({
         queryKey: ["getEmployeeUpsertTaskResult"],
         queryFn: async () => {
             return await EmployeeApi._getEmployeeUpsertTaskResult(taskId);
         },
-        refetchInterval: delay,
-        enabled: !!taskId,
-        onSuccess: (data) => {
-            // Handle successful fetch
-            console.log(data)
-            notifications.show({
-                color: "green",
-                title: "Notice",
-                message: "Import in progress",
-            });
-        },
-        onError: (data) => {
-            // Handle error
-            const error = data as AxiosError<ResponseErrorDetail>;
-            notifications.show({
-                color: "red",
-                title: "Failed",
-                message: error.response?.data?.message,
-            });
-        }
+        enabled: !!taskId
     });
 
-    return { isError, isLoading, data, error };
+    return { isError, isLoading, data, error, refetch };
 };
 
-export const useGetShopProgress = (taskId: string | null, delay: number) => {
-    const { isError, isLoading, data, error, refetch }: UseQueryResult<Progress, Error> = useQuery({
+export const useGetShopProgress = (taskId: string | undefined, delay: number) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<{ id: string, dataProgress: Progress }, Error> = useQuery({
         queryKey: ["getShopProgress"],
         queryFn: async () => {
-            return await ShopAPI._getShopProgress(taskId);
+            const res = await ShopAPI._getShopProgress(taskId);
+            return {
+                id: uuidv4(),
+                dataProgress: res
+            }
         },
-        enabled: !!taskId,
-        refetchInterval: query => query?.percents == 100 ? false : delay,
+        enabled: taskId != undefined,
+        refetchInterval: query => query?.dataProgress?.percents == 100 ? false : delay,
         refetchIntervalInBackground: true
     });
 
     return { isError, isLoading, data, error, refetch };
 };
 
-export const useGetEmployeeProgress = (taskId: string | null, delay: number) => {
-    const { isError, isLoading, data, error, refetch }: UseQueryResult<Progress, Error> = useQuery({
+export const useGetEmployeeProgress = (taskId: string | undefined, delay: number) => {
+    const { isError, isLoading, data, error, refetch }: UseQueryResult<{ id: string, dataProgress: Progress }, Error> = useQuery({
         queryKey: ["getEmployeeProgress"],
         queryFn: async () => {
-            return await EmployeeApi._getEmployeeProgress(taskId);
+            // console.log("in use get empl request")
+            const res = await EmployeeApi._getEmployeeProgress(taskId);
+            return {
+                id: uuidv4(),
+                dataProgress: res
+            }
         },
-        refetchInterval: query => query?.percent == 100 ? false : delay,
-        enabled: !!taskId,
+        refetchInterval: query => query?.dataProgress?.percents == 100 ? false : delay,
+        enabled: taskId != undefined,
         refetchIntervalInBackground: true,
     });
-
     return { isError, isLoading, data, error, refetch };
 };

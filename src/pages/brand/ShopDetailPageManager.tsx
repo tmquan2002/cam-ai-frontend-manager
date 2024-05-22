@@ -441,10 +441,11 @@ const ShopDetailPageManager = () => {
                   onSubmit={form.onSubmit((values) => {
                     const updateShopParams: UpdateShopParams = {
                       shopId: data?.id ?? "0",
+                      shopManagerId: data?.shopManager?.id,
                       addressLine: values.addressLine,
                       wardId: values.wardId ?? "0",
                       name: values.name,
-                      phone: values.phone == "" ? null : values.phone,
+                      phone: isEmpty(values.phone) ? null : values.phone,
                       openTime: values?.openTime,
                       closeTime: values?.closeTime,
                     };
@@ -473,11 +474,11 @@ const ShopDetailPageManager = () => {
                 >
                   <EditAndUpdateForm fields={fields} />
 
-                  {/* <Group justify="flex-end" mt="md">
-                    <Button disabled={!form.isDirty()} type="submit">
+                  <Group justify="flex-end" mt="md">
+                    <Button type="submit">
                       Submit
                     </Button>
-                  </Group> */}
+                  </Group>
                 </form>
               </Box>
             </Box>

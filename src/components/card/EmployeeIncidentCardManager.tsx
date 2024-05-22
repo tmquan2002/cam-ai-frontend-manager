@@ -1,4 +1,16 @@
 import {
+  Badge,
+  Box,
+  Collapse,
+  Divider,
+  Grid,
+  Group,
+  Stack,
+  Text,
+  rem
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import {
   IconCategory,
   IconChevronDown,
   IconClockHour5,
@@ -8,25 +20,13 @@ import {
   IconPointFilled,
   IconUser,
 } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { useNavigate } from "react-router-dom";
 import { IncidentStatus } from "../../models/CamAIEnum";
 import { EmployeeDetail } from "../../models/Employee";
 import { IncidentDetail } from "../../models/Incident";
-import {
-  Badge,
-  Box,
-  Collapse,
-  Divider,
-  Grid,
-  Group,
-  Stack,
-  Text,
-  rem,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useNavigate } from "react-router-dom";
 import classes from "./EmployeeIncidentCard.module.scss";
-import _ from "lodash";
-import dayjs from "dayjs";
 
 export type EmployeeIncidentCardProps = {
   employee: EmployeeDetail | null;
@@ -75,10 +75,7 @@ const renderIncidentStatusText = (status: IncidentStatus | undefined) => {
   }
 };
 
-export const EmployeeIncidentCardManager = ({
-  employee,
-  incidentList,
-}: EmployeeIncidentCardProps) => {
+export const EmployeeIncidentCardManager = ({ employee, incidentList, }: EmployeeIncidentCardProps) => {
   const [opened, { toggle }] = useDisclosure(false);
   const navigate = useNavigate();
 
@@ -155,8 +152,8 @@ export const EmployeeIncidentCardManager = ({
                   index == incidentList?.length - 1
                     ? {}
                     : {
-                        borderBottom: "1px solid #B4B4B4",
-                      }
+                      borderBottom: "1px solid #B4B4B4",
+                    }
                 }
                 pb={rem(12)}
                 className={classes["clickable-style"]}

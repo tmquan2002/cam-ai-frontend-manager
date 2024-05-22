@@ -1,7 +1,7 @@
 import { getAccessToken } from "../context/AuthContext";
 import { ShopStatus } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
-import { Progress } from "../models/Progress";
+import { Progress } from "../models/Task";
 import { ShopDetail } from "../models/Shop";
 import http, { toQueryParams } from "../utils/http";
 
@@ -142,7 +142,7 @@ export const ShopAPI = {
     return res?.data;
   },
 
-  _getShopUpsertTaskResult: async (taskId: string) => {
+  _getShopUpsertTaskResult: async (taskId: string | undefined) => {
     const access_token = getAccessToken();
 
     const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/result`, {
@@ -154,7 +154,7 @@ export const ShopAPI = {
     return res?.data;
   },
 
-  _getShopProgress: async (taskId: string | null) => {
+  _getShopProgress: async (taskId: string | undefined) => {
     const access_token = getAccessToken();
 
     const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/progress`, {

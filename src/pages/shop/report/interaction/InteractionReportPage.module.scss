@@ -10,8 +10,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    border-bottom: rem(1px) solid
-      light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-3));
+    border-bottom: rem(1px) solid #ccc;
   }
 }
 
@@ -20,7 +19,13 @@
 }
 
 .selectedInteraction {
-  background-color: #e3f4fb;
+  @include light {
+    background-color: #e1e4eb;
+  }
+
+  @include dark {
+    background-color: #434343;
+  }
 }
 
 .transition {

@@ -40,7 +40,7 @@ const CreateManagerPage = () => {
         p={rem(32)}
       >
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} mb={rem(30)} >
-          New shop manager
+          New Shop Manager
         </Text>
         <CreateShopManagerForm mode="manager" />
       </Paper>

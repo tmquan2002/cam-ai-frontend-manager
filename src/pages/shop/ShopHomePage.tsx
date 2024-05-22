@@ -10,6 +10,7 @@ import {
   Text,
   Transition,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import * as _ from "lodash";
 import classes from "./ShopHomePage.module.scss";
@@ -28,12 +29,11 @@ import {
 } from "../../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import { NotificationColorPalette } from "../../types/constant";
-import { useGetNewIncident, useReports } from "../../hooks/useReport";
+import { useGetNewIncident } from "../../hooks/useReport";
 import { ReadyState } from "react-use-websocket";
 import { IconCaretRight } from "@tabler/icons-react";
 import CameraCard from "../../components/card/CameraCard";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
-import NoImage from "../../components/image/NoImage";
 
 export type TitleAndNumberCard = {
   title: string;
@@ -66,6 +66,9 @@ const IncidentCard = ({
 }: IncidentDetail) => {
   const navigate = useNavigate();
   const [mouted, setMouted] = useState(false);
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
 
   useEffect(() => {
     setTimeout(() => {
@@ -103,15 +106,20 @@ const IncidentCard = ({
             px={rem(20)}
           >
             <div>
-              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+              <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Evidence(s)
               </Text>
-              <Text fw={600} size={rem(14)} lh={rem(20)} c={"rgb(17, 24, 39)"}>
+              <Text
+                fw={600}
+                size={rem(14)}
+                lh={rem(20)}
+                c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+              >
                 {evidences ? evidences?.length : 0}
               </Text>
             </div>
             <div>
-              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+              <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Status
               </Text>
               <Flex align={"center"}>
@@ -132,10 +140,15 @@ const IncidentCard = ({
               </Flex>
             </div>
             <div>
-              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+              <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Time
               </Text>
-              <Text fw={600} size={rem(14)} lh={rem(20)} c={"rgb(17, 24, 39)"}>
+              <Text
+                fw={600}
+                size={rem(14)}
+                lh={rem(20)}
+                c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+              >
                 {dayjs(startTime).format("HH:mm")}
               </Text>
             </div>

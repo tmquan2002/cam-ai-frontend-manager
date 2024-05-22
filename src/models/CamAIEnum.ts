@@ -149,6 +149,11 @@ export enum EventType {
   MoreEvidence = "MoreEvidence",
 }
 
+export enum TaskStatus {
+  Success = "Success",
+  Fail = "Fail",
+}
+
 //Status badge section
 
 export enum CommonStatus {
@@ -164,6 +169,7 @@ export enum ActiveStatusGroup {
   Accepted = IncidentStatus.Accepted,
   Working = EdgeboxInstallStatus.Working,
   Installing = EdgeBoxLocation.Installing,
+  Success = TaskStatus.Success,
 }
 
 export enum InactiveStatusGroup {
@@ -172,6 +178,7 @@ export enum InactiveStatusGroup {
   Disconnected = CameraStatus.Disconnected,
   Rejected = IncidentStatus.Rejected,
   Unhealthy = EdgeboxInstallStatus.Unhealthy,
+  Fail = TaskStatus.Fail,
 }
 
 export enum IdleStatusGroup {

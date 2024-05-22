@@ -20,6 +20,7 @@ import {
   Stack,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import {
   EmployeeIncidentCard,
@@ -41,6 +42,9 @@ type SearchIncidentField = {
 };
 
 const EmployeeIncidentReport = () => {
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
@@ -228,7 +232,7 @@ const EmployeeIncidentReport = () => {
       >
         <Box
           mb={rem(32)}
-          bg={"#f9fafb"}
+          bg={computedColorScheme == "light" ? "white" : "#242424"}
           py={rem(20)}
           style={{
             borderBottom: "1px solid #ccc",
@@ -275,9 +279,8 @@ const EmployeeIncidentReport = () => {
                   px={rem(20)}
                   py={rem(20)}
                   radius={"md"}
-                  style={{
-                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
-                  }}
+                  shadow="lg"
+                  bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
                 >
                   <Group>
                     <Avatar
@@ -289,7 +292,10 @@ const EmployeeIncidentReport = () => {
                       <IconCheck size={"2rem"} />
                     </Avatar>
                     <Stack justify="center" gap={rem(6)}>
-                      <Text c="#000" fw={500}>
+                      <Text
+                        c={computedColorScheme == "dark" ? "white" : "black"}
+                        fw={500}
+                      >
                         Assigned incident
                       </Text>
                       <Text size={rem(22)} fw={700} c={"green"}>
@@ -311,17 +317,19 @@ const EmployeeIncidentReport = () => {
                 <Paper
                   px={rem(20)}
                   py={rem(20)}
-                  style={{
-                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
-                  }}
+                  shadow="lg"
                   radius={"md"}
+                  bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
                 >
                   <Group>
                     <Avatar radius={"md"} color="blue" size={rem(68)}>
                       <IconEye size={"2rem"} />
                     </Avatar>
                     <Stack justify="center" gap={rem(8)}>
-                      <Text c="#000" fw={500}>
+                      <Text
+                        c={computedColorScheme == "dark" ? "white" : "black"}
+                        fw={500}
+                      >
                         Unassigned incident
                       </Text>
                       <Text size={rem(22)} fw={700} c={"blue"}>
@@ -344,17 +352,19 @@ const EmployeeIncidentReport = () => {
                 <Paper
                   px={rem(20)}
                   py={rem(20)}
-                  style={{
-                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
-                  }}
+                  shadow="lg"
                   radius={"md"}
+                  bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
                 >
                   <Group>
                     <Avatar radius={"md"} color="red" size={rem(68)}>
                       <IconX size={"2rem"} />
                     </Avatar>
                     <Stack justify="center" gap={rem(8)}>
-                      <Text c="#000" fw={500}>
+                      <Text
+                        c={computedColorScheme == "dark" ? "white" : "black"}
+                        fw={500}
+                      >
                         Rejected incident
                       </Text>
                       <Text size={rem(22)} fw={700} c={"red"}>

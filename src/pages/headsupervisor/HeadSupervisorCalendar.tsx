@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Center,
-  Collapse,
   Divider,
   Flex,
   Group,
@@ -20,13 +19,13 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import {
   IconBrandHipchat,
   IconChevronRight,
   IconExclamationCircle,
-  IconSettings,
   IconX,
 } from "@tabler/icons-react";
 import { IconCalendarTime } from "@tabler/icons-react";
@@ -53,14 +52,12 @@ import { differentDateReturnFormattedString } from "../../utils/helperFunction";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
 import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
-import { IncidentType, Role } from "../../models/CamAIEnum";
+import { IncidentType } from "../../models/CamAIEnum";
 import { modals } from "@mantine/modals";
-import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
 import { notifications } from "@mantine/notifications";
-import { NotificationColorPalette } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE } from "../../types/constant";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
-import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
 import _ from "lodash";
 import { SuperVisorAssignmentDetail } from "../../models/Shop";
 import { useGetIncidentByAssignmentId } from "../../hooks/useGetIncidentByAssignmentId";
@@ -69,7 +66,9 @@ import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
 const HeadSupervisorCalendar = () => {
-  const [opened, { toggle }] = useDisclosure(false);
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const [
     assignPopoverOpened,
     { toggle: toggleAssignPopover, close: closeAssignPopover },
@@ -103,13 +102,10 @@ const HeadSupervisorCalendar = () => {
   const { data: employeeList, isLoading: isEmployeeListLoading } =
     useGetEmployeeList({ size: 999 });
 
-  const {
-    data: supervisorList,
-    isLoading: isGetSupervisorListLoading,
-    refetch: refetchSupervisorList,
-  } = useGetSupervisorAssignmentHistory({
-    date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
-  });
+  const { data: supervisorList, isLoading: isGetSupervisorListLoading } =
+    useGetSupervisorAssignmentHistory({
+      date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
+    });
 
   const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
     useAssignIncident();
@@ -340,7 +336,7 @@ const HeadSupervisorCalendar = () => {
               variant="separated"
               radius="md"
               mt={rem(20)}
-              defaultValue={"0"}
+              defaultValue={DEFAULT_PAGE_SIZE}
             >
               {reverseSupervisorList?.map((i, index) => {
                 return (
@@ -692,12 +688,12 @@ const HeadSupervisorCalendar = () => {
               style={{
                 border: "1px solid #ccc",
               }}
+              bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
             >
               <Card.Section
                 style={{
                   borderBottom: "1px solid #ccc",
                 }}
-                bg={"#f9fafb"}
                 py={rem(16)}
                 px={rem(12)}
               >

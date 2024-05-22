@@ -1,5 +1,5 @@
 import { Button, Group } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -15,8 +15,9 @@ import { useGetProvinceList } from "../../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../../hooks/useGetWardList";
 import { Gender, Role } from "../../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../../models/Response";
-import { PHONE_REGEX } from "../../../types/constant";
+import { useTaskBrand } from "../../../routes/BrandRoute";
 import { getDateFromSetYear, mapLookupToArray } from "../../../utils/helperFunction";
+import { EMAIL_REGEX, PHONE_REGEX } from "../../../types/constant";
 
 export type CreateAccountField = {
     email: string;
@@ -32,6 +33,7 @@ export type CreateAccountField = {
 
 const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "shop"; close?: () => void; refetch?: () => {} }) => {
     const navigate = useNavigate();
+    const { taskId } = useTaskBrand();
     const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
         { size: 1 }
     );
@@ -54,7 +56,8 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
 
         validate: {
             name: isNotEmpty("Name is required"),
-            email: isEmail("Invalid email - ex: name@gmail.com"),
+            email: (value: string) => isEmpty(value) ? "Email is required"
+                : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
             gender: isNotEmpty("Please select gender"),
             phone: (value) => isEmpty(value) ? null :
                 PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
@@ -82,6 +85,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     placeholder: "Name",
                     label: "Name",
                     required: true,
+                    disabled: taskId != undefined,
                 },
                 spans: 6,
             },
@@ -93,6 +97,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     placeholder: "Email",
                     label: "Email",
                     required: true,
+                    disabled: taskId != undefined,
                 },
                 spans: 6,
             },
@@ -103,6 +108,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     name: "phone",
                     placeholder: "Phone",
                     label: "Phone",
+                    disabled: taskId != undefined,
                 },
                 spans: 4,
             },
@@ -116,6 +122,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     form: createAccountForm,
                     name: "gender",
                     required: true,
+                    disabled: taskId != undefined,
                 },
                 spans: 4,
             },
@@ -127,6 +134,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     name: "birthday",
                     placeholder: "Birthday",
                     label: "Birthday",
+                    disabled: taskId != undefined,
                 },
                 spans: 4,
             },
@@ -141,7 +149,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     }),
                     form: createAccountForm,
                     name: "province",
-
+                    disabled: taskId != undefined,
                     loading: isProvicesLoading,
                 },
                 spans: 4,
@@ -157,7 +165,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     form: createAccountForm,
                     name: "district",
                     loading: isCreateAccountDistrictsLoading,
-
+                    disabled: taskId != undefined,
                     // disabled: true,
                 },
                 spans: 4,
@@ -173,6 +181,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     form: createAccountForm,
                     name: "wardId",
                     loading: isCreateAccountWardsLoading,
+                    disabled: taskId != undefined,
                 },
                 spans: 4,
             },
@@ -183,6 +192,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     name: "addressLine",
                     placeholder: "Address",
                     label: "Address",
+                    disabled: taskId != undefined,
                 },
             },
         ];

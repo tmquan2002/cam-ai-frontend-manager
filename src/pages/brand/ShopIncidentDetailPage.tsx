@@ -4,6 +4,7 @@ import {
   Flex,
   Group,
   Loader,
+  LoadingOverlay,
   Paper,
   ScrollArea,
   Select,
@@ -92,12 +93,9 @@ const ShopIncidentDetailPage = () => {
     }
   }, [incidentData]);
 
-  if (isGetIncidentLoading) {
-    return <Loader />;
-  }
-
   return (
-    <Box>
+    <Box pos="relative">
+      <LoadingOverlay visible={isGetIncidentLoading} />
       <Box pt={rem(20)} pl={rem(32)}>
         <CustomBreadcrumb items={breadcrumbs} goBack />
       </Box>

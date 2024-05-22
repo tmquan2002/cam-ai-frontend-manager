@@ -12,16 +12,18 @@ import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 import IncidentListPage from "../pages/brand/IncidentListPage";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
 import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
+import ShopImportResultPage from "../pages/brand/ShopImportResultPage";
 import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
-import ShopListPage from "../pages/brand/ShopListPage";
 import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
 import IncidentReportPageManager from "../pages/brand/report/incident/IncidentReportPageManager";
 import InteractionReportPageManager from "../pages/brand/report/interaction/InteractionReportPageManager";
 import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
 import LoginPage from "../pages/common/login/LoginPage";
+import HeadSupervisorMainPage from "../pages/headsupervisor/HeadSupervisorMainPage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
+import EmployeeImportResultPage from "../pages/shop/EmployeeImportResultPage";
 import EmployeeListPage from "../pages/shop/EmployeeListPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
 import ShopCalendar from "../pages/shop/ShopCalendar";
@@ -35,9 +37,8 @@ import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab"
 import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
 import BrandRoute from "./BrandRoute";
 import CommonRoute from "./CommonRoute";
-import ShopRoute from "./ShopRoute";
 import HeadSupervisorRoute from "./HeadSupervisorRoute";
-import HeadSupervisorMainPage from "../pages/headsupervisor/HeadSupervisorMainPage";
+import ShopRoute from "./ShopRoute";
 
 const AppRoute = () => {
   return useRoutes([
@@ -116,6 +117,10 @@ const AppRoute = () => {
           path: "calendar/setting",
           element: <ShopCalendarSetting />,
         },
+        {
+          path: "import/:id",
+          element: <EmployeeImportResultPage />,
+        },
       ],
     },
     {
@@ -142,10 +147,10 @@ const AppRoute = () => {
           path: "employee/:id",
           element: <ShopEmployeeDetailPage />,
         },
-        {
-          path: "shop",
-          element: <ShopListPage />,
-        },
+        // {
+        //   path: "shop",
+        //   element: <ShopListPage />,
+        // },
         {
           path: "shop/:id",
           element: <ShopDetailPageManager />,
@@ -188,6 +193,10 @@ const AppRoute = () => {
         {
           path: "report/interaction",
           element: <InteractionReportPageManager />,
+        },
+        {
+          path: "import/:id",
+          element: <ShopImportResultPage />,
         },
       ],
     },

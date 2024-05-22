@@ -14,6 +14,7 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
 import {
@@ -104,6 +105,9 @@ const renderIncidentTypeLegendTitle = (
 };
 
 const TimeIncidentReport = () => {
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
@@ -347,14 +351,12 @@ const TimeIncidentReport = () => {
       >
         <Table.Td>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-              {item.incidentType}
-            </Text>
+            <Text size={rem(13)}>{item.incidentType}</Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -363,7 +365,7 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -372,23 +374,17 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-              {item?.evidences.length}
-            </Text>
+            <Text size={rem(13)}>{item?.evidences.length}</Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-              {item?.employee?.name ?? "Empty"}
-            </Text>
+            <Text size={rem(13)}>{item?.employee?.name ?? "Empty"}</Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-              {item.status}
-            </Text>
+            <Text size={rem(13)}>{item.status}</Text>
           </Center>
         </Table.Td>
       </Table.Tr>
@@ -408,7 +404,6 @@ const TimeIncidentReport = () => {
         >
           <Box
             mb={rem(32)}
-            bg={"#f9fafb"}
             py={rem(20)}
             style={{
               borderBottom: "1px solid #ccc",
@@ -427,16 +422,40 @@ const TimeIncidentReport = () => {
           ) : (
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)} mr={rem(12)}>
-                <LegendCard
-                  type="line"
-                  color="rgb(37, 150, 190)"
-                  title="Total incident"
-                />
-                <LegendCard
-                  type="bar"
-                  color="rgba(255, 99, 132, 1)"
-                  title="Average incident time"
-                />
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "999px",
+                      width: rem(20),
+                      aspectRatio: 5,
+                      backgroundColor: "rgb(37, 150, 190)",
+                    }}
+                  />
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
+                    Total incident
+                  </Text>
+                </Group>
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "2px",
+                      width: rem(10),
+                      aspectRatio: 1,
+                      backgroundColor: "rgba(255, 99, 132, 1)",
+                    }}
+                  />
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
+                    Average incident time
+                  </Text>
+                </Group>
               </Group>
 
               <Flex mb={rem(32)}>
@@ -444,7 +463,6 @@ const TimeIncidentReport = () => {
                   style={{
                     width: "40px",
                     zIndex: 999,
-                    backgroundColor: "#fff",
                   }}
                 >
                   <Chart
@@ -606,7 +624,6 @@ const TimeIncidentReport = () => {
                             label: "Total incident ",
                             data: data?.map((i) => i.count),
                             borderColor: "rgb(37, 150, 190)",
-                            backgroundColor: "rgb(37, 150, 190, 0.5)",
                             cubicInterpolationMode: "monotone",
                             pointHoverRadius: 7,
                             pointHoverBackgroundColor: "#fff",
@@ -645,9 +662,7 @@ const TimeIncidentReport = () => {
                     <Text
                       py={rem(20)}
                       ta={"center"}
-                      c={"rgb(17, 24, 39)"}
                       fw={500}
-                      bg={"#f9fafb"}
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
@@ -707,9 +722,7 @@ const TimeIncidentReport = () => {
                     <Text
                       py={rem(20)}
                       ta={"center"}
-                      c={"rgb(17, 24, 39)"}
                       fw={500}
-                      bg={"#f9fafb"}
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
@@ -787,12 +800,12 @@ const TimeIncidentReport = () => {
             style={{
               border: "1px solid #ccc",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
                 borderBottom: "1px solid #ccc",
               }}
-              bg={"#f9fafb"}
               py={rem(16)}
               px={rem(12)}
             >
@@ -811,7 +824,6 @@ const TimeIncidentReport = () => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(10)}
                   >
                     {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
@@ -826,7 +838,6 @@ const TimeIncidentReport = () => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(16)}
                   >
                     {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
@@ -849,48 +860,28 @@ const TimeIncidentReport = () => {
                     <Table.Tr>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Type
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Start time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             End time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Evidences
                           </Text>
                         </Center>
@@ -898,24 +889,14 @@ const TimeIncidentReport = () => {
 
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Assigned to
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Status
                           </Text>
                         </Center>
@@ -938,13 +919,13 @@ const TimeIncidentReport = () => {
             style={{
               border: "1px solid rgb(229 231 235)",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section>
               <Box
                 style={{
                   borderBottom: "1px solid #ccc",
                 }}
-                bg={"#f9fafb"}
                 py={rem(16)}
                 px={rem(24)}
               >
@@ -979,22 +960,12 @@ const TimeIncidentReport = () => {
                       pb={rem(8)}
                       mb={rem(10)}
                     >
-                      <Text
-                        c={"rgb(107 114 128"}
-                        size={rem(14)}
-                        lh={rem(24)}
-                        fw={500}
-                      >
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
                         {dayjs(
                           selectedIncidentItem?.evidences?.[0]?.createdDate
                         ).format("LL")}
                       </Text>
-                      <Text
-                        c={"rgb(107 114 128"}
-                        size={rem(14)}
-                        lh={rem(24)}
-                        fw={500}
-                      >
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
                         Assigned to :{" "}
                         <Text
                           span

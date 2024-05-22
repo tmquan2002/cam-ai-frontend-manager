@@ -12,7 +12,7 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { EmployeeStatus } from "../../models/CamAIEnum";
 import { EmployeeDetail } from "../../models/Employee";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./BrandEmployeeListPage.module.scss";
 
@@ -38,7 +38,7 @@ const BrandEmployeeListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("20");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
   const [search, setSearch] = useState<string>("");
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(SearchCategory.NAME);
   const { data: shopList, isLoading: isLoadingShop } = useGetShopList({ enabled: true, size: 999 });
@@ -77,7 +77,7 @@ const BrandEmployeeListPage = () => {
 
   const searchParams: GetEmployeeListParams = useMemo(() => {
     let sb: GetEmployeeListParams = {
-      size: Number(pageSize),
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       shopId: form.values.shopId,
       pageIndex: activePage - 1,
       employeeStatus: form.values.employeeStatus || EmployeeStatus.Active,
@@ -274,7 +274,7 @@ const BrandEmployeeListPage = () => {
               label="Page Size"
               allowDeselect={false}
               placeholder="0"
-              data={PAGE_SIZE_SELECT} defaultValue={"20"}
+              data={PAGE_SIZE_SELECT} defaultValue={DEFAULT_PAGE_SIZE}
               value={pageSize}
               onChange={(value) => {
                 setPageSize(value)

@@ -1,13 +1,3 @@
-import { useForm } from "@mantine/form";
-import {
-  IncidentStatus,
-  IncidentType,
-  ReportInterval,
-} from "../../../../models/CamAIEnum";
-import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
-import { useEffect, useMemo, useState } from "react";
-import dayjs from "dayjs";
-import _ from "lodash";
 import {
   Badge,
   Box,
@@ -24,27 +14,43 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
 import NoImage from "../../../../components/image/NoImage";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+  IncidentStatus,
+  IncidentType,
+  ReportInterval,
+} from "../../../../models/CamAIEnum";
 
+import { DonutChart } from "@mantine/charts";
+import { useScrollIntoView } from "@mantine/hooks";
 import { Chart } from "react-chartjs-2";
 import LegendCard, {
   LEGEND_TYPES,
 } from "../../../../components/card/LegendCard";
+import LoadingImage from "../../../../components/image/LoadingImage";
+import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
+import { useGetIncidentPercent } from "../../../../hooks/useGetIncidentPercent";
 import {
   IncidentDetail,
   IncidentPercentStatusDetail,
@@ -54,11 +60,6 @@ import {
   addDaysBaseOnReportInterval,
   differentDateReturnFormattedString,
 } from "../../../../utils/helperFunction";
-import { DonutChart } from "@mantine/charts";
-import { useGetIncidentPercent } from "../../../../hooks/useGetIncidentPercent";
-import LoadingImage from "../../../../components/image/LoadingImage";
-import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
-import { useScrollIntoView } from "@mantine/hooks";
 import classes from "./TimeIncidentReport.module.scss";
 
 ChartJS.register(
@@ -94,10 +95,7 @@ const renderIncidentStatusLegendTitle = (
   ).toFixed(2)}%`;
 };
 
-const renderIncidentTypeLegendTitle = (
-  details: IncidentPercentTypeDetail[],
-  type: IncidentType
-) => {
+const renderIncidentTypeLegendTitle = (details: IncidentPercentTypeDetail[], type: IncidentType) => {
   const detail = details.find((i) => i.type == type);
 
   return `${type} incident (${detail?.total}) - ${(detail?.percent
@@ -107,6 +105,7 @@ const renderIncidentTypeLegendTitle = (
 };
 
 const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
@@ -137,14 +136,14 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
     validate: (values) => ({
       toDate:
         values.startDate &&
-        values?.toDate &&
-        values?.toDate?.getTime() < values?.startDate?.getTime()
+          values?.toDate &&
+          values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toDate &&
-        values?.startDate &&
-        values?.toDate?.getTime() < values?.startDate?.getTime()
+          values?.startDate &&
+          values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -191,6 +190,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       form.values.toDate,
       shopId,
     ]);
+
   const {
     data: incidentReportByTimeData,
     isLoading: isGetIncidentReportByTimeDataLoading,
@@ -351,9 +351,9 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       </Table.Td>
     </Table.Tr>
   ) : (
-    incidentList?.values.map((item) => (
+    incidentList?.values.map((item, index) => (
       <Table.Tr
-        key={item.id}
+        key={index}
         style={{
           cursor: "pointer",
         }}
@@ -368,14 +368,14 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       >
         <Table.Td>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item.incidentType}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -384,7 +384,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -393,21 +393,21 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.evidences.length}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.employee?.name ?? "Empty"}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text fw={500} size={rem(13)}>
               {item.status}
             </Text>
           </Center>
@@ -422,17 +422,16 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
         <Box
           style={{
             borderRadius: "8px",
-            border: "1px solid #ccc",
+            border: "1px solid grey",
             marginTop: rem(20),
             overflow: "hidden",
           }}
         >
           <Box
             mb={rem(32)}
-            bg={"#f9fafb"}
             py={rem(20)}
             style={{
-              borderBottom: "1px solid #ccc",
+              borderBottom: "1px solid grey",
             }}
           >
             <Group justify="flex-end" mr={rem(20)}>
@@ -454,23 +453,41 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
           ) : (
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)} mr={rem(12)}>
-                <LegendCard
-                  type="line"
-                  color="rgb(37, 150, 190)"
-                  title="Total incident"
-                />
-                <LegendCard
-                  type="bar"
-                  color="rgba(255, 99, 132, 1)"
-                  title="Average incident time"
-                />
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "999px",
+                      width: rem(20),
+                      aspectRatio: 5,
+                      backgroundColor: "rgb(37, 150, 190)",
+                    }}
+                  />
+                  <Text size={rem(14)} fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                    Total incident
+                  </Text>
+                </Group>
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "2px",
+                      width: rem(10),
+                      aspectRatio: 1,
+                      backgroundColor: "rgba(255, 99, 132, 1)",
+                    }}
+                  />
+                  <Text size={rem(14)} fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                    Average incident time
+                  </Text>
+                </Group>
               </Group>
+              
               <Flex mb={rem(32)}>
                 <Box
                   style={{
                     width: "40px",
                     zIndex: 999,
-                    backgroundColor: "#fff",
                   }}
                 >
                   <Chart
@@ -505,7 +522,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                             drawTicks: false,
                           },
                           border: {
-                            color: "#000",
+                            color: "grey",
                           },
                           suggestedMax: 10,
                         },
@@ -548,12 +565,12 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                     style={
                       data && data?.length > 7
                         ? {
-                            width: `${1500 + (data?.length - 7) * 70}px`,
-                            height: "600px",
-                          }
+                          width: `${1500 + (data?.length - 7) * 70}px`,
+                          height: "600px",
+                        }
                         : {
-                            height: "600px",
-                          }
+                          height: "600px",
+                        }
                     }
                   >
                     <Chart
@@ -611,7 +628,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           if (elements.length > 0) {
                             const selectedData =
                               incidentReportByTimeData?.data?.[
-                                elements[0].index
+                              elements[0].index
                               ];
                             setSelectedIncidentItem(null);
                             setSelectedDuration({
@@ -632,7 +649,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                             label: "Total incident ",
                             data: data?.map((i) => i.count),
                             borderColor: "rgb(37, 150, 190)",
-                            backgroundColor: "rgb(37, 150, 190, 0.5)",
                             cubicInterpolationMode: "monotone",
                             pointHoverRadius: 7,
                             pointHoverBackgroundColor: "#fff",
@@ -662,15 +678,13 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                     flex={1}
                     style={{
                       borderRadius: rem(12),
-                      border: "1px solid #ccc",
+                      border: "1px solid grey",
                     }}
                   >
                     <Text
                       py={rem(20)}
                       ta={"center"}
-                      c={"rgb(17, 24, 39)"}
                       fw={500}
-                      bg={"#f9fafb"}
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
@@ -687,15 +701,15 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                         data={
                           incidentPercent
                             ? incidentPercent?.types?.map((i) => {
-                                return {
-                                  name: i.type + " incident",
-                                  color:
-                                    i.type == IncidentType.Phone
-                                      ? "indigo.6"
-                                      : "yellow.6",
-                                  value: i.total,
-                                };
-                              })
+                              return {
+                                name: i.type + " incident",
+                                color:
+                                  i.type == IncidentType.Phone
+                                    ? "indigo.6"
+                                    : "yellow.6",
+                                value: i.total,
+                              };
+                            })
                             : []
                         }
                       />
@@ -724,15 +738,13 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                     flex={1}
                     style={{
                       borderRadius: rem(12),
-                      border: "1px solid #ccc",
+                      border: "1px solid grey",
                     }}
                   >
                     <Text
                       py={rem(20)}
                       ta={"center"}
-                      c={"rgb(17, 24, 39)"}
                       fw={500}
-                      bg={"#f9fafb"}
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
@@ -749,17 +761,17 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                         data={
                           incidentPercent
                             ? incidentPercent?.statuses.map((i) => {
-                                return {
-                                  color:
-                                    i.status == IncidentStatus.Accepted
-                                      ? "#12b886"
-                                      : i.status == IncidentStatus.New
+                              return {
+                                color:
+                                  i.status == IncidentStatus.Accepted
+                                    ? "#12b886"
+                                    : i.status == IncidentStatus.New
                                       ? "#4c6ef5"
                                       : "#fa5252",
-                                  name: i.status,
-                                  value: i.total,
-                                };
-                              })
+                                name: i.status,
+                                value: i.total,
+                              };
+                            })
                             : []
                         }
                       />
@@ -808,19 +820,19 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
             mb={rem(40)}
             ref={targetRef}
             style={{
-              border: "1px solid #ccc",
+              border: "1px solid grey",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
-                borderBottom: "1px solid #ccc",
+                borderBottom: "1px solid grey",
               }}
-              bg={"#f9fafb"}
               py={rem(16)}
               px={rem(12)}
             >
               <Group justify="space-between">
-                <Text size="md" fw={600}>
+                <Text size="md" fw={600} ml={rem(32)}>
                   Incident list
                 </Text>
                 <Group gap={rem(6)}>
@@ -834,7 +846,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(10)}
                   >
                     {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
@@ -849,7 +860,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(16)}
                   >
                     {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
@@ -868,7 +878,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Type
@@ -880,7 +889,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Start time
@@ -892,7 +900,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             End time
@@ -904,7 +911,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Evidences
@@ -917,7 +923,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Assigned to
@@ -929,7 +934,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Status
@@ -954,13 +958,13 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
             style={{
               border: "1px solid rgb(229 231 235)",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section>
               <Box
                 style={{
-                  borderBottom: "1px solid #ccc",
+                  borderBottom: "1px solid grey",
                 }}
-                bg={"#f9fafb"}
                 py={rem(16)}
                 px={rem(24)}
               >
@@ -974,11 +978,11 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                     </Text>
                     <Badge radius={"sm"} color={"green"} c={"#fff"}>
                       {selectedIncidentItem?.startTime &&
-                      selectedIncidentItem.endTime
+                        selectedIncidentItem.endTime
                         ? differentDateReturnFormattedString(
-                            selectedIncidentItem?.startTime,
-                            selectedIncidentItem?.endTime
-                          )
+                          selectedIncidentItem?.startTime,
+                          selectedIncidentItem?.endTime
+                        )
                         : "undefined"}
                     </Badge>
                   </Group>
@@ -996,7 +1000,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                       mb={rem(10)}
                     >
                       <Text
-                        c={"rgb(107 114 128"}
                         size={rem(14)}
                         lh={rem(24)}
                         fw={500}
@@ -1006,7 +1009,6 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                         ).format("LL")}
                       </Text>
                       <Text
-                        c={"rgb(107 114 128"}
                         size={rem(14)}
                         lh={rem(24)}
                         fw={500}

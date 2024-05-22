@@ -7,6 +7,7 @@ import {
   Tabs,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { IconClock, IconUser } from "@tabler/icons-react";
 import EmployeeIncidentReportTab from "./EmployeeIncidentReportTab";
@@ -15,6 +16,7 @@ import { useGetShopList } from "../../../../hooks/useGetShopList";
 import { useState } from "react";
 
 const IncidentReportPageManager = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [selectedShop, setSelectedShop] = useState<string | null>(null);
   const iconStyle = { width: rem(20), height: rem(20) };
   const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
@@ -23,7 +25,9 @@ const IncidentReportPageManager = () => {
   });
 
   return (
-    <Flex px={rem(40)} pt={rem(20)} bg={"#fff"} flex={1} direction={"column"}>
+    <Flex px={rem(40)} pt={rem(20)}
+      bg={computedColorScheme == "light" ? "#f6f8fc" : "#1a1a1a"}
+      flex={1} direction={"column"}>
       <Group justify="space-between" align="center" my={rem(20)}>
         <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
           Incident Report
@@ -48,11 +52,11 @@ const IncidentReportPageManager = () => {
             data={
               shopList
                 ? shopList?.values.map((item) => {
-                    return {
-                      value: item?.id,
-                      label: item?.name,
-                    };
-                  })
+                  return {
+                    value: item?.id,
+                    label: item?.name,
+                  };
+                })
                 : []
             }
             placeholder={"Select a shop"}
@@ -60,7 +64,8 @@ const IncidentReportPageManager = () => {
         )}
       </Group>
 
-      <Box pb={rem(40)}>
+      <Box py={rem(10)} px={rem(32)}
+        bg={computedColorScheme == "light" ? "white" : "#242424"} >
         <Tabs keepMounted={false} variant="default" defaultValue="ByEmployee">
           <Tabs.List>
             <Tabs.Tab
@@ -81,8 +86,8 @@ const IncidentReportPageManager = () => {
             {selectedShop ? (
               <EmployeeIncidentReportTab shopId={selectedShop} />
             ) : (
-              <Text mt={rem(28)} size="md" fw={500}>
-                No shop selected
+              <Text my={rem(20)} size="md" fw={500}>
+                No Shop Selected
               </Text>
             )}
           </Tabs.Panel>
@@ -91,8 +96,8 @@ const IncidentReportPageManager = () => {
             {selectedShop ? (
               <TimeIncidentReportTab shopId={selectedShop} />
             ) : (
-              <Text size="md" mt={rem(28)} fw={500}>
-                No shop selected
+              <Text size="md" my={rem(20)} fw={500}>
+                No Shop Selected
               </Text>
             )}
           </Tabs.Panel>

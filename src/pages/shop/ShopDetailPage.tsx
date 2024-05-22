@@ -66,8 +66,8 @@ const ShopDetailPage = () => {
         isEmpty(value)
           ? null
           : PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+            ? null
+            : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
       province: isNotEmpty("Provice is required"),
@@ -372,6 +372,7 @@ const ShopDetailPage = () => {
                 {cameraList?.values?.map((item) => (
                   <Tooltip label="View camera" key={item?.id}>
                     <Button
+                      c="light-blue.3"
                       variant="outline"
                       fullWidth
                       size={rem(52)}

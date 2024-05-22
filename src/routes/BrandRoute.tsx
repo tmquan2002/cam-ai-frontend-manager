@@ -1,7 +1,7 @@
-import { AppShell, useComputedColorScheme } from "@mantine/core";
+import { AppShell, Text, rem, useComputedColorScheme } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { Navigate, Outlet, useOutletContext } from "react-router-dom";
+import { Link, Navigate, Outlet, useOutletContext } from "react-router-dom";
 import { getUserRole } from "../context/AuthContext";
 // import ShopHeader from "../components/header/ShopHeader";
 import BrandHeader from "../components/header/BrandHeader";
@@ -9,14 +9,18 @@ import { BrandNavbar } from "../components/navbar/BrandNavbar";
 import { Role } from "../models/CamAIEnum";
 import { useGetShopProgress } from "../hooks/useFiles";
 import { notifications } from "@mantine/notifications";
-import { ProgressTask } from "../models/Progress";
+import { ProgressTask } from "../models/Task";
+import { CommonConstant, POLLING_INTERVAL } from "../types/constant";
+import { IconCheck } from "@tabler/icons-react";
 
 const BrandRoute = () => {
-  const [taskId, setTaskId] = useState<string | null>(null);
+  const [taskId, setTaskId] = useState<string | undefined>(
+    localStorage.getItem(CommonConstant.TASK_ID) ?? undefined
+  );
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [userRole, setUserRole] = useState<Role | null>(Role.BrandManager);
-  const { data: dataProgress } = useGetShopProgress(taskId, 1000);
+  const { data: dataProId } = useGetShopProgress(taskId, POLLING_INTERVAL);
   const computedColorScheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
@@ -27,14 +31,16 @@ const BrandRoute = () => {
   }, []);
 
   useEffect(() => {
-    if (dataProgress?.percents !== 100) {
+    if (dataProId?.dataProgress?.percents !== 100) {
       notifications.update({
         id: "uploadShopProgress",
         title: "Import in progress",
-        message: `${dataProgress?.detailed?.currentFinishedRecord}/${
-          dataProgress?.detailed?.total
+        message: `${dataProId?.dataProgress?.detailed?.currentFinishedRecord}/${
+          dataProId?.dataProgress?.detailed?.total
         } Done (${
-          dataProgress?.percents ? Math.round(dataProgress?.percents) : 0
+          dataProId?.dataProgress?.percents
+            ? Math.round(dataProId?.dataProgress?.percents)
+            : 0
         } %)`,
         autoClose: false,
         loading: true,
@@ -43,14 +49,22 @@ const BrandRoute = () => {
       notifications.update({
         color: "teal",
         id: "uploadShopProgress",
-        title: "Import Finished",
-        message: "Upload Complete",
+        title: "Import Completed",
+        message: (
+          <Link
+            to={`/brand/import/${taskId}`}
+            style={{ textDecoration: "none" }}
+          >
+            <Text>View Import Detail</Text>
+          </Link>
+        ),
+        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
         loading: false,
-        autoClose: 5000,
+        autoClose: 10000,
       });
-      setTaskId(null);
+      setTaskId(undefined);
     }
-  }, [dataProgress]);
+  }, [dataProId]);
 
   switch (userRole) {
     case Role.BrandManager:

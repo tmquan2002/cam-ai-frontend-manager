@@ -8,32 +8,32 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { useEffect, useMemo } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { ResponseErrorDetail } from "../../models/Response";
-import { useGetProfile } from "../../hooks/useGetProfile";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useChangePassword } from "../../hooks/useChangePassword";
+import { notifications } from "@mantine/notifications";
+import { IconKey } from "@tabler/icons-react";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
+import { isEmpty } from "lodash";
+import { useEffect, useMemo } from "react";
 import {
   ChangePasswordParams,
   UpdateProfileParams,
 } from "../../apis/ProfileAPI";
-import { IconKey } from "@tabler/icons-react";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender } from "../../models/CamAIEnum";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
 import { getAccessToken } from "../../context/AuthContext";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useChangePassword } from "../../hooks/useChangePassword";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetProfile } from "../../hooks/useGetProfile";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateProfile } from "../../hooks/useUpdateProfile";
-import dayjs from "dayjs";
-import { isEmpty } from "lodash";
-import { PHONE_REGEX } from "../../types/constant";
+import { Gender } from "../../models/CamAIEnum";
+import { ResponseErrorDetail } from "../../models/Response";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 
 type ProfileFieldValue = {
   name: string;
@@ -74,14 +74,15 @@ const ShopManagerProfilePage = () => {
 
     validate: {
       name: isNotEmpty("Name is required"),
-      email: isEmail("Invalid email - ex: name@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
         isEmpty(value)
           ? null
           : PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+            ? null
+            : "A phone number should have a length of 10-12 characters",
     },
   });
 

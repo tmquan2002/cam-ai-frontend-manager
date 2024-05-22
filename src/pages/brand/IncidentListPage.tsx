@@ -30,7 +30,7 @@ import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
 import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import { mapLookupToArray } from "../../utils/helperFunction";
 import classes from "./IncidentListPage.module.scss";
 
@@ -51,7 +51,7 @@ const IncidentListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
   const [activePage, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<string | null>("5");
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
@@ -78,7 +78,7 @@ const IncidentListPage = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: Number(pageSize) ?? 5,
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       pageIndex: activePage - 1,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
@@ -335,7 +335,7 @@ const IncidentListPage = () => {
             allowDeselect={false}
             placeholder="0"
             data={PAGE_SIZE_SELECT}
-            defaultValue={"5"}
+            defaultValue={DEFAULT_PAGE_SIZE}
             value={pageSize}
             onChange={(value) => {
               setPageSize(value);

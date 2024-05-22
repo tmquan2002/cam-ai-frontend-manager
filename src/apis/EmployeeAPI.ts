@@ -145,7 +145,7 @@ export const EmployeeApi = {
     return res?.data;
   },
 
-  _getEmployeeProgress: async (taskId: string | null) => {
+  _getEmployeeProgress: async (taskId: string | undefined) => {
     const access_token = getAccessToken();
 
     const res = await http.get<{

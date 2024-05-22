@@ -20,6 +20,7 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import cx from "clsx";
 
@@ -32,7 +33,10 @@ import {
   startOfMonth,
 } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
-import { NotificationColorPalette } from "../../types/constant";
+import {
+  DEFAULT_PAGE_SIZE,
+  NotificationColorPalette,
+} from "../../types/constant";
 import classes from "./ShopCalendar.module.scss";
 import clsx from "clsx";
 import {
@@ -61,7 +65,6 @@ import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorA
 import { modals } from "@mantine/modals";
 import _ from "lodash";
 import { SuperVisorAssignmentDetail } from "../../models/Shop";
-import { useDeleteHeadSupervisor } from "../../hooks/useDeleteHeadSupervisor";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useGetIncidentByAssignmentId } from "../../hooks/useGetIncidentByAssignmentId";
@@ -98,6 +101,9 @@ const renderInChargeRole = (role: Role | undefined | null) => {
 };
 
 const ShopCalendar = ({ events }: ShopCalendarProps) => {
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const [opened, { toggle }] = useDisclosure(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -326,14 +332,14 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       >
         <Table.Td>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text fw={500} size={rem(13)}>
               {item.incidentType}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text fw={500} size={rem(13)}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -342,7 +348,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text fw={500} size={rem(13)}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -351,7 +357,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text fw={500} size={rem(13)}>
               {item?.evidences.length}
             </Text>
           </Center>
@@ -372,7 +378,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text fw={500} size={rem(13)}>
               {item.status}
             </Text>
           </Center>
@@ -468,7 +474,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       <Flex
         px={rem(60)}
         pt={rem(40)}
-        bg={"#fff"}
+        bg={computedColorScheme == "light" ? "#fff" : ""}
         flex={1}
         pb={rem(40)}
         direction={"column"}
@@ -476,14 +482,23 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         <Group align="flex-start" gap={rem(60)}>
           <Box flex={4}>
             <Group justify="space-between" align="center">
-              <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} lh={rem(36)}>
+              <Text
+                c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+                fw={600}
+                size={rem(17)}
+                lh={rem(36)}
+              >
                 Supervisor shift
               </Text>
               <ActionIcon
                 variant="light"
                 aria-label="Settings"
                 onClick={toggle}
-                color="rgb(79, 70, 229)"
+                color={
+                  computedColorScheme == "light"
+                    ? "rgb(79, 70, 229)"
+                    : "#A194FF"
+                }
                 size={"lg"}
               >
                 <IconSettings
@@ -586,13 +601,14 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
               variant="separated"
               radius="md"
               mt={rem(20)}
-              defaultValue={"0"}
+              defaultValue={DEFAULT_PAGE_SIZE}
             >
               {reverseSupervisorList?.map((i, index) => {
                 return (
                   <Accordion.Item
                     style={{
-                      backgroundColor: "#fefefe",
+                      backgroundColor:
+                        computedColorScheme == "light" ? "#fefefe" : "#1f1f1f",
                       border: "1px solid #ccc",
                     }}
                     key={index.toString()}
@@ -623,7 +639,11 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       >
                         <Box>
                           <Text
-                            c={"rgb(17, 24, 39)"}
+                            c={
+                              computedColorScheme == "light"
+                                ? "rgb(17, 24, 39)"
+                                : "white"
+                            }
                             lh={rem(26)}
                             fw={500}
                             size={rem(16)}
@@ -637,12 +657,11 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                 width: rem(20),
                                 aspectRatio: 1,
                               }}
-                              color={"rgb(107, 114, 128)"}
                             />
 
                             <Text
                               ml={rem(10)}
-                              c={"rgb(107, 114, 128)"}
+                              c={"grey"}
                               lh={rem(26)}
                               size={rem(14)}
                             >
@@ -693,11 +712,19 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                     width: rem(20),
                                     aspectRatio: 1,
                                   }}
-                                  color={"#198754"}
+                                  color={
+                                    computedColorScheme == "light"
+                                      ? "#198754"
+                                      : "#33A788"
+                                  }
                                 />
                                 <Text
                                   ml={rem(6)}
-                                  c={"#198754"}
+                                  c={
+                                    computedColorScheme == "light"
+                                      ? "#198754"
+                                      : "#33A788"
+                                  }
                                   lh={rem(26)}
                                   size={rem(14)}
                                 >
@@ -721,7 +748,10 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                               px={rem(12)}
                               style={{
                                 borderRadius: rem(8),
-                                backgroundColor: "#fefefe",
+                                backgroundColor:
+                                  computedColorScheme == "light"
+                                    ? "#fefefe"
+                                    : "#1f1f1f",
                                 // border: "1px solid #ccc",
                               }}
                             >
@@ -730,7 +760,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                 align="center"
                                 pb={rem(4)}
                               >
-                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
+                                <Text c={"grey"} size={rem(14)}>
                                   Supervisor
                                 </Text>
                                 <Text
@@ -764,7 +794,11 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                   gap={rem(8)}
                                 >
                                   <Text
-                                    c={"rgb(79, 70, 229)"}
+                                    c={
+                                      computedColorScheme == "light"
+                                        ? "rgb(79, 70, 229)"
+                                        : "light-blue.4"
+                                    }
                                     fw={500}
                                     size={rem(14)}
                                   >
@@ -774,13 +808,21 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                   <Text
                                     py={rem(4)}
                                     px={rem(7)}
-                                    bg={"rgb(240 253 244)"}
-                                    c={"rgb(21 128 61)"}
+                                    bg={
+                                      computedColorScheme == "light"
+                                        ? "rgb(240 253 244)"
+                                        : "#293c2c"
+                                    }
+                                    c={
+                                      computedColorScheme == "light"
+                                        ? "rgb(21 128 61)"
+                                        : "#89e597"
+                                    }
                                     size={rem(12)}
                                     fw={500}
                                     style={{
                                       borderRadius: 999,
-                                      border: "1px solid #e5e7eb",
+                                      border: "1px solid #ccc",
                                     }}
                                   >
                                     {renderInChargeRole(
@@ -821,7 +863,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                   </ActionIcon>
                   <Button
                     variant="subtle"
-                    color="#000"
+                    color={computedColorScheme == "dark" ? "white" : "#000"}
                     onClick={() => {
                       setCurrentDate(new Date());
                       setSelectedDate(new Date());
@@ -848,13 +890,17 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
             </Box>
 
             <Box>
-              <SimpleGrid cols={7} spacing={0} style={{}}>
+              <SimpleGrid cols={7} spacing={0}>
                 {WEEKDAYS.map((day, i) => {
                   return (
                     <Box py={rem(8)} key={day + i}>
                       <Text
                         key={day}
-                        c={"rgb(55 65 81)"}
+                        c={
+                          computedColorScheme == "light"
+                            ? "rgb(55 65 81)"
+                            : "white"
+                        }
                         size={rem(14)}
                         lh={rem(24)}
                         ta={"center"}
@@ -883,6 +929,8 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       style={{
                         borderBottom: "1px solid #ccc",
                         borderLeft: "1px solid #ccc",
+                        backgroundColor:
+                          computedColorScheme == "dark" ? "#1f1f1f" : "white",
                       }}
                       py={rem(8)}
                       ta={"center"}
@@ -900,16 +948,24 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       ta={"center"}
                       className={
                         isToday(day)
-                          ? clsx(classes.today, classes.activeCard)
+                          ? clsx(classes.today)
                           : dayjs(day).isSame(selectedDate, "day")
-                          ? clsx(classes.selectedDay, classes.activeCard)
+                          ? clsx(classes.selectedDay)
                           : classes["activeCard"]
                       }
                       onClick={() => {
                         setSelectedDate(day);
                       }}
                     >
-                      <Text c={"rgb(55, 65, 81)"} size={rem(12)} lh={rem(48)}>
+                      <Text
+                        c={
+                          computedColorScheme == "light"
+                            ? "rgb(55, 65, 81)"
+                            : "white"
+                        }
+                        size={rem(12)}
+                        lh={rem(48)}
+                      >
                         {format(day, "d")}
                       </Text>
                       {todaysEvents.map((event) => {
@@ -933,6 +989,8 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       style={{
                         borderBottom: "1px solid #ccc",
                         borderLeft: "1px solid #ccc",
+                        backgroundColor:
+                          computedColorScheme == "dark" ? "#1f1f1f" : "white",
                       }}
                       py={rem(8)}
                       ta={"center"}
@@ -958,7 +1016,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                 style={{
                   borderBottom: "1px solid #ccc",
                 }}
-                bg={"#f9fafb"}
+                bg={computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f"}
                 py={rem(20)}
                 px={rem(12)}
               >
@@ -974,10 +1032,10 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       radius={"sm"}
                       color={"green"}
                       style={{
-                        border: "1px solid green",
+                        border: "1px solid #000",
+                        color: "#000",
                       }}
                       variant="light"
-                      c={"#000"}
                       mr={rem(10)}
                     >
                       {dayjs(selectedShift?.startTime).format("HH:mm | DD-MM")}
@@ -989,10 +1047,10 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       radius={"sm"}
                       color={"green"}
                       style={{
-                        border: "1px solid green",
+                        border: "1px solid #000",
+                        color: "#000",
                       }}
                       variant="light"
-                      c={"#000"}
                       mr={rem(16)}
                     >
                       {dayjs(selectedShift?.endTime ?? new Date()).format(
@@ -1023,48 +1081,28 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                           <Table.Tr>
                             <Table.Th py={rem(16)}>
                               <Center>
-                                <Text
-                                  size={rem(13)}
-                                  lh={rem(24)}
-                                  c={"rgb(55 65 81)"}
-                                  fw={600}
-                                >
+                                <Text size={rem(13)} lh={rem(24)} fw={600}>
                                   Type
                                 </Text>
                               </Center>
                             </Table.Th>
                             <Table.Th py={rem(16)}>
                               <Center>
-                                <Text
-                                  size={rem(13)}
-                                  lh={rem(24)}
-                                  c={"rgb(55 65 81)"}
-                                  fw={600}
-                                >
+                                <Text size={rem(13)} lh={rem(24)} fw={600}>
                                   Start time
                                 </Text>
                               </Center>
                             </Table.Th>
                             <Table.Th py={rem(16)}>
                               <Center>
-                                <Text
-                                  size={rem(13)}
-                                  lh={rem(24)}
-                                  c={"rgb(55 65 81)"}
-                                  fw={600}
-                                >
+                                <Text size={rem(13)} lh={rem(24)} fw={600}>
                                   End time
                                 </Text>
                               </Center>
                             </Table.Th>
                             <Table.Th py={rem(16)}>
                               <Center>
-                                <Text
-                                  size={rem(13)}
-                                  lh={rem(24)}
-                                  c={"rgb(55 65 81)"}
-                                  fw={600}
-                                >
+                                <Text size={rem(13)} lh={rem(24)} fw={600}>
                                   Evidences
                                 </Text>
                               </Center>
@@ -1096,12 +1134,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                             </Table.Th>
                             <Table.Th py={rem(16)}>
                               <Center>
-                                <Text
-                                  size={rem(13)}
-                                  lh={rem(24)}
-                                  c={"rgb(55 65 81)"}
-                                  fw={600}
-                                >
+                                <Text size={rem(13)} lh={rem(24)} fw={600}>
                                   Status
                                 </Text>
                               </Center>
@@ -1132,7 +1165,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                   style={{
                     borderBottom: "1px solid #ccc",
                   }}
-                  bg={"#f9fafb"}
+                  bg={computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f"}
                   py={rem(16)}
                   px={rem(24)}
                 >
@@ -1154,68 +1187,13 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                           : "undefined"}
                       </Badge>
                     </Group>
-                    <Popover
-                      position="bottom"
-                      withArrow
-                      shadow="md"
-                      opened={assignPopoverOpened}
-                    >
-                      <Popover.Target>
-                        <Button
-                          loading={isAssignIncidentLoading}
-                          variant="outline"
-                          color="rgb(79, 70, 229)"
-                          onClick={toggleAssignPopover}
-                        >
-                          Assign
-                        </Button>
-                      </Popover.Target>
-                      <Popover.Dropdown>
-                        {isEmployeeListLoading ? (
-                          <Loader />
-                        ) : (
-                          <Select
-                            ref={ref}
-                            size="sm"
-                            style={{
-                              fontWeight: 500,
-                              borderRadius: rem(8),
-                            }}
-                            onChange={(_value) => {
-                              console.log(123);
-
-                              onAssignIncident({
-                                employeeId: _value ?? "",
-                                incidentId: selectedIncidentItem.id,
-                              });
-                            }}
-                            placeholder="Assign to.."
-                            searchable
-                            value={selectedIncidentItem?.id}
-                            data={employeeList?.values?.map((item) => {
-                              return {
-                                value: item?.id,
-                                label: item?.name,
-                              };
-                            })}
-                            nothingFoundMessage="Nothing found..."
-                          />
-                        )}
-                      </Popover.Dropdown>
-                    </Popover>
-
-                    <Button
-                      color={"red"}
-                      loading={isRejectIncidentLoading}
-                      onClick={() => {
-                        openRejectIncidentModal(selectedIncidentItem.id);
-                      }}
-                    >
-                      Reject
-                    </Button>
                   </Group>
                 </Box>
-                <ScrollArea.Autosize mah={1000} my={rem(12)}>
+                <ScrollArea.Autosize
+                  mah={1000}
+                  py={rem(12)}
+                  bg={computedColorScheme == "light" ? "#fff" : "#1f1f1f"}
+                >
                   <Box px={rem(24)}>
                     <Box>
                       <Group
@@ -1226,34 +1204,86 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                         pb={rem(8)}
                         mb={rem(10)}
                       >
-                        <Text
-                          c={"rgb(107 114 128"}
-                          size={rem(14)}
-                          lh={rem(24)}
-                          fw={500}
-                        >
+                        <Text size={rem(14)} lh={rem(24)} fw={500}>
                           {dayjs(
                             selectedIncidentItem?.evidences?.[0]?.createdDate
                           ).format("LL")}
                         </Text>
-                        <Text
-                          c={"rgb(107 114 128"}
-                          size={rem(14)}
-                          lh={rem(24)}
-                          fw={500}
-                        >
-                          Assigned to :{" "}
-                          <Text
-                            span
-                            c="blue"
-                            inherit
-                            style={{
-                              cursor: "pointer",
+                        <Group>
+                          <Text size={rem(14)} lh={rem(24)} fw={500}>
+                            Assigned to :{" "}
+                            <Text
+                              span
+                              c="blue"
+                              inherit
+                              style={{
+                                cursor: "pointer",
+                              }}
+                            >
+                              {selectedIncidentItem?.employee?.name ??
+                                "(Empty)"}
+                            </Text>
+                          </Text>
+                          <Popover
+                            position="bottom"
+                            withArrow
+                            shadow="md"
+                            opened={assignPopoverOpened}
+                          >
+                            <Popover.Target>
+                              <Button
+                                loading={isAssignIncidentLoading}
+                                variant="outline"
+                                color="rgb(79, 70, 229)"
+                                onClick={toggleAssignPopover}
+                              >
+                                Assign
+                              </Button>
+                            </Popover.Target>
+                            <Popover.Dropdown>
+                              {isEmployeeListLoading ? (
+                                <Loader />
+                              ) : (
+                                <Select
+                                  ref={ref}
+                                  size="sm"
+                                  style={{
+                                    fontWeight: 500,
+                                    borderRadius: rem(8),
+                                  }}
+                                  onChange={(_value) => {
+                                    console.log(123);
+
+                                    onAssignIncident({
+                                      employeeId: _value ?? "",
+                                      incidentId: selectedIncidentItem.id,
+                                    });
+                                  }}
+                                  placeholder="Assign to.."
+                                  searchable
+                                  value={selectedIncidentItem?.id}
+                                  data={employeeList?.values?.map((item) => {
+                                    return {
+                                      value: item?.id,
+                                      label: item?.name,
+                                    };
+                                  })}
+                                  nothingFoundMessage="Nothing found..."
+                                />
+                              )}
+                            </Popover.Dropdown>
+                          </Popover>
+
+                          <Button
+                            color={"red"}
+                            loading={isRejectIncidentLoading}
+                            onClick={() => {
+                              openRejectIncidentModal(selectedIncidentItem.id);
                             }}
                           >
-                            {selectedIncidentItem?.employee?.name ?? "(Empty)"}
-                          </Text>
-                        </Text>
+                            Reject
+                          </Button>
+                        </Group>
                       </Group>
                       {selectedIncidentItem?.evidences?.length == 0 ? (
                         <NoImage type="NO_DATA" />

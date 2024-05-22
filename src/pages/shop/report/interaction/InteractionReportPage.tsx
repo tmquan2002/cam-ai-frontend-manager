@@ -10,47 +10,45 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useScrollIntoView } from "@mantine/hooks";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
   BarController,
   BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LineElement,
+  LinearScale,
+  PointElement,
+  Title,
+  Tooltip,
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
-import { Chart } from "react-chartjs-2";
-import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
-import NoImage from "../../../../components/image/NoImage";
-import { useForm } from "@mantine/form";
-import { useEffect, useMemo, useState } from "react";
+import cx from "clsx";
 import dayjs from "dayjs";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";
 import _ from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { Chart } from "react-chartjs-2";
+import { GetShopHumanCountReportParams } from "../../../../apis/ReportAPI";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../../../components/form/EditAndUpdateForm";
-import LegendCard, {
-  LEGEND_TYPES,
-} from "../../../../components/card/LegendCard";
-import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
-import { IncidentDetail } from "../../../../models/Incident";
-import classes from "./InteractionReportPage.module.scss";
-import cx from "clsx";
 import LoadingImage from "../../../../components/image/LoadingImage";
-import { useScrollIntoView } from "@mantine/hooks";
+import NoImage from "../../../../components/image/NoImage";
+import { useShopHumanCountReport } from "../../../../hooks/useGetHumanCountReport";
+import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
+import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
+import { IncidentDetail } from "../../../../models/Incident";
 import {
   addDaysBaseOnReportInterval,
   differentDateReturnFormattedString,
   makeDivisibleByDivider,
 } from "../../../../utils/helperFunction";
-import { useShopHumanCountReport } from "../../../../hooks/useGetHumanCountReport";
-import { GetShopHumanCountReportParams } from "../../../../apis/ReportAPI";
+import classes from "./InteractionReportPage.module.scss";
 dayjs.extend(LocalizedFormat);
 
 ChartJS.register(
@@ -72,6 +70,9 @@ type SearchIncidentField = {
 };
 
 export const InteractionReportPage = () => {
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
@@ -260,14 +261,14 @@ export const InteractionReportPage = () => {
       >
         <Table.Td>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {index + 1}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -276,7 +277,7 @@ export const InteractionReportPage = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -285,14 +286,14 @@ export const InteractionReportPage = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item.evidences.length}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item.incidentType}
             </Text>
           </Center>
@@ -314,7 +315,13 @@ export const InteractionReportPage = () => {
   }, [selectedInteractionItem]);
 
   return (
-    <Flex px={rem(40)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
+    <Flex
+      px={rem(40)}
+      pt={rem(12)}
+      flex={1}
+      direction={"column"}
+      bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}
+    >
       <Text
         size={rem(24)}
         fw={700}
@@ -330,12 +337,12 @@ export const InteractionReportPage = () => {
         style={{
           border: "1px solid rgb(229 231 235)",
         }}
+        bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
       >
         <Card.Section
           style={{
             borderBottom: "1px solid #ccc",
           }}
-          bg={"#f9fafb"}
           py={rem(16)}
           px={rem(24)}
         >
@@ -358,23 +365,46 @@ export const InteractionReportPage = () => {
           ) : (
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)}>
-                <LegendCard
-                  type={LEGEND_TYPES.BAR}
-                  color="rgba(255, 99, 132, 1)"
-                  title="Total interaction"
-                />
-                <LegendCard
-                  type={LEGEND_TYPES.LINE}
-                  color="rgb(37, 150, 190)"
-                  title="Total employee"
-                />
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "999px",
+                      width: rem(20),
+                      aspectRatio: 5,
+                      backgroundColor: "rgb(37, 150, 190)",
+                    }}
+                  />
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
+                    Total employee
+                  </Text>
+                </Group>
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "2px",
+                      width: rem(10),
+                      aspectRatio: 1,
+                      backgroundColor: "rgba(255, 99, 132, 1)",
+                    }}
+                  />
+                  <Text
+                    size={rem(14)}
+                    fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}
+                  >
+                    Total interaction
+                  </Text>
+                </Group>
               </Group>
               <Flex>
                 <Box
                   style={{
                     width: "40px",
                     zIndex: 999,
-                    backgroundColor: "#fff",
                   }}
                 >
                   <Chart
@@ -620,17 +650,18 @@ export const InteractionReportPage = () => {
             style={{
               border: "1px solid #ccc",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
                 borderBottom: "1px solid #ccc",
+                backgroundColor: "#f9fafb",
               }}
-              bg={"#f9fafb"}
               py={rem(16)}
               px={rem(12)}
             >
               <Group justify="space-between">
-                <Text size="md" fw={600}>
+                <Text size="md" fw={600} ml={10}>
                   Interaction list
                 </Text>
                 <Group gap={rem(6)}>
@@ -644,7 +675,6 @@ export const InteractionReportPage = () => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(10)}
                   >
                     {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
@@ -659,7 +689,6 @@ export const InteractionReportPage = () => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(16)}
                   >
                     {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
@@ -681,60 +710,35 @@ export const InteractionReportPage = () => {
                     <Table.Tr>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Index
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Start time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             End time
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Evidences
                           </Text>
                         </Center>
                       </Table.Th>
                       <Table.Th py={rem(16)}>
                         <Center>
-                          <Text
-                            size={rem(13)}
-                            lh={rem(24)}
-                            c={"rgb(55 65 81)"}
-                            fw={600}
-                          >
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
                             Type
                           </Text>
                         </Center>
@@ -756,15 +760,16 @@ export const InteractionReportPage = () => {
             w={"100%"}
             ref={interactionDetailRef}
             style={{
-              border: "1px solid rgb(229 231 235)",
+              border: "1px solid #ccc",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section>
               <Box
                 style={{
                   borderBottom: "1px solid #ccc",
+                  backgroundColor: "#f9fafb",
                 }}
-                bg={"#f9fafb"}
                 py={rem(16)}
                 px={rem(24)}
               >
@@ -805,12 +810,7 @@ export const InteractionReportPage = () => {
                       pb={rem(8)}
                       mb={rem(10)}
                     >
-                      <Text
-                        c={"rgb(107 114 128"}
-                        size={rem(14)}
-                        lh={rem(24)}
-                        fw={500}
-                      >
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
                         {dayjs(
                           selectedInteractionItem?.evidences?.[0]?.createdDate
                         ).format("LL")}
