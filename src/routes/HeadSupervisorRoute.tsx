@@ -6,17 +6,18 @@ import { Navigate, Outlet } from "react-router-dom";
 import ShopSupervisorHeader from "../components/header/ShopSupervisorHeader";
 
 const HeadSupervisorRoute = () => {
-  const [userRole, setUserRole] = useState<Role | null>(
-    Role.ShopHeadSupervisor
-  );
+  const [userRole, setUserRole] = useState<Role | null>(Role.ShopSupervisor);
 
   useEffect(() => {
     const currentUserRole: Role | null = getUserRole();
 
     setUserRole(currentUserRole);
   }, []);
+
+  console.log(userRole);
+
   switch (userRole) {
-    case Role.ShopHeadSupervisor:
+    case Role.ShopSupervisor:
       return (
         <AppShell
           header={{ height: 60 }}
@@ -43,8 +44,6 @@ const HeadSupervisorRoute = () => {
         </AppShell>
       );
 
-    case Role.ShopSupervisor:
-      return <Navigate to={"/supervisor"} />;
     case Role.BrandManager:
       return <Navigate to={"/brand"} />;
     default:

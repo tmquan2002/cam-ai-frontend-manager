@@ -208,7 +208,7 @@ const TimeIncidentReport = () => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
-        duration: item?.averageDuration ?? 0 * item.count,
+        duration: item?.averageDuration,
       };
     });
   }, [incidentReportByTimeData]);
@@ -618,9 +618,11 @@ const TimeIncidentReport = () => {
                           },
                           {
                             type: "bar" as const,
-                            label: "Average duration ",
+                            label: "Average duration",
                             data: data?.map((i) => i.duration),
-                            hidden: true,
+                            backgroundColor: "rgba(255, 99, 132, 0.6)",
+                            borderColor: "rgba(255, 99, 132)",
+                            borderRadius: 6,
                           },
                         ],
                       }}

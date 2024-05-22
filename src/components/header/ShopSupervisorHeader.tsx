@@ -29,7 +29,7 @@ const convertRoleString = (role: Role | null | undefined): string => {
     case Role.BrandManager:
       return "Brand manager";
     case Role.ShopHeadSupervisor:
-      return "Head supervisor";
+      return "Shop supervisor";
     case Role.ShopManager:
       return "Shop manager";
     case Role.ShopSupervisor:

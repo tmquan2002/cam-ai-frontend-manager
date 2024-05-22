@@ -11,6 +11,7 @@ import {
   Flex,
   Group,
   Loader,
+  Popover,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -41,16 +42,19 @@ import {
   IconChevronRight,
   IconExclamationCircle,
   IconSettings,
+  IconX,
 } from "@tabler/icons-react";
-import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
+import {
+  useClickOutside,
+  useDisclosure,
+  useScrollIntoView,
+} from "@mantine/hooks";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import dayjs from "dayjs";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { IncidentDetail } from "../../models/Incident";
 import { differentDateReturnFormattedString } from "../../utils/helperFunction";
 import NoImage from "../../components/image/NoImage";
 import LoadingImage from "../../components/image/LoadingImage";
-import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
 import { Role } from "../../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
@@ -58,9 +62,13 @@ import { modals } from "@mantine/modals";
 import _ from "lodash";
 import { SuperVisorAssignmentDetail } from "../../models/Shop";
 import { useDeleteHeadSupervisor } from "../../hooks/useDeleteHeadSupervisor";
-import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
 import { AxiosError } from "axios";
 import { ResponseErrorDetail } from "../../models/Response";
+import { useGetIncidentByAssignmentId } from "../../hooks/useGetIncidentByAssignmentId";
+import { useAssignSupervisor } from "../../hooks/useAssignSupervisor";
+import { useDeleteSupervisor } from "../../hooks/useDeleteSupervisor";
+import { useAssignIncident } from "../../hooks/useAssignIncident";
+import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
 interface Event {
@@ -72,9 +80,32 @@ interface ShopCalendarProps {
   events: Event[];
 }
 
+const renderInChargeRole = (role: Role | undefined | null) => {
+  switch (role) {
+    case Role.ShopHeadSupervisor:
+    case Role.ShopSupervisor:
+      return "Supervisor";
+    case Role.Admin:
+      return "Admin";
+    case Role.BrandManager:
+    case Role.ShopManager:
+      return "Manager";
+    case Role.SystemHandler:
+      return "System";
+    default:
+      return "No role";
+  }
+};
+
 const ShopCalendar = ({ events }: ShopCalendarProps) => {
   const [opened, { toggle }] = useDisclosure(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const [
+    assignPopoverOpened,
+    { toggle: toggleAssignPopover, close: closeAssignPopover },
+  ] = useDisclosure(false);
+  const ref = useClickOutside(closeAssignPopover, ["mouseup", "touchend"]);
   const {
     scrollIntoView: scrollIntoIncidentDetail,
     targetRef: incidentDetailRef,
@@ -87,16 +118,16 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
   const [selectedShift, setSelectedShift] =
     useState<SuperVisorAssignmentDetail | null>(null);
 
+  const {
+    data: incidentList,
+    isLoading: isGetIncidentListLoading,
+    refetch: refetchIncidentList,
+  } = useGetIncidentByAssignmentId({
+    id: selectedShift?.id ?? "",
+    enabled: !!selectedShift,
+  });
   const { mutate: assignSuperVisor, isLoading: isAssignSupervisorLoading } =
     useAssignSupervisor();
-
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList({
-      enabled: !!selectedShift,
-      fromTime: selectedShift?.startTime,
-      toTime: selectedShift?.endTime,
-    });
-
   const { data: employeeList, isLoading: isEmployeeListLoading } =
     useGetEmployeeList({ size: 999 });
 
@@ -108,13 +139,13 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
     date: dayjs(selectedDate ?? new Date()).format("YYYY-MM-DD"),
   });
 
-  const {
-    mutate: deleteHeadSupervisor,
-    isLoading: isDeleteHeadSupervisorLoading,
-  } = useDeleteHeadSupervisor();
-
   const { mutate: deleteSupervisor, isLoading: isDeleteSupervisorLoading } =
     useDeleteSupervisor();
+
+  const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
+    useAssignIncident();
+  const { mutate: rejectIncident, isLoading: isRejectIncidentLoading } =
+    useRejectIncidentById();
 
   const firstDayOfMonth = startOfMonth(currentDate);
   const lastDayOfMonth = endOfMonth(currentDate);
@@ -137,53 +168,6 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       return acc;
     }, {});
   }, [events]);
-
-  const openConfirmHeadSupervisorModal = ({
-    id,
-    supervisorName,
-  }: {
-    id: string;
-    supervisorName: string;
-  }) =>
-    modals.openConfirmModal({
-      title: "Please confirm modify head supervisor",
-      children: (
-        <Text size="sm">
-          Confirm modify{" "}
-          <Text inherit span fw={600}>
-            {supervisorName}
-          </Text>{" "}
-          as new head supervisor
-        </Text>
-      ),
-      labels: { confirm: "Confirm", cancel: "Cancel" },
-      onCancel: () => console.log("Cancel"),
-      onConfirm: () => {
-        assignSuperVisor(
-          { employeeId: id, role: Role.ShopHeadSupervisor },
-          {
-            onSuccess() {
-              notifications.show({
-                title: "Success",
-                message: "Assign head supervisor successfully!",
-                autoClose: 6000,
-                c: NotificationColorPalette.UP_COMING,
-              });
-              refetchSupervisorList();
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                title: "Failed",
-                message: error?.message ?? "Assign head supervisor failed!",
-                autoClose: 6000,
-                c: NotificationColorPalette.ALERT_MESSAGE,
-              });
-            },
-          }
-        );
-      },
-    });
 
   const openConfirmSupervisorModal = ({
     id,
@@ -232,41 +216,9 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       },
     });
 
-  const openConfirmDeleteHeadSupervisorModal = () => {
-    modals.openConfirmModal({
-      title: "Please confirm delete head supervisor",
-      children: <Text size="sm">Confirm delete head supervisor?</Text>,
-      labels: { confirm: "Confirm", cancel: "Cancel" },
-      onCancel: () => console.log("Cancel"),
-      onConfirm: () => {
-        deleteHeadSupervisor(
-          {},
-          {
-            onSuccess() {
-              notifications.show({
-                message: "Remove head supervisor successfully!",
-                title: "Success",
-              });
-              refetchSupervisorList();
-            },
-            onError(data) {
-              const error = data as AxiosError<ResponseErrorDetail>;
-              notifications.show({
-                title: "Failed",
-                message: error?.message ?? "Remove head supervisor failed!",
-                autoClose: 6000,
-                c: NotificationColorPalette.ALERT_MESSAGE,
-              });
-            },
-          }
-        );
-      },
-    });
-  };
-
   const openConfirmDeleteSupervisorModal = () => {
     modals.openConfirmModal({
-      title: "Please confirm modify supervisor",
+      title: "Please confirm delete supervisor",
       children: <Text size="sm">Confirm delete supervisor?</Text>,
       labels: { confirm: "Confirm", cancel: "Cancel" },
       onCancel: () => console.log("Cancel"),
@@ -309,8 +261,10 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
   }, [selectedIncidentItem]);
 
   const reverseSupervisorList = useMemo(() => {
-    return supervisorList?.reverse();
-  }, [supervisorList]);
+    if (!isGetSupervisorListLoading && supervisorList) {
+      return supervisorList?.reverse();
+    }
+  }, [supervisorList, isGetSupervisorListLoading]);
 
   useEffect(() => {
     if (reverseSupervisorList && reverseSupervisorList.length > 0) {
@@ -322,6 +276,8 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         ),
         endTime: dayjs(lastShiftItem?.endTime).format("YYYY-MM-DDTHH:mm:ss"),
       });
+    } else {
+      setSelectedShift(null);
     }
   }, [reverseSupervisorList]);
 
@@ -353,7 +309,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       </Table.Td>
     </Table.Tr>
   ) : (
-    incidentList?.values.map((item) => (
+    incidentList?.map((item) => (
       <Table.Tr
         key={item.id}
         style={{
@@ -403,6 +359,13 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         <Table.Td py={rem(18)}>
           <Center>
             <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+              {item?.inChargeAccount?.name ?? "Empty"}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
               {item?.employee?.name ?? "Empty"}
             </Text>
           </Center>
@@ -424,22 +387,80 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
     name,
   }: {
     id: string;
-    role: Role.ShopHeadSupervisor | Role.ShopSupervisor;
+    role: Role.ShopSupervisor;
     name: string;
   }) => {
-    if (role == Role.ShopHeadSupervisor) {
-      openConfirmHeadSupervisorModal({
-        id: id,
-        supervisorName: name,
-      });
-    }
-
     if (role == Role.ShopSupervisor) {
       openConfirmSupervisorModal({
         id: id,
         supervisorName: name,
       });
     }
+  };
+
+  const openRejectIncidentModal = (incidentId: string) => {
+    modals.openConfirmModal({
+      title: "Reject Incident",
+      confirmProps: { color: "red" },
+      children: <Text size="sm">Reject this incident?</Text>,
+      labels: { confirm: "Confirm", cancel: "Cancel" },
+      centered: true,
+      onCancel: () => console.log("Cancel"),
+      onConfirm: () => {
+        rejectIncident(incidentId, {
+          onSuccess() {
+            notifications.show({
+              title: "Successful",
+              message: "Reject successfully!",
+            });
+            refetchIncidentList();
+          },
+          onError(data) {
+            const error = data as AxiosError<ResponseErrorDetail>;
+            notifications.show({
+              color: "red",
+              icon: <IconX />,
+              title: "Reject failed",
+              message: error.response?.data?.message,
+            });
+          },
+        });
+      },
+    });
+  };
+
+  const onAssignIncident = ({
+    employeeId,
+    incidentId,
+  }: {
+    employeeId: string;
+    incidentId: string;
+  }) => {
+    assignIncident(
+      {
+        employeeId,
+        incidentId,
+      },
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Assign successfully",
+            message: "Incident assign success!",
+          });
+          closeAssignPopover();
+          refetchIncidentList();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            icon: <IconX />,
+            title: "Assign failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
   };
 
   return (
@@ -474,14 +495,15 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
             <Collapse in={opened}>
               <Group
                 style={{
-                  paddingTop: rem(20),
+                  paddingTop: rem(16),
                   marginTop: rem(12),
                   borderTop: "1px solid #ccc",
                 }}
               >
                 {isEmployeeListLoading ||
-                isDeleteHeadSupervisorLoading ||
-                isGetSupervisorListLoading ? (
+                isDeleteSupervisorLoading ||
+                isGetSupervisorListLoading ||
+                isAssignSupervisorLoading ? (
                   <Loader />
                 ) : (
                   <Select
@@ -492,7 +514,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       fontWeight: 500,
                       fontSize: rem(14),
                     }}
-                    label="Head supervisor"
+                    label="Current supervisor"
                     clearable
                     disabled={!!selectedDate && !isToday(selectedDate)}
                     allowDeselect
@@ -505,18 +527,18 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       if (option) {
                         handleSetSuperVisor({
                           id: _value ?? "",
-                          role: Role.ShopHeadSupervisor,
+                          role: Role.ShopSupervisor,
                           name: option?.label,
                         });
                       }
                     }}
-                    placeholder="Head supervisor is empty"
+                    placeholder="Supervisor is empty"
                     p={0}
-                    value={selectedShift?.headSupervisorId}
+                    value={reverseSupervisorList?.[0]?.supervisorId}
                     searchable
                     rightSectionPointerEvents={"inherit"}
                     onClear={() => {
-                      openConfirmDeleteHeadSupervisorModal();
+                      openConfirmDeleteSupervisorModal();
                     }}
                     onClick={(e) => e.preventDefault()}
                     nothingFoundMessage="Nothing found..."
@@ -557,77 +579,6 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                     ]}
                   />
                 )}
-                {isEmployeeListLoading ||
-                isDeleteSupervisorLoading ||
-                isGetSupervisorListLoading ? (
-                  <Loader />
-                ) : (
-                  <Select
-                    radius={rem(8)}
-                    flex={1}
-                    style={{
-                      fontWeight: 500,
-                      fontSize: rem(14),
-                    }}
-                    styles={{
-                      label: {
-                        marginBottom: rem(4),
-                      },
-                    }}
-                    clearable
-                    allowDeselect
-                    label="Supervisor"
-                    p={0}
-                    disabled={!!selectedDate && !isToday(selectedDate)}
-                    placeholder="Supervisor is empty"
-                    onClear={openConfirmDeleteSupervisorModal}
-                    onChange={(_value, option) => {
-                      handleSetSuperVisor({
-                        id: _value ?? "",
-                        role: Role.ShopSupervisor,
-                        name: option?.label,
-                      });
-                    }}
-                    value={selectedShift?.supervisorId}
-                    searchable
-                    nothingFoundMessage="Nothing found..."
-                    data={[
-                      {
-                        group: "Head supervisor",
-                        items: employeeStatisticData?.HeadSupervisor
-                          ? employeeStatisticData?.HeadSupervisor.map((i) => {
-                              return {
-                                value: i?.id,
-                                label: i?.name,
-                              };
-                            })
-                          : [],
-                      },
-                      {
-                        group: "Supervisor",
-                        items: employeeStatisticData?.Supervisor
-                          ? employeeStatisticData?.Supervisor.map((i) => {
-                              return {
-                                value: i?.id,
-                                label: i?.name,
-                              };
-                            })
-                          : [],
-                      },
-                      {
-                        group: "Employee",
-                        items: employeeStatisticData?.Employee
-                          ? employeeStatisticData?.Employee.map((i) => {
-                              return {
-                                value: i?.id,
-                                label: i?.name,
-                              };
-                            })
-                          : [],
-                      },
-                    ]}
-                  />
-                )}
               </Group>
             </Collapse>
 
@@ -657,7 +608,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                         startTime: dayjs(i?.startTime).format(
                           "YYYY-MM-DDTHH:mm:ss"
                         ),
-                        endTime: dayjs(i?.endTime).format(
+                        endTime: dayjs(i?.endTime ?? new Date()).format(
                           "YYYY-MM-DDTHH:mm:ss"
                         ),
                       });
@@ -761,9 +712,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                     </Accordion.Control>
                     <Accordion.Panel>
                       <>
-                        {isEmployeeListLoading ||
-                        isAssignSupervisorLoading ||
-                        isGetSupervisorListLoading ? (
+                        {isEmployeeListLoading || isGetSupervisorListLoading ? (
                           <Loader />
                         ) : (
                           <>
@@ -779,34 +728,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                               <Group
                                 justify="space-between"
                                 align="center"
-                                pb={rem(24)}
-                                style={{
-                                  borderBottom: "1px solid #ccc",
-                                }}
-                              >
-                                <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
-                                  Head supervisor
-                                </Text>
-                                <Text
-                                  c={"rgb(17, 24, 39)"}
-                                  size={rem(14)}
-                                  fw={500}
-                                >
-                                  {i?.headSupervisor?.name ?? (
-                                    <Text span inherit c={"#ccc"}>
-                                      Head supervisor is empty
-                                    </Text>
-                                  )}
-                                </Text>
-                              </Group>
-
-                              <Group
-                                justify="space-between"
-                                align="center"
-                                py={rem(24)}
-                                style={{
-                                  borderBottom: "1px solid #ccc",
-                                }}
+                                pb={rem(4)}
                               >
                                 <Text c={"rgb(75, 85, 99)"} size={rem(14)}>
                                   Supervisor
@@ -827,7 +749,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                               <Group
                                 justify="space-between"
                                 align="center"
-                                py={rem(24)}
+                                py={rem(20)}
                               >
                                 <Text
                                   c={"rgb(17, 24, 39)"}
@@ -861,9 +783,9 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                                       border: "1px solid #e5e7eb",
                                     }}
                                   >
-                                    {selectedShift?.inChargeAccountRole
-                                      .match(/[A-Z][a-z]*|[0-9]+/g)
-                                      ?.join(" ")}
+                                    {renderInChargeRole(
+                                      selectedShift?.inChargeAccountRole
+                                    )}
                                   </Text>
                                 </Group>
                               </Group>
@@ -1037,7 +959,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                   borderBottom: "1px solid #ccc",
                 }}
                 bg={"#f9fafb"}
-                py={rem(16)}
+                py={rem(20)}
                 px={rem(12)}
               >
                 <Group justify="space-between">
@@ -1073,7 +995,9 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                       c={"#000"}
                       mr={rem(16)}
                     >
-                      {dayjs(selectedShift?.endTime).format("HH:mm DD-MM")}
+                      {dayjs(selectedShift?.endTime ?? new Date()).format(
+                        "HH:mm DD-MM"
+                      )}
                     </Badge>
                   </Group>
                 </Group>
@@ -1084,7 +1008,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                   mah={700}
                   onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
                 >
-                  {incidentList?.isValuesEmpty ? (
+                  {incidentList?.length == 0 ? (
                     <Box my={rem(10)}>
                       <NoImage type="NO_DATA" />
                     </Box>
@@ -1146,6 +1070,18 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                               </Center>
                             </Table.Th>
 
+                            <Table.Th py={rem(16)}>
+                              <Center>
+                                <Text
+                                  size={rem(13)}
+                                  lh={rem(24)}
+                                  c={"rgb(55 65 81)"}
+                                  fw={600}
+                                >
+                                  In charge
+                                </Text>
+                              </Center>
+                            </Table.Th>
                             <Table.Th py={rem(16)}>
                               <Center>
                                 <Text
@@ -1218,6 +1154,65 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                           : "undefined"}
                       </Badge>
                     </Group>
+                    <Popover
+                      position="bottom"
+                      withArrow
+                      shadow="md"
+                      opened={assignPopoverOpened}
+                    >
+                      <Popover.Target>
+                        <Button
+                          loading={isAssignIncidentLoading}
+                          variant="outline"
+                          color="rgb(79, 70, 229)"
+                          onClick={toggleAssignPopover}
+                        >
+                          Assign
+                        </Button>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        {isEmployeeListLoading ? (
+                          <Loader />
+                        ) : (
+                          <Select
+                            ref={ref}
+                            size="sm"
+                            style={{
+                              fontWeight: 500,
+                              borderRadius: rem(8),
+                            }}
+                            onChange={(_value) => {
+                              console.log(123);
+
+                              onAssignIncident({
+                                employeeId: _value ?? "",
+                                incidentId: selectedIncidentItem.id,
+                              });
+                            }}
+                            placeholder="Assign to.."
+                            searchable
+                            value={selectedIncidentItem?.id}
+                            data={employeeList?.values?.map((item) => {
+                              return {
+                                value: item?.id,
+                                label: item?.name,
+                              };
+                            })}
+                            nothingFoundMessage="Nothing found..."
+                          />
+                        )}
+                      </Popover.Dropdown>
+                    </Popover>
+
+                    <Button
+                      color={"red"}
+                      loading={isRejectIncidentLoading}
+                      onClick={() => {
+                        openRejectIncidentModal(selectedIncidentItem.id);
+                      }}
+                    >
+                      Reject
+                    </Button>
                   </Group>
                 </Box>
                 <ScrollArea.Autosize mah={1000} my={rem(12)}>

@@ -38,8 +38,6 @@ import CommonRoute from "./CommonRoute";
 import ShopRoute from "./ShopRoute";
 import HeadSupervisorRoute from "./HeadSupervisorRoute";
 import HeadSupervisorMainPage from "../pages/headsupervisor/HeadSupervisorMainPage";
-import SupervisorRoute from "./SupervisorRoute";
-import SupervisorMainPage from "../pages/supervisor/SupervisorMainPage";
 
 const AppRoute = () => {
   return useRoutes([
@@ -194,7 +192,7 @@ const AppRoute = () => {
       ],
     },
     {
-      path: "headsupervisor",
+      path: "supervisor",
       element: <HeadSupervisorRoute />,
       children: [
         {
@@ -203,16 +201,7 @@ const AppRoute = () => {
         },
       ],
     },
-    {
-      path: "supervisor",
-      element: <SupervisorRoute />,
-      children: [
-        {
-          path: "",
-          element: <SupervisorMainPage />,
-        },
-      ],
-    },
+
     {
       path: "*",
       element: <NothingFoundBackground />,

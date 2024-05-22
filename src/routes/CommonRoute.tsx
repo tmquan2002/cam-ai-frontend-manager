@@ -15,10 +15,9 @@ const CommonRoute = () => {
       return <Navigate to={"/brand"} />;
     case Role.ShopManager:
       return <Navigate to={"/shop"} />;
-    case Role.ShopHeadSupervisor:
-      return <Navigate to={"/headsupervisor"} />;
     case Role.ShopSupervisor:
       return <Navigate to={"/supervisor"} />;
+
     default:
       return <Outlet />;
   }

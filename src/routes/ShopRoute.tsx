@@ -27,27 +27,31 @@ const ShopRoute = () => {
   }, []);
 
   useEffect(() => {
-    console.log(dataProgress)
+    console.log(dataProgress);
     if (dataProgress?.percent !== 100) {
       notifications.update({
         id: "uploadEmployeeProgress",
         title: "Import in progress",
-        message: `${dataProgress?.detailed?.currentFinishedRecord}/${dataProgress?.detailed?.total} Done (${dataProgress?.percent ? Math.round(dataProgress?.percent) : 0} %)`,
+        message: `${dataProgress?.detailed?.currentFinishedRecord}/${
+          dataProgress?.detailed?.total
+        } Done (${
+          dataProgress?.percent ? Math.round(dataProgress?.percent) : 0
+        } %)`,
         autoClose: false,
         loading: true,
       });
     } else {
       notifications.update({
-        color: 'teal',
+        color: "teal",
         id: "uploadEmployeeProgress",
         title: "Import Finished",
         message: "Upload Complete",
         loading: false,
         autoClose: 5000,
       });
-      setTaskId(null)
+      setTaskId(null);
     }
-  }, [dataProgress, taskId])
+  }, [dataProgress, taskId]);
 
   switch (userRole) {
     case Role.ShopManager:
@@ -88,6 +92,8 @@ const ShopRoute = () => {
       );
     case Role.BrandManager:
       return <Navigate to={"/brand"} />;
+    case Role.ShopSupervisor:
+      return <Navigate to={"/supervisor"} />;
     default:
       return <Navigate to={"/login"} replace />;
   }

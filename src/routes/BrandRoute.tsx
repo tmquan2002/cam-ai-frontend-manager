@@ -31,22 +31,26 @@ const BrandRoute = () => {
       notifications.update({
         id: "uploadShopProgress",
         title: "Import in progress",
-        message: `${dataProgress?.detailed?.currentFinishedRecord}/${dataProgress?.detailed?.total} Done (${dataProgress?.percents ? Math.round(dataProgress?.percents) : 0} %)`,
+        message: `${dataProgress?.detailed?.currentFinishedRecord}/${
+          dataProgress?.detailed?.total
+        } Done (${
+          dataProgress?.percents ? Math.round(dataProgress?.percents) : 0
+        } %)`,
         autoClose: false,
         loading: true,
       });
     } else {
       notifications.update({
-        color: 'teal',
+        color: "teal",
         id: "uploadShopProgress",
         title: "Import Finished",
         message: "Upload Complete",
         loading: false,
         autoClose: 5000,
       });
-      setTaskId(null)
+      setTaskId(null);
     }
-  }, [dataProgress])
+  }, [dataProgress]);
 
   switch (userRole) {
     case Role.BrandManager:
@@ -87,6 +91,8 @@ const BrandRoute = () => {
       );
     case Role.ShopManager:
       return <Navigate to={"/shop"} />;
+    case Role.ShopSupervisor:
+      return <Navigate to={"/supervisor"} />;
     default:
       return <Navigate to={"/login"} replace />;
   }

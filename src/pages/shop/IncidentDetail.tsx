@@ -34,7 +34,11 @@ import { useAssignIncident } from "../../hooks/useAssignIncident";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import { useGetIncidentById } from "../../hooks/useGetIncidentById";
 import { useRejectIncidentById } from "../../hooks/useRejectIncidentById";
-import { EvidenceType, IncidentType } from "../../models/CamAIEnum";
+import {
+  EvidenceType,
+  IncidentStatus,
+  IncidentType,
+} from "../../models/CamAIEnum";
 import { EvidenceDetail } from "../../models/Evidence";
 import { ResponseErrorDetail } from "../../models/Response";
 import classes from "./IncidentDetail.module.scss";
@@ -250,18 +254,22 @@ const IncidentDetail = () => {
                 >
                   Assign
                 </Button>
-                <Button
-                  bg={"#fff"}
-                  c={"#c92a2a"}
-                  fw={500}
-                  style={{
-                    borderColor: "#c92a2a",
-                  }}
-                  onClick={openModal}
-                  loading={isRejectIncidentLoading}
-                >
-                  Reject
-                </Button>
+                {incidentData?.status != IncidentStatus.Rejected ? (
+                  <Button
+                    bg={"#fff"}
+                    c={"#c92a2a"}
+                    fw={500}
+                    style={{
+                      borderColor: "#c92a2a",
+                    }}
+                    onClick={openModal}
+                    loading={isRejectIncidentLoading}
+                  >
+                    Reject
+                  </Button>
+                ) : (
+                  <></>
+                )}
               </Group>
             )}
           </Group>
@@ -314,14 +322,19 @@ const IncidentDetail = () => {
           <Box
             w={rem(440)}
             style={{
-              border: "1px solid rgb(229, 231, 235)",
+              border: "1px solid #ccc",
 
-              backgroundColor: "#f9fafb",
               borderRadius: rem(8),
             }}
           >
             <Box>
-              <Stack p={rem(24)} gap={4}>
+              <Stack
+                p={rem(24)}
+                gap={4}
+                style={{
+                  backgroundColor: "#f9fafb",
+                }}
+              >
                 <Group justify="space-between">
                   <Text
                     fw={600}
@@ -338,14 +351,14 @@ const IncidentDetail = () => {
                   />
                 </Group>
               </Stack>
-              <Divider color="rgb(229, 231, 235)" />
+              <Divider color="#ccc" />
               <Stack p={rem(24)} gap={rem(18)}>
                 {incidentData?.employee && (
                   <Group>
                     <IconUserCircle
                       style={{
                         width: rem(22),
-                        color: "rgba(156,163,175)",
+                        color: "#000",
                         aspectRatio: 1,
                       }}
                     />
@@ -375,7 +388,7 @@ const IncidentDetail = () => {
                   <IconClock
                     style={{
                       width: rem(22),
-                      color: "rgb(156,163,175)",
+                      color: "#000",
                       aspectRatio: 1,
                     }}
                   />
@@ -390,12 +403,15 @@ const IncidentDetail = () => {
                     <IconUsers
                       style={{
                         width: rem(22),
-                        color: "rgba(156,163,175)",
+                        color: "#000",
                         aspectRatio: 1,
                       }}
                     />
                     <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
-                      Assigned by{" "}
+                      {incidentData?.status == IncidentStatus.Rejected
+                        ? "Rejected "
+                        : "Assigned "}
+                      by{" "}
                       <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
                         {incidentData?.assigningAccount?.name}
                       </Text>
@@ -407,7 +423,7 @@ const IncidentDetail = () => {
                   <IconPictureInPicture
                     style={{
                       width: rem(22),
-                      color: "rgba(156,163,175)",
+                      color: "#000",
                       aspectRatio: 1,
                     }}
                   />
@@ -422,7 +438,7 @@ const IncidentDetail = () => {
                   <IconReport
                     style={{
                       width: rem(22),
-                      color: "rgba(156,163,175)",
+                      color: "#000",
                       aspectRatio: 1,
                     }}
                   />
@@ -437,7 +453,7 @@ const IncidentDetail = () => {
                   <IconRobot
                     style={{
                       width: rem(22),
-                      color: "rgba(156,163,175)",
+                      color: "#000",
                       aspectRatio: 1,
                     }}
                   />
@@ -449,8 +465,6 @@ const IncidentDetail = () => {
                   </Text>
                 </Group>
               </Stack>
-              {/* <Divider color="rgb(229, 231, 235)" />
-              <Box p={rem(24)}></Box> */}
             </Box>
           </Box>
         </Group>

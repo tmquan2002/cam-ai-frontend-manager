@@ -155,4 +155,18 @@ export const IncidentApi = {
 
     return res?.data;
   },
+  _getIncidentByAssignmentId: async (id: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<IncidentDetail[]>(
+      `/api/supervisorassignments/${id}/incidents`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+
+    return res?.data;
+  },
 };

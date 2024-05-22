@@ -42,7 +42,7 @@ const SupervisorRoute = () => {
       );
 
     case Role.ShopHeadSupervisor:
-      return <Navigate to={"/headsupervisor"} />;
+      return <Navigate to={"/supervisor"} />;
     case Role.BrandManager:
       return <Navigate to={"/brand"} />;
     default:
