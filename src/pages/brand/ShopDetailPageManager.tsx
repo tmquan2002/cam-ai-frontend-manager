@@ -31,7 +31,7 @@ import { useUpdateShopById } from "../../hooks/useUpdateShopById";
 import { CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
-import { removeTime, replaceIfNun } from "../../utils/helperFunction";
+import { formatTime, removeTime, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -441,16 +441,17 @@ const ShopDetailPageManager = () => {
                   onSubmit={form.onSubmit((values) => {
                     const updateShopParams: UpdateShopParams = {
                       shopId: data?.id ?? "0",
-                      shopManagerId: data?.shopManager?.id,
+                      shopManagerId: data?.shopManager?.id ?? "",
                       addressLine: values.addressLine,
                       wardId: values.wardId ?? "0",
                       name: values.name,
                       phone: isEmpty(values.phone) ? null : values.phone,
-                      openTime: values?.openTime,
-                      closeTime: values?.closeTime,
+                      openTime: formatTime(values?.openTime, true, true),
+                      closeTime: formatTime(values?.closeTime, true, true),
                     };
 
-                    // console.log(updateShopParams)
+                    console.log(updateShopParams)
+                    console.log(values)
 
                     updateShop(updateShopParams, {
                       onSuccess() {
@@ -476,7 +477,7 @@ const ShopDetailPageManager = () => {
 
                   <Group justify="flex-end" mt="md">
                     <Button type="submit">
-                      Submit
+                      Update
                     </Button>
                   </Group>
                 </form>

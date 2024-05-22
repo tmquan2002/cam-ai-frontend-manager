@@ -54,6 +54,8 @@ export enum NotificationStatus {
 export enum NotificationType {
   EdgeBoxUnhealthy = "EdgeBoxUnhealthy",
   EdgeBoxInstallActivation = "EdgeBoxInstallActivation",
+  UpsertEmployee = "UpsertEmployee",
+  UpsertShopAndManager = "UpsertShopAndManager",
 }
 
 export enum NotificationPriority {

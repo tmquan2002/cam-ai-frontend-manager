@@ -1,10 +1,12 @@
 import { Avatar, Box, Center, Divider, Flex, Highlight, Indicator, Loader, ScrollArea, Tabs, Text, rem, useComputedColorScheme, } from "@mantine/core";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useUpdateNotificationStatus } from "../../hooks/useUpdateNotificationStatus";
-import { NotificationStatus } from "../../models/CamAIEnum";
+import { NotificationStatus, NotificationType } from "../../models/CamAIEnum";
 import { NotificationDetail } from "../../models/Notification";
 import { timeSince } from "../../utils/helperFunction";
 import classes from "./Notification.module.scss";
+import { notifications } from "@mantine/notifications";
 
 export const TabsHeader = ({
   active,
@@ -104,6 +106,7 @@ const Notification = ({
   isNotificationListLoading,
 }: NotificationProps) => {
   const { mutate: updateNotificationStatus } = useUpdateNotificationStatus();
+  const navigate = useNavigate();
 
   // const handleNavigate = ({ relatedEntityId, type }: NotificationDetail) => {
   //   switch (type) {
@@ -175,6 +178,23 @@ const Notification = ({
                         },
                       }
                     );
+                    if (!item?.relatedEntityId) {
+                      notifications.show({
+                        color: "red",
+                        title: "Failed",
+                        message: "This Task Log is expired",
+                      });
+                    }
+
+                    if (item?.type == NotificationType.UpsertEmployee && item?.relatedEntityId) {
+                      navigate(`/shop/import/${item?.relatedEntityId?.split('-').join('')}`)
+                    }
+
+                    if (item?.type == NotificationType.UpsertShopAndManager && item?.relatedEntityId) {
+                      navigate(`/brand/import/${item?.relatedEntityId?.split('-').join('')}`)
+                    }
+
+
                   }}
                 >
                   <DetailCard
