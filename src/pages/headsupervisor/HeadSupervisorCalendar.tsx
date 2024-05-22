@@ -19,6 +19,7 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
 import {
@@ -61,6 +62,7 @@ import { SuperVisorAssignmentDetail } from "../../models/Shop";
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
 const HeadSupervisorCalendar = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [opened, { toggle }] = useDisclosure(false);
 
   const [scrolled, setScrolled] = useState(false);
@@ -807,12 +809,12 @@ const HeadSupervisorCalendar = () => {
               style={{
                 border: "1px solid #ccc",
               }}
+              bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
             >
               <Card.Section
                 style={{
                   borderBottom: "1px solid #ccc",
                 }}
-                bg={"#f9fafb"}
                 py={rem(16)}
                 px={rem(12)}
               >

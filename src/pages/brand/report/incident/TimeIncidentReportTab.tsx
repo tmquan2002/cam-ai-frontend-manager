@@ -816,6 +816,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
             style={{
               border: "1px solid grey",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
@@ -951,6 +952,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
             style={{
               border: "1px solid rgb(229 231 235)",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section>
               <Box

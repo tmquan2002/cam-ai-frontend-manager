@@ -798,12 +798,12 @@ const TimeIncidentReport = () => {
             style={{
               border: "1px solid grey",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section
               style={{
                 borderBottom: "1px solid grey",
               }}
-              bg={"#f9fafb"}
               py={rem(16)}
               px={rem(12)}
             >
@@ -941,13 +941,13 @@ const TimeIncidentReport = () => {
             style={{
               border: "1px solid rgb(229 231 235)",
             }}
+            bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
           >
             <Card.Section>
               <Box
                 style={{
                   borderBottom: "1px solid grey",
                 }}
-                bg={"#f9fafb"}
                 py={rem(16)}
                 px={rem(24)}
               >
