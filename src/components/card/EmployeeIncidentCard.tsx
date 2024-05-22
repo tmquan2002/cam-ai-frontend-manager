@@ -75,10 +75,7 @@ const renderIncidentStatusText = (status: IncidentStatus | undefined) => {
   }
 };
 
-export const EmployeeIncidentCard = ({
-  employee,
-  incidentList,
-}: EmployeeIncidentCardProps) => {
+export const EmployeeIncidentCard = ({ employee, incidentList, }: EmployeeIncidentCardProps) => {
   const [opened, { toggle }] = useDisclosure(false);
   const navigate = useNavigate();
 
@@ -103,25 +100,25 @@ export const EmployeeIncidentCard = ({
           )}
 
           {_.isEmpty(employee) ? (
-            <Text c={"#000"} fw={500} py={rem(20)} ml={rem(20)}>
+            <Text fw={500} py={rem(20)} ml={rem(20)}>
               Unassigned incident
             </Text>
           ) : (
             <Stack py={rem(12)} gap={rem(3)} ml={rem(20)}>
               <Group align="center">
-                <IconUser style={{ width: rem(18), color: "#000" }} />
-                <Text c={"#000"} size={rem(15)} fw={500}>
+                <IconUser style={{ width: rem(20) }} stroke={1.5} />
+                <Text size={"md"} fw={500}>
                   {employee?.name ?? "Empty"}
                 </Text>
               </Group>
               <Group align="center">
-                <IconMail style={{ width: rem(18), color: "rgb(75 85 99)" }} />
-                <Text size={rem(14)} fw={400} c={"rgb(75 85 99)"}>
+                <IconMail style={{ width: rem(20) }} stroke={1.5} />
+                <Text fw={500} c={"dimmed"}>
                   {employee?.email ?? "Empty"}
                 </Text>
-                <IconPointFilled style={{ width: rem(16), color: "#000" }} />
-                <IconPhone style={{ width: rem(18), color: "rgb(75 85 99)" }} />
-                <Text size={rem(14)} fw={400} c={"rgb(75 85 99)"}>
+                <IconPointFilled style={{ width: rem(16) }} stroke={1.5} />
+                <IconPhone style={{ width: rem(20) }} stroke={1.5} />
+                <Text fw={500} c={"dimmed"}>
                   {employee?.phone ?? "Empty"}
                 </Text>
               </Group>
@@ -155,8 +152,8 @@ export const EmployeeIncidentCard = ({
                   index == incidentList?.length - 1
                     ? {}
                     : {
-                        borderBottom: "1px solid #B4B4B4",
-                      }
+                      borderBottom: "1px solid #B4B4B4",
+                    }
                 }
                 pb={rem(12)}
                 className={classes["clickable-style"]}

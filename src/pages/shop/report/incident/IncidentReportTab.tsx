@@ -1,15 +1,17 @@
 import _ from "lodash";
 import EmployeeIncidentReport from "./EmployeeIncidentReport";
-import { Box, Flex, Tabs, Text, rem } from "@mantine/core";
+import { Box, Flex, Tabs, Text, rem, useComputedColorScheme } from "@mantine/core";
 import { IconClock } from "@tabler/icons-react";
 import TimeIncidentReport from "./TimeIncidentReport";
 import { IconUser } from "@tabler/icons-react";
 
 const IncidentReportPage = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const iconStyle = { width: rem(20), height: rem(20) };
 
   return (
-    <Flex px={rem(40)} pt={rem(12)} bg={"#fff"} flex={1} direction={"column"}>
+    <Flex px={rem(40)} pt={rem(12)} flex={1} direction={"column"}
+      bg={computedColorScheme == "light" ? "#f6f8fc" : "#1a1a1a"}>
       <Text size={rem(24)} fw={700} my={rem(20)} c={"light-blue"} mb={rem(24)}>
         Incident report
       </Text>

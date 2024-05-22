@@ -185,6 +185,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       form.values.toDate,
       shopId,
     ]);
+
   const {
     data: incidentReportByTimeData,
     isLoading: isGetIncidentReportByTimeDataLoading,
@@ -474,6 +475,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                   </Text>
                 </Group>
               </Group>
+              
               <Flex mb={rem(32)}>
                 <Box
                   style={{

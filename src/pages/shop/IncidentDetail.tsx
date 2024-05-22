@@ -5,12 +5,14 @@ import {
   Divider,
   Group,
   Loader,
+  LoadingOverlay,
   Modal,
   Select,
   Skeleton,
   Stack,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { modals } from "@mantine/modals";
@@ -48,6 +50,7 @@ type IncidentFormField = {
 };
 
 const IncidentDetail = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const [opened, { open, close }] = useDisclosure(false);
   const { id } = useParams<{ id: string }>();
   const form = useForm<IncidentFormField>();
@@ -142,12 +145,9 @@ const IncidentDetail = () => {
     form.reset();
   }, [incidentData]);
 
-  if (isGetIncidentLoading) {
-    return <Loader />;
-  }
-
   return (
-    <>
+    <Box pos="relative">
+      <LoadingOverlay visible={isGetIncidentLoading} />
       <Modal
         opened={opened}
         onClose={close}
@@ -196,7 +196,7 @@ const IncidentDetail = () => {
           </Group>
         </form>
       </Modal>
-      <Box flex={1} bg={"#fff"}>
+      <Box flex={1} bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}>
         <Box
           px={rem(32)}
           py={rem(24)}
@@ -223,13 +223,13 @@ const IncidentDetail = () => {
                 <Text
                   size={rem(18)}
                   fw={600}
-                  c={"rgb(17, 24, 39)"}
+                  c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
                   lh={rem(26)}
                 >
                   {incidentData?.incidentType} incident
                 </Text>
                 <Text
-                  c={"rgb(55, 65, 81)"}
+                  c={"dimmed"}
                   size={rem(14)}
                   fw={400}
                   lh={rem(26)}
@@ -251,8 +251,8 @@ const IncidentDetail = () => {
                   Assign
                 </Button>
                 <Button
-                  bg={"#fff"}
-                  c={"#c92a2a"}
+                  variant="outline"
+                  c={computedColorScheme == "light" ? "#c92a2a" : "#E75151"}
                   fw={500}
                   style={{
                     borderColor: "#c92a2a",
@@ -283,7 +283,7 @@ const IncidentDetail = () => {
             }}
           >
             <Box
-              bg={"#f9fafb"}
+              bg={computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f"}
               py={rem(28)}
               px={rem(24)}
               style={{
@@ -315,8 +315,7 @@ const IncidentDetail = () => {
             w={rem(440)}
             style={{
               border: "1px solid rgb(229, 231, 235)",
-
-              backgroundColor: "#f9fafb",
+              backgroundColor: computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f",
               borderRadius: rem(8),
             }}
           >
@@ -326,7 +325,7 @@ const IncidentDetail = () => {
                   <Text
                     fw={600}
                     size={rem(17)}
-                    c={"rgb(17, 24, 39)"}
+                    c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
                     lh={rem(26)}
                   >
                     {incidentData?.incidentType} incident
@@ -345,7 +344,7 @@ const IncidentDetail = () => {
                     <IconUserCircle
                       style={{
                         width: rem(22),
-                        color: "rgba(156,163,175)",
+                        color: "dimmed",
                         aspectRatio: 1,
                       }}
                     />
@@ -353,7 +352,7 @@ const IncidentDetail = () => {
                     <Text
                       size={rem(15)}
                       fw={500}
-                      c={"rgb(17, 24, 39)"}
+                      c={computedColorScheme == "light" ? "black" : "white"}
                       lh={rem(24)}
                     >
                       <Text
@@ -362,7 +361,7 @@ const IncidentDetail = () => {
                         lh={rem(24)}
                         inherit
                         fw={400}
-                        c={"rgb(107, 114, 128)"}
+                        c={"dimmed"}
                       >
                         Assign to{" "}
                       </Text>
@@ -375,11 +374,11 @@ const IncidentDetail = () => {
                   <IconClock
                     style={{
                       width: rem(22),
-                      color: "rgb(156,163,175)",
+                      color: "dimmed",
                       aspectRatio: 1,
                     }}
                   />
-                  <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
+                  <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
                     {dayjs(incidentData?.startTime).format(
                       "MMMM DD, YYYY h:mm A"
                     )}
@@ -390,13 +389,13 @@ const IncidentDetail = () => {
                     <IconUsers
                       style={{
                         width: rem(22),
-                        color: "rgba(156,163,175)",
+                        color: "dimmed",
                         aspectRatio: 1,
                       }}
                     />
-                    <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
+                    <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
                       Assigned by{" "}
-                      <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
+                      <Text inherit span fw={500} c={computedColorScheme == "light" ? "black" : "white"}>
                         {incidentData?.assigningAccount?.name}
                       </Text>
                     </Text>
@@ -411,9 +410,9 @@ const IncidentDetail = () => {
                       aspectRatio: 1,
                     }}
                   />
-                  <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
+                  <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
                     Evidences :
-                    <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
+                    <Text inherit span fw={500} c={computedColorScheme == "light" ? "black" : "white"}>
                       {" " + incidentData?.evidences.length}
                     </Text>
                   </Text>
@@ -426,9 +425,9 @@ const IncidentDetail = () => {
                       aspectRatio: 1,
                     }}
                   />
-                  <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
+                  <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
                     In charge :
-                    <Text inherit span fw={500} c={"rgb(17, 24, 39)"}>
+                    <Text inherit span fw={500} c={computedColorScheme == "light" ? "black" : "white"}>
                       {" " + incidentData?.inChargeAccount?.name}
                     </Text>
                   </Text>
@@ -441,9 +440,9 @@ const IncidentDetail = () => {
                       aspectRatio: 1,
                     }}
                   />
-                  <Text size={rem(15)} c={"rgb(107, 114, 128)"} lh={rem(24)}>
+                  <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
                     AI identity :
-                    <Text span inherit fw={500} c={"rgb(17, 24, 39)"}>
+                    <Text span inherit fw={500} c={computedColorScheme == "light" ? "black" : "white"}>
                       {" " + incidentData?.aiId}
                     </Text>
                   </Text>
@@ -455,7 +454,7 @@ const IncidentDetail = () => {
           </Box>
         </Group>
       </Box>
-    </>
+    </Box>
   );
 };
 

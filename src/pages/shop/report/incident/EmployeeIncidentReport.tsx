@@ -20,6 +20,7 @@ import {
   Stack,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import {
   EmployeeIncidentCard,
@@ -41,6 +42,7 @@ type SearchIncidentField = {
 };
 
 const EmployeeIncidentReport = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
@@ -54,14 +56,14 @@ const EmployeeIncidentReport = () => {
     validate: (values) => ({
       toTime:
         values.toTime &&
-        values?.fromTime &&
-        values?.toTime?.getTime() < values?.fromTime?.getTime()
+          values?.fromTime &&
+          values?.toTime?.getTime() < values?.fromTime?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toTime &&
-        values?.fromTime &&
-        values?.toTime?.getTime() < values?.fromTime?.getTime()
+          values?.fromTime &&
+          values?.toTime?.getTime() < values?.fromTime?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -220,7 +222,7 @@ const EmployeeIncidentReport = () => {
       <Box
         style={{
           borderRadius: "8px",
-          border: "1px solid #ccc",
+          border: "1px solid grey",
           marginTop: rem(20),
           overflow: "hidden",
           paddingBottom: rem(40),
@@ -228,10 +230,10 @@ const EmployeeIncidentReport = () => {
       >
         <Box
           mb={rem(32)}
-          bg={"#f9fafb"}
+          bg={computedColorScheme == "light" ? "white" : "#242424"}
           py={rem(20)}
           style={{
-            borderBottom: "1px solid #ccc",
+            borderBottom: "1px solid grey",
           }}
         >
           <Group justify="flex-end" mr={rem(12)}>
@@ -271,25 +273,14 @@ const EmployeeIncidentReport = () => {
               <Skeleton
                 visible={isGetIncidentListLoading || isGetEmployeeListLoading}
               >
-                <Paper
-                  px={rem(20)}
-                  py={rem(20)}
-                  radius={"md"}
-                  style={{
-                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
+                <Paper px={rem(20)} py={rem(20)} radius={"md"} shadow="lg"
+                  bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}>
                   <Group>
-                    <Avatar
-                      radius={"md"}
-                      color="green"
-                      size={rem(68)}
-                      mr={rem(12)}
-                    >
+                    <Avatar radius={"md"} color="green" size={rem(68)} mr={rem(12)}>
                       <IconCheck size={"2rem"} />
                     </Avatar>
                     <Stack justify="center" gap={rem(6)}>
-                      <Text c="#000" fw={500}>
+                      <Text c={computedColorScheme == "dark" ? "white" : "black"} fw={500}>
                         Assigned incident
                       </Text>
                       <Text size={rem(22)} fw={700} c={"green"}>
@@ -308,20 +299,14 @@ const EmployeeIncidentReport = () => {
               <Skeleton
                 visible={isGetIncidentListLoading || isGetEmployeeListLoading}
               >
-                <Paper
-                  px={rem(20)}
-                  py={rem(20)}
-                  style={{
-                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
-                  }}
-                  radius={"md"}
-                >
+                <Paper px={rem(20)} py={rem(20)} shadow="lg" radius={"md"}
+                  bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}>
                   <Group>
                     <Avatar radius={"md"} color="blue" size={rem(68)}>
                       <IconEye size={"2rem"} />
                     </Avatar>
                     <Stack justify="center" gap={rem(8)}>
-                      <Text c="#000" fw={500}>
+                      <Text c={computedColorScheme == "dark" ? "white" : "black"} fw={500}>
                         Unassigned incident
                       </Text>
                       <Text size={rem(22)} fw={700} c={"blue"}>
@@ -341,20 +326,14 @@ const EmployeeIncidentReport = () => {
               <Skeleton
                 visible={isGetIncidentListLoading || isGetEmployeeListLoading}
               >
-                <Paper
-                  px={rem(20)}
-                  py={rem(20)}
-                  style={{
-                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)",
-                  }}
-                  radius={"md"}
-                >
+                <Paper px={rem(20)} py={rem(20)} shadow="lg" radius={"md"}
+                  bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}>
                   <Group>
                     <Avatar radius={"md"} color="red" size={rem(68)}>
                       <IconX size={"2rem"} />
                     </Avatar>
                     <Stack justify="center" gap={rem(8)}>
-                      <Text c="#000" fw={500}>
+                      <Text c={computedColorScheme == "dark" ? "white" : "black"} fw={500}>
                         Rejected incident
                       </Text>
                       <Text size={rem(22)} fw={700} c={"red"}>

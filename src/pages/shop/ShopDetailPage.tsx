@@ -372,6 +372,7 @@ const ShopDetailPage = () => {
                 {cameraList?.values?.map((item) => (
                   <Tooltip label="View camera" key={item?.id}>
                     <Button
+                      c="light-blue.3"
                       variant="outline"
                       fullWidth
                       size={rem(52)}

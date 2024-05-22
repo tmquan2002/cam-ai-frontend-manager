@@ -1,19 +1,52 @@
 .today {
-  background-color: #eff6ff;
+  border-bottom: 1px solid grey;
+  border-left: 1px solid grey;
+
+  @include light {
+    background-color: #eff6ff;
+  }
+
+  @include dark {
+    background-color: #595959;
+  }
 }
 
 .selectedDay {
-  background-color: #d2e3fc;
+  border-bottom: 1px solid grey;
+  border-left: 1px solid grey;
+
+  @include light {
+    background-color: #d2e3fc;
+  }
+
+  @include dark {
+    background-color: #434343;
+  }
 }
 
 .activeCard {
-  border-bottom: 1px solid #ccc;
-  border-left: 1px solid #ccc;
+  border-bottom: 1px solid grey;
+  border-left: 1px solid grey;
+
+  @include light {
+    background-color: white;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
   cursor: pointer;
 }
 
 .activeCard:hover {
-  background-color: #d2e3fc;
+  @include light {
+    background-color: #d2e3fc;
+  }
+
+  @include dark {
+    background-color: #434343;
+  }
 }
 
 .timelinePrimaryPoint {
@@ -32,7 +65,7 @@
   margin: rem(2);
 }
 
-.timelinePrimaryPoint:hover > .innerTimelinePrimaryPoint {
+.timelinePrimaryPoint:hover>.innerTimelinePrimaryPoint {
   background-color: #228be6;
   transition: background-color 400ms ease-in;
 }
@@ -50,10 +83,11 @@
   cursor: pointer;
 }
 
-.timelineWrapper:hover > .divider {
+.timelineWrapper:hover>.divider {
   border-color: #228be6 !important;
   transition: border-color 400ms ease-in;
 }
+
 .timelineWrapper:hover .innerTimelinePrimaryPoint,
 .timelineWrapper:hover .timelineSecondaryPoint {
   background-color: #228be6 !important;
@@ -101,11 +135,25 @@
 .scrolled {
   box-shadow: var(--mantine-shadow-sm);
 }
+
 .selectedInteraction {
-  background-color: #e3f4fb;
+  @include light {
+    background-color: #eaf8fe;
+  }
+
+  @include dark {
+    background-color: #3b3b3b;
+  }
 }
 
 .activeAccordion {
-  background-color: #fff;
+  @include light {
+    background-color: white;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
   border: 1px solid rgb(79, 70, 229) !important;
 }

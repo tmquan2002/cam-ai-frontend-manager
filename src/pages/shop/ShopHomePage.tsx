@@ -66,6 +66,7 @@ const IncidentCard = ({
 }: IncidentDetail) => {
   const navigate = useNavigate();
   const [mouted, setMouted] = useState(false);
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
 
   useEffect(() => {
     setTimeout(() => {
@@ -103,15 +104,15 @@ const IncidentCard = ({
             px={rem(20)}
           >
             <div>
-              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+              <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Evidence(s)
               </Text>
-              <Text fw={600} size={rem(14)} lh={rem(20)} c={"rgb(17, 24, 39)"}>
+              <Text fw={600} size={rem(14)} lh={rem(20)} c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}>
                 {evidences ? evidences?.length : 0}
               </Text>
             </div>
             <div>
-              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+              <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Status
               </Text>
               <Flex align={"center"}>
@@ -132,10 +133,10 @@ const IncidentCard = ({
               </Flex>
             </div>
             <div>
-              <Text size={rem(14)} c="rgb(107, 114, 128)" lh={rem(21)}>
+              <Text size={rem(14)} c="dimmed" lh={rem(21)}>
                 Time
               </Text>
-              <Text fw={600} size={rem(14)} lh={rem(20)} c={"rgb(17, 24, 39)"}>
+              <Text fw={600} size={rem(14)} lh={rem(20)} c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}>
                 {dayjs(startTime).format("HH:mm")}
               </Text>
             </div>
@@ -285,7 +286,7 @@ const ShopHomePage = () => {
 
     return (
       <Flex justify={"space-between"}>
-        <Group align="flex-start">
+        <Group align="flex-end">
           {cameraList?.values?.map((item) =>
             item?.status == CameraStatus.Connected ? (
               <CameraCard cameraId={item?.id} key={item?.id} />

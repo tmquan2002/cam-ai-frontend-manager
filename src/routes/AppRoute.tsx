@@ -12,6 +12,7 @@ import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
 import IncidentListPage from "../pages/brand/IncidentListPage";
 import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
 import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
+import ShopImportResultPage from "../pages/brand/ShopImportResultPage";
 import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
 import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
@@ -22,13 +23,13 @@ import LoginPage from "../pages/common/login/LoginPage";
 import HeadSupervisorMainPage from "../pages/headsupervisor/HeadSupervisorMainPage";
 import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
 import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
+import EmployeeImportResultPage from "../pages/shop/EmployeeImportResultPage";
 import EmployeeListPage from "../pages/shop/EmployeeListPage";
 import IncidentDetail from "../pages/shop/IncidentDetail";
 import ShopCalendar from "../pages/shop/ShopCalendar";
 import ShopCalendarSetting from "../pages/shop/ShopCalendarSetting";
 import ShopDetailPage from "../pages/shop/ShopDetailPage";
 import ShopHomePage from "../pages/shop/ShopHomePage";
-import EmployeeImportResultPage from "../pages/shop/EmployeeImportResultPage";
 import ShopIncidentListPage from "../pages/shop/ShopIncidentListPage";
 import ShopInteractionPage from "../pages/shop/ShopInteractionPage";
 import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
@@ -40,7 +41,6 @@ import CommonRoute from "./CommonRoute";
 import HeadSupervisorRoute from "./HeadSupervisorRoute";
 import ShopRoute from "./ShopRoute";
 import SupervisorRoute from "./SupervisorRoute";
-import ShopImportResultPage from "../pages/brand/ShopImportResultPage";
 
 const AppRoute = () => {
   return useRoutes([

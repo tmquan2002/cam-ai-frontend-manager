@@ -14,6 +14,7 @@ import {
   Table,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useGetIncidentReportByTime } from "../../../../hooks/useGetIncidentReportByTime";
 import {
@@ -104,6 +105,7 @@ const renderIncidentTypeLegendTitle = (
 };
 
 const TimeIncidentReport = () => {
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 60,
   });
@@ -130,14 +132,14 @@ const TimeIncidentReport = () => {
     validate: (values) => ({
       toDate:
         values.startDate &&
-        values?.toDate &&
-        values?.toDate?.getTime() < values?.startDate?.getTime()
+          values?.toDate &&
+          values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toDate &&
-        values?.startDate &&
-        values?.toDate?.getTime() < values?.startDate?.getTime()
+          values?.startDate &&
+          values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -347,14 +349,14 @@ const TimeIncidentReport = () => {
       >
         <Table.Td>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item.incidentType}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -363,7 +365,7 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -372,21 +374,21 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.evidences.length}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item?.employee?.name ?? "Empty"}
             </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
+            <Text size={rem(13)}>
               {item.status}
             </Text>
           </Center>
@@ -401,17 +403,16 @@ const TimeIncidentReport = () => {
         <Box
           style={{
             borderRadius: "8px",
-            border: "1px solid #ccc",
+            border: "1px solid grey",
             marginTop: rem(20),
             overflow: "hidden",
           }}
         >
           <Box
             mb={rem(32)}
-            bg={"#f9fafb"}
             py={rem(20)}
             style={{
-              borderBottom: "1px solid #ccc",
+              borderBottom: "1px solid grey",
             }}
           >
             <Group justify="flex-end">
@@ -422,21 +423,39 @@ const TimeIncidentReport = () => {
           </Box>
 
           {!incidentReportByTimeData ||
-          incidentReportByTimeData?.data?.length == 0 ? (
+            incidentReportByTimeData?.data?.length == 0 ? (
             <NoImage type="NO_DATA" />
           ) : (
             <Box>
               <Group justify="flex-end" mt={rem(20)} mb={rem(6)} mr={rem(12)}>
-                <LegendCard
-                  type="line"
-                  color="rgb(37, 150, 190)"
-                  title="Total incident"
-                />
-                <LegendCard
-                  type="bar"
-                  color="rgba(255, 99, 132, 1)"
-                  title="Average incident time"
-                />
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "999px",
+                      width: rem(20),
+                      aspectRatio: 5,
+                      backgroundColor: "rgb(37, 150, 190)",
+                    }}
+                  />
+                  <Text size={rem(14)} fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                    Total incident
+                  </Text>
+                </Group>
+                <Group gap={"sm"} align="center">
+                  <Box
+                    style={{
+                      borderRadius: "2px",
+                      width: rem(10),
+                      aspectRatio: 1,
+                      backgroundColor: "rgba(255, 99, 132, 1)",
+                    }}
+                  />
+                  <Text size={rem(14)} fw={500}
+                    c={computedColorScheme == "dark" ? `white` : `black`}>
+                    Average incident time
+                  </Text>
+                </Group>
               </Group>
 
               <Flex mb={rem(32)}>
@@ -444,7 +463,6 @@ const TimeIncidentReport = () => {
                   style={{
                     width: "40px",
                     zIndex: 999,
-                    backgroundColor: "#fff",
                   }}
                 >
                   <Chart
@@ -522,12 +540,12 @@ const TimeIncidentReport = () => {
                     style={
                       data && data?.length > 7
                         ? {
-                            width: `${1500 + (data?.length - 7) * 70}px`,
-                            height: "600px",
-                          }
+                          width: `${1500 + (data?.length - 7) * 70}px`,
+                          height: "600px",
+                        }
                         : {
-                            height: "600px",
-                          }
+                          height: "600px",
+                        }
                     }
                   >
                     <Chart
@@ -585,7 +603,7 @@ const TimeIncidentReport = () => {
                           if (elements.length > 0) {
                             const selectedData =
                               incidentReportByTimeData?.data?.[
-                                elements[0].index
+                              elements[0].index
                               ];
                             setSelectedIncidentItem(null);
                             setSelectedDuration({
@@ -606,7 +624,6 @@ const TimeIncidentReport = () => {
                             label: "Total incident ",
                             data: data?.map((i) => i.count),
                             borderColor: "rgb(37, 150, 190)",
-                            backgroundColor: "rgb(37, 150, 190, 0.5)",
                             cubicInterpolationMode: "monotone",
                             pointHoverRadius: 7,
                             pointHoverBackgroundColor: "#fff",
@@ -637,7 +654,7 @@ const TimeIncidentReport = () => {
                     flex={1}
                     style={{
                       borderRadius: rem(12),
-                      border: "1px solid #ccc",
+                      border: "1px solid grey",
                     }}
                   >
                     <Text
@@ -660,15 +677,15 @@ const TimeIncidentReport = () => {
                         data={
                           incidentPercent
                             ? incidentPercent?.types?.map((i) => {
-                                return {
-                                  name: i.type + " incident",
-                                  color:
-                                    i.type == IncidentType.Phone
-                                      ? "indigo.6"
-                                      : "yellow.6",
-                                  value: i.total,
-                                };
-                              })
+                              return {
+                                name: i.type + " incident",
+                                color:
+                                  i.type == IncidentType.Phone
+                                    ? "indigo.6"
+                                    : "yellow.6",
+                                value: i.total,
+                              };
+                            })
                             : []
                         }
                       />
@@ -697,7 +714,7 @@ const TimeIncidentReport = () => {
                     flex={1}
                     style={{
                       borderRadius: rem(12),
-                      border: "1px solid #ccc",
+                      border: "1px solid grey",
                     }}
                   >
                     <Text
@@ -720,17 +737,17 @@ const TimeIncidentReport = () => {
                         data={
                           incidentPercent
                             ? incidentPercent?.statuses.map((i) => {
-                                return {
-                                  color:
-                                    i.status == IncidentStatus.Accepted
-                                      ? "#12b886"
-                                      : i.status == IncidentStatus.New
+                              return {
+                                color:
+                                  i.status == IncidentStatus.Accepted
+                                    ? "#12b886"
+                                    : i.status == IncidentStatus.New
                                       ? "#4c6ef5"
                                       : "#fa5252",
-                                  name: i.status,
-                                  value: i.total,
-                                };
-                              })
+                                name: i.status,
+                                value: i.total,
+                              };
+                            })
                             : []
                         }
                       />
@@ -779,12 +796,12 @@ const TimeIncidentReport = () => {
             mb={rem(40)}
             ref={targetRef}
             style={{
-              border: "1px solid #ccc",
+              border: "1px solid grey",
             }}
           >
             <Card.Section
               style={{
-                borderBottom: "1px solid #ccc",
+                borderBottom: "1px solid grey",
               }}
               bg={"#f9fafb"}
               py={rem(16)}
@@ -805,7 +822,6 @@ const TimeIncidentReport = () => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(10)}
                   >
                     {dayjs(selectedDuration?.startTime).format("HH:mm | DD-MM")}
@@ -820,7 +836,6 @@ const TimeIncidentReport = () => {
                       border: "1px solid green",
                     }}
                     variant="light"
-                    c={"#000"}
                     mr={rem(16)}
                   >
                     {dayjs(selectedDuration?.endTime).format("HH:mm DD-MM")}
@@ -846,7 +861,6 @@ const TimeIncidentReport = () => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Type
@@ -858,7 +872,6 @@ const TimeIncidentReport = () => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Start time
@@ -870,7 +883,6 @@ const TimeIncidentReport = () => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             End time
@@ -882,7 +894,6 @@ const TimeIncidentReport = () => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Evidences
@@ -895,7 +906,6 @@ const TimeIncidentReport = () => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Assigned to
@@ -907,7 +917,6 @@ const TimeIncidentReport = () => {
                           <Text
                             size={rem(13)}
                             lh={rem(24)}
-                            c={"rgb(55 65 81)"}
                             fw={600}
                           >
                             Status
@@ -936,7 +945,7 @@ const TimeIncidentReport = () => {
             <Card.Section>
               <Box
                 style={{
-                  borderBottom: "1px solid #ccc",
+                  borderBottom: "1px solid grey",
                 }}
                 bg={"#f9fafb"}
                 py={rem(16)}
@@ -952,11 +961,11 @@ const TimeIncidentReport = () => {
                     </Text>
                     <Badge radius={"sm"} color={"green"} c={"#fff"}>
                       {selectedIncidentItem?.startTime &&
-                      selectedIncidentItem.endTime
+                        selectedIncidentItem.endTime
                         ? differentDateReturnFormattedString(
-                            selectedIncidentItem?.startTime,
-                            selectedIncidentItem?.endTime
-                          )
+                          selectedIncidentItem?.startTime,
+                          selectedIncidentItem?.endTime
+                        )
                         : "undefined"}
                     </Badge>
                   </Group>
@@ -974,7 +983,6 @@ const TimeIncidentReport = () => {
                       mb={rem(10)}
                     >
                       <Text
-                        c={"rgb(107 114 128"}
                         size={rem(14)}
                         lh={rem(24)}
                         fw={500}
@@ -984,7 +992,6 @@ const TimeIncidentReport = () => {
                         ).format("LL")}
                       </Text>
                       <Text
-                        c={"rgb(107 114 128"}
                         size={rem(14)}
                         lh={rem(24)}
                         fw={500}

@@ -19,7 +19,13 @@
 }
 
 .selectedInteraction {
-  background-color: #e3f4fb;
+  @include light {
+    background-color: #e1e4eb;
+  }
+
+  @include dark {
+    background-color: #434343;
+  }
 }
 
 .transition {
