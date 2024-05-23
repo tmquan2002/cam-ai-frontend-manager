@@ -7,6 +7,7 @@ import { NotificationDetail } from "../../models/Notification";
 import { timeSince } from "../../utils/helperFunction";
 import classes from "./Notification.module.scss";
 import { notifications } from "@mantine/notifications";
+import { useUpdateAllNotificationStatus } from "../../hooks/useUpdateAllNotificationStatus";
 
 export const TabsHeader = ({
   active,
@@ -100,12 +101,9 @@ export type NotificationProps = {
   isNotificationListLoading: boolean;
 };
 
-const Notification = ({
-  notificationList,
-  refetchNotification,
-  isNotificationListLoading,
-}: NotificationProps) => {
+const Notification = ({ notificationList, refetchNotification, isNotificationListLoading, }: NotificationProps) => {
   const { mutate: updateNotificationStatus } = useUpdateNotificationStatus();
+  const { mutate: updateAllNotificationStatus } = useUpdateAllNotificationStatus();
   const navigate = useNavigate();
 
   // const handleNavigate = ({ relatedEntityId, type }: NotificationDetail) => {
@@ -129,7 +127,17 @@ const Notification = ({
           Notification
         </Text>
         <Center>
-          <Text c="#adb5bd" size="md" className={classes["anchor"]}>
+          <Text c="#adb5bd" size="md" className={classes["anchor"]}
+            onClick={() => {
+              updateAllNotificationStatus(
+                undefined,
+                {
+                  onSuccess() {
+                    refetchNotification();
+                  },
+                }
+              )
+            }}>
             Mark all as read
           </Text>
         </Center>

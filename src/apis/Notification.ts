@@ -48,4 +48,17 @@ export const NotificationAPI = {
 
     return res?.data;
   },
+  _updateAllNotificationStatus: async () => {
+    const access_token = getAccessToken();
+    const res = await http.patch(
+      `/api/notifications/read-all`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+    return res?.data;
+  },
 };

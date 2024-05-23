@@ -51,7 +51,7 @@ const BrandHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
       <Group gap={5}>
         <LightDarkSwitch size="md" />
 
-        <Popover position="bottom-end" withArrow shadow="md">
+        <Popover position="bottom-end" withArrow shadow="md" onOpen={refetchNotificationList}>
           <Tooltip label="Notification" withArrow>
             <Popover.Target>
               <Indicator
