@@ -8,6 +8,7 @@ import {
   StatusColor,
   StatusColorLight,
 } from "../models/CamAIEnum";
+import { MetaData, TaskError } from "../models/Task";
 
 export function isEmpty(value: string | null | undefined) {
   return (
@@ -207,10 +208,10 @@ export function formatTime(
         hours = "12";
       }
     }
-    return `${hours}:${minutes}${withSeconds ? `:${seconds}` : ""} ${suffix}`;
+    return `${hours}:${minutes}${withSeconds ? `:${seconds ?? '00'}` : ""} ${suffix}`;
   }
 
-  return `${hours}:${minutes}${withSeconds ? `:${seconds}` : ""}`;
+  return `${hours}:${minutes}${withSeconds ? `:${seconds ?? '00'}` : ""}`;
 }
 
 export function getColorFromStatusName(statusName: string, light?: boolean) {
@@ -276,4 +277,13 @@ export function timeSince(date: Date) {
 
 export function randomInRange(start: number, end: number) {
   return Math.floor(Math.random() * (end - start + 1) + start);
+}
+
+/**
+ * Check if errors has type TaskError
+ * @param metadata Get metadata from response
+ * @returns 
+ */
+export function hasErrorType(metadata: MetaData): metadata is { errors: TaskError[] } {
+  return 'errors' in metadata;
 }

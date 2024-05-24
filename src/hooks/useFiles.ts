@@ -121,7 +121,7 @@ export const useGetEmployeeUpsertTask = () => {
 
 export const useGetEmployeeUpsertTaskResult = (taskId: string) => {
     const { isError, isLoading, data, error, refetch }: UseQueryResult<TaskResult, Error> = useQuery({
-        queryKey: ["getEmployeeUpsertTaskResult"],
+        queryKey: ["getEmployeeUpsertTaskResult", taskId],
         queryFn: async () => {
             return await EmployeeApi._getEmployeeUpsertTaskResult(taskId);
         },
