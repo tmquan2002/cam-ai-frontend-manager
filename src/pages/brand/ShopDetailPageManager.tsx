@@ -486,91 +486,132 @@ const ShopDetailPageManager = () => {
           </Tabs.Panel>
           <Tabs.Panel value="shopManager">
             <Box p={rem(32)}>
-              <Box>
-                <Group justify="space-between" mb={rem(20)}>
-                  <Group mb={15} gap={30}>
-                    <div>
-                      <Text size='md' fw={'bold'} fz={25} c={"light-blue.4"}>{data?.shopManager?.name}</Text>
-                      {data?.shopManager?.role && <Text size="md" fw="bold">{data.shopManager.role.replace(/([A-Z])/g, ' $1').trim()}</Text>}
-                    </div>
-                    <StatusBadge statusName={data?.shopManager?.accountStatus ? data.shopManager?.accountStatus : "None"}
-                      mb={15} mt={15} />
-                  </Group>
+              {!data?.shopManager ? <Box ta="center">
+                <Text mb={10} c="dimmed" fs="italic">This shop has no manager</Text>
 
-                  <Popover trapFocus position="bottom" withArrow shadow="md" opened={opened}>
-                    <Popover.Target>
-                      <Tooltip label="Assign selected" withArrow>
-                        <Button onClick={toggle}>
-                          Assign Shop Manager
+                <Popover trapFocus position="bottom" withArrow shadow="md" opened={opened}>
+                  <Popover.Target>
+                    <Tooltip label="Assign selected" withArrow>
+                      <Button onClick={toggle}>
+                        Assign Shop Manager
+                      </Button>
+                    </Tooltip>
+                  </Popover.Target>
+
+                  <Popover.Dropdown>
+                    <form onSubmit={assignManagerForm.onSubmit(onAssignManager)}>
+                      <Group align="baseline">
+                        {isAccountListLoading ? (
+                          <Loader mt={rem(30)} />
+                        ) : (
+                          <Select
+                            size="xs"
+                            {...assignManagerForm.getInputProps("shopManagerId")}
+                            placeholder="Assign to.."
+                            data={accountList?.values?.map((item) => {
+                              return {
+                                value: item?.id,
+                                label: item?.name,
+                                disabled: item?.id == data?.shopManager?.id,
+                              };
+                            })}
+                            nothingFoundMessage="Nothing found..."
+                          />
+                        )}
+                        <Button loading={updateShopManagerLoading} type="submit">
+                          Assign
                         </Button>
-                      </Tooltip>
-                    </Popover.Target>
+                      </Group>
+                    </form>
+                  </Popover.Dropdown>
+                </Popover>
+              </Box> :
+                <Box>
+                  <Group justify="space-between" mb={rem(20)}>
+                    <Group mb={15} gap={30}>
+                      <div>
+                        <Text size='md' fw={'bold'} fz={25} c={"light-blue.4"}>{data?.shopManager?.name}</Text>
+                        {data?.shopManager?.role && <Text size="md" fw="bold">{data.shopManager.role.replace(/([A-Z])/g, ' $1').trim()}</Text>}
+                      </div>
+                      <StatusBadge statusName={data?.shopManager?.accountStatus ? data.shopManager?.accountStatus : "None"}
+                        mb={15} mt={15} />
+                    </Group>
 
-                    <Popover.Dropdown>
-                      <form onSubmit={assignManagerForm.onSubmit(onAssignManager)}>
-                        <Group align="baseline">
-                          {isAccountListLoading ? (
-                            <Loader mt={rem(30)} />
-                          ) : (
-                            <Select
-                              size="xs"
-                              {...assignManagerForm.getInputProps("shopManagerId")}
-                              placeholder="Assign to.."
-                              data={accountList?.values?.map((item) => {
-                                return {
-                                  value: item?.id,
-                                  label: item?.name,
-                                  disabled: item?.id == data?.shopManager?.id,
-                                };
-                              })}
-                              nothingFoundMessage="Nothing found..."
-                            />
-                          )}
-                          <Button loading={updateShopManagerLoading} type="submit">
-                            Assign
+                    <Popover trapFocus position="bottom" withArrow shadow="md" opened={opened}>
+                      <Popover.Target>
+                        <Tooltip label="Assign selected" withArrow>
+                          <Button onClick={toggle}>
+                            Assign Shop Manager
                           </Button>
-                        </Group>
-                      </form>
-                    </Popover.Dropdown>
-                  </Popover>
+                        </Tooltip>
+                      </Popover.Target>
 
-                </Group>
-                {data?.shopManager?.gender &&
-                  <Group>
-                    {data?.shopManager?.gender == "Female" ?
-                      <BsGenderFemale /> :
-                      <BsGenderMale />
-                    }
-                    <Text size="md">{data?.shopManager?.gender}</Text>
+                      <Popover.Dropdown>
+                        <form onSubmit={assignManagerForm.onSubmit(onAssignManager)}>
+                          <Group align="baseline">
+                            {isAccountListLoading ? (
+                              <Loader mt={rem(30)} />
+                            ) : (
+                              <Select
+                                size="xs"
+                                {...assignManagerForm.getInputProps("shopManagerId")}
+                                placeholder="Assign to.."
+                                data={accountList?.values?.map((item) => {
+                                  return {
+                                    value: item?.id,
+                                    label: item?.name,
+                                    disabled: item?.id == data?.shopManager?.id,
+                                  };
+                                })}
+                                nothingFoundMessage="Nothing found..."
+                              />
+                            )}
+                            <Button loading={updateShopManagerLoading} type="submit">
+                              Assign
+                            </Button>
+                          </Group>
+                        </form>
+                      </Popover.Dropdown>
+                    </Popover>
+
                   </Group>
-                }
-                {data?.shopManager?.email &&
-                  <Group>
-                    <MdEmail />
-                    <Text size="md">{data?.shopManager?.email}</Text>
-                  </Group>
-                }
-                {data?.phone &&
-                  <Group>
-                    <MdPhone />
-                    <Text size="md">{data?.phone}</Text>
-                  </Group>
-                }
-                {data?.shopManager?.birthday &&
-                  <Group>
-                    <MdCalendarToday />
-                    <Text size="md">{removeTime(data?.shopManager?.birthday, "/", "dd/MM/yyyy")}</Text>
-                  </Group>
-                }
-                {(data?.shopManager?.ward || data?.shopManager?.addressLine) &&
-                  <Group>
-                    <MdHome />
-                    {(data?.shopManager?.ward && data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.addressLine}, {data?.shopManager?.ward?.name}, {data?.shopManager?.ward?.district?.name}, {data?.shopManager?.ward?.district?.province?.name}</Text>}
-                    {(data?.shopManager?.ward && !data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.ward?.name}, {data?.shopManager?.ward?.district?.name}, {data?.shopManager?.ward?.district?.province?.name}</Text>}
-                    {(!data?.shopManager?.ward && data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.addressLine}</Text>}
-                  </Group>
-                }
-              </Box>
+                  {data?.shopManager?.gender &&
+                    <Group>
+                      {data?.shopManager?.gender == "Female" ?
+                        <BsGenderFemale /> :
+                        <BsGenderMale />
+                      }
+                      <Text size="md">{data?.shopManager?.gender}</Text>
+                    </Group>
+                  }
+                  {data?.shopManager?.email &&
+                    <Group>
+                      <MdEmail />
+                      <Text size="md">{data?.shopManager?.email}</Text>
+                    </Group>
+                  }
+                  {data?.phone &&
+                    <Group>
+                      <MdPhone />
+                      <Text size="md">{data?.phone}</Text>
+                    </Group>
+                  }
+                  {data?.shopManager?.birthday &&
+                    <Group>
+                      <MdCalendarToday />
+                      <Text size="md">{removeTime(data?.shopManager?.birthday, "/", "dd/MM/yyyy")}</Text>
+                    </Group>
+                  }
+                  {(data?.shopManager?.ward || data?.shopManager?.addressLine) &&
+                    <Group>
+                      <MdHome />
+                      {(data?.shopManager?.ward && data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.addressLine}, {data?.shopManager?.ward?.name}, {data?.shopManager?.ward?.district?.name}, {data?.shopManager?.ward?.district?.province?.name}</Text>}
+                      {(data?.shopManager?.ward && !data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.ward?.name}, {data?.shopManager?.ward?.district?.name}, {data?.shopManager?.ward?.district?.province?.name}</Text>}
+                      {(!data?.shopManager?.ward && data?.shopManager?.addressLine) && <Text size="md">{data?.shopManager?.addressLine}</Text>}
+                    </Group>
+                  }
+                </Box>
+              }
             </Box>
           </Tabs.Panel>
           <Tabs.Panel value="employees">
