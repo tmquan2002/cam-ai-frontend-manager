@@ -103,6 +103,7 @@ const IncidentDetail = () => {
       confirmProps: { color: "red" },
       children: <Text size="sm">Confirm reject this incident?</Text>,
       labels: { confirm: "Confirm", cancel: "Cancel" },
+      centered: true,
       onCancel: () => console.log("Cancel"),
       onConfirm: () => {
         rejectIncident(id ?? "", {
