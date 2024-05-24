@@ -92,9 +92,9 @@ export const InteractionReportPage = () => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
       toDate: new Date(),
-      interval: ReportInterval.HalfDay,
+      interval: ReportInterval.Day,
     },
     validate: (values) => ({
       toDate:
@@ -331,238 +331,129 @@ export const InteractionReportPage = () => {
       >
         Interaction report
       </Text>
-      <Card
-        pb={rem(40)}
-        radius={8}
-        style={{
-          border: "1px solid rgb(229 231 235)",
-        }}
-        bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
-      >
-        <Card.Section
+
+      <Skeleton height={700} visible={isGetIncidentReportByTimeDataLoading}>
+        <Card
+          pb={rem(40)}
+          radius={8}
           style={{
-            borderBottom: "1px solid #ccc",
+            border: "1px solid #ccc",
           }}
-          py={rem(16)}
-          px={rem(24)}
+          bg={computedColorScheme == "light" ? "white" : "#1a1a1a"}
         >
-          <Group justify="space-between">
-            <Text size="md" fw={600}>
-              Interaction chart
-            </Text>
-            <Group>
-              <Box miw={rem(360)}>
-                <EditAndUpdateForm fields={fields} />
-              </Box>
-            </Group>
-          </Group>
-        </Card.Section>
-
-        <Card.Section px={rem(12)}>
-          {!incidentReportByTimeData ||
-          incidentReportByTimeData?.data?.length == 0 ? (
-            <NoImage type="NO_DATA" />
-          ) : (
-            <Box>
-              <Group justify="flex-end" mt={rem(20)} mb={rem(6)}>
-                <Group gap={"sm"} align="center">
-                  <Box
-                    style={{
-                      borderRadius: "999px",
-                      width: rem(20),
-                      aspectRatio: 5,
-                      backgroundColor: "rgb(37, 150, 190)",
-                    }}
-                  />
-                  <Text
-                    size={rem(14)}
-                    fw={500}
-                    c={computedColorScheme == "dark" ? `white` : `black`}
-                  >
-                    Total employee
-                  </Text>
-                </Group>
-                <Group gap={"sm"} align="center">
-                  <Box
-                    style={{
-                      borderRadius: "2px",
-                      width: rem(10),
-                      aspectRatio: 1,
-                      backgroundColor: "rgba(255, 99, 132, 1)",
-                    }}
-                  />
-                  <Text
-                    size={rem(14)}
-                    fw={500}
-                    c={computedColorScheme == "dark" ? `white` : `black`}
-                  >
-                    Total interaction
-                  </Text>
-                </Group>
-              </Group>
-              <Flex>
-                <Box
-                  style={{
-                    width: "40px",
-                    zIndex: 999,
-                  }}
-                >
-                  <Chart
-                    type="bar"
-                    options={{
-                      maintainAspectRatio: false,
-                      responsive: true,
-                      layout: {
-                        padding: {
-                          bottom: 47,
-                        },
-                      },
-
-                      scales: {
-                        x: {
-                          ticks: {
-                            display: false,
-                          },
-                          grid: {
-                            display: false,
-                          },
-                        },
-                        y: {
-                          ticks: {
-                            padding: 10,
-                            count: 7,
-                          },
-                          beginAtZero: true,
-                          afterFit: (ctx) => {
-                            ctx.width = 39;
-                          },
-                          grid: {
-                            drawTicks: false,
-                          },
-                          border: {
-                            color: "#000",
-                          },
-                          suggestedMax: 8,
-                          max: makeDivisibleByDivider(
-                            _.maxBy(data, function (o) {
-                              return o.interactionCount;
-                            })?.interactionCount ?? 6,
-                            6
-                          ),
-                        },
-                      },
-
-                      plugins: {
-                        title: {
-                          display: false,
-                        },
-                        legend: {
-                          display: false,
-                        },
-                      },
-                    }}
-                    data={{
-                      labels: data?.map((i) => i.time),
-                      datasets: [
-                        {
-                          label: "Total interaction",
-                          data: data?.map((i) => i.interactionCount),
-                          borderColor: "rgb(37, 150, 190)",
-                          backgroundColor: "rgb(37, 150, 190, 0.5)",
-                        },
-                      ],
-                    }}
-                  />
+          <Card.Section
+            style={{
+              borderBottom: "1px solid #ccc",
+              backgroundColor: "#f9fafb",
+            }}
+            py={rem(16)}
+            px={rem(24)}
+          >
+            <Group justify="flex-end">
+              <Group>
+                <Box miw={rem(360)}>
+                  <EditAndUpdateForm fields={fields} />
                 </Box>
+              </Group>
+            </Group>
+          </Card.Section>
 
-                <Box
-                  style={{
-                    width: "100%",
-                    maxWidth: "100%",
-                    height: "620px",
-                    overflowX: "scroll",
-                    transform: "translateX(-9px)",
-                  }}
-                >
+          <Card.Section px={rem(12)}>
+            {!incidentReportByTimeData ||
+            incidentReportByTimeData?.data?.length == 0 ? (
+              <Box mt={rem(12)}>
+                <NoImage type="NO_DATA" />
+              </Box>
+            ) : (
+              <Box>
+                <Group justify="flex-end" mt={rem(20)} mb={rem(6)}>
+                  <Group gap={"sm"} align="center">
+                    <Box
+                      style={{
+                        borderRadius: "999px",
+                        width: rem(20),
+                        aspectRatio: 5,
+                        backgroundColor: "rgb(37, 150, 190)",
+                      }}
+                    />
+                    <Text
+                      size={rem(14)}
+                      fw={500}
+                      c={computedColorScheme == "dark" ? `white` : `black`}
+                    >
+                      Total employee
+                    </Text>
+                  </Group>
+                  <Group gap={"sm"} align="center">
+                    <Box
+                      style={{
+                        borderRadius: "2px",
+                        width: rem(10),
+                        aspectRatio: 1,
+                        backgroundColor: "rgba(255, 99, 132, 1)",
+                      }}
+                    />
+                    <Text
+                      size={rem(14)}
+                      fw={500}
+                      c={computedColorScheme == "dark" ? `white` : `black`}
+                    >
+                      Total interaction
+                    </Text>
+                  </Group>
+                </Group>
+                <Flex>
                   <Box
-                    style={
-                      data && data?.length > 7
-                        ? {
-                            width: `${1500 + (data?.length - 7) * 70}px`,
-                            height: "600px",
-                          }
-                        : {
-                            height: "600px",
-                          }
-                    }
+                    style={{
+                      width: "40px",
+                      zIndex: 999,
+                    }}
                   >
                     <Chart
-                      type="line"
+                      type="bar"
                       options={{
-                        responsive: true,
                         maintainAspectRatio: false,
+                        responsive: true,
                         layout: {
                           padding: {
-                            top: 17,
+                            bottom: 47,
                           },
                         },
+
                         scales: {
-                          y: {
+                          x: {
                             ticks: {
                               display: false,
+                            },
+                            grid: {
+                              display: false,
+                            },
+                          },
+                          y: {
+                            ticks: {
+                              padding: 10,
                               count: 7,
                             },
-
+                            beginAtZero: true,
+                            afterFit: (ctx) => {
+                              ctx.width = 39;
+                            },
                             grid: {
                               drawTicks: false,
-                              tickWidth: 0,
-                              tickLength: 0,
-                              tickColor: "#000",
                             },
-
                             border: {
-                              dash: [8, 4],
+                              color: "#000",
                             },
+                            suggestedMax: 8,
                             max: makeDivisibleByDivider(
                               _.maxBy(data, function (o) {
                                 return o.interactionCount;
                               })?.interactionCount ?? 6,
-                              8
+                              6
                             ),
-
-                            suggestedMax: 8,
-                          },
-                          y1: {
-                            suggestedMax: 6,
-                            ticks: {
-                              display: false,
-                              count: 7,
-                            },
-                            grid: {
-                              drawTicks: false,
-                              tickWidth: 0,
-                              tickLength: 0,
-                              tickColor: "#000",
-                            },
-                            border: {
-                              dash: [8, 4],
-                            },
-                            max: 6,
-                          },
-                          x: {
-                            ticks: {
-                              padding: 10,
-                            },
-                            border: {
-                              color: "#000",
-                              dash: [8, 4],
-                            },
-                            beginAtZero: true,
-                            grid: {
-                              drawTicks: false,
-                            },
                           },
                         },
+
                         plugins: {
                           title: {
                             display: false,
@@ -571,74 +462,186 @@ export const InteractionReportPage = () => {
                             display: false,
                           },
                         },
-                        onClick(_event, elements, _chart) {
-                          if (elements.length > 0) {
-                            const selectedData =
-                              incidentReportByTimeData?.data?.[
-                                elements[0].index
-                              ];
-                            setSelectedInteractionItem(null);
-                            setSelectedDuration({
-                              startTime: selectedData?.time,
-                              endTime: addDaysBaseOnReportInterval(
-                                selectedData?.time,
-                                form.values.interval
-                              ),
-                            });
-                          }
-                        },
                       }}
                       data={{
                         labels: data?.map((i) => i.time),
-
                         datasets: [
                           {
-                            type: "line" as const,
-                            label: "Total employee",
-                            data: data?.map((i) => i.humanCount),
-                            borderColor: "rgb(37, 150, 190)",
-                            backgroundColor: "rgb(37, 150, 190, 0.5)",
-                            // cubicInterpolationMode: "monotone",
-                            pointHoverRadius: 7,
-                            pointHoverBackgroundColor: "#fff",
-                            pointBackgroundColor: "rgb(37, 150, 190)",
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            fill: false,
-                            pointHitRadius: 7,
-                            yAxisID: "y1",
-                          },
-                          {
-                            type: "bar" as const,
                             label: "Total interaction",
                             data: data?.map((i) => i.interactionCount),
-                            borderColor: "rgb(255, 99, 132)",
-                            backgroundColor: "rgba(255, 99, 132, 0.5)",
-
-                            borderWidth: {
-                              bottom: 0,
-                              left: 2,
-                              right: 2,
-                              top: 2,
-                            },
-                            borderRadius: {
-                              topRight: 5,
-                              topLeft: 5,
-                            },
-                            yAxisID: "y",
-
-                            borderSkipped: false,
+                            borderColor: "rgb(37, 150, 190)",
+                            backgroundColor: "rgb(37, 150, 190, 0.5)",
                           },
                         ],
                       }}
                     />
                   </Box>
-                </Box>
-              </Flex>
-            </Box>
-          )}
-        </Card.Section>
-      </Card>
+
+                  <Box
+                    style={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "620px",
+                      overflowX: "scroll",
+                      transform: "translateX(-9px)",
+                    }}
+                  >
+                    <Box
+                      style={
+                        data && data?.length > 7
+                          ? {
+                              width: `${1500 + (data?.length - 7) * 70}px`,
+                              height: "600px",
+                            }
+                          : {
+                              height: "600px",
+                            }
+                      }
+                    >
+                      <Chart
+                        type="line"
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          layout: {
+                            padding: {
+                              top: 17,
+                            },
+                          },
+                          scales: {
+                            y: {
+                              ticks: {
+                                display: false,
+                                count: 7,
+                              },
+
+                              grid: {
+                                drawTicks: false,
+                                tickWidth: 0,
+                                tickLength: 0,
+                                tickColor: "#000",
+                              },
+
+                              border: {
+                                dash: [8, 4],
+                              },
+                              max: makeDivisibleByDivider(
+                                _.maxBy(data, function (o) {
+                                  return o.interactionCount;
+                                })?.interactionCount ?? 6,
+                                8
+                              ),
+
+                              suggestedMax: 8,
+                            },
+                            y1: {
+                              suggestedMax: 6,
+                              ticks: {
+                                display: false,
+                                count: 7,
+                              },
+                              grid: {
+                                drawTicks: false,
+                                tickWidth: 0,
+                                tickLength: 0,
+                                tickColor: "#000",
+                              },
+                              border: {
+                                dash: [8, 4],
+                              },
+                              max: 6,
+                            },
+                            x: {
+                              ticks: {
+                                padding: 10,
+                              },
+                              border: {
+                                color: "#000",
+                                dash: [8, 4],
+                              },
+                              beginAtZero: true,
+                              grid: {
+                                drawTicks: false,
+                              },
+                            },
+                          },
+                          plugins: {
+                            title: {
+                              display: false,
+                            },
+                            legend: {
+                              display: false,
+                            },
+                          },
+                          onClick(_event, elements, _chart) {
+                            if (elements.length > 0) {
+                              const selectedData =
+                                incidentReportByTimeData?.data?.[
+                                  elements[0].index
+                                ];
+                              setSelectedInteractionItem(null);
+                              setSelectedDuration({
+                                startTime: selectedData?.time,
+                                endTime: addDaysBaseOnReportInterval(
+                                  selectedData?.time,
+                                  form.values.interval
+                                ),
+                              });
+                            }
+                          },
+                        }}
+                        data={{
+                          labels: data?.map((i) => i.time),
+
+                          datasets: [
+                            {
+                              type: "line" as const,
+                              label: "Total employee",
+                              data: data?.map((i) => i.humanCount),
+                              borderColor: "rgb(37, 150, 190)",
+                              backgroundColor: "rgb(37, 150, 190, 0.5)",
+                              // cubicInterpolationMode: "monotone",
+                              pointHoverRadius: 7,
+                              pointHoverBackgroundColor: "#fff",
+                              pointBackgroundColor: "rgb(37, 150, 190)",
+                              borderWidth: 2,
+                              pointRadius: 3,
+                              fill: false,
+                              pointHitRadius: 7,
+                              yAxisID: "y1",
+                            },
+                            {
+                              type: "bar" as const,
+                              label: "Total interaction",
+                              data: data?.map((i) => i.interactionCount),
+                              borderColor: "rgb(255, 99, 132)",
+                              backgroundColor: "rgba(255, 99, 132, 0.5)",
+
+                              borderWidth: {
+                                bottom: 0,
+                                left: 2,
+                                right: 2,
+                                top: 2,
+                              },
+                              borderRadius: {
+                                topRight: 5,
+                                topLeft: 5,
+                              },
+                              yAxisID: "y",
+
+                              borderSkipped: false,
+                            },
+                          ],
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Flex>
+              </Box>
+            )}
+          </Card.Section>
+        </Card>
+      </Skeleton>
 
       <Group align="flex-start" mt={rem(40)}>
         {interactionList ? (

@@ -59,7 +59,7 @@ import { IncidentDetail } from "../../models/Incident";
 import { differentDateReturnFormattedString } from "../../utils/helperFunction";
 import NoImage from "../../components/image/NoImage";
 import LoadingImage from "../../components/image/LoadingImage";
-import { Role } from "../../models/CamAIEnum";
+import { IncidentType, Role } from "../../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import { useGetSupervisorAssignmentHistory } from "../../hooks/useGetSupervisorAssignment";
 import { modals } from "@mantine/modals";
@@ -1171,7 +1171,10 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                 >
                   <Group justify="space-between">
                     <Text size="md" fw={600}>
-                      Incident detail
+                      {selectedIncidentItem?.incidentType ==
+                      IncidentType.Interaction
+                        ? "Interaction detail"
+                        : "Incident detail"}
                     </Text>
                     <Group gap={rem(8)}>
                       <Text fw={500} size="sm">
@@ -1209,81 +1212,87 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                             selectedIncidentItem?.evidences?.[0]?.createdDate
                           ).format("LL")}
                         </Text>
-                        <Group>
-                          <Text size={rem(14)} lh={rem(24)} fw={500}>
-                            Assigned to :{" "}
-                            <Text
-                              span
-                              c="blue"
-                              inherit
-                              style={{
-                                cursor: "pointer",
+                        {selectedIncidentItem?.incidentType !=
+                          IncidentType.Interaction && (
+                          <Group>
+                            <Text size={rem(14)} lh={rem(24)} fw={500}>
+                              Assigned to :{" "}
+                              <Text
+                                span
+                                c="blue"
+                                inherit
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                              >
+                                {selectedIncidentItem?.employee?.name ??
+                                  "(Empty)"}
+                              </Text>
+                            </Text>
+
+                            <Popover
+                              position="bottom"
+                              withArrow
+                              shadow="md"
+                              opened={assignPopoverOpened}
+                            >
+                              <Popover.Target>
+                                <Button
+                                  loading={isAssignIncidentLoading}
+                                  variant="outline"
+                                  color="rgb(79, 70, 229)"
+                                  onClick={toggleAssignPopover}
+                                >
+                                  Assign
+                                </Button>
+                              </Popover.Target>
+                              <Popover.Dropdown>
+                                {isEmployeeListLoading ? (
+                                  <Loader />
+                                ) : (
+                                  <Select
+                                    ref={ref}
+                                    size="sm"
+                                    style={{
+                                      fontWeight: 500,
+                                      borderRadius: rem(8),
+                                    }}
+                                    onChange={(_value) => {
+                                      console.log(123);
+
+                                      onAssignIncident({
+                                        employeeId: _value ?? "",
+                                        incidentId: selectedIncidentItem.id,
+                                      });
+                                    }}
+                                    placeholder="Assign to.."
+                                    searchable
+                                    value={selectedIncidentItem?.id}
+                                    data={employeeList?.values?.map((item) => {
+                                      return {
+                                        value: item?.id,
+                                        label: item?.name,
+                                      };
+                                    })}
+                                    nothingFoundMessage="Nothing found..."
+                                  />
+                                )}
+                              </Popover.Dropdown>
+                            </Popover>
+
+                            <Button
+                              color={"red"}
+                              loading={isRejectIncidentLoading}
+                              onClick={() => {
+                                openRejectIncidentModal(
+                                  selectedIncidentItem.id
+                                );
                               }}
                             >
-                              {selectedIncidentItem?.employee?.name ??
-                                "(Empty)"}
-                            </Text>
-                          </Text>
-                          <Popover
-                            position="bottom"
-                            withArrow
-                            shadow="md"
-                            opened={assignPopoverOpened}
-                          >
-                            <Popover.Target>
-                              <Button
-                                loading={isAssignIncidentLoading}
-                                variant="outline"
-                                color="rgb(79, 70, 229)"
-                                onClick={toggleAssignPopover}
-                              >
-                                Assign
-                              </Button>
-                            </Popover.Target>
-                            <Popover.Dropdown>
-                              {isEmployeeListLoading ? (
-                                <Loader />
-                              ) : (
-                                <Select
-                                  ref={ref}
-                                  size="sm"
-                                  style={{
-                                    fontWeight: 500,
-                                    borderRadius: rem(8),
-                                  }}
-                                  onChange={(_value) => {
-                                    console.log(123);
-
-                                    onAssignIncident({
-                                      employeeId: _value ?? "",
-                                      incidentId: selectedIncidentItem.id,
-                                    });
-                                  }}
-                                  placeholder="Assign to.."
-                                  searchable
-                                  value={selectedIncidentItem?.id}
-                                  data={employeeList?.values?.map((item) => {
-                                    return {
-                                      value: item?.id,
-                                      label: item?.name,
-                                    };
-                                  })}
-                                  nothingFoundMessage="Nothing found..."
-                                />
-                              )}
-                            </Popover.Dropdown>
-                          </Popover>
-
-                          <Button
-                            color={"red"}
-                            loading={isRejectIncidentLoading}
-                            onClick={() => {
-                              openRejectIncidentModal(selectedIncidentItem.id);
-                            }}
-                          >
-                            Reject
-                          </Button>
-                        </Group>
+                              Reject
+                            </Button>
+                          </Group>
+                        )}
                       </Group>
                       {selectedIncidentItem?.evidences?.length == 0 ? (
                         <NoImage type="NO_DATA" />
