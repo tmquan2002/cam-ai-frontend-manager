@@ -47,7 +47,7 @@ const ShopImportResultPage = () => {
                 {Object.entries(errorRow?.reasons).map(([key, value], index) => (
                     <Grid key={index} ta="left">
                         <Grid.Col span={2}>
-                            <Text fw="bold">{key}</Text>
+                            <Text fw="bold">{key ? key.toString().replace(/([A-Z])/g, ' $1').trim() : ""}</Text>
                         </Grid.Col>
                         <Grid.Col span={10}>
                             <Text>{value as string}</Text>

@@ -10,7 +10,6 @@ import {
   Grid,
   Group,
   Image,
-  Loader,
   LoadingOverlay,
   Menu,
   NumberInput,
@@ -22,7 +21,7 @@ import {
   Text,
   TextInput,
   Tooltip,
-  rem,
+  rem
 } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
@@ -59,6 +58,7 @@ import {
 import { useUploadBrandImage } from "../../hooks/useUploadBrandImage";
 import { ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
+import { useTaskBrand } from "../../routes/BrandRoute";
 import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
 import {
   formatTime,
@@ -66,7 +66,6 @@ import {
   mapLookupToArray,
 } from "../../utils/helperFunction";
 import classes from "./BrandMainPage.module.scss";
-import { useTaskBrand } from "../../routes/BrandRoute";
 
 type SearchShopField = {
   status: string | null;
@@ -95,10 +94,8 @@ const BrandMainPage = () => {
     SearchCategory.NAME
   );
   const { data, isLoading, refetch } = useGetBrandList({ size: 1 });
-  const { mutate: uploadBrandBanner, isLoading: isUploadBrandBannerLoading } =
-    useUploadBrandImage();
-  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } =
-    useUploadBrandImage();
+  const { mutate: uploadBrandBanner } = useUploadBrandImage();
+  const { mutate: uploadBrandLogo, isLoading: isUploadBrandLogoLoading } = useUploadBrandImage();
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
@@ -262,83 +259,79 @@ const BrandMainPage = () => {
           <Grid.Col span={12}>
             {/* Banner section */}
             <Box>
-              {isUploadBrandBannerLoading ? (
-                <Loader />
-              ) : (
-                <Tooltip label="Brand banner">
-                  <Dropzone
-                    onDrop={(files) =>
-                      handleUploadBrandImage(files, UploadBrandImageType.Banner)
-                    }
-                    onReject={(files) => console.log("rejected files", files)}
-                    style={{ border: 0, backgroundColor: 'transparent' }}
-                    maxSize={5 * 1024 ** 2}
+              <Tooltip label="Brand banner">
+                <Dropzone
+                  onDrop={(files) =>
+                    handleUploadBrandImage(files, UploadBrandImageType.Banner)
+                  }
+                  onReject={(files) => console.log("rejected files", files)}
+                  style={{ border: 0, backgroundColor: 'transparent' }}
+                  maxSize={5 * 1024 ** 2}
 
-                    maxFiles={1}
-                    accept={{
-                      "image/*": [],
-                    }}
-                  >
-                    {data?.values[0]?.banner ? (
-                      <LoadingImage
-                        radius={"md"}
-                        bg={"#000"}
-                        height={280}
-                        fit="cover"
-                        imageId={data?.values[0]?.banner?.id}
-                      />
-                    ) : (
-                      <Group
-                        justify="center"
-                        gap="xl"
-                        mih={220}
-                        style={{ pointerEvents: "none" }}
-                      >
-                        <Dropzone.Accept>
-                          <IconUpload
-                            style={{
-                              width: rem(52),
-                              height: rem(52),
-                              color: "var(--mantine-color-blue-6)",
-                            }}
-                            stroke={1.5}
-                          />
-                        </Dropzone.Accept>
-                        <Dropzone.Reject>
-                          <IconX
-                            style={{
-                              width: rem(52),
-                              height: rem(52),
-                              color: "var(--mantine-color-red-6)",
-                            }}
-                            stroke={1.5}
-                          />
-                        </Dropzone.Reject>
-                        <Dropzone.Idle>
-                          <IconPhoto
-                            style={{
-                              width: rem(52),
-                              height: rem(52),
-                              color: "var(--mantine-color-dimmed)",
-                            }}
-                            stroke={1.5}
-                          />
-                        </Dropzone.Idle>
+                  maxFiles={1}
+                  accept={{
+                    "image/*": [],
+                  }}
+                >
+                  {data?.values[0]?.banner ? (
+                    <LoadingImage
+                      radius={"md"}
+                      bg={"#000"}
+                      height={280}
+                      fit="cover"
+                      imageId={data?.values[0]?.banner?.id}
+                    />
+                  ) : (
+                    <Group
+                      justify="center"
+                      gap="xl"
+                      mih={220}
+                      style={{ pointerEvents: "none" }}
+                    >
+                      <Dropzone.Accept>
+                        <IconUpload
+                          style={{
+                            width: rem(52),
+                            height: rem(52),
+                            color: "var(--mantine-color-blue-6)",
+                          }}
+                          stroke={1.5}
+                        />
+                      </Dropzone.Accept>
+                      <Dropzone.Reject>
+                        <IconX
+                          style={{
+                            width: rem(52),
+                            height: rem(52),
+                            color: "var(--mantine-color-red-6)",
+                          }}
+                          stroke={1.5}
+                        />
+                      </Dropzone.Reject>
+                      <Dropzone.Idle>
+                        <IconPhoto
+                          style={{
+                            width: rem(52),
+                            height: rem(52),
+                            color: "var(--mantine-color-dimmed)",
+                          }}
+                          stroke={1.5}
+                        />
+                      </Dropzone.Idle>
 
-                        <div>
-                          <Text size="xl" inline>
-                            Upload brand banner
-                          </Text>
-                          <Text size="sm" c="dimmed" inline mt={7}>
-                            Only accept .png - .jpeg - .svg+xml - .gif file that are
-                            less than 10mb in size
-                          </Text>
-                        </div>
-                      </Group>
-                    )}
-                  </Dropzone>
-                </Tooltip>
-              )}
+                      <div>
+                        <Text size="xl" inline>
+                          Upload brand banner
+                        </Text>
+                        <Text size="sm" c="dimmed" inline mt={7}>
+                          Only accept .png - .jpeg - .svg+xml - .gif file that are
+                          less than 10mb in size
+                        </Text>
+                      </div>
+                    </Group>
+                  )}
+                </Dropzone>
+              </Tooltip>
             </Box>
           </Grid.Col>
           <Grid.Col span={{ base: 12, lg: 3 }} mx={rem(20)} mb={50}>
@@ -374,7 +367,7 @@ const BrandMainPage = () => {
                 </Dropzone>
               </Tooltip>
               <Text size="xl" fw={500} mb={rem(8)} ta="center">
-                {data?.values[0]?.name}
+                {data?.values[0]?.name ?? "No Data"}
               </Text>
 
               <Box mb={20}>
@@ -382,13 +375,13 @@ const BrandMainPage = () => {
                   <Box mr={rem(8)}>
                     <IconMail width={20} />
                   </Box>
-                  {data?.values[0]?.email}
+                  {data?.values[0]?.email ?? "No Data"}
                 </Flex>
                 <Flex>
                   <Box mr={rem(8)}>
                     <IconPhone width={20} />
                   </Box>
-                  {data?.values[0]?.phone}
+                  {data?.values[0]?.phone ?? "No Data"}
                 </Flex>
                 {data?.values[0]?.brandWebsite &&
                   <Flex>
@@ -471,7 +464,7 @@ const BrandMainPage = () => {
               </Button>
               <Button
                 leftSection={<IconPlus size={14} />}
-                
+
                 h={rem(48)}
                 onClick={() => {
                   navigate("/brand/create/shop");
