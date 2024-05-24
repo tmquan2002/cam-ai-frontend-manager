@@ -68,7 +68,7 @@ const ShopImportResultPage = () => {
             <LoadingOverlay visible={isLoading} />
             {isError ? <Box bg={computedColorScheme == "dark" ? "#1f1f1f" : "white"} p={rem(20)}
                 style={{ borderRadius: "5px", boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)" }}>
-                <Text c="dimmed" fs="italic" ta="center">Task Not Found</Text>
+                <Text c="dimmed" fs="italic" ta="center">Task not found or Expired</Text>
             </Box>
                 :
                 <>

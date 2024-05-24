@@ -49,7 +49,7 @@ const EmployeeIncidentReport = () => {
     validateInputOnChange: true,
     initialValues: {
       employeeId: null,
-      fromTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+      fromTime: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
       status: null,
       toTime: new Date(),
       incidentType: IncidentType.Incident,
@@ -236,6 +236,7 @@ const EmployeeIncidentReport = () => {
           py={rem(20)}
           style={{
             borderBottom: "1px solid #ccc",
+            backgroundColor: "#f9fafb",
           }}
         >
           <Group justify="flex-end" mr={rem(12)}>
@@ -279,7 +280,9 @@ const EmployeeIncidentReport = () => {
                   px={rem(20)}
                   py={rem(20)}
                   radius={"md"}
-                  shadow="lg"
+                  style={{
+                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.2)",
+                  }}
                   bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
                 >
                   <Group>
@@ -317,7 +320,9 @@ const EmployeeIncidentReport = () => {
                 <Paper
                   px={rem(20)}
                   py={rem(20)}
-                  shadow="lg"
+                  style={{
+                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.2)",
+                  }}
                   radius={"md"}
                   bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
                 >
@@ -352,7 +357,9 @@ const EmployeeIncidentReport = () => {
                 <Paper
                   px={rem(20)}
                   py={rem(20)}
-                  shadow="lg"
+                  style={{
+                    boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.2)",
+                  }}
                   radius={"md"}
                   bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
                 >

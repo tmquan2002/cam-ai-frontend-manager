@@ -9,15 +9,7 @@ import classes from "./Notification.module.scss";
 import { notifications } from "@mantine/notifications";
 import { useUpdateAllNotificationStatus } from "../../hooks/useUpdateAllNotificationStatus";
 
-export const TabsHeader = ({
-  active,
-  number,
-  text,
-}: {
-  text: string;
-  number: number;
-  active: boolean;
-}) => {
+export const TabsHeader = ({ active, number, text, }: { text: string; number: number; active: boolean; }) => {
   return (
     <Flex justify={"center"} align={"center"}>
       <Text
@@ -114,7 +106,7 @@ const Notification = ({ notificationList, refetchNotification, isNotificationLis
   //   }
   // };
 
-  const [activeTab, setActiveTab] = useState<string | null>("gallery");
+  const [activeTab, setActiveTab] = useState<string | null>("all");
   return (
     <ScrollArea w={rem(500)} h={680}>
       <Flex
@@ -153,25 +145,85 @@ const Notification = ({ notificationList, refetchNotification, isNotificationLis
         }}
       >
         <Tabs.List>
-          <Tabs.Tab value="gallery">
+          <Tabs.Tab value="all">
             <TabsHeader
-              active={activeTab == "gallery"}
+              active={activeTab == "all"}
+              number={notificationList.length}
+              text="All"
+            />
+          </Tabs.Tab>
+          <Tabs.Tab value="unread">
+            <TabsHeader
+              active={activeTab == "unread"}
               number={
                 notificationList.filter(
                   (n) => n.status == NotificationStatus.Unread
                 ).length
               }
-              text="All notification"
+              text="Unread"
             />
           </Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="gallery">
+        <Tabs.Panel value="all">
           {isNotificationListLoading ? (
             <Loader />
           ) : (
             <>
               {notificationList?.map((item) => (
+                <Box
+                  key={item?.id}
+                  onClick={() => {
+                    updateNotificationStatus(
+                      {
+                        notificationId: item?.id,
+                        status: NotificationStatus.Read,
+                      },
+                      {
+                        onSuccess() {
+                          refetchNotification();
+                        },
+                      }
+                    );
+                    if (!item?.relatedEntityId) {
+                      notifications.show({
+                        color: "red",
+                        title: "Failed",
+                        message: "This Task Log is expired",
+                      });
+                    }
+
+                    if (item?.type == NotificationType.UpsertEmployee && item?.relatedEntityId) {
+                      navigate(`/shop/import/${item?.relatedEntityId?.split('-').join('')}`)
+                    }
+
+                    if (item?.type == NotificationType.UpsertShopAndManager && item?.relatedEntityId) {
+                      navigate(`/brand/import/${item?.relatedEntityId?.split('-').join('')}`)
+                    }
+
+
+                  }}
+                >
+                  <DetailCard
+                    content={item?.content}
+                    time={item?.createdDate}
+                    title={item?.title}
+                    isRead={item?.status == NotificationStatus.Read}
+                  />
+                </Box>
+              ))}
+            </>
+          )}
+        </Tabs.Panel>
+
+        <Tabs.Panel value="unread">
+          {isNotificationListLoading ? (
+            <Loader />
+          ) : (
+            <>
+              {notificationList?.filter(
+                (n) => n.status == NotificationStatus.Unread
+              ).map((item) => (
                 <Box
                   key={item?.id}
                   onClick={() => {
