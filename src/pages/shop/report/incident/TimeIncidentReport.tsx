@@ -126,9 +126,9 @@ const TimeIncidentReport = () => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
       toDate: new Date(),
-      interval: ReportInterval.HalfDay,
+      interval: ReportInterval.Day,
       type: IncidentType.Incident,
     },
     validate: (values) => ({
@@ -351,12 +351,14 @@ const TimeIncidentReport = () => {
       >
         <Table.Td>
           <Center>
-            <Text size={rem(13)}>{item.incidentType}</Text>
+            <Text size={rem(13)} fw={500}>
+              {item.incidentType}
+            </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item?.startTime
                 ? dayjs(item.startTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -365,7 +367,7 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>
+            <Text size={rem(13)} fw={500}>
               {item?.endTime
                 ? dayjs(item.endTime).format("HH:mm | DD-MM")
                 : "Empty"}
@@ -374,17 +376,23 @@ const TimeIncidentReport = () => {
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>{item?.evidences.length}</Text>
+            <Text size={rem(13)} fw={500}>
+              {item?.evidences.length}
+            </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>{item?.employee?.name ?? "Empty"}</Text>
+            <Text size={rem(13)} fw={500}>
+              {item?.employee?.name ?? "Empty"}
+            </Text>
           </Center>
         </Table.Td>
         <Table.Td py={rem(18)}>
           <Center>
-            <Text size={rem(13)}>{item.status}</Text>
+            <Text size={rem(13)} fw={500}>
+              {item.status}
+            </Text>
           </Center>
         </Table.Td>
       </Table.Tr>
@@ -407,6 +415,7 @@ const TimeIncidentReport = () => {
             py={rem(20)}
             style={{
               borderBottom: "1px solid #ccc",
+              backgroundColor: "#f9fafb",
             }}
           >
             <Group justify="flex-end">
@@ -666,6 +675,7 @@ const TimeIncidentReport = () => {
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
+                        backgroundColor: "#f9fafb",
                       }}
                     >
                       Incident type ratio
@@ -726,6 +736,7 @@ const TimeIncidentReport = () => {
                       style={{
                         borderTopLeftRadius: rem(12),
                         borderTopRightRadius: rem(12),
+                        backgroundColor: "#f9fafb",
                       }}
                     >
                       Incident status ratio
@@ -805,12 +816,13 @@ const TimeIncidentReport = () => {
             <Card.Section
               style={{
                 borderBottom: "1px solid #ccc",
+                backgroundColor: "#f9fafb",
               }}
-              py={rem(16)}
+              py={rem(20)}
               px={rem(12)}
             >
               <Group justify="space-between">
-                <Text size="md" fw={600}>
+                <Text size="md" fw={600} ml={rem(10)}>
                   Incident list
                 </Text>
                 <Group gap={rem(6)}>

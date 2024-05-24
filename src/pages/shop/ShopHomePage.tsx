@@ -323,7 +323,7 @@ const ShopHomePage = () => {
         </Box>
 
         <Box w={420} py={rem(10)}>
-          <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(24)}>
+          <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(12)}>
             Live incidents
           </Text>
           {incidentList?.length == 0 ? (
