@@ -85,33 +85,26 @@ const EdgeBoxListPage = () => {
       brandList ? brandList?.values?.[0]?.id : null
     );
 
-  const items = edgeBoxList?.values
-    ?.filter((x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled)
-    .map((item) => <EdgeBoxCard {...item} />);
-
-  if (isGetBrandListLoading || isGetEdgeBoxListLoading)
-    return (
-      <Paper style={{ flex: 1, height: "100vh" }} pos={"relative"}>
-        <LoadingOverlay
-          visible={isGetBrandListLoading || isGetEdgeBoxListLoading}
-          zIndex={1000}
-          overlayProps={{ radius: "sm", blur: 1 }}
-        />
-      </Paper>
-    );
+  const items = edgeBoxList?.values?.filter((x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled)
 
   return (
-    <Paper m={rem(32)} p={rem(32)} style={{ flex: 1 }} shadow="xs">
+    <Paper m={rem(32)} p={rem(32)} shadow="xs" pos={"relative"}>
+      <LoadingOverlay
+        visible={isGetBrandListLoading || isGetEdgeBoxListLoading}
+        zIndex={1000}
+        overlayProps={{ radius: "sm", blur: 1 }}
+      />
       {" "}
       <Group mb={rem(20)} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Edge Box List
         </Text>
       </Group>
-      {/* <Collapse in={opened}>
-        <form></form>
-      </Collapse> */}
-      {items}
+      {!items || items?.length == 0 ? <Text c="dimmed" fs="italic" ta="center">No Edge Box Found</Text> :
+        <>
+          {items.map((item) => <EdgeBoxCard {...item} />)}
+        </>
+      }
     </Paper>
   );
 };

@@ -44,7 +44,7 @@ export function SidebarLinksGroup({
       {link.label}
     </Text>
   ));
-
+  console.log(location.pathname)
   return (
     <Box>
       <UnstyledButton
@@ -56,7 +56,7 @@ export function SidebarLinksGroup({
         }}
         className={
           (hasLinks && links.some((e) => location.pathname === e.link)) ||
-            location.pathname === path!
+            (location.pathname.includes(path!) && path !== "/brand" && path !== "/shop") || (location.pathname === path)
             ? `${classes["activeControl"]}`
             : `${classes["control"]}`
         }
@@ -71,7 +71,7 @@ export function SidebarLinksGroup({
               variant="transparent"
               className={
                 (hasLinks && links.some((e) => location.pathname === e.link)) ||
-                  location.pathname === path!
+                  (location.pathname.includes(path!) && path !== "/brand" && path !== "/shop") || (location.pathname === path)
                   ? classes["activeIcon"]
                   : classes["icon"]
               }

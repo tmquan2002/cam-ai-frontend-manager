@@ -94,24 +94,9 @@ const IncidentListPage = () => {
     form.values.shopId,
   ]);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList(searchParams);
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
-    enabled: true,
-    size: 999,
-  });
-
-  const removedInteractionIncident = useMemo(() => {
-    if (isGetEmployeeListLoading) {
-      return [];
-    } else {
-      return incidentList?.values?.filter(
-        (item) => item?.incidentType != IncidentType.Interaction
-      );
-    }
-  }, [incidentList, isGetIncidentListLoading]);
+  const { data: incidentList, isLoading: isGetIncidentListLoading } = useGetIncidentList(searchParams);
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
+  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({ enabled: true, size: 999, });
 
   const fields = useMemo(() => {
     return [
@@ -204,7 +189,7 @@ const IncidentListPage = () => {
     isGetShopListLoading,
   ]);
 
-  const rows = removedInteractionIncident?.map((row, index) => {
+  const rows = incidentList?.values?.map((row, index) => {
     return (
       <Table.Tr
         key={index}
