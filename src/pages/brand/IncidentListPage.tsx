@@ -209,11 +209,15 @@ const IncidentListPage = () => {
       <Table.Tr
         key={index}
         className={classes["clickable"]}
-        onClick={() => navigate(`/brand/incident/${row?.id}`)}
       >
         <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
-        <Table.Td>
-          <Text>{row?.incidentType}</Text>
+        <Table.Td
+          className={classes["pointer-style"]}
+          c={"blue"}
+          onClick={() => navigate(`/brand/incident/${row?.id}`)}>
+          <Tooltip label="View Incident" withArrow position="top-start">
+            <Text>{row?.incidentType}</Text>
+          </Tooltip>
         </Table.Td>
         <Table.Td
           className={classes["pointer-style"]}

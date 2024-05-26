@@ -317,16 +317,21 @@ const AccountDetailPage = () => {
           <Modal
             opened={opened}
             onClose={close}
+            centered
             title={
               <Text>
-                Confirm delete <Mark>{accountData?.name}</Mark> account?
+                Delete <Mark>{accountData?.name}</Mark> account?
               </Text>
             }
           // centered
           >
             <Group justify="flex-end" mt="md">
+              <Button onClick={close} color={"black"} variant="outline" size="xs">
+                Cancel
+              </Button>
               <Button
                 loading={isDeleteEmployeeLoading}
+                color="red"
                 onClick={() => {
                   deleteEmployee(id ?? "", {
                     onSuccess() {
@@ -349,10 +354,7 @@ const AccountDetailPage = () => {
                 variant="filled"
                 size="xs"
               >
-                Yes
-              </Button>
-              <Button onClick={close} color={"red"} variant="outline" size="xs">
-                No
+                Comfirm
               </Button>
             </Group>
           </Modal>

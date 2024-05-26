@@ -49,7 +49,7 @@ const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
     notificationList?.values == undefined ||
     notificationList?.values?.filter(
       (n) => n.status == NotificationStatus.Unread
-    ).length > 0;
+    ).length <= 0;
 
   return (
     <Flex justify="space-between" px={rem(32)} align={"center"} h={"100%"}>

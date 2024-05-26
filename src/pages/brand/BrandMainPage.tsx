@@ -487,7 +487,7 @@ const BrandMainPage = () => {
             </Collapse>
 
             {/* Table section */}
-            <Box>
+            <Box mt={20}>
               <LoadingOverlay
                 visible={isShopListLoading}
                 zIndex={1000}

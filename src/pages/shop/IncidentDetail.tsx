@@ -256,12 +256,9 @@ const IncidentDetail = () => {
                 </Button>
                 {incidentData?.status != IncidentStatus.Rejected ? (
                   <Button
-                    bg={"#fff"}
-                    c={computedColorScheme == "light" ? "#c92a2a" : "#E75151"}
                     fw={500}
-                    style={{
-                      borderColor: "#c92a2a",
-                    }}
+                    bg={"#c92a2a"}
+                    c={"#fff"}
                     onClick={openModal}
                     loading={isRejectIncidentLoading}
                   >
@@ -332,7 +329,7 @@ const IncidentDetail = () => {
                 p={rem(24)}
                 gap={4}
                 style={{
-                  backgroundColor: "#f9fafb",
+                  backgroundColor: computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f",
                 }}
               >
                 <Group justify="space-between">
@@ -362,7 +359,7 @@ const IncidentDetail = () => {
                     <IconUserCircle
                       style={{
                         width: rem(22),
-                        color: "#000",
+                        color: computedColorScheme == "light" ? "#000" : "white",
                         aspectRatio: 1,
                       }}
                     />
@@ -392,7 +389,7 @@ const IncidentDetail = () => {
                   <IconClock
                     style={{
                       width: rem(22),
-                      color: "#000",
+                      color: computedColorScheme == "light" ? "#000" : "white",
                       aspectRatio: 1,
                     }}
                   />
@@ -407,7 +404,7 @@ const IncidentDetail = () => {
                     <IconUsers
                       style={{
                         width: rem(22),
-                        color: "#000",
+                        color: computedColorScheme == "light" ? "#000" : "white",
                         aspectRatio: 1,
                       }}
                     />
@@ -427,7 +424,7 @@ const IncidentDetail = () => {
                   <IconPictureInPicture
                     style={{
                       width: rem(22),
-                      color: "#000",
+                      color: computedColorScheme == "light" ? "#000" : "white",
                       aspectRatio: 1,
                     }}
                   />
@@ -447,7 +444,7 @@ const IncidentDetail = () => {
                   <IconReport
                     style={{
                       width: rem(22),
-                      color: "#000",
+                      color: computedColorScheme == "light" ? "#000" : "white",
                       aspectRatio: 1,
                     }}
                   />
@@ -467,7 +464,7 @@ const IncidentDetail = () => {
                   <IconRobot
                     style={{
                       width: rem(22),
-                      color: "#000",
+                      color: computedColorScheme == "light" ? "#000" : "white",
                       aspectRatio: 1,
                     }}
                   />
