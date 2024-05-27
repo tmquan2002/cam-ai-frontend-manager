@@ -15,6 +15,13 @@ export type GetShopHumanCountReportParams = {
   interval: ReportInterval;
 };
 
+export type GetShopHumanCountReportByShopIdParams = {
+  startDate?: string;
+  endDate?: string;
+  interval: ReportInterval;
+  shopId: string;
+};
+
 export const ReportApi = {
   _getReportShopList: async (date?: string) => {
     const access_token = getAccessToken();
@@ -44,6 +51,20 @@ export const ReportApi = {
     const access_token = getAccessToken();
     const res = await http.get<HumanCountDetail>(
       `/api/shops/customer?${toQueryParams(params)}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
+    return res?.data;
+  },
+  _getHumanCountReportByShopId: async (
+    params: GetShopHumanCountReportByShopIdParams
+  ) => {
+    const access_token = getAccessToken();
+    const res = await http.get<HumanCountDetail>(
+      `/api/shops/${params.shopId}/customer?${toQueryParams(params)}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`,

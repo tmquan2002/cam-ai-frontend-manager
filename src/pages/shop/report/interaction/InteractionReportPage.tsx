@@ -140,7 +140,7 @@ export const InteractionReportPage = () => {
   const {
     data: incidentReportByTimeData,
     isLoading: isGetIncidentReportByTimeDataLoading,
-  } = useShopHumanCountReport(searchParams);
+  } = useShopHumanCountReport({ ...searchParams });
 
   const { data: interactionList, isLoading: isGetInteractionListLoading } =
     useGetIncidentList({
@@ -199,10 +199,6 @@ export const InteractionReportPage = () => {
           radius: rem(8),
 
           data: [
-            {
-              value: ReportInterval.HalfHour,
-              label: "30 minutes",
-            },
             {
               value: ReportInterval.Hour,
               label: "1 hour",
@@ -407,6 +403,7 @@ export const InteractionReportPage = () => {
                     style={{
                       width: "40px",
                       zIndex: 999,
+                      backgroundColor: "#fff",
                     }}
                   >
                     <Chart

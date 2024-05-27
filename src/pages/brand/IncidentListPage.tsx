@@ -94,24 +94,9 @@ const IncidentListPage = () => {
     form.values.shopId,
   ]);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList(searchParams);
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
-    enabled: true,
-    size: 999,
-  });
-
-  const removedInteractionIncident = useMemo(() => {
-    if (isGetEmployeeListLoading) {
-      return [];
-    } else {
-      return incidentList?.values?.filter(
-        (item) => item?.incidentType != IncidentType.Interaction
-      );
-    }
-  }, [incidentList, isGetIncidentListLoading]);
+  const { data: incidentList, isLoading: isGetIncidentListLoading } = useGetIncidentList(searchParams);
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
+  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({ enabled: true, size: 999, });
 
   const fields = useMemo(() => {
     return [
@@ -204,16 +189,20 @@ const IncidentListPage = () => {
     isGetShopListLoading,
   ]);
 
-  const rows = removedInteractionIncident?.map((row, index) => {
+  const rows = incidentList?.values?.map((row, index) => {
     return (
       <Table.Tr
         key={index}
         className={classes["clickable"]}
-        onClick={() => navigate(`/brand/incident/${row?.id}`)}
       >
         <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
-        <Table.Td>
-          <Text>{row?.incidentType}</Text>
+        <Table.Td
+          className={classes["pointer-style"]}
+          c={"blue"}
+          onClick={() => navigate(`/brand/incident/${row?.id}`)}>
+          <Tooltip label="View Incident" withArrow position="top-start">
+            <Text>{row?.incidentType}</Text>
+          </Tooltip>
         </Table.Td>
         <Table.Td
           className={classes["pointer-style"]}

@@ -39,7 +39,7 @@ const BrandHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
     notificationList?.values == undefined ||
     notificationList?.values?.filter(
       (n) => n.status == NotificationStatus.Unread
-    ).length > 0;
+    ).length <= 0;
 
   return (
     <Flex justify="space-between" px={rem(32)} align={"center"} h={"100%"}>
@@ -55,7 +55,7 @@ const BrandHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
           <Tooltip label="Notification" withArrow>
             <Popover.Target>
               <Indicator
-                size={isNotificationAllRead ? 5 : 0}
+                size={isNotificationAllRead ? 0 : 5}
                 color="pale-red.6"
               >
                 <ActionIcon variant="default" aria-label="Notifications">

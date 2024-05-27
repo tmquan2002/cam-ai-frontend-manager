@@ -12,6 +12,7 @@ import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { MantineProvider, createTheme } from "@mantine/core";
 import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
+import { IncidentProvider } from "./context/IncidentContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,7 +43,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <SessionProvider>
-              <Notifications position="bottom-right" />
+              <Notifications position="top-right" />
               <AppRoute />
             </SessionProvider>
           </BrowserRouter>

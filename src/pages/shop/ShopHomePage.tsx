@@ -27,13 +27,12 @@ import {
   IncidentStatus,
   IncidentType,
 } from "../../models/CamAIEnum";
-import { notifications } from "@mantine/notifications";
 import { NotificationColorPalette } from "../../types/constant";
-import { useGetNewIncident } from "../../hooks/useReport";
 import { ReadyState } from "react-use-websocket";
 import { IconCaretRight } from "@tabler/icons-react";
 import CameraCard from "../../components/card/CameraCard";
 import { useGetEdgeBoxInstallByShopId } from "../../hooks/useGetEdgeBoxInstallByShopId";
+import { useGetLiveIncidents } from "../../context/IncidentContext";
 
 export type TitleAndNumberCard = {
   title: string;
@@ -160,7 +159,7 @@ const IncidentCard = ({
 };
 
 const ShopHomePage = () => {
-  const { lastJsonMessage, readyState } = useGetNewIncident();
+  const liveIncidentData = useGetLiveIncidents();
 
   const [incidentList, setIncidentList] = useState<IncidentDetail[]>([]);
   const { data: currentIncidentData, isLoading: isGetCurrentIncidentListData } =
@@ -180,26 +179,10 @@ const ShopHomePage = () => {
     useGetEdgeBoxInstallByShopId(shopData?.values?.[0]?.id ?? null);
 
   const handleNewIncident = (incident: IncidentDetail) => {
-    notifications.show({
-      title: "New incident",
-      message: `Incident found at ${dayjs(incident?.startTime).format(
-        "HH:mm"
-      )} `,
-      autoClose: 6000,
-      c: NotificationColorPalette.UP_COMING,
-    });
     setIncidentList([incident, ...incidentList]);
   };
 
-  const handleMoreInteraction = (incident: IncidentDetail) => {
-    notifications.show({
-      title: "More evidence found",
-      message: `Incident at ${dayjs(incident.startTime).format(
-        "HH:mm"
-      )} updated`,
-      autoClose: 6000,
-      c: NotificationColorPalette.REPORT_EXPENSES,
-    });
+  const handleMoreEvidence = (incident: IncidentDetail) => {
     const evidentIndex = _.findIndex(incidentList, (listTime) => {
       return listTime?.id == incident.id;
     });
@@ -209,7 +192,7 @@ const ShopHomePage = () => {
   const handleUpdateNewIncident = (incident: WebSocketIncident) => {
     switch (incident.EventType) {
       case EventType.MoreEvidence:
-        handleMoreInteraction(incident?.Incident);
+        handleMoreEvidence(incident?.Incident);
         break;
       case EventType.NewIncident:
         handleNewIncident(incident?.Incident);
@@ -230,12 +213,13 @@ const ShopHomePage = () => {
   }, [currentIncidentData, isGetCurrentIncidentListData]);
 
   useEffect(() => {
-    if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
-      handleUpdateNewIncident(lastJsonMessage);
+    if (
+      liveIncidentData?.state == ReadyState.OPEN &&
+      !_.isEmpty(liveIncidentData.latestIncident)
+    ) {
+      handleUpdateNewIncident(liveIncidentData.latestIncident);
     }
-  }, [readyState, lastJsonMessage]);
-
-  console.log(readyState, lastJsonMessage);
+  }, [liveIncidentData]);
 
   const renderStatisticContent = () => {
     if (isShopDataLoading || isGetEdgeBoxLoading) {

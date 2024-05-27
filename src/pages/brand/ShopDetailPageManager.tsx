@@ -178,10 +178,12 @@ const ShopDetailPageManager = () => {
       children: (
         <Text size="sm">
           Do you really want to{" "}
-          {currentStatus == ShopStatus.Active ? "Disable" : "Enable"} this shop!
+          {currentStatus == ShopStatus.Active ? "disable" : "enable"} this shop!
         </Text>
       ),
       labels: { confirm: "Confirm", cancel: "Cancel" },
+      centered: true,
+      confirmProps: { color: 'red' },
       onCancel: () => { },
       onConfirm: () => handleToggleShopStatus(currentStatus),
     });

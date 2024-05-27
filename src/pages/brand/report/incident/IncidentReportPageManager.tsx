@@ -16,7 +16,9 @@ import { useGetShopList } from "../../../../hooks/useGetShopList";
 import { useState } from "react";
 
 const IncidentReportPageManager = () => {
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const [selectedShop, setSelectedShop] = useState<string | null>(null);
   const iconStyle = { width: rem(20), height: rem(20) };
   const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
@@ -25,9 +27,13 @@ const IncidentReportPageManager = () => {
   });
 
   return (
-    <Flex px={rem(40)} pt={rem(20)}
-      bg={computedColorScheme == "light" ? "#f6f8fc" : "#1a1a1a"}
-      flex={1} direction={"column"}>
+    <Flex
+      px={rem(40)}
+      pt={rem(20)}
+      bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}
+      flex={1}
+      direction={"column"}
+    >
       <Group justify="space-between" align="center" my={rem(20)}>
         <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
           Incident Report
@@ -41,6 +47,7 @@ const IncidentReportPageManager = () => {
             size="sm"
             radius={rem(8)}
             w={rem(320)}
+            allowDeselect={false}
             style={{
               fontWeight: 500,
             }}
@@ -52,11 +59,11 @@ const IncidentReportPageManager = () => {
             data={
               shopList
                 ? shopList?.values.map((item) => {
-                  return {
-                    value: item?.id,
-                    label: item?.name,
-                  };
-                })
+                    return {
+                      value: item?.id,
+                      label: item?.name,
+                    };
+                  })
                 : []
             }
             placeholder={"Select a shop"}
@@ -64,8 +71,10 @@ const IncidentReportPageManager = () => {
         )}
       </Group>
 
-      <Box py={rem(10)} px={rem(32)}
-        bg={computedColorScheme == "light" ? "white" : "#242424"} >
+      <Box
+        py={rem(10)}
+        bg={computedColorScheme == "light" ? "white" : "#242424"}
+      >
         <Tabs keepMounted={false} variant="default" defaultValue="ByEmployee">
           <Tabs.List>
             <Tabs.Tab
