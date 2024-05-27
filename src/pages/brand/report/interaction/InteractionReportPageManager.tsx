@@ -26,11 +26,10 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 
-import { Chart, Line } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
 import NoImage from "../../../../components/image/NoImage";
 import { useForm } from "@mantine/form";
-import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import _ from "lodash";
