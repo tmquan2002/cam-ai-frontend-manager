@@ -153,7 +153,11 @@ const IncidentDetail = () => {
   }, [incidentData]);
 
   return (
-    <Box pos="relative">
+    <Box
+      pos="relative"
+      flex={1}
+      bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}
+    >
       <LoadingOverlay visible={isGetIncidentLoading} />
       <Modal
         opened={opened}
@@ -203,7 +207,7 @@ const IncidentDetail = () => {
           </Group>
         </form>
       </Modal>
-      <Box flex={1} bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}>
+      <Box>
         <Box
           px={rem(32)}
           py={rem(24)}
@@ -288,7 +292,7 @@ const IncidentDetail = () => {
             }}
           >
             <Box
-              bg={computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f"}
+              bg={computedColorScheme == "light" ? "#fff" : "#1f1f1f"}
               py={rem(28)}
               px={rem(24)}
               style={{
@@ -329,7 +333,8 @@ const IncidentDetail = () => {
                 p={rem(24)}
                 gap={4}
                 style={{
-                  backgroundColor: computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f",
+                  backgroundColor:
+                    computedColorScheme == "light" ? "#fff" : "#1f1f1f",
                 }}
               >
                 <Group justify="space-between">
@@ -359,7 +364,8 @@ const IncidentDetail = () => {
                     <IconUserCircle
                       style={{
                         width: rem(22),
-                        color: computedColorScheme == "light" ? "#000" : "white",
+                        color:
+                          computedColorScheme == "light" ? "#000" : "white",
                         aspectRatio: 1,
                       }}
                     />
@@ -404,7 +410,8 @@ const IncidentDetail = () => {
                     <IconUsers
                       style={{
                         width: rem(22),
-                        color: computedColorScheme == "light" ? "#000" : "white",
+                        color:
+                          computedColorScheme == "light" ? "#000" : "white",
                         aspectRatio: 1,
                       }}
                     />

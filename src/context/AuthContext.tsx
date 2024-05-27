@@ -68,8 +68,9 @@ export function SessionProvider(props: React.PropsWithChildren) {
     CommonConstant.USER_ACCESS_TOKEN
   );
 
-  const [[isRefreshTokenLoading], setRefreshToken] =
-    useStorageState(CommonConstant.USER_REFRESH_TOKEN);
+  const [[isRefreshTokenLoading], setRefreshToken] = useStorageState(
+    CommonConstant.USER_REFRESH_TOKEN
+  );
 
   const navigate = useNavigate();
 
@@ -79,17 +80,25 @@ export function SessionProvider(props: React.PropsWithChildren) {
         return res;
       },
       (err) => {
+        // notifications.show({
+        //   title: err?.response?.status,
+        //   message: err?.response?.data?.message,
+        //   color: "red",
+        // });
+
         if (err?.response?.status == 401) {
           if (err?.response?.headers.auto != "True") {
             // console.log("clear tokens auth context");
             const darkMode = localStorage.getItem("mantine-color-scheme-value");
             localStorage.clear();
-            localStorage.setItem("mantine-color-scheme-value", darkMode ?? "light");
+            localStorage.setItem(
+              "mantine-color-scheme-value",
+              darkMode ?? "light"
+            );
             navigate("/");
           }
         }
         throw err;
-
       }
     );
   }, []);
@@ -104,10 +113,12 @@ export function SessionProvider(props: React.PropsWithChildren) {
           navigate(0);
         },
         signOut: () => {
-
           const darkMode = localStorage.getItem("mantine-color-scheme-value");
-          localStorage.clear()
-          localStorage.setItem("mantine-color-scheme-value", darkMode ?? "light");
+          localStorage.clear();
+          localStorage.setItem(
+            "mantine-color-scheme-value",
+            darkMode ?? "light"
+          );
           navigate("/login");
         },
         isLoading: isAccessTokenLoading || isRefreshTokenLoading,

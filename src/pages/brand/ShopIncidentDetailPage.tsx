@@ -9,10 +9,17 @@ import {
   Stack,
   Text,
   rem,
-  useComputedColorScheme
+  useComputedColorScheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconClock, IconPictureInPicture, IconReport, IconRobot, IconUserCircle, IconUsers } from "@tabler/icons-react";
+import {
+  IconClock,
+  IconPictureInPicture,
+  IconReport,
+  IconRobot,
+  IconUserCircle,
+  IconUsers,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect } from "react";
@@ -61,13 +68,14 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
   }
 };
 
-
-
 const ShopIncidentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const form = useForm<IncidentFormField>();
-  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
-  const { data: incidentData, isLoading: isGetIncidentLoading } = useGetIncidentById(id ?? "");
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
+  const { data: incidentData, isLoading: isGetIncidentLoading } =
+    useGetIncidentById(id ?? "");
 
   useEffect(() => {
     if (incidentData?.employeeId) {
@@ -85,17 +93,13 @@ const ShopIncidentDetailPage = () => {
           <Text
             size={rem(18)}
             fw={600}
-            c={
-              computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"
-            }
+            c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
             lh={rem(26)}
           >
             {incidentData?.incidentType} incident
           </Text>
           <Text c={"dimmed"} size={rem(14)} fw={400} lh={rem(26)}>
-            {dayjs(incidentData?.startTime).format(
-              "MMMM DD, YYYY h:mm A"
-            )}
+            {dayjs(incidentData?.startTime).format("MMMM DD, YYYY h:mm A")}
           </Text>
         </Box>
       </Paper>
@@ -105,7 +109,13 @@ const ShopIncidentDetailPage = () => {
             flex: 1,
           }}
         >
-          <Paper shadow="xs" mx={rem(32)} my={rem(40)} px={rem(32)} py={rem(28)}>
+          <Paper
+            shadow="xs"
+            mx={rem(32)}
+            my={rem(40)}
+            px={rem(32)}
+            py={rem(28)}
+          >
             <Group justify="space-between" align="flex-end" mb={rem(20)}>
               <Text fw={500} size={rem(20)}>
                 Evidence
@@ -133,7 +143,8 @@ const ShopIncidentDetailPage = () => {
               p={rem(24)}
               gap={4}
               style={{
-                backgroundColor: computedColorScheme == "light" ? "#f9fafb" : "#1f1f1f",
+                backgroundColor:
+                  computedColorScheme == "light" ? "#fff" : "#1f1f1f",
               }}
             >
               <Group justify="space-between">
@@ -141,9 +152,7 @@ const ShopIncidentDetailPage = () => {
                   fw={600}
                   size={rem(17)}
                   c={
-                    computedColorScheme == "light"
-                      ? "rgb(17, 24, 39)"
-                      : "white"
+                    computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"
                   }
                   lh={rem(26)}
                 >
@@ -203,7 +212,12 @@ const ShopIncidentDetailPage = () => {
                       ? "Rejected "
                       : "Assigned "}
                     by{" "}
-                    <Text inherit span fw={500} c={computedColorScheme == "light" ? "black" : "white"}>
+                    <Text
+                      inherit
+                      span
+                      fw={500}
+                      c={computedColorScheme == "light" ? "black" : "white"}
+                    >
                       {incidentData?.assigningAccount?.name}
                     </Text>
                   </Text>

@@ -39,6 +39,7 @@ import BrandRoute from "./BrandRoute";
 import CommonRoute from "./CommonRoute";
 import HeadSupervisorRoute from "./HeadSupervisorRoute";
 import ShopRoute from "./ShopRoute";
+import { IncidentProvider } from "../context/IncidentContext";
 
 const AppRoute = () => {
   return useRoutes([
@@ -54,7 +55,12 @@ const AppRoute = () => {
     },
     {
       path: "shop",
-      element: <ShopRoute />,
+
+      element: (
+        <IncidentProvider>
+          <ShopRoute />
+        </IncidentProvider>
+      ),
       children: [
         {
           path: "",
@@ -202,7 +208,11 @@ const AppRoute = () => {
     },
     {
       path: "supervisor",
-      element: <HeadSupervisorRoute />,
+      element: (
+        <IncidentProvider>
+          <HeadSupervisorRoute />
+        </IncidentProvider>
+      ),
       children: [
         {
           path: "",

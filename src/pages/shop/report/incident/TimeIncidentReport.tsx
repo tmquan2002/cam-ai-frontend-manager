@@ -472,6 +472,7 @@ const TimeIncidentReport = () => {
                   style={{
                     width: "40px",
                     zIndex: 999,
+                    backgroundColor: "#fff",
                   }}
                 >
                   <Chart
