@@ -34,9 +34,9 @@ const IncidentReportPageManager = () => {
       flex={1}
       direction={"column"}
     >
-      <Group justify="space-between" align="center" my={rem(20)}>
-        <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
-          Incident Report
+      <Group justify="space-between" align="center" my={rem(16)}>
+        <Text size={rem(22)} fw={"bold"} c={"light-blue.4"}>
+          Incident report
         </Text>
         {isGetShopListLoading ? (
           <Loader />

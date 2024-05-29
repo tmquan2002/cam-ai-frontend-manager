@@ -239,7 +239,7 @@ const ShopIncidentDetailPage = () => {
                     fw={500}
                     c={computedColorScheme == "light" ? "black" : "white"}
                   >
-                    {" " + incidentData?.inChargeAccount?.name}
+                    {" " + incidentData?.assignment?.inChargeAccount?.name}
                   </Text>
                 </Text>
               </Group>

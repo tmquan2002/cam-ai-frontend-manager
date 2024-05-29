@@ -31,16 +31,7 @@ import { useForm } from "@mantine/form";
 import { GetIncidentReportByTimeParams } from "../../../../apis/IncidentAPI";
 import _ from "lodash";
 import NoImage from "../../../../components/image/NoImage";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Chart as ChartJS, registerables } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import classes from "./TimeIncidentReport.module.scss";
 import { Chart } from "react-chartjs-2";
@@ -52,6 +43,7 @@ import { useGetIncidentList } from "../../../../hooks/useGetIncidentList";
 import {
   addDaysBaseOnReportInterval,
   differentDateReturnFormattedString,
+  makeDivisibleByDivider,
 } from "../../../../utils/helperFunction";
 import {
   IncidentDetail,
@@ -63,16 +55,8 @@ import LoadingImage from "../../../../components/image/LoadingImage";
 import { DonutChart } from "@mantine/charts";
 import { useGetIncidentPercent } from "../../../../hooks/useGetIncidentPercent";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  zoomPlugin
-);
+ChartJS.register(...registerables, zoomPlugin);
+
 type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;
@@ -190,7 +174,7 @@ const TimeIncidentReport = () => {
       fromTime: selectedDuration?.startTime,
       toTime: selectedDuration?.endTime,
       size: 999,
-      incidentType: IncidentType.Incident,
+      incidentType: form.values.type,
     });
 
   const { data: incidentPercent, isLoading: isGetIncidentPercentLoading } =
@@ -498,6 +482,7 @@ const TimeIncidentReport = () => {
                         y: {
                           ticks: {
                             padding: 10,
+                            count: 7,
                           },
                           beginAtZero: true,
                           afterFit: (ctx) => {
@@ -509,7 +494,13 @@ const TimeIncidentReport = () => {
                           border: {
                             color: "#000",
                           },
-                          suggestedMax: 10,
+                          suggestedMax: 8,
+                          max: makeDivisibleByDivider(
+                            _.maxBy(data, function (o) {
+                              return o.count;
+                            })?.count ?? 6,
+                            6
+                          ),
                         },
                       },
 
@@ -524,15 +515,7 @@ const TimeIncidentReport = () => {
                     }}
                     data={{
                       labels: data?.map((i) => i.time),
-                      datasets: [
-                        {
-                          type: "bar",
-                          label: "Total interactions",
-                          borderColor: "rgb(37, 150, 190)",
-                          backgroundColor: "rgb(37, 150, 190, 0.5)",
-                          data: data?.map((i) => i.count),
-                        },
-                      ],
+                      datasets: [],
                     }}
                   />
                 </Box>
@@ -572,6 +555,7 @@ const TimeIncidentReport = () => {
                           y: {
                             ticks: {
                               display: false,
+                              count: 7,
                             },
 
                             grid: {
@@ -584,7 +568,36 @@ const TimeIncidentReport = () => {
                             border: {
                               dash: [8, 4],
                             },
-                            suggestedMax: 10,
+                            max: makeDivisibleByDivider(
+                              _.maxBy(data, function (o) {
+                                return o.count;
+                              })?.count ?? 6,
+                              8
+                            ),
+
+                            suggestedMax: 8,
+                          },
+                          y1: {
+                            suggestedMax: 6,
+                            ticks: {
+                              display: false,
+                              count: 7,
+                            },
+                            grid: {
+                              drawTicks: false,
+                              tickWidth: 0,
+                              tickLength: 0,
+                              tickColor: "#000",
+                            },
+                            border: {
+                              dash: [8, 4],
+                            },
+                            max: makeDivisibleByDivider(
+                              _.maxBy(data, function (o) {
+                                return o.duration;
+                              })?.duration ?? 6,
+                              8
+                            ),
                           },
                           x: {
                             ticks: {
@@ -642,6 +655,7 @@ const TimeIncidentReport = () => {
                             pointRadius: 3,
                             fill: true,
                             pointHitRadius: 7,
+                            yAxisID: "y",
                           },
                           {
                             type: "bar" as const,
@@ -650,6 +664,7 @@ const TimeIncidentReport = () => {
                             backgroundColor: "rgba(255, 99, 132, 0.6)",
                             borderColor: "rgba(255, 99, 132)",
                             borderRadius: 6,
+                            yAxisID: "y1",
                           },
                         ],
                       }}

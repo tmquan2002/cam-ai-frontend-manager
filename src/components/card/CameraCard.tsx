@@ -21,8 +21,9 @@ const CameraCard = ({ cameraId }: CameraCardProps) => {
       const rws = new ReconnectingWebSocket(
         data,
         ["Bearer", `${getAccessToken()}`],
+
         {
-          maxRetries: 3,
+          maxRetries: 8,
         }
       );
 
@@ -43,13 +44,11 @@ const CameraCard = ({ cameraId }: CameraCardProps) => {
 
       setInterval(() => {
         console.log("Close and reconnect");
-        rws.close();
         rws.reconnect();
-      }, 2 * 60 * 1000);
+      }, 1 * 60 * 1000);
 
       // rws.onclose = () => {
       //   console.log("Close and reconnect");
-      //   rws.reconnect();
       // };
     }
   }, [data]);
