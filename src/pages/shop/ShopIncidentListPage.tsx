@@ -95,6 +95,7 @@ const ShopIncidentListPage = () => {
   const [incidentCheckBoxList, handlers] =
     useListState<IncidentDetailWithChecked>([]);
   const allChecked = incidentCheckBoxList.every((value) => value.checked);
+  const allUnchecked = incidentCheckBoxList.every((value) => !value.checked);
   const indeterminate =
     incidentCheckBoxList.some((value) => value.checked) && !allChecked;
   // const [firstCheckId, setFirstCheckId] = useState("");
@@ -420,7 +421,6 @@ const ShopIncidentListPage = () => {
     >
       <Group justify="space-between">
         <Checkbox
-          w={20} size="xs"
           checked={row.checked}
           disabled={row.disabled}
           onChange={(event) =>
@@ -509,17 +509,18 @@ const ShopIncidentListPage = () => {
         {/* Top section */}
         <Group>
           <Group>
-            <Tooltip label="Select All">
+            <Tooltip label={allUnchecked ? "Select All" : "Unselect All"} withArrow>
               <ActionIcon
                 variant="subtle"
                 color={"gray"}
                 onClick={() => {
                   handlers.setState((current) =>
-                    current.map((value) => ({ ...value, checked: !allChecked }))
+                    current.map((value) => ({ ...value, checked: allUnchecked ? true : false }))
                   )
                 }}
+                style={{}}
               >
-                {allChecked ? <IconSquareRoundedCheck size={20} /> : indeterminate ? <IconSquareRoundedMinus size={20} /> : <IconSquareRounded size={20} />}
+                {allChecked ? <IconSquareRoundedCheck size={25} /> : indeterminate ? <IconSquareRoundedMinus size={25} /> : <IconSquareRounded size={25} />}
               </ActionIcon>
             </Tooltip>
 
@@ -535,7 +536,7 @@ const ShopIncidentListPage = () => {
                       variant="subtle" color={"gray"}
                       onClick={toggleSelectedPopover}
                     >
-                      <IconUserUp size={20} />
+                      <IconUserUp size={25} />
                     </ActionIcon>
                   </Tooltip>
                 </Popover.Target>
@@ -584,7 +585,7 @@ const ShopIncidentListPage = () => {
                   onClick={openMassRejectModal}
                   loading={isMassRejectIncidentLoading}
                 >
-                  <IconIdOff size={20} />
+                  <IconIdOff size={25} />
                 </ActionIcon>
               </Tooltip>
             }
@@ -598,7 +599,7 @@ const ShopIncidentListPage = () => {
                 variant={openedFilter ? "filled" : "subtle"}
                 onClick={toggleFilter}
               >
-                <IconFilter size={20} />
+                <IconFilter size={25} />
               </ActionIcon>
             </Tooltip>
           </Group>
