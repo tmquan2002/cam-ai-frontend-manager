@@ -16,13 +16,13 @@ import { useGetWardList } from "../../../hooks/useGetWardList";
 import { Gender, Role } from "../../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../../models/Response";
 import { useTaskBrand } from "../../../routes/BrandRoute";
-import { getDateFromSetYear, mapLookupToArray } from "../../../utils/helperFunction";
 import { EMAIL_REGEX, PHONE_REGEX } from "../../../types/constant";
+import { mapLookupToArray } from "../../../utils/helperFunction";
 
 export type CreateAccountField = {
     email: string;
     name: string;
-    gender: Gender;
+    gender: Gender | null;
     phone: string;
     birthday: Date | null;
     wardId: string;
@@ -45,9 +45,9 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
         initialValues: {
             email: "",
             name: "",
-            gender: Gender.Male,
+            gender: null,
             phone: "",
-            birthday: new Date("01/01/2000"),
+            birthday: null,
             addressLine: "",
             province: "",
             district: "",
@@ -130,7 +130,6 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                 type: FIELD_TYPES.DATE,
                 fieldProps: {
                     form: createAccountForm,
-                    maxDate: getDateFromSetYear(18),
                     name: "birthday",
                     placeholder: "Birthday",
                     label: "Birthday",
@@ -216,10 +215,10 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                         addressLine,
                         birthday: dayjs(birthday).format("YYYY-MM-DD"),
                         brandId: brandList?.values[0].id ?? "",
-                        email,
+                        email: email ?? null,
                         gender: gender ?? null,
                         name,
-                        phone,
+                        phone: phone ?? null,
                         role: Role.ShopManager,
                         wardId: isEmpty(wardId) ? null : +wardId,
                     };

@@ -44,9 +44,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export type CreateEmployeeField = {
   name: string;
   email: string;
-  gender: Gender;
+  gender: Gender | null;
   phone: string;
-  birthday?: Date;
+  birthday?: Date | null;
   addressLine: string;
   wardId: string;
   province: string;
@@ -73,9 +73,9 @@ const ShopEmployeeDetailPage = () => {
     initialValues: {
       name: '',
       email: '',
-      gender: Gender.Male,
+      gender: null,
       phone: '',
-      birthday: new Date('01/01/2000'),
+      birthday: null,
       addressLine: '',
       wardId: ``,
       province: ``,
@@ -100,11 +100,11 @@ const ShopEmployeeDetailPage = () => {
       updateEmployeeForm.setValues({
         name: employeeData?.name ?? '',
         email: employeeData?.email ?? '',
-        gender: employeeData?.gender ?? '',
+        gender: employeeData?.gender ?? null,
         phone: employeeData?.phone ?? '',
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
-          : new Date("01/01/2000"),
+          : null,
         addressLine: employeeData?.addressLine ?? '',
         wardId: `${employeeData?.wardId}`,
         province: `${employeeData?.ward?.district?.provinceId}`,
@@ -155,6 +155,7 @@ const ShopEmployeeDetailPage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
+          required: true,
           readonly: true,
         },
       },

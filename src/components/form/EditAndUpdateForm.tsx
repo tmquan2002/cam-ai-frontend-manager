@@ -121,7 +121,7 @@ const renderSelect = ({ fieldProps }: any) => {
         label: {
           fontWeight: 500,
           fontSize: rem(14),
-          marginBottom: rem(4),
+          marginBottom: rem(8),
         },
         dropdown: {
           fontWeight: fontWeight ?? 400,

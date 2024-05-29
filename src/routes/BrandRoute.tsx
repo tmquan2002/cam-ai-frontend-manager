@@ -61,6 +61,7 @@ const BrandRoute = () => {
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
         loading: false,
         autoClose: 10000,
+        withCloseButton: true,
       });
       setTaskId(undefined);
     }

@@ -1,13 +1,13 @@
 import { AccountDetail } from "./Account";
 import {
-  EdgeBoxStatus,
   EventType,
   IncidentStatus,
-  IncidentType,
+  IncidentType
 } from "./CamAIEnum";
+import { EdgeboxDetail } from "./Edgebox";
 import { EmployeeDetail } from "./Employee";
 import { EvidenceDetail } from "./Evidence";
-import { ShopDetail } from "./Shop";
+import { ShopDetail, SuperVisorAssignmentDetail } from "./Shop";
 
 export type IncidentDetail = {
   aiId: number;
@@ -19,7 +19,7 @@ export type IncidentDetail = {
   status: IncidentStatus;
   shopId: string;
   shop: ShopDetail | null;
-  edgeBox: EdgeBoxStatus | null;
+  edgeBox: EdgeboxDetail | null;
   employee: EmployeeDetail | null;
   evidences: EvidenceDetail[];
   id: string;
@@ -28,6 +28,8 @@ export type IncidentDetail = {
   assigningAccountId: string | null;
   inChargeAccount: AccountDetail | null;
   inChargeAccountId: string | null;
+  assignmentId: string | null;
+  assignment: SuperVisorAssignmentDetail | null;
 };
 
 export type WebSocketIncident = {

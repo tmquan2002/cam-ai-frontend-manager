@@ -40,7 +40,7 @@ type SearchIncidentField = {
   toTime?: Date | null;
   edgeBoxId?: string;
   status?: IncidentStatus | null;
-  shopId?: string;
+  shopId?: string | null;
   brandId?: string;
   employeeId?: string | null;
   size?: number;
@@ -55,6 +55,7 @@ const IncidentListPage = () => {
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
+      shopId: null,
       employeeId: null,
       fromTime: null,
       status: null,
