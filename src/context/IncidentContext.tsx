@@ -3,7 +3,7 @@ import { useGetNewIncident } from "../hooks/useReport";
 import { IncidentDetail, WebSocketIncident } from "../models/Incident";
 import { ReadyState } from "react-use-websocket";
 import _ from "lodash";
-import { EventType, Role } from "../models/CamAIEnum";
+import { EventType, IncidentType, Role } from "../models/CamAIEnum";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import { NotificationColorPalette } from "../types/constant";
@@ -40,11 +40,13 @@ export function IncidentProvider(props: React.PropsWithChildren) {
   };
 
   const handleNewIncident = (incident: IncidentDetail) => {
+    const isInteractionType = incident.incidentType == IncidentType.Interaction;
+
     notifications.show({
-      title: "New incident",
-      message: `Incident found at ${dayjs(incident?.startTime).format(
-        "HH:mm"
-      )} `,
+      title: isInteractionType ? "New interaction" : "New incident",
+      message: `${
+        isInteractionType ? "Interaction" : "Incident"
+      } found at ${dayjs(incident?.startTime).format("HH:mm")} `,
       autoClose: 5000,
       c: NotificationColorPalette.UP_COMING,
       style:

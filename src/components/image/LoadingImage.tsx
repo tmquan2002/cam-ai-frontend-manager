@@ -10,7 +10,10 @@ interface LoadingImageProps extends ImageProps {
 
 const LoadingImage = (props: LoadingImageProps) => {
   const { imageId, ...rest } = props;
-  const { data, isLoading } = useGetImageById(imageId);
+  const { data, isLoading } = useGetImageById({
+    id: imageId,
+    scaleFactor: 0.7,
+  });
   const [isLoadFailed, setIsLoadFailed] = useState<boolean>(false);
 
   const imageSrc = useMemo(() => {

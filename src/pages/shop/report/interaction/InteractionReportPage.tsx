@@ -7,6 +7,7 @@ import {
   Group,
   ScrollArea,
   Skeleton,
+  Stack,
   Table,
   Text,
   rem,
@@ -567,16 +568,15 @@ export const InteractionReportPage = () => {
                               label: "Total employee",
                               data: data?.map((i) => i.humanCount),
                               borderColor: "rgb(37, 150, 190)",
-                              backgroundColor: "rgb(37, 150, 190, 0.5)",
-                              // cubicInterpolationMode: "monotone",
+                              cubicInterpolationMode: "monotone",
                               pointHoverRadius: 7,
                               pointHoverBackgroundColor: "#fff",
                               pointBackgroundColor: "rgb(37, 150, 190)",
                               borderWidth: 2,
                               pointRadius: 3,
-                              fill: false,
+                              fill: true,
                               pointHitRadius: 7,
-                              yAxisID: "y1",
+                              yAxisID: "y",
                             },
                             {
                               type: "bar" as const,
@@ -611,7 +611,7 @@ export const InteractionReportPage = () => {
         </Card>
       </Skeleton>
 
-      <Group align="flex-start" mt={rem(40)}>
+      <Stack align="flex-start" mt={rem(40)}>
         {interactionList ? (
           <Card
             radius={8}
@@ -728,8 +728,8 @@ export const InteractionReportPage = () => {
         {selectedInteractionItem ? (
           <Card
             radius={8}
-            w={"100%"}
             ref={interactionDetailRef}
+            w={"100%"}
             style={{
               border: "1px solid #ccc",
             }}
@@ -808,7 +808,7 @@ export const InteractionReportPage = () => {
         ) : (
           <></>
         )}
-      </Group>
+      </Stack>
     </Flex>
   );
 };
