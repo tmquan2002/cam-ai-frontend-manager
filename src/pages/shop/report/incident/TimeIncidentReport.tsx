@@ -977,7 +977,7 @@ const TimeIncidentReport = () => {
                   </Group>
                 </Group>
               </Box>
-              <ScrollArea.Autosize mah={1000} my={rem(12)}>
+              <ScrollArea.Autosize mah={1400} my={rem(12)}>
                 <Box px={rem(24)}>
                   <Box>
                     <Group

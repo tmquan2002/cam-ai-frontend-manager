@@ -365,7 +365,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         <Table.Td py={rem(18)}>
           <Center>
             <Text c={"rgb(17 24 39"} fw={500} size={rem(13)}>
-              {item?.assignment?.inChargeAccount?.name ?? "Empty"}
+              {item?.assignment?.supervisor?.name ?? "Empty"}
             </Text>
           </Center>
         </Table.Td>
