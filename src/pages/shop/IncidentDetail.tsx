@@ -28,7 +28,7 @@ import {
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import _ from "lodash";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import LoadingImage from "../../components/image/LoadingImage";
 import NoImage from "../../components/image/NoImage";
@@ -71,6 +71,9 @@ const IncidentDetail = () => {
     useRejectIncidentById();
   const { mutate: assignIncident, isLoading: isAssignIncidentLoading } =
     useAssignIncident();
+  const isInteractionType = useMemo(() => {
+    return incidentData?.incidentType == IncidentType.Interaction;
+  }, [incidentData]);
 
   const onAssignIncident = (fieldValues: IncidentFormField) => {
     assignIncident(
@@ -239,7 +242,9 @@ const IncidentDetail = () => {
                   }
                   lh={rem(26)}
                 >
-                  {incidentData?.incidentType} incident
+                  {isInteractionType
+                    ? incidentData?.incidentType
+                    : incidentData?.incidentType + " incident"}
                 </Text>
                 <Text c={"dimmed"} size={rem(14)} fw={400} lh={rem(26)}>
                   {dayjs(incidentData?.startTime).format(
@@ -248,7 +253,7 @@ const IncidentDetail = () => {
                 </Text>
               </Stack>
             </Group>
-            {incidentData?.incidentType != IncidentType.Interaction && (
+            {!isInteractionType && (
               <Group>
                 <Button
                   fw={500}
@@ -292,7 +297,7 @@ const IncidentDetail = () => {
             }}
           >
             <Box
-              bg={computedColorScheme == "light" ? "#fff" : "#1f1f1f"}
+              bg={computedColorScheme == "light" ? "#f9f9f9" : "#1f1f1f"}
               py={rem(28)}
               px={rem(24)}
               style={{
@@ -330,14 +335,20 @@ const IncidentDetail = () => {
           >
             <Box>
               <Stack
-                p={rem(24)}
                 gap={4}
                 style={{
                   backgroundColor:
                     computedColorScheme == "light" ? "#fff" : "#1f1f1f",
                 }}
               >
-                <Group justify="space-between">
+                <Group
+                  p={rem(24)}
+                  justify="space-between"
+                  style={{
+                    backgroundColor:
+                      computedColorScheme == "light" ? "#f9f9f9" : "#1f1f1f",
+                  }}
+                >
                   <Text
                     fw={600}
                     size={rem(17)}
@@ -348,13 +359,17 @@ const IncidentDetail = () => {
                     }
                     lh={rem(26)}
                   >
-                    {incidentData?.incidentType} incident
+                    {isInteractionType
+                      ? incidentData?.incidentType
+                      : incidentData?.incidentType + " incident"}
                   </Text>
-                  <StatusBadge
-                    statusName={incidentData?.status || "None"}
-                    size="sm"
-                    padding={10}
-                  />
+                  {!isInteractionType && (
+                    <StatusBadge
+                      statusName={incidentData?.status || "None"}
+                      size="sm"
+                      padding={10}
+                    />
+                  )}
                 </Group>
               </Stack>
               <Divider color="#ccc" />
@@ -399,7 +414,17 @@ const IncidentDetail = () => {
                       aspectRatio: 1,
                     }}
                   />
-                  <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
+                  <Text
+                    size={rem(15)}
+                    fw={500}
+                    lh={rem(24)}
+                    style={{
+                      color:
+                        computedColorScheme == "light"
+                          ? "rgb(17, 24, 39)"
+                          : "white",
+                    }}
+                  >
                     {dayjs(incidentData?.startTime).format(
                       "MMMM DD, YYYY h:mm A"
                     )}
@@ -463,7 +488,7 @@ const IncidentDetail = () => {
                       fw={500}
                       c={computedColorScheme == "light" ? "black" : "white"}
                     >
-                      {" " + incidentData?.inChargeAccount?.name}
+                      {" " + incidentData?.assignment?.supervisor?.name}
                     </Text>
                   </Text>
                 </Group>

@@ -14,17 +14,6 @@ import {
   rem,
   useComputedColorScheme,
 } from "@mantine/core";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import zoomPlugin from "chartjs-plugin-zoom";
 
 import { Chart } from "react-chartjs-2";
 import { IncidentType, ReportInterval } from "../../../../models/CamAIEnum";
@@ -50,17 +39,9 @@ import {
 import LoadingImage from "../../../../components/image/LoadingImage";
 import { useGetShopHumanCountReportByShopId } from "../../../../hooks/useGetHumanCountReportByShopId";
 import { GetShopHumanCountReportByShopIdParams } from "../../../../apis/ReportAPI";
+import { Chart as ChartJS, registerables } from "chart.js";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  zoomPlugin
-);
+ChartJS.register(...registerables);
 type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;

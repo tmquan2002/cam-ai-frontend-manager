@@ -4,6 +4,7 @@ import {
   EventType,
   IncidentStatus,
   IncidentType,
+  Role,
 } from "./CamAIEnum";
 import { EmployeeDetail } from "./Employee";
 import { EvidenceDetail } from "./Evidence";
@@ -16,18 +17,17 @@ export type IncidentDetail = {
   endTime: string;
   edgeBoxId: string;
   employeeId: string;
-  status: IncidentStatus;
   shopId: string;
+  status: IncidentStatus;
+  assigningAccountId: string | null;
+  assigningAccount: AccountDetail | null;
+  assignmentId: string | null;
+  assignment: AssignmentDetail | null;
+  evidences: EvidenceDetail[];
+  id: string;
   shop: ShopDetail | null;
   edgeBox: EdgeBoxStatus | null;
   employee: EmployeeDetail | null;
-  evidences: EvidenceDetail[];
-  id: string;
-  createdDate: string;
-  assigningAccount: AccountDetail | null;
-  assigningAccountId: string | null;
-  inChargeAccount: AccountDetail | null;
-  inChargeAccountId: string | null;
 };
 
 export type WebSocketIncident = {
@@ -54,4 +54,19 @@ export type IncidentPercentTypeDetail = {
   total: number;
   percent: number;
   statuses: IncidentPercentStatusDetail[];
+};
+
+export type AssignmentDetail = {
+  id: string;
+  shopId: string;
+  supervisorId: string | null;
+  inChargeAccountId: string | null;
+  inChargeAccountRole: Role;
+  inChargeEmployeeId: string | null;
+  startTime: string;
+  endTime: string;
+  supervisor: AccountDetail | null;
+  inChargeAccount: AccountDetail | null;
+  incidents: IncidentDetail[];
+  interactions: IncidentDetail[];
 };

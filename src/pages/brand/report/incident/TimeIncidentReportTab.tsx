@@ -17,16 +17,6 @@ import {
   useComputedColorScheme,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
@@ -59,18 +49,13 @@ import {
 import {
   addDaysBaseOnReportInterval,
   differentDateReturnFormattedString,
+  makeDivisibleByDivider,
 } from "../../../../utils/helperFunction";
 import classes from "./TimeIncidentReport.module.scss";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { Chart as ChartJS, registerables } from "chart.js";
+
+ChartJS.register(...registerables);
 
 export type TimeIncidentReportTabProps = {
   shopId: string | null;
@@ -223,7 +208,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       toTime: selectedDuration?.endTime,
       size: 999,
       shopId: shopId,
-      incidentType: IncidentType.Incident,
+      incidentType: form.values.type,
     });
 
   const data = useMemo(() => {
@@ -234,7 +219,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
       return {
         time: dayjs(item.time).format("HH:mm DD-MM"),
         count: item.count,
-        totalTime: item.averageDuration ?? 0 * item.count,
+        duration: item.averageDuration,
       };
     });
   }, [incidentReportByTimeData]);
@@ -520,6 +505,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                         y: {
                           ticks: {
                             padding: 10,
+                            count: 7,
                           },
                           beginAtZero: true,
                           afterFit: (ctx) => {
@@ -531,7 +517,13 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           border: {
                             color: "grey",
                           },
-                          suggestedMax: 10,
+                          suggestedMax: 8,
+                          max: makeDivisibleByDivider(
+                            _.maxBy(data, function (o) {
+                              return o.count;
+                            })?.count ?? 6,
+                            6
+                          ),
                         },
                       },
 
@@ -546,15 +538,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                     }}
                     data={{
                       labels: data?.map((i) => i.time),
-                      datasets: [
-                        {
-                          type: "bar",
-                          label: "Total interactions",
-                          borderColor: "rgb(37, 150, 190)",
-                          backgroundColor: "rgb(37, 150, 190, 0.5)",
-                          data: data?.map((i) => i.count),
-                        },
-                      ],
+                      datasets: [],
                     }}
                   />
                 </Box>
@@ -594,6 +578,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                           y: {
                             ticks: {
                               display: false,
+                              count: 7,
                             },
 
                             grid: {
@@ -606,7 +591,36 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                             border: {
                               dash: [8, 4],
                             },
-                            suggestedMax: 10,
+                            max: makeDivisibleByDivider(
+                              _.maxBy(data, function (o) {
+                                return o.count;
+                              })?.count ?? 6,
+                              8
+                            ),
+
+                            suggestedMax: 8,
+                          },
+                          y1: {
+                            suggestedMax: 6,
+                            ticks: {
+                              display: false,
+                              count: 7,
+                            },
+                            grid: {
+                              drawTicks: false,
+                              tickWidth: 0,
+                              tickLength: 0,
+                              tickColor: "#000",
+                            },
+                            border: {
+                              dash: [8, 4],
+                            },
+                            max: makeDivisibleByDivider(
+                              _.maxBy(data, function (o) {
+                                return o.duration;
+                              })?.duration ?? 6,
+                              8
+                            ),
                           },
                           x: {
                             ticks: {
@@ -664,27 +678,16 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
                             pointRadius: 3,
                             fill: true,
                             pointHitRadius: 7,
+                            yAxisID: "y",
                           },
                           {
                             type: "bar" as const,
                             label: "Average duration",
-                            data: data?.map((i) => i.totalTime),
-                            borderColor: "rgb(255, 99, 132)",
-                            backgroundColor: "rgba(255, 99, 132, 0.5)",
-
-                            borderWidth: {
-                              bottom: 0,
-                              left: 2,
-                              right: 2,
-                              top: 2,
-                            },
-                            borderRadius: {
-                              topRight: 5,
-                              topLeft: 5,
-                            },
-                            yAxisID: "y",
-
-                            borderSkipped: false,
+                            data: data?.map((i) => i.duration),
+                            backgroundColor: "rgba(255, 99, 132, 0.6)",
+                            borderColor: "rgba(255, 99, 132)",
+                            borderRadius: 6,
+                            yAxisID: "y1",
                           },
                         ],
                       }}

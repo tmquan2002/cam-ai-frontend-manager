@@ -165,7 +165,7 @@ const ShopHomePage = () => {
   const { data: currentIncidentData, isLoading: isGetCurrentIncidentListData } =
     useGetIncidentList({
       size: 999,
-      fromTime: dayjs().format("YYYY-MM-DD"),
+      fromTime: dayjs().format("YYYY-MM-DDT00:00:00"),
     });
 
   const { data: shopData, isLoading: isShopDataLoading } = useGetShopList({
@@ -179,13 +179,23 @@ const ShopHomePage = () => {
     useGetEdgeBoxInstallByShopId(shopData?.values?.[0]?.id ?? null);
 
   const handleNewIncident = (incident: IncidentDetail) => {
-    setIncidentList([incident, ...incidentList]);
+    const incidentIndex = _.findIndex(incidentList, (listTime) => {
+      return listTime?.id == incident.id;
+    });
+
+    if (incidentIndex == -1) {
+      setIncidentList([incident, ...incidentList]);
+    } else {
+      console.log({ incident });
+      console.log(incidentList[incidentIndex]);
+    }
   };
 
   const handleMoreEvidence = (incident: IncidentDetail) => {
     const evidentIndex = _.findIndex(incidentList, (listTime) => {
       return listTime?.id == incident.id;
     });
+
     incidentList.splice(evidentIndex, 1, incident);
   };
 
@@ -197,6 +207,8 @@ const ShopHomePage = () => {
       case EventType.NewIncident:
         handleNewIncident(incident?.Incident);
         break;
+      default:
+        console.log("event type not hadnled");
     }
   };
 
@@ -219,7 +231,7 @@ const ShopHomePage = () => {
     ) {
       handleUpdateNewIncident(liveIncidentData.latestIncident);
     }
-  }, [liveIncidentData]);
+  }, [liveIncidentData?.latestIncident]);
 
   const renderStatisticContent = () => {
     if (isShopDataLoading || isGetEdgeBoxLoading) {
@@ -306,8 +318,8 @@ const ShopHomePage = () => {
           </Box>
         </Box>
 
-        <Box w={420} py={rem(10)}>
-          <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(12)}>
+        <Box w={420}>
+          <Text c={"rgb(17, 24, 39)"} fw={600} size={rem(17)} mb={rem(24)}>
             Live incidents
           </Text>
           {incidentList?.length == 0 ? (

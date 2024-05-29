@@ -29,8 +29,54 @@ import _ from "lodash";
 import dayjs from "dayjs";
 
 export type EmployeeIncidentCardProps = {
+  status: IncidentStatus;
   employee: EmployeeDetail | null;
   incidentList: IncidentDetail[];
+};
+
+const renderIncidentTitle = ({
+  employee,
+  status,
+}: {
+  status: IncidentStatus;
+  employee: EmployeeDetail | null;
+}) => {
+  switch (status) {
+    case IncidentStatus.Accepted:
+      return (
+        <Stack py={rem(12)} gap={rem(3)} ml={rem(20)}>
+          <Group align="center">
+            <IconUser style={{ width: rem(20) }} stroke={1.5} />
+            <Text size={"md"} fw={500}>
+              {employee?.name ?? "Empty"}
+            </Text>
+          </Group>
+          <Group align="center">
+            <IconMail style={{ width: rem(20) }} stroke={1.5} />
+            <Text fw={500} c={"dimmed"}>
+              {employee?.email ?? "Empty"}
+            </Text>
+            <IconPointFilled style={{ width: rem(16) }} stroke={1.5} />
+            <IconPhone style={{ width: rem(20) }} stroke={1.5} />
+            <Text fw={500} c={"dimmed"}>
+              {employee?.phone ?? "Empty"}
+            </Text>
+          </Group>
+        </Stack>
+      );
+    case IncidentStatus.New:
+      return (
+        <Text fw={500} py={rem(20)} ml={rem(20)} c={"blue"}>
+          Unassigned incident
+        </Text>
+      );
+    case IncidentStatus.Rejected:
+      return (
+        <Text fw={500} py={rem(20)} ml={rem(20)} c={"red"}>
+          Rejected incident
+        </Text>
+      );
+  }
 };
 
 const renderIncidentStatusText = (status: IncidentStatus | undefined) => {
@@ -75,7 +121,11 @@ const renderIncidentStatusText = (status: IncidentStatus | undefined) => {
   }
 };
 
-export const EmployeeIncidentCard = ({ employee, incidentList, }: EmployeeIncidentCardProps) => {
+export const EmployeeIncidentCard = ({
+  status,
+  employee,
+  incidentList,
+}: EmployeeIncidentCardProps) => {
   const [opened, { toggle }] = useDisclosure(false);
   const navigate = useNavigate();
 
@@ -96,34 +146,19 @@ export const EmployeeIncidentCard = ({ employee, incidentList, }: EmployeeIncide
           {opened ? (
             <> </>
           ) : (
-            <Divider orientation="vertical" size={"md"} color={"blue"} />
+            <Divider
+              orientation="vertical"
+              size={"md"}
+              color={
+                status == IncidentStatus.Accepted
+                  ? "indigo"
+                  : status == IncidentStatus.Rejected
+                  ? "red"
+                  : "blue"
+              }
+            />
           )}
-
-          {_.isEmpty(employee) ? (
-            <Text fw={500} py={rem(20)} ml={rem(20)}>
-              Unassigned incident
-            </Text>
-          ) : (
-            <Stack py={rem(12)} gap={rem(3)} ml={rem(20)}>
-              <Group align="center">
-                <IconUser style={{ width: rem(20) }} stroke={1.5} />
-                <Text size={"md"} fw={500}>
-                  {employee?.name ?? "Empty"}
-                </Text>
-              </Group>
-              <Group align="center">
-                <IconMail style={{ width: rem(20) }} stroke={1.5} />
-                <Text fw={500} c={"dimmed"}>
-                  {employee?.email ?? "Empty"}
-                </Text>
-                <IconPointFilled style={{ width: rem(16) }} stroke={1.5} />
-                <IconPhone style={{ width: rem(20) }} stroke={1.5} />
-                <Text fw={500} c={"dimmed"}>
-                  {employee?.phone ?? "Empty"}
-                </Text>
-              </Group>
-            </Stack>
-          )}
+          {renderIncidentTitle({ status, employee })}
         </Group>
 
         <Group align="center" py={rem(12)}>
@@ -152,8 +187,8 @@ export const EmployeeIncidentCard = ({ employee, incidentList, }: EmployeeIncide
                   index == incidentList?.length - 1
                     ? {}
                     : {
-                      borderBottom: "1px solid #B4B4B4",
-                    }
+                        borderBottom: "1px solid #B4B4B4",
+                      }
                 }
                 pb={rem(12)}
                 className={classes["clickable-style"]}

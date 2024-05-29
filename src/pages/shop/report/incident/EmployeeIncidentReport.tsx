@@ -129,6 +129,7 @@ const EmployeeIncidentReport = () => {
     var incidentArray: EmployeeIncidentCardProps[] = employeeList?.values?.map(
       (e) => {
         return {
+          status: IncidentStatus.Accepted,
           employee: e,
           incidentList: [],
         };
@@ -136,33 +137,56 @@ const EmployeeIncidentReport = () => {
     );
 
     incidentArray.push({
+      status: IncidentStatus.New,
       employee: null,
       incidentList: [],
     });
 
+    incidentArray.push({
+      status: IncidentStatus.Rejected,
+      employee: null,
+      incidentList: [],
+    });
+
+    const rejectedIndex = _.findIndex(incidentArray, function (value) {
+      return value?.status == IncidentStatus.Rejected;
+    });
     // Add incident to current array
 
-    if (removedInteractionIncident.length != 0) {
-      removedInteractionIncident.forEach((item) => {
-        const existingEmployeeIndex = _.findIndex(
-          incidentArray,
-          function (value) {
-            return value?.employee?.id == item?.employeeId;
-          }
-        );
-        if (existingEmployeeIndex != -1) {
-          incidentArray[existingEmployeeIndex].incidentList.push(item);
-        }
-      });
-    }
+    removedInteractionIncident.forEach((item) => {
+      if (item.status == IncidentStatus.Rejected) {
+        incidentArray[rejectedIndex].incidentList.push(item);
+        return;
+      }
 
-    // Push unassigned incident to last of array
-    const unAssignedIncidentIndex = _.findIndex(incidentArray, {
-      employee: null,
+      const existingEmployeeIndex = _.findIndex(
+        incidentArray,
+        function (value) {
+          return value?.employee?.id == item?.employeeId;
+        }
+      );
+      if (existingEmployeeIndex != -1) {
+        incidentArray[existingEmployeeIndex].incidentList.push(item);
+      }
     });
-    if (unAssignedIncidentIndex != -1) {
-      incidentArray.push(incidentArray.splice(unAssignedIncidentIndex, 1)[0]);
-    }
+
+    incidentArray = _.sortBy(
+      incidentArray,
+      function (item: EmployeeIncidentCardProps) {
+        return -item.incidentList.length;
+      }
+    );
+
+    //Push unassigned and rejected incident to last of array
+    const unAssignedIncidentIndex = _.findIndex(incidentArray, {
+      status: IncidentStatus.New,
+    });
+
+    incidentArray.push(incidentArray.splice(unAssignedIncidentIndex, 1)[0]);
+    const rejectedIncidentIndex = _.findIndex(incidentArray, {
+      status: IncidentStatus.Rejected,
+    });
+    incidentArray.push(incidentArray.splice(rejectedIncidentIndex, 1)[0]);
     return incidentArray;
   }, [removedInteractionIncident, employeeList]);
 
@@ -266,6 +290,7 @@ const EmployeeIncidentReport = () => {
           {newArray?.map((item, index) => (
             <Box key={index} pt={index == 0 ? 0 : rem(12)}>
               <EmployeeIncidentCard
+                status={item?.status}
                 employee={item?.employee}
                 incidentList={item?.incidentList}
               />

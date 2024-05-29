@@ -1,20 +1,23 @@
 import {
   Box,
+  Button,
   Collapse,
   Group,
+  Input,
   LoadingOverlay,
   Paper,
   Stack,
   Text,
   rem,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useFocusWithin } from "@mantine/hooks";
 import {
   IconChevronDown,
   IconHome2,
   IconHomeLink,
   IconPointFilled,
   IconRouter,
+  IconX,
 } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
 import { EdgeBoxInstallDetailComp } from "../../components/edgeBoxInstall/EdgeBoxInstallDetailComp";
@@ -23,10 +26,59 @@ import { useGetEdgeBoxInstallByBrandId } from "../../hooks/useGetEdgeBoxInstallB
 import { EdgeboxInstallStatus } from "../../models/CamAIEnum";
 import { EdgeBoxInstallDetail } from "../../models/Edgebox";
 import classes from "./EdgeBoxListPage.module.scss";
+import { useForm } from "@mantine/form";
+import { useActiveEdgeBoxByShopId } from "../../hooks/useActiveEdgeboxByShopId";
+import { notifications } from "@mantine/notifications";
+import { AxiosError } from "axios";
+import { ResponseErrorDetail } from "../../models/Response";
 
-const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
+type ActivationFormValue = {
+  activationCode: string;
+};
+
+const EdgeBoxCard = (
+  props: EdgeBoxInstallDetail & {
+    refetchList: () => {};
+  }
+) => {
   const [opened, { toggle }] = useDisclosure(false);
   const navigate = useNavigate();
+  const { mutate: activeEdgeBox, isLoading: isActiveEdgeBoxLoading } =
+    useActiveEdgeBoxByShopId();
+
+  const { ref, focused } = useFocusWithin();
+
+  const activationForm = useForm<ActivationFormValue>();
+
+  const toggleOpenCard = () => {
+    if (!focused) {
+      toggle();
+    }
+  };
+
+  const onActivationEdgeBox = ({ activationCode }: ActivationFormValue) => {
+    activeEdgeBox(
+      { shopId: props.shopId ?? "", activationCode: activationCode },
+      {
+        onSuccess() {
+          notifications.show({
+            title: "Success",
+            message: "Activate Edge Box successfully!",
+          });
+          props.refetchList();
+        },
+        onError(data) {
+          const error = data as AxiosError<ResponseErrorDetail>;
+          notifications.show({
+            color: "red",
+            icon: <IconX />,
+            title: "Assign failed",
+            message: error.response?.data?.message,
+          });
+        },
+      }
+    );
+  };
 
   return (
     <Box key={props?.edgeBoxId} mt={rem(12)}>
@@ -38,7 +90,7 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
         }
         px={rem(32)}
         py={rem(20)}
-        onClick={toggle}
+        onClick={toggleOpenCard}
       >
         <Stack gap={"xs"}>
           <Group align="center">
@@ -57,7 +109,30 @@ const EdgeBoxCard = (props: EdgeBoxInstallDetail) => {
             <Text>{props?.shop?.addressLine}</Text>
           </Group>
         </Stack>
-        <IconChevronDown style={{ width: rem(20) }} stroke={1.5} />
+
+        {opened ? (
+          <form
+            onSubmit={activationForm.onSubmit(onActivationEdgeBox)}
+            ref={ref}
+          >
+            <Group gap={"xs"}>
+              <Input
+                w={rem(400)}
+                {...activationForm.getInputProps("activationCode")}
+                placeholder="Enter an activation code here"
+              />
+              <Button
+                type="submit"
+                loading={isActiveEdgeBoxLoading}
+                disabled={!activationForm.isDirty()}
+              >
+                Confirm
+              </Button>
+            </Group>
+          </form>
+        ) : (
+          <IconChevronDown style={{ width: rem(20) }} stroke={1.5} />
+        )}
       </Group>
       <Collapse in={opened}>
         <Box
@@ -80,12 +155,17 @@ const EdgeBoxListPage = () => {
   const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
     { size: 1 }
   );
-  const { data: edgeBoxList, isLoading: isGetEdgeBoxListLoading } =
-    useGetEdgeBoxInstallByBrandId(
-      brandList ? brandList?.values?.[0]?.id : null
-    );
+  const {
+    data: edgeBoxList,
+    isLoading: isGetEdgeBoxListLoading,
+    refetch,
+  } = useGetEdgeBoxInstallByBrandId(
+    brandList ? brandList?.values?.[0]?.id : null
+  );
 
-  const items = edgeBoxList?.values?.filter((x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled)
+  const items = edgeBoxList?.values?.filter(
+    (x) => x.edgeBoxInstallStatus != EdgeboxInstallStatus.Disabled
+  );
 
   return (
     <Paper m={rem(32)} p={rem(32)} shadow="xs" pos={"relative"}>
@@ -93,18 +173,29 @@ const EdgeBoxListPage = () => {
         visible={isGetBrandListLoading || isGetEdgeBoxListLoading}
         zIndex={1000}
         overlayProps={{ radius: "sm", blur: 1 }}
-      />
-      {" "}
+      />{" "}
       <Group mb={rem(20)} justify="space-between">
         <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
-          Edge Box List
+          Edge box list
         </Text>
       </Group>
-      {!items || items?.length == 0 ? <Text c="dimmed" fs="italic" ta="center">No Edge Box Found</Text> :
+      {!items || items?.length == 0 ? (
+        <Text c="dimmed" fs="italic" ta="center">
+          No Edge Box Found
+        </Text>
+      ) : (
         <>
-          {items.map((item) => <EdgeBoxCard {...item} />)}
+          {items.map((item) => {
+            const params: EdgeBoxInstallDetail & {
+              refetchList: () => {};
+            } = {
+              ...item,
+              refetchList: refetch,
+            };
+            return <EdgeBoxCard {...params} />;
+          })}
         </>
-      }
+      )}
     </Paper>
   );
 };

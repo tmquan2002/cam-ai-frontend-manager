@@ -14,19 +14,6 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useScrollIntoView } from "@mantine/hooks";
-import {
-  BarController,
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LineElement,
-  LinearScale,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
-import zoomPlugin from "chartjs-plugin-zoom";
 import cx from "clsx";
 import dayjs from "dayjs";
 import LocalizedFormat from "dayjs/plugin/localizedFormat";
@@ -49,20 +36,11 @@ import {
   makeDivisibleByDivider,
 } from "../../../../utils/helperFunction";
 import classes from "./InteractionReportPage.module.scss";
+import { Chart as ChartJS, registerables } from "chart.js";
+
+ChartJS.register(...registerables);
 dayjs.extend(LocalizedFormat);
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  zoomPlugin,
-  BarController
-);
 type SearchIncidentField = {
   startDate?: Date;
   toDate?: Date;
@@ -328,7 +306,7 @@ export const InteractionReportPage = () => {
         Interaction report
       </Text>
 
-      <Skeleton height={700} visible={isGetIncidentReportByTimeDataLoading}>
+      <Skeleton visible={isGetIncidentReportByTimeDataLoading}>
         <Card
           pb={rem(40)}
           radius={8}
@@ -462,14 +440,7 @@ export const InteractionReportPage = () => {
                       }}
                       data={{
                         labels: data?.map((i) => i.time),
-                        datasets: [
-                          {
-                            label: "Total interaction",
-                            data: data?.map((i) => i.interactionCount),
-                            borderColor: "rgb(37, 150, 190)",
-                            backgroundColor: "rgb(37, 150, 190, 0.5)",
-                          },
-                        ],
+                        datasets: [],
                       }}
                     />
                   </Box>
