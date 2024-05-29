@@ -61,10 +61,10 @@ const RenderProgress = ({ name, value, total, color, type, colorManager, colorSh
                             />
                             <Box>
                                 <Group>
-                                    <ColorSwatch color={colorShop ?? "grey"} size={15}/> <Text>Shops</Text>
+                                    <ColorSwatch color={colorShop ?? "grey"} size={15} /> <Text>Shops - <Text span fw={500}>{valueShop}</Text></Text>
                                 </Group>
                                 <Group>
-                                    <ColorSwatch color={colorManager ?? "grey"} size={15}/><Text>Managers</Text>
+                                    <ColorSwatch color={colorManager ?? "grey"} size={15} /><Text>Managers - <Text span fw={500}>{valueManager}</Text></Text>
                                 </Group>
                             </Box>
                         </Group>
