@@ -50,7 +50,7 @@ const ShopRoute = () => {
       notifications.update({
         color: "teal",
         id: "uploadEmployeeProgress",
-        title: "Import Finished",
+        title: "Import Completed",
         message: (
           <Link
             to={`/shop/import/${taskId}`}
@@ -62,6 +62,7 @@ const ShopRoute = () => {
         icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
         loading: false,
         autoClose: 5000,
+        withCloseButton: true,
       });
       setTaskId(undefined);
     }

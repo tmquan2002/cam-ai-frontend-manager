@@ -44,9 +44,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export type CreateEmployeeField = {
   name: string;
   email: string;
-  gender: Gender;
-  phone: string;
-  birthday?: Date;
+  gender: Gender | null;
+  phone: string | null;
+  birthday?: Date | null;
   addressLine: string;
   wardId: string;
   province: string;
@@ -73,9 +73,9 @@ const ShopEmployeeDetailPage = () => {
     initialValues: {
       name: '',
       email: '',
-      gender: Gender.Male,
-      phone: '',
-      birthday: new Date('01/01/2000'),
+      gender: null,
+      phone: null,
+      birthday: null,
       addressLine: '',
       wardId: ``,
       province: ``,
@@ -86,12 +86,8 @@ const ShopEmployeeDetailPage = () => {
       email: (value: string) => isEmpty(value) ? "Email is required"
         : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        value == undefined ||
-          value == "" ||
-          PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) || value == null ? null :
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -100,11 +96,11 @@ const ShopEmployeeDetailPage = () => {
       updateEmployeeForm.setValues({
         name: employeeData?.name ?? '',
         email: employeeData?.email ?? '',
-        gender: employeeData?.gender ?? '',
-        phone: employeeData?.phone ?? '',
+        gender: employeeData?.gender ?? null,
+        phone: isEmpty(employeeData?.phone) ? null : employeeData?.phone,
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
-          : new Date("01/01/2000"),
+          : null,
         addressLine: employeeData?.addressLine ?? '',
         wardId: `${employeeData?.wardId}`,
         province: `${employeeData?.ward?.district?.provinceId}`,
@@ -155,6 +151,7 @@ const ShopEmployeeDetailPage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
+          required: true,
           readonly: true,
         },
       },

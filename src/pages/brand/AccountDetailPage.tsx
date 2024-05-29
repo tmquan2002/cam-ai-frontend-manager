@@ -49,10 +49,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileFieldValue = {
   name: string;
   email: string;
-  phone: string;
-  birthday?: Date;
+  phone: string | null;
+  birthday?: Date | null;
   addressLine: string;
-  gender: Gender;
+  gender: Gender | null;
   wardId: string;
   province: string;
   district: string;
@@ -65,9 +65,9 @@ const AccountDetailPage = () => {
     initialValues: {
       name: "",
       email: "",
-      phone: "",
-      birthday: new Date("01/01/2000"),
-      gender: Gender.Male,
+      phone: null,
+      birthday: null,
+      gender: null,
       addressLine: "",
       district: "",
       province: "",
@@ -79,11 +79,8 @@ const AccountDetailPage = () => {
         : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
       phone: (value) =>
-        isEmpty(value)
-          ? null
-          : PHONE_REGEX.test(value)
-            ? null
-            : "A phone number should have a length of 10-12 characters",
+        isEmpty(value) || value == null ? null : PHONE_REGEX.test(value)
+          ? null : "A phone number should have a length of 10-12 characters",
     },
   });
   const { data: provinces, isLoading: isProvicesLoading } =
@@ -107,7 +104,7 @@ const AccountDetailPage = () => {
         addressLine: accountData?.addressLine,
         birthday: accountData.birthday
           ? new Date(accountData.birthday)
-          : undefined,
+          : null,
         district: accountData?.ward?.districtId?.toString(),
         email: accountData?.email,
         gender: accountData?.gender,
@@ -278,7 +275,7 @@ const AccountDetailPage = () => {
                     : null,
                   gender: values.gender,
                   name: values.name,
-                  phone: values.phone,
+                  phone: isEmpty(values.phone) ? null : values.phone,
                   wardId: +values?.wardId,
                   userId: id ?? "",
                 };

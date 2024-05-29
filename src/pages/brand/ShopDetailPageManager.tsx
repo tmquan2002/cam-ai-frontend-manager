@@ -28,7 +28,7 @@ import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetShopById } from "../../hooks/useGetShopById";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateShopById } from "../../hooks/useUpdateShopById";
-import { CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, ShopStatus } from "../../models/CamAIEnum";
+import { AccountStatus, CameraStatus, EdgeBoxActivationStatus, EdgeboxInstallStatus, Role, ShopStatus } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { formatTime, removeTime, replaceIfNun } from "../../utils/helperFunction";
@@ -46,7 +46,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export type FormFieldValue = {
   name: string;
-  phone: string;
+  phone: string | null;
   province: string | null;
   district: string | null;
   wardId: string | null;
@@ -70,7 +70,7 @@ const ShopDetailPageManager = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [opened, { toggle }] = useDisclosure(false);
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({ shopId: id });
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({ shopId: id, pageIndex: 0, size: 999 });
   const { data: cameraList, isLoading: isGetCameraListLoading } = useGetCameraListByShopId(id);
   const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } = useChangeShopStatus();
   const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading, refetch: refetchEdgeBoxInstallList, } = useGetEdgeBoxInstallByShopId(id ?? "");
@@ -104,7 +104,7 @@ const ShopDetailPageManager = () => {
   const form = useForm<FormFieldValue>({
     initialValues: {
       name: data?.name ?? "",
-      phone: data?.phone ?? "",
+      phone: data?.phone ?? null,
       wardId: `${data?.wardId}`,
       addressLine: data?.addressLine ?? "",
       brandName: data?.brand?.name ?? "",
@@ -118,7 +118,7 @@ const ShopDetailPageManager = () => {
         { min: 2, max: 50 },
         "Shop name must be 1- 50 characters long"
       ),
-      phone: (value) => isEmpty(value) ? null :
+      phone: (value) => isEmpty(value) || value == null ? null :
         PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
@@ -135,7 +135,7 @@ const ShopDetailPageManager = () => {
     },
   });
 
-  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({ size: 999, });
+  const { data: accountList, isLoading: isAccountListLoading, refetch: refetchAccountList, } = useGetAccountList({ size: 999, role: Role.ShopManager });
   const { data: provinces, isLoading: isProvicesLoading } = useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(+(form.values.province ?? 0));
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(+(form.values.district ?? 0));
@@ -246,7 +246,7 @@ const ShopDetailPageManager = () => {
     if (data) {
       const initialData: FormFieldValue = {
         name: data?.name,
-        phone: data?.phone ?? "",
+        phone: data?.phone ?? null,
         wardId: `${data?.wardId}`,
         addressLine: data?.addressLine,
         brandName: data?.brand?.name,
@@ -419,7 +419,7 @@ const ShopDetailPageManager = () => {
                     <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
                       {data?.name}
                     </Text>
-                    <StatusBadge statusName={data?.shopStatus ?? "None"} mt={rem(6)} />
+                    <StatusBadge statusName={data?.shopStatus ?? "None"} mt={rem(6)} padding={10} size="sm" />
                   </Group>
 
                   {isChangeShopStatusLoading ? (
@@ -510,7 +510,9 @@ const ShopDetailPageManager = () => {
                             size="xs"
                             {...assignManagerForm.getInputProps("shopManagerId")}
                             placeholder="Assign to.."
-                            data={accountList?.values?.map((item) => {
+                            data={accountList?.values?.filter((filterItem) => {
+                              return filterItem.accountStatus !== AccountStatus.Inactive && !filterItem.managingShop
+                            }).map((item) => {
                               return {
                                 value: item?.id,
                                 label: item?.name,
@@ -558,7 +560,9 @@ const ShopDetailPageManager = () => {
                                 size="xs"
                                 {...assignManagerForm.getInputProps("shopManagerId")}
                                 placeholder="Assign to.."
-                                data={accountList?.values?.map((item) => {
+                                data={accountList?.values?.filter((filterItem) => {
+                                  return filterItem.accountStatus !== AccountStatus.Inactive && !filterItem.managingShop
+                                }).map((item) => {
                                   return {
                                     value: item?.id,
                                     label: item?.name,

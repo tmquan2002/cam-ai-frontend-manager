@@ -16,14 +16,14 @@ import { useGetWardList } from "../../../hooks/useGetWardList";
 import { Gender, Role } from "../../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../../models/Response";
 import { useTaskBrand } from "../../../routes/BrandRoute";
-import { getDateFromSetYear, mapLookupToArray } from "../../../utils/helperFunction";
 import { EMAIL_REGEX, PHONE_REGEX } from "../../../types/constant";
+import { mapLookupToArray } from "../../../utils/helperFunction";
 
 export type CreateAccountField = {
     email: string;
     name: string;
-    gender: Gender;
-    phone: string;
+    gender: Gender | null;
+    phone: string | null;
     birthday: Date | null;
     wardId: string;
     addressLine: string;
@@ -45,9 +45,9 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
         initialValues: {
             email: "",
             name: "",
-            gender: Gender.Male,
-            phone: "",
-            birthday: new Date("01/01/2000"),
+            gender: null,
+            phone: null,
+            birthday: null,
             addressLine: "",
             province: "",
             district: "",
@@ -59,7 +59,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
             email: (value: string) => isEmpty(value) ? "Email is required"
                 : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
             gender: isNotEmpty("Please select gender"),
-            phone: (value) => isEmpty(value) ? null :
+            phone: (value) => isEmpty(value) || value == null ? null :
                 PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
         },
     });
@@ -130,7 +130,6 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                 type: FIELD_TYPES.DATE,
                 fieldProps: {
                     form: createAccountForm,
-                    maxDate: getDateFromSetYear(18),
                     name: "birthday",
                     placeholder: "Birthday",
                     label: "Birthday",
@@ -216,10 +215,10 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                         addressLine,
                         birthday: dayjs(birthday).format("YYYY-MM-DD"),
                         brandId: brandList?.values[0].id ?? "",
-                        email,
+                        email: email ?? null,
                         gender: gender ?? null,
                         name,
-                        phone,
+                        phone: isEmpty(phone) ? null : phone,
                         role: Role.ShopManager,
                         wardId: isEmpty(wardId) ? null : +wardId,
                     };

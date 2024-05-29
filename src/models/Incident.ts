@@ -1,11 +1,6 @@
 import { AccountDetail } from "./Account";
-import {
-  EdgeBoxStatus,
-  EventType,
-  IncidentStatus,
-  IncidentType,
-  Role,
-} from "./CamAIEnum";
+import { EventType, IncidentStatus, IncidentType, Role } from "./CamAIEnum";
+import { EdgeboxDetail } from "./Edgebox";
 import { EmployeeDetail } from "./Employee";
 import { EvidenceDetail } from "./Evidence";
 import { ShopDetail } from "./Shop";
@@ -26,7 +21,7 @@ export type IncidentDetail = {
   evidences: EvidenceDetail[];
   id: string;
   shop: ShopDetail | null;
-  edgeBox: EdgeBoxStatus | null;
+  edgeBox: EdgeboxDetail | null;
   employee: EmployeeDetail | null;
 };
 

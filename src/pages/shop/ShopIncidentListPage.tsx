@@ -9,12 +9,12 @@ import {
   Flex,
   Group,
   Loader,
+  LoadingOverlay,
   Pagination,
   Paper,
   Popover,
   ScrollArea,
   Select,
-  Skeleton,
   Text,
   Tooltip,
   rem
@@ -36,7 +36,6 @@ import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import _ from "lodash";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   GetIncidentParams,
   MassRejectIncidentParams,
@@ -510,21 +509,19 @@ const ShopIncidentListPage = () => {
         {/* Top section */}
         <Group>
           <Group>
-            {incidentList?.totalCount && incidentList?.totalCount > 0 &&
-              <Tooltip label="Select All">
-                <ActionIcon
-                  variant="subtle"
-                  color={"gray"}
-                  onClick={() => {
-                    handlers.setState((current) =>
-                      current.map((value) => ({ ...value, checked: !allChecked }))
-                    )
-                  }}
-                >
-                  {allChecked ? <IconSquareRoundedCheck size={20} /> : indeterminate ? <IconSquareRoundedMinus size={20} /> : <IconSquareRounded size={20} />}
-                </ActionIcon>
-              </Tooltip>
-            }
+            <Tooltip label="Select All">
+              <ActionIcon
+                variant="subtle"
+                color={"gray"}
+                onClick={() => {
+                  handlers.setState((current) =>
+                    current.map((value) => ({ ...value, checked: !allChecked }))
+                  )
+                }}
+              >
+                {allChecked ? <IconSquareRoundedCheck size={20} /> : indeterminate ? <IconSquareRoundedMinus size={20} /> : <IconSquareRounded size={20} />}
+              </ActionIcon>
+            </Tooltip>
 
             {selectedCount > 0 &&
               <Text>|</Text>
@@ -642,10 +639,18 @@ const ShopIncidentListPage = () => {
         <ScrollArea
           type="hover"
           mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
+          pos="relative"
         >
-          <Skeleton visible={isGetIncidentListLoading}>
-            {renderIncidentList}
-          </Skeleton>
+          <LoadingOverlay visible={isGetIncidentListLoading} overlayProps={{ radius: "sm", blur: 8 }} />
+          {renderIncidentList?.length == 0 ?
+            <Center w={rem(350)} h={"calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"}>
+              <Text fw={500} size="sm" c="dimmed" fs="italic">
+                No Incident Found
+              </Text>
+            </Center>
+            :
+            renderIncidentList
+          }
         </ScrollArea>
         <Divider mr={rem(4)} orientation="vertical" />
         <Divider mr={rem(8)} orientation="vertical" />
@@ -656,125 +661,112 @@ const ShopIncidentListPage = () => {
             style={{ display: "flex", flex: 1 }}
             type="hover"
             mah="calc(84vh - var(--app-shell-header-height) - var(--app-shell-footer-height, 0px) )"
+            pos="relative"
           >
-            <Skeleton visible={isGetIncidentLoading}>
-              <Box pl={rem(12)} pr={rem(32)}>
-                <Group justify="space-between" align="center">
-                  <Box py={rem(16)} >
-                    <Group align="center">
-                      <Text size={rem(20)} fw={500}>
-                        {incidentData?.incidentType} Incident
-                      </Text>
-                      <Text>|</Text>
-                      <Text size={rem(20)} fw={500} c={"dimmed"}>
-                        {" "}
-                        {dayjs(incidentData?.startTime).format(
-                          "DD/MM/YYYY h:mm A"
-                        )}
-                      </Text>
-                      <StatusBadge
-                        statusName={incidentData?.status || "None"}
-                        size="sm"
-                        padding={10}
-                      />
-                    </Group>
-                    {incidentData?.employee &&
-                      <Text size={rem(18)} mt={5}>
-                        Employee: <Link to={`/shop/employee/${incidentData?.employee?.id}`} style={{ textDecoration: 'None' }}>{incidentData?.employee?.name}</Link>
-                      </Text>
-                    }
-                  </Box>
+            <LoadingOverlay visible={isGetIncidentLoading} overlayProps={{ radius: "sm", blur: 8 }} />
+            <Box pl={rem(12)} pr={rem(32)}>
+              <Group justify="space-between" align="center">
 
-                  {/* Single assign form */}
-                  <Group>
-                    <form onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}>
-                      <Group align="baseline">
-                        {isGetEmployeeListLoading ? (
-                          <Loader mt={rem(30)} />
-                        ) : (
-                          <Select
-                            size="xs"
-                            {...assignIncidentForm.getInputProps("employeeId")}
-                            placeholder="Assign to.."
-                            data={employeeList?.values?.map((item) => {
-                              return {
-                                value: item?.id,
-                                label: item?.name,
-                              };
-                            })}
-                            nothingFoundMessage="Nothing found..."
-                          />
-                        )}
-                        <Button
-                          variant="gradient"
-                          size="xs"
-                          type="submit"
-                          loading={isAssignIncidentLoading}
-                          gradient={{
-                            from: "light-blue.5",
-                            to: "light-blue.7",
-                            deg: 90,
-                          }}
-                        >
-                          Assign
-                        </Button>
-                      </Group>
-                    </form>
-                    <Text>|</Text>
-                    <Tooltip label="Reject incident">
-                      <ActionIcon
-                        variant="gradient"
-                        gradient={{
-                          from: "pale-red.5",
-                          to: "pale-red.7",
-                          deg: 90,
-                        }}
-                        onClick={openRejectModal}
-                        loading={isRejectIncidentLoading}
-                      >
-                        <IconIdOff
-                          style={{ width: "70%", height: "70%" }}
-                          stroke={1.5}
-                        />
-                      </ActionIcon>
-                    </Tooltip>
-                  </Group>
-                </Group>
-
-                <Group justify="space-between" mb={rem(12)}>
-                  <Text fw={500} size={rem(20)}>
-                    Evidence
-                  </Text>
-                  <Group>
-                    <Text fw={500} size={rem(16)}>
+                <Box py={rem(16)} >
+                  <Group align="center">
+                    <Text fw={500} size={rem(20)}>
                       Total evidence:{" "}
                       <Text span c={"blue"} inherit>
                         {incidentData?.evidences.length}
                       </Text>
                     </Text>
-                    <>|</>
-                    <Text fw={500} size={rem(16)}>
+                    <Text>|</Text>
+                    <Text fw={500} size={rem(20)}>
                       AI identity :{" "}
                       <Text span c={"blue"} inherit>
                         {incidentData?.aiId}
                       </Text>
                     </Text>
                   </Group>
+                </Box>
+
+                {/* Single assign form */}
+                <Group>
+                  <form onSubmit={assignIncidentForm.onSubmit(onAssignIncident)}>
+                    <Group align="baseline">
+                      {isGetEmployeeListLoading ? (
+                        <Loader mt={rem(30)} />
+                      ) : (
+                        <Select
+                          size="xs"
+                          {...assignIncidentForm.getInputProps("employeeId")}
+                          placeholder="Assign to.."
+                          data={employeeList?.values?.map((item) => {
+                            return {
+                              value: item?.id,
+                              label: item?.name,
+                            };
+                          })}
+                          nothingFoundMessage="Nothing found..."
+                        />
+                      )}
+                      <Button
+                        variant="gradient"
+                        size="xs"
+                        type="submit"
+                        loading={isAssignIncidentLoading}
+                        gradient={{
+                          from: "light-blue.5",
+                          to: "light-blue.7",
+                          deg: 90,
+                        }}
+                      >
+                        Assign
+                      </Button>
+                    </Group>
+                  </form>
+                  <Text>|</Text>
+                  <Tooltip label="Reject incident">
+                    <ActionIcon
+                      variant="gradient"
+                      gradient={{
+                        from: "pale-red.5",
+                        to: "pale-red.7",
+                        deg: 90,
+                      }}
+                      onClick={openRejectModal}
+                      loading={isRejectIncidentLoading}
+                    >
+                      <IconIdOff
+                        style={{ width: "70%", height: "70%" }}
+                        stroke={1.5}
+                      />
+                    </ActionIcon>
+                  </Tooltip>
                 </Group>
-                <Divider color="#acacac" mb={rem(20)} />
-                {_.isEmpty(incidentData?.evidences) ? (
-                  <NoImage type="NO_DATA" />
-                ) : (
-                  incidentData?.evidences?.map((item) => {
-                    return (
-                      <Box key={item.id} mb={rem(20)}>
-                        {renderIncidentFootage(item)}
-                      </Box>
-                    );
-                  })
-                )}
-              </Box>
-            </Skeleton>
+              </Group>
+
+              <Group justify="space-between" mb={rem(12)}>
+                <Text fw={500} size={rem(20)}>
+                  Evidence
+                </Text>
+                <Group>
+                  <Text fw={500} size={rem(16)}>
+                    In Charge:{" "}
+                    <Text span c={"blue"} inherit>
+                      {incidentData?.assignment?.inChargeAccount?.name ?? "None"}
+                    </Text>
+                  </Text>
+                </Group>
+              </Group>
+              <Divider color="#acacac" mb={rem(20)} />
+              {_.isEmpty(incidentData?.evidences) ? (
+                <NoImage type="NO_DATA" />
+              ) : (
+                incidentData?.evidences?.map((item) => {
+                  return (
+                    <Box key={item.id} mb={rem(20)}>
+                      {renderIncidentFootage(item)}
+                    </Box>
+                  );
+                })
+              )}
+            </Box>
           </ScrollArea>
         ) : (
           <Center

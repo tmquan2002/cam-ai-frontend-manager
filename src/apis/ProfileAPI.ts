@@ -11,7 +11,7 @@ export type ChangePasswordParams = {
 
 export type UpdateProfileParams = {
   email: string;
-  gender: string;
+  gender: string | null;
   phone: string | null;
   birthday: string | null;
   wardId: number | null;

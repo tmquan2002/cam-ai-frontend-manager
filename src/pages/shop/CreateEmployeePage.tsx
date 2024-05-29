@@ -24,10 +24,9 @@ import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
 import { useTaskShop } from "../../routes/ShopRoute";
-import { CommonConstant, EMAIL_REGEX } from "../../types/constant";
+import { CommonConstant, EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 import {
-  getDateFromSetYear,
-  mapLookupToArray,
+  mapLookupToArray
 } from "../../utils/helperFunction";
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -42,7 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export type CreateEmployeeField = {
   name: string | null;
   email: string;
-  gender: Gender;
+  gender: Gender | null;
   phone: string | null;
   birthday: Date | null;
   addressLine: string | null;
@@ -60,8 +59,8 @@ const CreateEmployeePage = () => {
     initialValues: {
       name: "",
       email: "",
-      gender: Gender.Male,
-      phone: "",
+      gender: null,
+      phone: null,
       birthday: null,
       addressLine: "",
       wardId: null,
@@ -71,7 +70,9 @@ const CreateEmployeePage = () => {
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value: string) => isEmpty(value) ? "Email is required"
-      : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      phone: (value) => isEmpty(value) || value == null ? null :
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       gender: isNotEmpty("Please select gender"),
     },
   });
@@ -156,7 +157,6 @@ const CreateEmployeePage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          maxDate: getDateFromSetYear(18),
           radius: "md",
           disabled: taskId !== undefined,
         },
@@ -277,7 +277,7 @@ const CreateEmployeePage = () => {
                 birthday: birthday
                   ? dayjs(birthday).format("YYYY-MM-DD")
                   : null,
-                phone,
+                phone: isEmpty(phone) ? null : phone,
                 wardId,
               };
 

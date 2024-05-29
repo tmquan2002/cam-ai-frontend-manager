@@ -44,8 +44,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { useTaskShop } from "../../routes/ShopRoute";
 import { DEFAULT_PAGE_SIZE, EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import {
-  getDateFromSetYear,
-  mapLookupToArray,
+  mapLookupToArray
 } from "../../utils/helperFunction";
 import classes from "./EmployeeDetailPage.module.scss";
 
@@ -61,9 +60,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export type CreateEmployeeField = {
   name: string;
   email: string;
-  gender: Gender;
-  phone: string;
-  birthday?: Date;
+  gender: Gender | null;
+  phone: string | null;
+  birthday?: Date | null;
   addressLine: string;
   wardId: string;
   province: string;
@@ -90,17 +89,24 @@ const EmployeeDetailPage = () => {
       employeeId: params?.id ?? undefined,
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
+    initialValues: {
+      addressLine: "",
+      district: "",
+      email: "",
+      gender: null,
+      name: "",
+      phone: null,
+      province: "",
+      wardId: "",
+      birthday: null
+    },
     validate: {
       name: isNotEmpty("Employee name is required"),
       email: (value: string) => isEmpty(value) ? "Email is required"
         : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        isEmpty(value)
-          ? null
-          : PHONE_REGEX.test(value)
-            ? null
-            : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) || value == null ? null : PHONE_REGEX.test(value)
+        ? null : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
@@ -115,7 +121,7 @@ const EmployeeDetailPage = () => {
         phone: employeeData?.phone ?? undefined,
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
-          : undefined,
+          : null,
         addressLine: employeeData?.addressLine ?? undefined,
         wardId: `${employeeData?.wardId}`,
         province: `${employeeData?.ward?.district?.provinceId}`,
@@ -217,7 +223,6 @@ const EmployeeDetailPage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
-          maxDate: getDateFromSetYear(18),
           radius: "md",
           disabled: taskId !== undefined,
         },
@@ -326,12 +331,12 @@ const EmployeeDetailPage = () => {
                 const createEmployeeParams: UpdateEmployeeParams = {
                   email: email ?? "",
                   name: name ?? "",
-                  gender: gender ?? "",
+                  gender: gender ?? null,
                   addressLine,
                   birthday: birthday
                     ? dayjs(birthday).format("YYYY-MM-DD")
                     : null,
-                  phone,
+                  phone: isEmpty(phone) ? null : phone,
                   wardId: wardId ? +wardId : null,
                 };
                 updateEmployee(

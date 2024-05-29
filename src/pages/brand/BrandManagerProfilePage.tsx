@@ -38,10 +38,10 @@ import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 type ProfileFieldValue = {
   name: string;
   email: string;
-  phone: string;
-  birthday?: Date;
+  phone: string | null;
+  birthday?: Date | null;
   address: string;
-  gender: Gender;
+  gender: Gender | null;
   wardId: string;
   province: string;
   district: string;
@@ -65,7 +65,7 @@ const BrandManagerProfilePage = () => {
       email: (value: string) => isEmpty(value) ? "Email is required"
         : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) => isEmpty(value) ? null :
+      phone: (value) => isEmpty(value) || value == null ? null :
         PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
@@ -134,7 +134,7 @@ const BrandManagerProfilePage = () => {
         name: account?.name,
         email: account?.email,
         phone: account?.phone,
-        birthday: account?.birthday ? new Date(account?.birthday) : undefined,
+        birthday: account?.birthday ? new Date(account?.birthday) : null,
         address: account?.addressLine,
         gender: account?.gender,
         district: account?.ward?.districtId?.toString(),
@@ -379,8 +379,8 @@ const BrandManagerProfilePage = () => {
               birthday: values?.birthday
                 ? dayjs(values.birthday).format("YYYY-MM-DD")
                 : null,
-              gender: values.gender,
-              phone: values.phone,
+              gender: values.gender ?? null,
+              phone: isEmpty(values.phone) ? null : values.phone,
               wardId: +values?.wardId,
               email: values?.email,
             };
