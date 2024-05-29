@@ -38,10 +38,10 @@ import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 type ProfileFieldValue = {
   name: string;
   email: string;
-  phone: string;
-  birthday?: Date;
+  phone: string | null;
+  birthday?: Date | null;
   address: string;
-  gender: Gender;
+  gender: Gender | null;
   shop: string;
   wardId: string;
   province: string;
@@ -62,10 +62,10 @@ const ShopManagerProfilePage = () => {
     initialValues: {
       name: "",
       email: "",
-      phone: "",
-      birthday: new Date("01/01/2000"),
+      phone: null,
+      birthday: null,
       address: "",
-      gender: Gender.Male,
+      gender: null,
       shop: "",
       district: "",
       province: "",
@@ -77,12 +77,8 @@ const ShopManagerProfilePage = () => {
       email: (value: string) => isEmpty(value) ? "Email is required"
         : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        isEmpty(value)
-          ? null
-          : PHONE_REGEX.test(value)
-            ? null
-            : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) || value == null ? null : PHONE_REGEX.test(value)
+        ? null : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -154,8 +150,8 @@ const ShopManagerProfilePage = () => {
       form.setInitialValues({
         name: account?.name,
         email: account?.email,
-        phone: account?.phone,
-        birthday: account?.birthday ? new Date(account?.birthday) : undefined,
+        phone: account?.phone ?? null,
+        birthday: account?.birthday ? new Date(account?.birthday) : null,
         address: account?.addressLine,
         gender: account?.gender,
         shop: account?.managingShop?.name,
@@ -394,7 +390,7 @@ const ShopManagerProfilePage = () => {
                 ? dayjs(values.birthday).format("YYYY-MM-DD")
                 : null,
               gender: values.gender,
-              phone: values.phone,
+              phone: isEmpty(values?.phone) ? null : values?.phone,
               wardId: +values?.wardId,
               email: values?.email,
             };

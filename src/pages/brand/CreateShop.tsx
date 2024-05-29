@@ -36,7 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ]
 export type CreateShopField = {
   name: string;
-  phone: string;
+  phone: string | null;
   wardId: string;
   shopManagerId: string | null;
   addressLine: string;
@@ -54,7 +54,7 @@ const CreateShop = () => {
   const createShopForm = useForm<CreateShopField>({
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
-      phone: (value) => isEmpty(value) ? null :
+      phone: (value) => isEmpty(value) || value == null ? null :
         PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address line is required"),
       wardId: isNotEmpty("Ward is required"),

@@ -23,7 +23,7 @@ export type CreateAccountField = {
     email: string;
     name: string;
     gender: Gender | null;
-    phone: string;
+    phone: string | null;
     birthday: Date | null;
     wardId: string;
     addressLine: string;
@@ -46,7 +46,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
             email: "",
             name: "",
             gender: null,
-            phone: "",
+            phone: null,
             birthday: null,
             addressLine: "",
             province: "",
@@ -59,7 +59,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
             email: (value: string) => isEmpty(value) ? "Email is required"
                 : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
             gender: isNotEmpty("Please select gender"),
-            phone: (value) => isEmpty(value) ? null :
+            phone: (value) => isEmpty(value) || value == null ? null :
                 PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
         },
     });
@@ -218,7 +218,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                         email: email ?? null,
                         gender: gender ?? null,
                         name,
-                        phone: phone ?? null,
+                        phone: isEmpty(phone) ? null : phone,
                         role: Role.ShopManager,
                         wardId: isEmpty(wardId) ? null : +wardId,
                     };

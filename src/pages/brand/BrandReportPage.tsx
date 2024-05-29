@@ -24,10 +24,9 @@ import { useGetShopListSelect } from "../../hooks/useGetShopList";
 import { useGetPastReportByShop, useReportByShop } from "../../hooks/useReport";
 import { ChartReportData } from "../../models/Report";
 import {
-  getDateFromSetYear,
   getDateTime,
   removeTime,
-  returnWebsocketConnection,
+  returnWebsocketConnection
 } from "../../utils/helperFunction";
 import classes from "./BrandReportPage.module.scss";
 
@@ -159,7 +158,6 @@ const BrandReportPage = () => {
           value={date}
           onChange={setDate}
           placeholder="January 1, 2000"
-          maxDate={getDateFromSetYear(18)}
         />
       </Group>
 

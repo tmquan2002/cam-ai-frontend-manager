@@ -45,7 +45,7 @@ export type CreateEmployeeField = {
   name: string;
   email: string;
   gender: Gender | null;
-  phone: string;
+  phone: string | null;
   birthday?: Date | null;
   addressLine: string;
   wardId: string;
@@ -74,7 +74,7 @@ const ShopEmployeeDetailPage = () => {
       name: '',
       email: '',
       gender: null,
-      phone: '',
+      phone: null,
       birthday: null,
       addressLine: '',
       wardId: ``,
@@ -86,12 +86,8 @@ const ShopEmployeeDetailPage = () => {
       email: (value: string) => isEmpty(value) ? "Email is required"
         : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) =>
-        value == undefined ||
-          value == "" ||
-          PHONE_REGEX.test(value)
-          ? null
-          : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) || value == null ? null :
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -101,7 +97,7 @@ const ShopEmployeeDetailPage = () => {
         name: employeeData?.name ?? '',
         email: employeeData?.email ?? '',
         gender: employeeData?.gender ?? null,
-        phone: employeeData?.phone ?? '',
+        phone: isEmpty(employeeData?.phone) ? null : employeeData?.phone,
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
           : null,

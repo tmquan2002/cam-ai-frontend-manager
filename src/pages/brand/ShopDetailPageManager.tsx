@@ -46,7 +46,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export type FormFieldValue = {
   name: string;
-  phone: string;
+  phone: string | null;
   province: string | null;
   district: string | null;
   wardId: string | null;
@@ -104,7 +104,7 @@ const ShopDetailPageManager = () => {
   const form = useForm<FormFieldValue>({
     initialValues: {
       name: data?.name ?? "",
-      phone: data?.phone ?? "",
+      phone: data?.phone ?? null,
       wardId: `${data?.wardId}`,
       addressLine: data?.addressLine ?? "",
       brandName: data?.brand?.name ?? "",
@@ -118,7 +118,7 @@ const ShopDetailPageManager = () => {
         { min: 2, max: 50 },
         "Shop name must be 1- 50 characters long"
       ),
-      phone: (value) => isEmpty(value) ? null :
+      phone: (value) => isEmpty(value) || value == null ? null :
         PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
       wardId: isNotEmpty("Please select ward"),
@@ -246,7 +246,7 @@ const ShopDetailPageManager = () => {
     if (data) {
       const initialData: FormFieldValue = {
         name: data?.name,
-        phone: data?.phone ?? "",
+        phone: data?.phone ?? null,
         wardId: `${data?.wardId}`,
         addressLine: data?.addressLine,
         brandName: data?.brand?.name,
