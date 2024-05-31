@@ -12,7 +12,7 @@ const LoadingImage = (props: LoadingImageProps) => {
   const { imageId, ...rest } = props;
   const { data, isLoading } = useGetImageById({
     id: imageId,
-    scaleFactor: 0.7,
+    scaleFactor: 0.8,
   });
   const [isLoadFailed, setIsLoadFailed] = useState<boolean>(false);
 

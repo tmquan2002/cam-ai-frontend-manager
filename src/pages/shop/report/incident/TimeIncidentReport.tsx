@@ -110,9 +110,9 @@ const TimeIncidentReport = () => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
-      interval: ReportInterval.Day,
+      interval: ReportInterval.HalfDay,
       type: IncidentType.Incident,
     },
     validate: (values) => ({
@@ -309,6 +309,9 @@ const TimeIncidentReport = () => {
       <Table.Td py={rem(18)}>
         <Skeleton w={"100%"} h={rem(40)} />
       </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
 
       <Table.Td py={rem(18)}>
         <Skeleton w={"100%"} h={rem(40)} />
@@ -361,7 +364,14 @@ const TimeIncidentReport = () => {
         <Table.Td py={rem(18)}>
           <Center>
             <Text size={rem(13)} fw={500}>
-              {item?.evidences.length}
+              {item?.evidences?.length}
+            </Text>
+          </Center>
+        </Table.Td>
+        <Table.Td py={rem(18)}>
+          <Center>
+            <Text size={rem(13)} fw={500}>
+              {item?.assignment?.supervisor?.name ?? "Empty"}
             </Text>
           </Center>
         </Table.Td>
@@ -914,6 +924,13 @@ const TimeIncidentReport = () => {
                           </Text>
                         </Center>
                       </Table.Th>
+                      <Table.Th py={rem(16)}>
+                        <Center>
+                          <Text size={rem(13)} lh={rem(24)} fw={600}>
+                            In charge
+                          </Text>
+                        </Center>
+                      </Table.Th>
 
                       <Table.Th py={rem(16)}>
                         <Center>
@@ -956,6 +973,7 @@ const TimeIncidentReport = () => {
                 }}
                 py={rem(16)}
                 px={rem(24)}
+                bg={computedColorScheme == "light" ? "#f9f9f9" : "#000"}
               >
                 <Group justify="space-between">
                   <Text size="md" fw={600}>
@@ -977,7 +995,7 @@ const TimeIncidentReport = () => {
                   </Group>
                 </Group>
               </Box>
-              <ScrollArea.Autosize mah={1400} my={rem(12)}>
+              <ScrollArea.Autosize mah={1400} my={rem(20)}>
                 <Box px={rem(24)}>
                   <Box>
                     <Group
@@ -985,39 +1003,60 @@ const TimeIncidentReport = () => {
                       style={{
                         borderBottom: "1px solid #e5e7eb",
                       }}
-                      pb={rem(8)}
-                      mb={rem(10)}
+                      pb={rem(12)}
+                      mb={rem(12)}
                     >
                       <Text size={rem(14)} lh={rem(24)} fw={500}>
                         {dayjs(
                           selectedIncidentItem?.evidences?.[0]?.createdDate
                         ).format("LL")}
                       </Text>
-                      <Text size={rem(14)} lh={rem(24)} fw={500}>
-                        Assigned to :{" "}
-                        <Text
-                          span
-                          c="blue"
-                          inherit
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        >
-                          {selectedIncidentItem?.employee?.name ?? "(Empty)"}
+                      <Group gap={rem(8)} align="center">
+                        <Text size={rem(14)} lh={rem(24)} fw={500}>
+                          Assigned to :{" "}
+                          <Text
+                            span
+                            c="blue"
+                            inherit
+                            style={{
+                              cursor: "pointer",
+                            }}
+                          >
+                            {selectedIncidentItem?.employee?.name ?? "(Empty)"}
+                          </Text>
                         </Text>
-                      </Text>
+                        <Divider
+                          orientation="vertical"
+                          size={rem(2)}
+                          color={"#ccc"}
+                        />
+                        <Text size={rem(14)} lh={rem(24)} fw={500}>
+                          AI identify :{" "}
+                          <Text
+                            span
+                            c="blue"
+                            inherit
+                            style={{
+                              cursor: "pointer",
+                            }}
+                          >
+                            {selectedIncidentItem?.aiId ?? "(Empty)"}
+                          </Text>
+                        </Text>
+                      </Group>
                     </Group>
                     {selectedIncidentItem?.evidences?.length == 0 ? (
                       <NoImage type="NO_DATA" />
                     ) : (
                       selectedIncidentItem?.evidences.map((i) => (
-                        <LoadingImage
-                          mb={rem(12)}
-                          fit="contain"
-                          radius={"md"}
-                          key={i.id}
-                          imageId={i?.imageId ?? ""}
-                        />
+                        <Center w={"100%"}>
+                          <LoadingImage
+                            mb={rem(12)}
+                            radius={"md"}
+                            key={i.id}
+                            imageId={i?.imageId ?? ""}
+                          />
+                        </Center>
                       ))
                     )}
                   </Box>

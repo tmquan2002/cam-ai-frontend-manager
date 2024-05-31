@@ -49,7 +49,7 @@ const EmployeeIncidentReport = () => {
     validateInputOnChange: true,
     initialValues: {
       employeeId: null,
-      fromTime: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      fromTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       status: null,
       toTime: new Date(),
       incidentType: IncidentType.Incident,

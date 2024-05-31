@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { SessionProvider } from "./context/AuthContext";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
-import { MantineProvider, createTheme } from "@mantine/core";
+import { MantineProvider, createTheme, rem } from "@mantine/core";
 import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
 
 const queryClient = new QueryClient({
@@ -42,7 +42,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <SessionProvider>
-              <Notifications position="top-right" />
+              <Notifications position="top-right" mt={rem(40)} />
               <AppRoute />
             </SessionProvider>
           </BrowserRouter>

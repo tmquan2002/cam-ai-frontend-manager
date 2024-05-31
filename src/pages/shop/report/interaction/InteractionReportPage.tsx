@@ -71,9 +71,9 @@ export const InteractionReportPage = () => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
-      interval: ReportInterval.Day,
+      interval: ReportInterval.Hour,
     },
     validate: (values) => ({
       toDate:
@@ -356,7 +356,7 @@ export const InteractionReportPage = () => {
                       fw={500}
                       c={computedColorScheme == "dark" ? `white` : `black`}
                     >
-                      Total employee
+                      Total interaction
                     </Text>
                   </Group>
                   <Group gap={"sm"} align="center">
@@ -373,7 +373,7 @@ export const InteractionReportPage = () => {
                       fw={500}
                       c={computedColorScheme == "dark" ? `white` : `black`}
                     >
-                      Total interaction
+                      Total employee
                     </Text>
                   </Group>
                 </Group>
@@ -565,8 +565,8 @@ export const InteractionReportPage = () => {
                           datasets: [
                             {
                               type: "line" as const,
-                              label: "Total employee",
-                              data: data?.map((i) => i.humanCount),
+                              label: "Total interaction",
+                              data: data?.map((i) => i.interactionCount),
                               borderColor: "rgb(37, 150, 190)",
                               cubicInterpolationMode: "monotone",
                               pointHoverRadius: 7,
@@ -580,8 +580,9 @@ export const InteractionReportPage = () => {
                             },
                             {
                               type: "bar" as const,
-                              label: "Total interaction",
-                              data: data?.map((i) => i.interactionCount),
+                              label: "Total employee",
+                              data: data?.map((i) => i.humanCount),
+
                               borderColor: "rgb(255, 99, 132)",
                               backgroundColor: "rgba(255, 99, 132, 0.5)",
 
@@ -595,7 +596,7 @@ export const InteractionReportPage = () => {
                                 topRight: 5,
                                 topLeft: 5,
                               },
-                              yAxisID: "y",
+                              yAxisID: "y1",
 
                               borderSkipped: false,
                             },
@@ -752,12 +753,7 @@ export const InteractionReportPage = () => {
                     <Text fw={500} size="sm">
                       Total time:
                     </Text>
-                    <Badge
-                      radius={"sm"}
-                      color={"green"}
-                      c={"#fff"}
-                      mr={rem(16)}
-                    >
+                    <Badge radius={"sm"} color={"green"} c={"#fff"}>
                       {selectedInteractionItem?.startTime &&
                       selectedInteractionItem.endTime
                         ? differentDateReturnFormattedString(
@@ -786,18 +782,32 @@ export const InteractionReportPage = () => {
                           selectedInteractionItem?.evidences?.[0]?.createdDate
                         ).format("LL")}
                       </Text>
+                      <Text size={rem(14)} lh={rem(24)} fw={500}>
+                        AI identify :{" "}
+                        <Text
+                          span
+                          c="blue"
+                          inherit
+                          style={{
+                            cursor: "pointer",
+                          }}
+                        >
+                          {selectedInteractionItem?.aiId ?? "(Empty)"}
+                        </Text>
+                      </Text>
                     </Group>
                     {selectedInteractionItem?.evidences?.length == 0 ? (
                       <NoImage type="NO_DATA" />
                     ) : (
                       selectedInteractionItem?.evidences.map((i) => (
-                        <LoadingImage
-                          fit="contain"
-                          radius={"md"}
-                          mb={rem(12)}
-                          key={i.id}
-                          imageId={i?.imageId ?? ""}
-                        />
+                        <Center>
+                          <LoadingImage
+                            radius={"md"}
+                            mb={rem(12)}
+                            key={i.id}
+                            imageId={i?.imageId ?? ""}
+                          />
+                        </Center>
                       ))
                     )}
                   </Box>
