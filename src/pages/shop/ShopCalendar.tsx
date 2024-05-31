@@ -313,6 +313,12 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
       <Table.Td py={rem(18)}>
         <Skeleton w={"100%"} h={rem(40)} />
       </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
+      <Table.Td py={rem(18)}>
+        <Skeleton w={"100%"} h={rem(40)} />
+      </Table.Td>
     </Table.Tr>
   ) : (
     incidentList?.map((item) => (
@@ -596,250 +602,276 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                 )}
               </Group>
             </Collapse>
-
-            <Accordion
-              variant="separated"
-              radius="md"
-              mt={rem(20)}
-              defaultValue={DEFAULT_PAGE_SIZE}
-            >
-              {reverseSupervisorList?.map((i, index) => {
-                return (
-                  <Accordion.Item
-                    style={{
-                      backgroundColor:
-                        computedColorScheme == "light" ? "#fefefe" : "#1f1f1f",
-                      border: "1px solid #ccc",
-                    }}
-                    key={index.toString()}
-                    value={index.toString()}
-                    className={
-                      i.id == selectedShift?.id
-                        ? classes["activeAccordion"]
-                        : ""
-                    }
-                    onClick={() => {
-                      setSelectedShift({
-                        ...i,
-                        startTime: dayjs(i?.startTime).format(
-                          "YYYY-MM-DDTHH:mm:ss"
-                        ),
-                        endTime: dayjs(i?.endTime ?? new Date()).format(
-                          "YYYY-MM-DDTHH:mm:ss"
-                        ),
-                      });
-                    }}
-                  >
-                    <Accordion.Control>
-                      <Group
-                        key={i.id}
-                        justify="space-between"
-                        py={rem(8)}
-                        px={rem(12)}
-                      >
-                        <Box>
-                          <Text
-                            c={
-                              computedColorScheme == "light"
-                                ? "rgb(17, 24, 39)"
-                                : "white"
-                            }
-                            lh={rem(26)}
-                            fw={500}
-                            size={rem(16)}
-                            mb={rem(4)}
-                          >
-                            {i?.inChargeAccount?.name}
-                          </Text>
-                          <Group gap={0}>
-                            <IconCalendarTime
-                              style={{
-                                width: rem(20),
-                                aspectRatio: 1,
-                              }}
-                            />
-
+            {isGetSupervisorListLoading ? (
+              <>
+                <Skeleton
+                  radius={"md"}
+                  mt={rem(20)}
+                  w={"100%"}
+                  height={rem(80)}
+                />{" "}
+                <Skeleton
+                  radius={"md"}
+                  mt={rem(20)}
+                  w={"100%"}
+                  height={rem(80)}
+                />{" "}
+                <Skeleton
+                  radius={"md"}
+                  mt={rem(20)}
+                  w={"100%"}
+                  height={rem(80)}
+                />
+              </>
+            ) : (
+              <Accordion
+                variant="separated"
+                radius="md"
+                mt={rem(20)}
+                defaultValue={DEFAULT_PAGE_SIZE}
+              >
+                {reverseSupervisorList?.map((i, index) => {
+                  return (
+                    <Accordion.Item
+                      style={{
+                        backgroundColor:
+                          computedColorScheme == "light"
+                            ? "#fefefe"
+                            : "#1f1f1f",
+                        border: "1px solid #ccc",
+                      }}
+                      key={index.toString()}
+                      value={index.toString()}
+                      className={
+                        i.id == selectedShift?.id
+                          ? classes["activeAccordion"]
+                          : ""
+                      }
+                      onClick={() => {
+                        setSelectedShift({
+                          ...i,
+                          startTime: dayjs(i?.startTime).format(
+                            "YYYY-MM-DDTHH:mm:ss"
+                          ),
+                          endTime: dayjs(i?.endTime ?? new Date()).format(
+                            "YYYY-MM-DDTHH:mm:ss"
+                          ),
+                        });
+                      }}
+                    >
+                      <Accordion.Control>
+                        <Group
+                          key={i.id}
+                          justify="space-between"
+                          py={rem(8)}
+                          px={rem(12)}
+                        >
+                          <Box>
                             <Text
-                              ml={rem(10)}
-                              c={"grey"}
+                              c={
+                                computedColorScheme == "light"
+                                  ? "rgb(17, 24, 39)"
+                                  : "white"
+                              }
                               lh={rem(26)}
-                              size={rem(14)}
+                              fw={500}
+                              size={rem(16)}
+                              mb={rem(4)}
                             >
-                              {format(
-                                i.startTime ?? new Date(),
-                                "MMMM do, yyyy "
-                              )}
-                              from{" "}
-                              {format(i?.startTime ?? new Date(), "hh:mm a")} to{" "}
-                              {i?.endTime
-                                ? format(i?.endTime ?? new Date(), "hh:mm a")
-                                : "Now"}
+                              {i?.inChargeAccount?.name}
                             </Text>
-                            {i.incidents.length != 0 && (
-                              <>
-                                <Divider
-                                  mx={rem(16)}
-                                  color="rgb(107,114,128,.5)"
-                                  orientation="vertical"
-                                />
-                                <IconExclamationCircle
-                                  style={{
-                                    width: rem(20),
-                                    aspectRatio: 1,
-                                  }}
-                                  color={"#c92a2a"}
-                                />
-                                <Text
-                                  ml={rem(6)}
-                                  c={"#c92a2a"}
-                                  lh={rem(26)}
-                                  size={rem(14)}
-                                >
-                                  {i.incidents.length + " "}
-                                  incident(s)
-                                </Text>
-                              </>
-                            )}
-                            {i.interactions.length != 0 && (
-                              <>
-                                <Divider
-                                  mx={rem(16)}
-                                  color="rgb(107,114,128,.5)"
-                                  orientation="vertical"
-                                />
-                                <IconBrandHipchat
-                                  style={{
-                                    width: rem(20),
-                                    aspectRatio: 1,
-                                  }}
-                                  color={
-                                    computedColorScheme == "light"
-                                      ? "#198754"
-                                      : "#33A788"
-                                  }
-                                />
-                                <Text
-                                  ml={rem(6)}
-                                  c={
-                                    computedColorScheme == "light"
-                                      ? "#198754"
-                                      : "#33A788"
-                                  }
-                                  lh={rem(26)}
-                                  size={rem(14)}
-                                >
-                                  {i.interactions.length + " "}
-                                  interaction(s)
-                                </Text>
-                              </>
-                            )}
-                          </Group>
-                        </Box>
-                      </Group>
-                    </Accordion.Control>
-                    <Accordion.Panel>
-                      <>
-                        {isEmployeeListLoading || isGetSupervisorListLoading ? (
-                          <Loader />
-                        ) : (
-                          <>
-                            <Stack
-                              gap={0}
-                              px={rem(12)}
-                              style={{
-                                borderRadius: rem(8),
-                                backgroundColor:
-                                  computedColorScheme == "light"
-                                    ? "#fefefe"
-                                    : "#1f1f1f",
-                                // border: "1px solid #ccc",
-                              }}
-                            >
-                              <Group
-                                justify="space-between"
-                                align="center"
-                                pb={rem(4)}
-                              >
-                                <Text c={"grey"} size={rem(14)}>
-                                  Supervisor
-                                </Text>
-                                <Text
-                                  c={"rgb(17, 24, 39)"}
-                                  size={rem(14)}
-                                  fw={500}
-                                >
-                                  {i?.supervisor?.name ?? (
-                                    <Text span inherit c={"#ccc"}>
-                                      Supervisor is empty
-                                    </Text>
-                                  )}
-                                </Text>
-                              </Group>
+                            <Group gap={0}>
+                              <IconCalendarTime
+                                style={{
+                                  width: rem(20),
+                                  aspectRatio: 1,
+                                }}
+                              />
 
-                              <Group
-                                justify="space-between"
-                                align="center"
-                                py={rem(20)}
+                              <Text
+                                ml={rem(10)}
+                                c={"grey"}
+                                lh={rem(26)}
+                                size={rem(14)}
                               >
-                                <Text
-                                  c={"rgb(17, 24, 39)"}
-                                  size={rem(14)}
-                                  fw={500}
-                                >
-                                  In charge
-                                </Text>
+                                {format(
+                                  i.startTime ?? new Date(),
+                                  "MMMM do, yyyy "
+                                )}
+                                from{" "}
+                                {format(i?.startTime ?? new Date(), "hh:mm a")}{" "}
+                                to{" "}
+                                {i?.endTime
+                                  ? format(i?.endTime ?? new Date(), "hh:mm a")
+                                  : "Now"}
+                              </Text>
+                              {i.incidents.length != 0 && (
+                                <>
+                                  <Divider
+                                    mx={rem(16)}
+                                    color="rgb(107,114,128,.5)"
+                                    orientation="vertical"
+                                  />
+                                  <IconExclamationCircle
+                                    style={{
+                                      width: rem(20),
+                                      aspectRatio: 1,
+                                    }}
+                                    color={"#c92a2a"}
+                                  />
+                                  <Text
+                                    ml={rem(6)}
+                                    c={"#c92a2a"}
+                                    lh={rem(26)}
+                                    size={rem(14)}
+                                  >
+                                    {i.incidents.length + " "}
+                                    incident(s)
+                                  </Text>
+                                </>
+                              )}
+                              {i.interactions.length != 0 && (
+                                <>
+                                  <Divider
+                                    mx={rem(16)}
+                                    color="rgb(107,114,128,.5)"
+                                    orientation="vertical"
+                                  />
+                                  <IconBrandHipchat
+                                    style={{
+                                      width: rem(20),
+                                      aspectRatio: 1,
+                                    }}
+                                    color={
+                                      computedColorScheme == "light"
+                                        ? "#198754"
+                                        : "#33A788"
+                                    }
+                                  />
+                                  <Text
+                                    ml={rem(6)}
+                                    c={
+                                      computedColorScheme == "light"
+                                        ? "#198754"
+                                        : "#33A788"
+                                    }
+                                    lh={rem(26)}
+                                    size={rem(14)}
+                                  >
+                                    {i.interactions.length + " "}
+                                    interaction(s)
+                                  </Text>
+                                </>
+                              )}
+                            </Group>
+                          </Box>
+                        </Group>
+                      </Accordion.Control>
+                      <Accordion.Panel>
+                        <>
+                          {isEmployeeListLoading ||
+                          isGetSupervisorListLoading ? (
+                            <Loader />
+                          ) : (
+                            <>
+                              <Stack
+                                gap={0}
+                                px={rem(12)}
+                                style={{
+                                  borderRadius: rem(8),
+                                  backgroundColor:
+                                    computedColorScheme == "light"
+                                      ? "#fefefe"
+                                      : "#1f1f1f",
+                                  // border: "1px solid #ccc",
+                                }}
+                              >
                                 <Group
                                   justify="space-between"
                                   align="center"
-                                  gap={rem(8)}
+                                  pb={rem(4)}
                                 >
-                                  <Text
-                                    c={
-                                      computedColorScheme == "light"
-                                        ? "rgb(79, 70, 229)"
-                                        : "light-blue.4"
-                                    }
-                                    fw={500}
-                                    size={rem(14)}
-                                  >
-                                    {selectedShift?.inChargeAccount.name}
+                                  <Text c={"grey"} size={rem(14)}>
+                                    Supervisor
                                   </Text>
-
                                   <Text
-                                    py={rem(4)}
-                                    px={rem(7)}
-                                    bg={
-                                      computedColorScheme == "light"
-                                        ? "rgb(240 253 244)"
-                                        : "#293c2c"
-                                    }
-                                    c={
-                                      computedColorScheme == "light"
-                                        ? "rgb(21 128 61)"
-                                        : "#89e597"
-                                    }
-                                    size={rem(12)}
+                                    c={"rgb(17, 24, 39)"}
+                                    size={rem(14)}
                                     fw={500}
-                                    style={{
-                                      borderRadius: 999,
-                                      border: "1px solid #ccc",
-                                    }}
                                   >
-                                    {renderInChargeRole(
-                                      selectedShift?.inChargeAccountRole
+                                    {i?.supervisor?.name ?? (
+                                      <Text span inherit c={"#ccc"}>
+                                        Supervisor is empty
+                                      </Text>
                                     )}
                                   </Text>
                                 </Group>
-                              </Group>
-                            </Stack>
-                          </>
-                        )}
-                      </>
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                );
-              })}
-            </Accordion>
+
+                                <Group
+                                  justify="space-between"
+                                  align="center"
+                                  py={rem(20)}
+                                >
+                                  <Text
+                                    c={"rgb(17, 24, 39)"}
+                                    size={rem(14)}
+                                    fw={500}
+                                  >
+                                    In charge
+                                  </Text>
+                                  <Group
+                                    justify="space-between"
+                                    align="center"
+                                    gap={rem(8)}
+                                  >
+                                    <Text
+                                      c={
+                                        computedColorScheme == "light"
+                                          ? "rgb(79, 70, 229)"
+                                          : "light-blue.4"
+                                      }
+                                      fw={500}
+                                      size={rem(14)}
+                                    >
+                                      {selectedShift?.inChargeAccount.name}
+                                    </Text>
+
+                                    <Text
+                                      py={rem(4)}
+                                      px={rem(7)}
+                                      bg={
+                                        computedColorScheme == "light"
+                                          ? "rgb(240 253 244)"
+                                          : "#293c2c"
+                                      }
+                                      c={
+                                        computedColorScheme == "light"
+                                          ? "rgb(21 128 61)"
+                                          : "#89e597"
+                                      }
+                                      size={rem(12)}
+                                      fw={500}
+                                      style={{
+                                        borderRadius: 999,
+                                        border: "1px solid #ccc",
+                                      }}
+                                    >
+                                      {renderInChargeRole(
+                                        selectedShift?.inChargeAccountRole
+                                      )}
+                                    </Text>
+                                  </Group>
+                                </Group>
+                              </Stack>
+                            </>
+                          )}
+                        </>
+                      </Accordion.Panel>
+                    </Accordion.Item>
+                  );
+                })}
+              </Accordion>
+            )}
           </Box>
 
           <Box flex={3}>
@@ -1003,7 +1035,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
         </Group>
 
         <Group align="flex-start" mt={rem(40)}>
-          {incidentList ? (
+          {incidentList || isGetIncidentListLoading ? (
             <Card
               radius={8}
               w={"100%"}
