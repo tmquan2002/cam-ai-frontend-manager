@@ -322,9 +322,9 @@ const TimeIncidentReport = () => {
       </Table.Td>
     </Table.Tr>
   ) : (
-    incidentList?.values.map((item) => (
+    incidentList?.values.map((item, i) => (
       <Table.Tr
-        key={item.id}
+        key={i}
         style={{
           cursor: "pointer",
         }}
@@ -1049,12 +1049,11 @@ const TimeIncidentReport = () => {
                     {selectedIncidentItem?.evidences?.length == 0 ? (
                       <NoImage type="NO_DATA" />
                     ) : (
-                      selectedIncidentItem?.evidences.map((i) => (
-                        <Center w={"100%"}>
+                      selectedIncidentItem?.evidences.map((i, index) => (
+                        <Center w={"100%"} key={index}>
                           <LoadingImage
                             mb={rem(12)}
                             radius={"md"}
-                            key={i.id}
                             fit="contain"
                             imageId={i?.imageId ?? ""}
                           />

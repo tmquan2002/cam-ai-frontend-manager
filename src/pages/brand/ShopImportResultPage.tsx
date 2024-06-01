@@ -61,10 +61,10 @@ const RenderProgress = ({ name, value, total, color, type, colorManager, colorSh
                             />
                             <Box>
                                 <Group>
-                                    <ColorSwatch color={colorShop ?? "grey"} size={15}/> <Text>Shops</Text>
+                                    <ColorSwatch color={colorShop ?? "grey"} size={15} /> <Text>Shops - <Text span fw={500}>{valueShop}</Text></Text>
                                 </Group>
                                 <Group>
-                                    <ColorSwatch color={colorManager ?? "grey"} size={15}/><Text>Managers</Text>
+                                    <ColorSwatch color={colorManager ?? "grey"} size={15} /><Text>Managers - <Text span fw={500}>{valueManager}</Text></Text>
                                 </Group>
                             </Box>
                         </Group>
@@ -131,12 +131,12 @@ const ShopImportResultPage = () => {
                     <Box mb={20}>
                         <Box bg={computedColorScheme == "dark" ? "#1f1f1f" : "white"} p={rem(20)}
                             style={{ borderRadius: "5px", boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)" }}>
-                            <Text size={rem(17)} mb={10} ta="center">Total Uploaded:
+                            {/* <Text size={rem(17)} mb={10} ta="center">Total Uploaded:
                                 <Text c="light-blue.7" fw={500} span inherit>{" " + total}</Text>
-                            </Text>
+                            </Text> */}
                             {/* <Text size="sm" c="dimmed" fw={500}>{data?.description}</Text> */}
 
-                            <Grid justify="space-between" mt={20}>
+                            <Grid justify="space-between">
                                 <RenderProgress name="Inserted"
                                     color={computedColorScheme == "light" ? StatusColor.ACTIVE : StatusColorLight.ACTIVE}
                                     colorShop={StatusColor.ACTIVE} colorManager={StatusColorLight.ACTIVE}

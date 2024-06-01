@@ -36,7 +36,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ]
 export type CreateShopField = {
   name: string;
-  phone: string | null;
+  phone: string;
   wardId: string;
   shopManagerId: string | null;
   addressLine: string;
@@ -52,6 +52,17 @@ const CreateShop = () => {
   const { taskId, setTaskId } = useTaskBrand();
 
   const createShopForm = useForm<CreateShopField>({
+    initialValues: {
+      addressLine: "",
+      closeTime: "",
+      district: "",
+      openTime: "",
+      name: "",
+      phone: "",
+      province: "",
+      shopManagerId: "",
+      wardId: ""
+    },
     validate: {
       name: hasLength({ min: 1, max: 50 }, "Name is 1-50 characters long"),
       phone: (value) => isEmpty(value) || value == null ? null :
@@ -300,7 +311,7 @@ const CreateShop = () => {
 
           <Group justify="flex-end" mt="md">
             <Button
-              disabled={!createShopForm.isDirty() || taskId != undefined}
+              disabled={!createShopForm.isDirty() || taskId !== undefined}
               type="submit"
               loading={isCreateShopLoading}
             >

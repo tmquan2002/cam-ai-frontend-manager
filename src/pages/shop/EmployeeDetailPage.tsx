@@ -61,7 +61,7 @@ export type CreateEmployeeField = {
   name: string;
   email: string;
   gender: Gender | null;
-  phone: string | null;
+  phone: string;
   birthday?: Date | null;
   addressLine: string;
   wardId: string;
@@ -95,7 +95,7 @@ const EmployeeDetailPage = () => {
       email: "",
       gender: null,
       name: "",
-      phone: null,
+      phone: "",
       province: "",
       wardId: "",
       birthday: null
@@ -115,14 +115,14 @@ const EmployeeDetailPage = () => {
   useEffect(() => {
     if (employeeData) {
       updateEmployeeForm.setInitialValues({
-        name: employeeData?.name ?? undefined,
-        email: employeeData?.email ?? undefined,
-        gender: employeeData?.gender ?? undefined,
-        phone: employeeData?.phone ?? undefined,
+        name: employeeData?.name ?? "",
+        email: employeeData?.email ?? "",
+        gender: employeeData?.gender ?? null,
+        phone: employeeData?.phone ?? "",
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
           : null,
-        addressLine: employeeData?.addressLine ?? undefined,
+        addressLine: employeeData?.addressLine ?? "",
         wardId: `${employeeData?.wardId}`,
         province: `${employeeData?.ward?.district?.provinceId}`,
         district: `${employeeData?.ward?.districtId}`,

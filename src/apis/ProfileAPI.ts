@@ -14,7 +14,7 @@ export type UpdateProfileParams = {
   gender: string | null;
   phone: string | null;
   birthday: string | null;
-  wardId: number | null;
+  wardId: number | string | null;
   addressLine: string | null;
 };
 

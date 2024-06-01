@@ -49,13 +49,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileFieldValue = {
   name: string;
   email: string;
-  phone: string | null;
+  phone: string;
   birthday?: Date | null;
   addressLine: string;
   gender: Gender | null;
-  wardId: string;
-  province: string;
-  district: string;
+  wardId: string | null;
+  province: string | null;
+  district: string | null;
 };
 
 const AccountDetailPage = () => {
@@ -65,13 +65,13 @@ const AccountDetailPage = () => {
     initialValues: {
       name: "",
       email: "",
-      phone: null,
+      phone: "",
       birthday: null,
       gender: null,
       addressLine: "",
-      district: "",
-      province: "",
-      wardId: "",
+      district: null,
+      province: null,
+      wardId: null,
     },
     validate: {
       name: isNotEmpty("Name is required"),
@@ -91,7 +91,7 @@ const AccountDetailPage = () => {
   const { data: wards, isLoading: isWardsLoading } = useGetWardList(
     +(form.values.district ?? 0)
   );
-  const { data: accountData, isLoading: isAccountDataLoading } =
+  const { data: accountData, isFetching: isAccountDataLoading, refetch } =
     useGetAccountById(id ?? "");
   const { mutate: updateAccount, isLoading: isUpdateAccountLoading } =
     useUpdateAccount();
@@ -101,15 +101,15 @@ const AccountDetailPage = () => {
   useEffect(() => {
     if (accountData) {
       form.setInitialValues({
-        addressLine: accountData?.addressLine,
+        addressLine: accountData?.addressLine ?? "",
         birthday: accountData.birthday
           ? new Date(accountData.birthday)
           : null,
         district: accountData?.ward?.districtId?.toString(),
-        email: accountData?.email,
+        email: accountData?.email ?? "",
         gender: accountData?.gender,
-        name: accountData?.name,
-        phone: accountData?.phone,
+        name: accountData?.name ?? "",
+        phone: accountData?.phone ?? "",
         province: accountData?.ward?.district?.provinceId?.toString(),
         wardId: accountData?.wardId?.toString(),
       });
@@ -171,6 +171,7 @@ const AccountDetailPage = () => {
           data: mapLookupToArray(Gender ?? {}),
           form,
           name: "gender",
+          required: true,
         },
         spans: 12,
       },
@@ -212,7 +213,7 @@ const AccountDetailPage = () => {
           }),
           form: form,
           name: "wardId",
-          loading: isWardsLoading,
+          loading: isDistrictsLoading || isWardsLoading,
         },
         spans: 4,
       },
@@ -269,18 +270,20 @@ const AccountDetailPage = () => {
             <form
               onSubmit={form.onSubmit((values) => {
                 const params: UpdateAccountParams = {
-                  addressLine: values.addressLine,
+                  addressLine: values.addressLine ?? "",
                   birthday: values.birthday
                     ? dayjs(values.birthday).format("YYYY-MM-DD")
                     : null,
                   gender: values.gender,
                   name: values.name,
                   phone: isEmpty(values.phone) ? null : values.phone,
-                  wardId: +values?.wardId,
+                  wardId: values?.wardId ?? null,
                   userId: id ?? "",
                 };
                 updateAccount(params, {
                   onSuccess() {
+                    refetch();
+                    form.reset();
                     notifications.show({
                       title: "Successfully",
                       message: "Update account success!",

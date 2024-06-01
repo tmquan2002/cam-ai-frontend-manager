@@ -7,7 +7,7 @@ export type UpdateAccountParams = {
   gender: Gender | null;
   phone: string | null;
   birthday: string | null;
-  wardId: number;
+  wardId: number | string | null;
   addressLine: string;
   userId: string;
 };
@@ -16,7 +16,7 @@ export type CreateAccountParams = {
   name: string;
   gender: Gender | null;
   phone: string | null;
-  birthday: string;
+  birthday: string | null;
   wardId: number | null;
   addressLine: string | null;
   brandId: string;
