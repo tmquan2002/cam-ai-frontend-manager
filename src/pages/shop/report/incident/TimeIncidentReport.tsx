@@ -186,6 +186,7 @@ const TimeIncidentReport = () => {
         ? dayjs(form.values.toDate).format("YYYY-MM-DD")
         : dayjs().format("YYYY-MM-DD"),
       enabled: true,
+      type: form.values.type,
     });
 
   const data = useMemo(() => {
@@ -1054,6 +1055,7 @@ const TimeIncidentReport = () => {
                             mb={rem(12)}
                             radius={"md"}
                             key={i.id}
+                            fit="contain"
                             imageId={i?.imageId ?? ""}
                           />
                         </Center>
