@@ -84,10 +84,10 @@ const EmployeeImportResultPage = () => {
                     <Box mb={20}>
                         <Box bg={computedColorScheme == "dark" ? "#1f1f1f" : "white"} p={rem(20)}
                             style={{ borderRadius: "5px", boxShadow: "0px 1px 10px 0px rgba(0, 0, 0, 0.1)" }}>
-                            <Text size={rem(17)} fw={500} mb={10} ta="center">{total} Rows Uploaded</Text>
+                            {/* <Text size={rem(17)} fw={500} mb={10} ta="center">{total} Rows Uploaded</Text> */}
                             {/* <Text size="sm" c="dimmed" fw={500}>{data?.description}</Text> */}
 
-                            <Grid justify="space-between" mt={20} gutter={30}>
+                            <Grid justify="space-between" gutter={30}>
                                 <RenderProgress name="Inserted"
                                     color={computedColorScheme == "light" ? StatusColor.ACTIVE : StatusColorLight.ACTIVE}
                                     value={data?.inserted ?? 0} total={total} />

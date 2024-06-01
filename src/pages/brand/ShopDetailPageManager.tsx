@@ -33,6 +33,7 @@ import { ResponseErrorDetail } from "../../models/Response";
 import { IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
 import { formatTime, removeTime, replaceIfNun } from "../../utils/helperFunction";
 import classes from "./ShopDetailPageManager.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -46,7 +47,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export type FormFieldValue = {
   name: string;
-  phone: string | null;
+  phone: string;
   province: string | null;
   district: string | null;
   wardId: string | null;
@@ -74,6 +75,7 @@ const ShopDetailPageManager = () => {
   const { data: cameraList, isLoading: isGetCameraListLoading } = useGetCameraListByShopId(id);
   const { mutate: changeShopStatus, isLoading: isChangeShopStatusLoading } = useChangeShopStatus();
   const { data: edgeBoxInstallList, isLoading: isEdgeboxInstallListLoading, refetch: refetchEdgeBoxInstallList, } = useGetEdgeBoxInstallByShopId(id ?? "");
+  const { taskId } = useTaskBrand();
 
   const rows = employeeList?.values?.map((row, index) => (
     <Tooltip label="View Employee" key={row.id}>
@@ -104,7 +106,7 @@ const ShopDetailPageManager = () => {
   const form = useForm<FormFieldValue>({
     initialValues: {
       name: data?.name ?? "",
-      phone: data?.phone ?? null,
+      phone: data?.phone ?? "",
       wardId: `${data?.wardId}`,
       addressLine: data?.addressLine ?? "",
       brandName: data?.brand?.name ?? "",
@@ -121,7 +123,7 @@ const ShopDetailPageManager = () => {
       phone: (value) => isEmpty(value) || value == null ? null :
         PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       addressLine: isNotEmpty("Address should not be empty"),
-      wardId: isNotEmpty("Please select ward"),
+      wardId: isNotEmpty("Ward is required"),
       province: isNotEmpty("Provice is required"),
       district: isNotEmpty("District is required"),
       openTime: isNotEmpty("Open time is required"),
@@ -245,8 +247,8 @@ const ShopDetailPageManager = () => {
   useEffect(() => {
     if (data) {
       const initialData: FormFieldValue = {
-        name: data?.name,
-        phone: data?.phone ?? null,
+        name: data?.name ?? "",
+        phone: data?.phone ?? "",
         wardId: `${data?.wardId}`,
         addressLine: data?.addressLine,
         brandName: data?.brand?.name,
@@ -269,6 +271,7 @@ const ShopDetailPageManager = () => {
           placeholder: "Shop name",
           label: "Shop name",
           required: true,
+          disabled: taskId != undefined,
         },
       },
       {
@@ -278,6 +281,7 @@ const ShopDetailPageManager = () => {
           name: "phone",
           placeholder: "Shop phone",
           label: "Shop phone",
+          disabled: taskId != undefined,
         },
       },
       {
@@ -288,6 +292,7 @@ const ShopDetailPageManager = () => {
           placeholder: "Open Time",
           label: "Open time",
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 6,
       },
@@ -299,6 +304,7 @@ const ShopDetailPageManager = () => {
           placeholder: "Close Time",
           label: "Close time",
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 6,
       },
@@ -326,6 +332,7 @@ const ShopDetailPageManager = () => {
           name: "province",
           loading: isProvicesLoading,
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 4,
       },
@@ -341,6 +348,7 @@ const ShopDetailPageManager = () => {
           name: "district",
           loading: isDistrictsLoading,
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 4,
       },
@@ -356,6 +364,7 @@ const ShopDetailPageManager = () => {
           name: "wardId",
           loading: isWardsLoading,
           required: true,
+          disabled: taskId != undefined,
         },
         spans: 4,
       },
@@ -367,6 +376,7 @@ const ShopDetailPageManager = () => {
           placeholder: "Shop address",
           label: "Shop address",
           required: true,
+          disabled: taskId != undefined,
         },
       },
     ];
@@ -385,7 +395,12 @@ const ShopDetailPageManager = () => {
   );
 
   return (
-    <Box pb={20}>
+    <Box pb={20} pos="relative">
+      <LoadingOverlay
+        visible={isLoading || updateShopLoading}
+        zIndex={1000}
+        overlayProps={{ radius: "sm", blur: 2 }}
+      />
       <Box pt={rem(20)} pl={rem(32)}>
         <CustomBreadcrumb items={breadcrumbs} goBack />
       </Box>
@@ -408,11 +423,6 @@ const ShopDetailPageManager = () => {
 
           <Tabs.Panel value="general">
             <Box p={rem(32)}>
-              <LoadingOverlay
-                visible={isLoading || updateShopLoading}
-                zIndex={1000}
-                overlayProps={{ radius: "sm", blur: 2 }}
-              />
               <Box>
                 <Group justify="space-between" pb={rem(20)}>
                   <Group align="center">
@@ -444,9 +454,9 @@ const ShopDetailPageManager = () => {
                     const updateShopParams: UpdateShopParams = {
                       shopId: data?.id ?? "0",
                       shopManagerId: data?.shopManager?.id ?? "",
-                      addressLine: values.addressLine,
+                      addressLine: values.addressLine ?? "",
                       wardId: values.wardId ?? "0",
-                      name: values.name,
+                      name: values.name ?? "",
                       phone: isEmpty(values.phone) ? null : values.phone,
                       openTime: formatTime(values?.openTime, true, true),
                       closeTime: formatTime(values?.closeTime, true, true),
@@ -478,7 +488,7 @@ const ShopDetailPageManager = () => {
                   <EditAndUpdateForm fields={fields} />
 
                   <Group justify="flex-end" mt="md">
-                    <Button type="submit">
+                    <Button type="submit" disabled={taskId !== undefined}>
                       Update
                     </Button>
                   </Group>

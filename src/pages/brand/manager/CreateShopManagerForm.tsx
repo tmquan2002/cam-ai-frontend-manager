@@ -46,7 +46,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
             email: "",
             name: "",
             gender: null,
-            phone: null,
+            phone: "",
             birthday: null,
             addressLine: "",
             province: "",
@@ -213,7 +213,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                 ({ addressLine, birthday, email, gender, name, phone, wardId, }: CreateAccountField) => {
                     const params: CreateAccountParams = {
                         addressLine,
-                        birthday: dayjs(birthday).format("YYYY-MM-DD"),
+                        birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
                         brandId: brandList?.values[0].id ?? "",
                         email: email ?? null,
                         gender: gender ?? null,

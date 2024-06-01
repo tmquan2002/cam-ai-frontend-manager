@@ -44,7 +44,7 @@ export function SidebarLinksGroup({
       {link.label}
     </Text>
   ));
-  console.log(location.pathname)
+  // console.log(location.pathname)
   return (
     <Box>
       <UnstyledButton

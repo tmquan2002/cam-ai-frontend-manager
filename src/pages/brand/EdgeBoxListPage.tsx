@@ -185,14 +185,14 @@ const EdgeBoxListPage = () => {
         </Text>
       ) : (
         <>
-          {items.map((item) => {
+          {items.map((item, i) => {
             const params: EdgeBoxInstallDetail & {
               refetchList: () => {};
             } = {
               ...item,
               refetchList: refetch,
             };
-            return <EdgeBoxCard {...params} />;
+            return <EdgeBoxCard {...params} key={i} />;
           })}
         </>
       )}

@@ -6,8 +6,10 @@ export const useGetAccountById = (id: string) => {
   const {
     isError,
     isLoading,
+    isFetching,
     data,
     error,
+    refetch
   }: UseQueryResult<AccountDetail, Error> = useQuery({
     queryKey: ["account", id],
     queryFn: async () => {
@@ -15,5 +17,5 @@ export const useGetAccountById = (id: string) => {
     },
   });
 
-  return { isError, isLoading, data, error };
+  return { isError, isLoading, isFetching, data, error, refetch };
 };

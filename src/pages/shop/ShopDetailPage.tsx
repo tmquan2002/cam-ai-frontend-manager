@@ -46,7 +46,7 @@ import { PHONE_REGEX } from "../../types/constant";
 
 export type FormFieldValue = {
   name: string;
-  phone: string | null;
+  phone: string;
   province: string | null;
   district: string | null;
   wardId: string | null;
@@ -60,6 +60,17 @@ const ShopDetailPage = () => {
   const navigate = useNavigate();
 
   const form = useForm<FormFieldValue>({
+    initialValues: {
+      name: "",
+      phone: "",
+      province: "",
+      district: "",
+      wardId: null,
+      addressLine: '',
+      brandName: '',
+      openTime: '',
+      closeTime: '',
+    },
     validate: {
       name: isNotEmpty("Name should not be empty"),
       phone: (value) => isEmpty(value) || value == null ? null : PHONE_REGEX.test(value)
@@ -93,11 +104,11 @@ const ShopDetailPage = () => {
       const { values } = data;
       if (!_.isEmpty(values)) {
         const initialData: FormFieldValue = {
-          name: values[0]?.name,
-          phone: values[0]?.phone ?? null,
+          name: values[0]?.name ?? "",
+          phone: values[0]?.phone ?? "",
           wardId: `${values[0]?.wardId}`,
-          addressLine: values[0]?.addressLine,
-          brandName: values[0]?.brand.name,
+          addressLine: values[0]?.addressLine ?? "",
+          brandName: values[0]?.brand.name ?? "",
           province: `${values[0]?.ward?.district?.province?.id}`,
           district: `${values[0]?.ward?.district?.id}`,
           openTime: values[0]?.openTime,

@@ -38,13 +38,13 @@ import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 type ProfileFieldValue = {
   name: string;
   email: string;
-  phone: string | null;
+  phone: string;
   birthday?: Date | null;
   address: string;
   gender: Gender | null;
-  wardId: string;
-  province: string;
-  district: string;
+  wardId: string | null;
+  province: string | null;
+  district: string | null;
 };
 
 type ChangePasswordFieldValue = {
@@ -60,6 +60,17 @@ const BrandManagerProfilePage = () => {
   const { mutate: changePassword, isLoading: isChangingPassword } =
     useChangePassword();
   const form = useForm<ProfileFieldValue>({
+    initialValues: {
+      address: "",
+      district: null,
+      email: "",
+      gender: null,
+      name: "",
+      phone: "",
+      province: null,
+      wardId: null,
+      birthday: null
+    },
     validate: {
       name: isNotEmpty("Name is required"),
       email: (value: string) => isEmpty(value) ? "Email is required"
@@ -381,7 +392,7 @@ const BrandManagerProfilePage = () => {
                 : null,
               gender: values.gender ?? null,
               phone: isEmpty(values.phone) ? null : values.phone,
-              wardId: +values?.wardId,
+              wardId: values?.wardId ?? null,
               email: values?.email,
             };
             updateProfile(params, {

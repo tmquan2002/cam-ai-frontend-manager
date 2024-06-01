@@ -60,7 +60,7 @@ const CreateEmployeePage = () => {
       name: "",
       email: "",
       gender: null,
-      phone: null,
+      phone: "",
       birthday: null,
       addressLine: "",
       wardId: null,

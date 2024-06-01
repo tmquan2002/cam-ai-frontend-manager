@@ -38,7 +38,7 @@ import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 type ProfileFieldValue = {
   name: string;
   email: string;
-  phone: string | null;
+  phone: string;
   birthday?: Date | null;
   address: string;
   gender: Gender | null;
@@ -62,7 +62,7 @@ const ShopManagerProfilePage = () => {
     initialValues: {
       name: "",
       email: "",
-      phone: null,
+      phone: "",
       birthday: null,
       address: "",
       gender: null,
@@ -148,11 +148,11 @@ const ShopManagerProfilePage = () => {
   useEffect(() => {
     if (account) {
       form.setInitialValues({
-        name: account?.name,
-        email: account?.email,
-        phone: account?.phone ?? null,
+        name: account?.name ?? "",
+        email: account?.email ?? "",
+        phone: account?.phone ?? "",
         birthday: account?.birthday ? new Date(account?.birthday) : null,
-        address: account?.addressLine,
+        address: account?.addressLine ?? "",
         gender: account?.gender,
         shop: account?.managingShop?.name,
         district: account?.ward?.districtId.toString(),
@@ -391,7 +391,7 @@ const ShopManagerProfilePage = () => {
                 : null,
               gender: values.gender,
               phone: isEmpty(values?.phone) ? null : values?.phone,
-              wardId: +values?.wardId,
+              wardId: values?.wardId ?? "",
               email: values?.email,
             };
             updateProfile(params, {
