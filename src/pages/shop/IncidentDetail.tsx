@@ -138,7 +138,6 @@ const IncidentDetail = () => {
             <LoadingImage
               radius={"sm"}
               bg={"#000"}
-              fit="contain"
               imageId={evidence?.image?.id}
             />
           </Box>

@@ -39,6 +39,7 @@ export type GetIncidentPercentParams = {
   shopId?: string;
   startDate: string;
   endDate: string;
+  type: IncidentType;
 };
 export type MassRejectIncidentParams = {
   incidentIds: string[];

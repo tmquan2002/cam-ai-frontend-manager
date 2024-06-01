@@ -1,4 +1,4 @@
-import { Box, Image, ImageProps, Skeleton } from "@mantine/core";
+import { Box, Image, ImageProps, Skeleton, rem } from "@mantine/core";
 import { useGetImageById } from "../../hooks/useGetImageById";
 import { useMemo, useState } from "react";
 import NoImage from "./NoImage";
@@ -14,6 +14,7 @@ const LoadingImage = (props: LoadingImageProps) => {
     id: imageId,
     scaleFactor: 0.8,
   });
+
   const [isLoadFailed, setIsLoadFailed] = useState<boolean>(false);
 
   const imageSrc = useMemo(() => {
@@ -32,10 +33,11 @@ const LoadingImage = (props: LoadingImageProps) => {
     return (
       <Skeleton
         height={props?.height ?? 400}
-        w={props.w ?? "auto"}
+        w={props.w ?? "100%"}
+        mb={rem(12)}
         animate
         radius={8}
-      ></Skeleton>
+      />
     );
   }
 

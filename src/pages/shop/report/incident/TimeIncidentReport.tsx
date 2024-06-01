@@ -118,14 +118,14 @@ const TimeIncidentReport = () => {
     validate: (values) => ({
       toDate:
         values.startDate &&
-          values?.toDate &&
-          values?.toDate?.getTime() < values?.startDate?.getTime()
+        values?.toDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "End date must be after start date"
           : null,
       fromTime:
         values.toDate &&
-          values?.startDate &&
-          values?.toDate?.getTime() < values?.startDate?.getTime()
+        values?.startDate &&
+        values?.toDate?.getTime() < values?.startDate?.getTime()
           ? "Start date must be before end date"
           : null,
     }),
@@ -186,6 +186,7 @@ const TimeIncidentReport = () => {
         ? dayjs(form.values.toDate).format("YYYY-MM-DD")
         : dayjs().format("YYYY-MM-DD"),
       enabled: true,
+      type: form.values.type,
     });
 
   const data = useMemo(() => {
@@ -420,7 +421,7 @@ const TimeIncidentReport = () => {
           </Box>
 
           {!incidentReportByTimeData ||
-            incidentReportByTimeData?.data?.length == 0 ? (
+          incidentReportByTimeData?.data?.length == 0 ? (
             <NoImage type="NO_DATA" />
           ) : (
             <Box>
@@ -543,12 +544,12 @@ const TimeIncidentReport = () => {
                     style={
                       data && data?.length > 7
                         ? {
-                          width: `${1500 + (data?.length - 7) * 70}px`,
-                          height: "600px",
-                        }
+                            width: `${1500 + (data?.length - 7) * 70}px`,
+                            height: "600px",
+                          }
                         : {
-                          height: "600px",
-                        }
+                            height: "600px",
+                          }
                     }
                   >
                     <Chart
@@ -636,7 +637,7 @@ const TimeIncidentReport = () => {
                           if (elements.length > 0) {
                             const selectedData =
                               incidentReportByTimeData?.data?.[
-                              elements[0].index
+                                elements[0].index
                               ];
                             setSelectedIncidentItem(null);
                             setSelectedDuration({
@@ -715,15 +716,15 @@ const TimeIncidentReport = () => {
                         data={
                           incidentPercent
                             ? incidentPercent?.types?.map((i) => {
-                              return {
-                                name: i.type + " incident",
-                                color:
-                                  i.type == IncidentType.Phone
-                                    ? "indigo.6"
-                                    : "yellow.6",
-                                value: i.total,
-                              };
-                            })
+                                return {
+                                  name: i.type + " incident",
+                                  color:
+                                    i.type == IncidentType.Phone
+                                      ? "indigo.6"
+                                      : "yellow.6",
+                                  value: i.total,
+                                };
+                              })
                             : []
                         }
                       />
@@ -776,17 +777,17 @@ const TimeIncidentReport = () => {
                         data={
                           incidentPercent
                             ? incidentPercent?.statuses.map((i) => {
-                              return {
-                                color:
-                                  i.status == IncidentStatus.Accepted
-                                    ? "#12b886"
-                                    : i.status == IncidentStatus.New
+                                return {
+                                  color:
+                                    i.status == IncidentStatus.Accepted
+                                      ? "#12b886"
+                                      : i.status == IncidentStatus.New
                                       ? "#4c6ef5"
                                       : "#fa5252",
-                                name: i.status,
-                                value: i.total,
-                              };
-                            })
+                                  name: i.status,
+                                  value: i.total,
+                                };
+                              })
                             : []
                         }
                       />
@@ -985,11 +986,11 @@ const TimeIncidentReport = () => {
                     </Text>
                     <Badge radius={"sm"} color={"green"} c={"#fff"}>
                       {selectedIncidentItem?.startTime &&
-                        selectedIncidentItem.endTime
+                      selectedIncidentItem.endTime
                         ? differentDateReturnFormattedString(
-                          selectedIncidentItem?.startTime,
-                          selectedIncidentItem?.endTime
-                        )
+                            selectedIncidentItem?.startTime,
+                            selectedIncidentItem?.endTime
+                          )
                         : "undefined"}
                     </Badge>
                   </Group>
@@ -1053,6 +1054,7 @@ const TimeIncidentReport = () => {
                           <LoadingImage
                             mb={rem(12)}
                             radius={"md"}
+                            fit="contain"
                             imageId={i?.imageId ?? ""}
                           />
                         </Center>

@@ -58,6 +58,8 @@ export function IncidentProvider(props: React.PropsWithChildren) {
       onClick: () => {
         handleClickNotification(incident.id);
       },
+      withCloseButton: false,
+      withBorder: true,
     });
   };
 
@@ -78,6 +80,8 @@ export function IncidentProvider(props: React.PropsWithChildren) {
       onClick: () => {
         handleClickNotification(incident.id);
       },
+      withCloseButton: false,
+      withBorder: true,
     });
   };
 
