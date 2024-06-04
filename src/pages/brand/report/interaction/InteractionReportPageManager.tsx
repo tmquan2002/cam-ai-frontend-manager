@@ -77,9 +77,9 @@ const InteractionReportPageManager = () => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
-      interval: ReportInterval.Day,
+      interval: ReportInterval.Hour,
     },
     validate: (values) => ({
       toDate:

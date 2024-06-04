@@ -118,7 +118,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
-      startDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       toDate: new Date(),
       interval: ReportInterval.HalfDay,
       type: IncidentType.Incident,
@@ -196,6 +196,7 @@ const TimeIncidentReportTab = ({ shopId }: TimeIncidentReportTabProps) => {
         : dayjs().format("YYYY-MM-DD"),
       enabled: !!shopId,
       shopId: shopId ?? "",
+      type: form.values.type,
     });
 
   const { data: incidentList, isLoading: isGetIncidentListLoading } =

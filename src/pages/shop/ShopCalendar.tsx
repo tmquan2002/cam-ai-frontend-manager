@@ -1226,7 +1226,7 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                 </Box>
                 <ScrollArea.Autosize
                   mah={1000}
-                  py={rem(12)}
+                  py={rem(20)}
                   bg={computedColorScheme == "light" ? "#fff" : "#1f1f1f"}
                 >
                   <Box px={rem(24)}>
@@ -1330,13 +1330,14 @@ const ShopCalendar = ({ events }: ShopCalendarProps) => {
                         <NoImage type="NO_DATA" />
                       ) : (
                         selectedIncidentItem?.evidences.map((i) => (
-                          <LoadingImage
-                            mb={rem(12)}
-                            fit="contain"
-                            radius={"md"}
-                            key={i.id}
-                            imageId={i?.imageId ?? ""}
-                          />
+                          <Center w={"100%"}>
+                            <LoadingImage
+                              mb={rem(12)}
+                              radius={"md"}
+                              key={i.id}
+                              imageId={i?.imageId ?? ""}
+                            />
+                          </Center>
                         ))
                       )}
                     </Box>
