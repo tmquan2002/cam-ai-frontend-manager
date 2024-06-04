@@ -750,7 +750,7 @@ const ShopIncidentListPage = () => {
                   <Text fw={500} size={rem(16)}>
                     In Charge:{" "}
                     <Text span c={"blue"} inherit>
-                      {incidentData?.assignment?.inChargeAccount?.name ?? "None"}
+                      {incidentData?.assignment?.supervisor?.name ?? "None"}
                     </Text>
                   </Text>
                 </Group>
