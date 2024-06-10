@@ -1,7 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import {
-  Badge,
   Box,
   Button,
   Center,
@@ -11,26 +8,31 @@ import {
   LoadingOverlay,
   Pagination,
   Paper,
+  Select,
   Table,
   Text,
+  Tooltip,
   rem,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
-import { IMAGE_CONSTANT } from "../../types/constant";
-import classes from "./IncidentListPage.module.scss";
-import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
-import { IconFilter } from "@tabler/icons-react";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { IconFilter } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import _ from "lodash";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { GetIncidentParams } from "../../apis/IncidentAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { useForm } from "@mantine/form";
 import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { GetIncidentParams } from "../../apis/IncidentAPI";
-import dayjs from "dayjs";
-import _ from "lodash";
+import { useGetIncidentList } from "../../hooks/useGetIncidentList";
 import { useGetShopList } from "../../hooks/useGetShopList";
+import { IncidentStatus, IncidentType } from "../../models/CamAIEnum";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./IncidentListPage.module.scss";
 
 type SearchIncidentField = {
   incidentType?: IncidentType | null;
@@ -38,7 +40,7 @@ type SearchIncidentField = {
   toTime?: Date | null;
   edgeBoxId?: string;
   status?: IncidentStatus | null;
-  shopId?: string;
+  shopId?: string | null;
   brandId?: string;
   employeeId?: string | null;
   size?: number;
@@ -48,23 +50,23 @@ type SearchIncidentField = {
 const IncidentListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
-
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
 
   const form = useForm<SearchIncidentField>({
     initialValues: {
+      shopId: null,
       employeeId: null,
       fromTime: null,
       status: null,
       toTime: null,
-      incidentType: null,
-      size: 20,
+      incidentType: IncidentType.Incident,
       pageIndex: activePage - 1,
     },
   });
 
   const searchParams: GetIncidentParams = useMemo(() => {
-    console.log(form.values);
+    // console.log(form.values);
 
     let sb: GetIncidentParams = {
       employeeId: form.values.employeeId,
@@ -77,13 +79,14 @@ const IncidentListPage = () => {
         : undefined,
       status: form.values.status,
       incidentType: form.values.incidentType,
-      size: form.values.size,
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       pageIndex: activePage - 1,
     };
     sb = _.omitBy(sb, _.isNil) as GetIncidentParams;
     return sb;
   }, [
     activePage,
+    pageSize,
     form.values.employeeId,
     form.values.fromTime,
     form.values.incidentType,
@@ -92,26 +95,9 @@ const IncidentListPage = () => {
     form.values.shopId,
   ]);
 
-  const { data: incidentList, isLoading: isGetIncidentListLoading } =
-    useGetIncidentList(searchParams);
-
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-
-  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
-    enabled: true,
-    size: 999,
-  });
-
-  const removedInteractionIncident = useMemo(() => {
-    if (isGetEmployeeListLoading) {
-      return [];
-    } else {
-      return incidentList?.values?.filter(
-        (item) => item?.incidentType != IncidentType.Interaction
-      );
-    }
-  }, [incidentList, isGetIncidentListLoading]);
+  const { data: incidentList, isLoading: isGetIncidentListLoading } = useGetIncidentList(searchParams);
+  const { data: employeeList, isLoading: isGetEmployeeListLoading } = useGetEmployeeList({});
+  const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({ enabled: true, size: 999, });
 
   const fields = useMemo(() => {
     return [
@@ -204,26 +190,20 @@ const IncidentListPage = () => {
     isGetShopListLoading,
   ]);
 
-  const renderIncidentStatusBadge = (status: IncidentStatus) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-      case IncidentStatus.Accepted:
-        return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-      case IncidentStatus.Rejected:
-        return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-    }
-  };
-
-  const rows = removedInteractionIncident?.map((row, index) => {
+  const rows = incidentList?.values?.map((row, index) => {
     return (
       <Table.Tr
         key={index}
         className={classes["clickable"]}
-        onClick={() => navigate(`/brand/incident/${row?.id}`)}
       >
-        <Table.Td>
-          <Text>{row?.incidentType}</Text>
+        <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
+        <Table.Td
+          className={classes["pointer-style"]}
+          c={"blue"}
+          onClick={() => navigate(`/brand/incident/${row?.id}`)}>
+          <Tooltip label="View Incident" withArrow position="top-start">
+            <Text>{row?.incidentType}</Text>
+          </Tooltip>
         </Table.Td>
         <Table.Td
           className={classes["pointer-style"]}
@@ -233,23 +213,33 @@ const IncidentListPage = () => {
             navigate(`/brand/shop/${row?.shopId}`);
           }}
         >
-          <Text>{row?.shop?.name}</Text>
+          <Tooltip label="View Shop" withArrow position="top-start">
+            <Text>{row?.shop?.name}</Text>
+          </Tooltip>
         </Table.Td>
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
         <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/brand/employee/${row?.employee?.id}`);
-            }}
-          >
-            {row?.employee?.name}
-          </Text>
+          {row?.employee ? (
+            <Tooltip label="View Employee" withArrow position="top-start">
+              <Text
+                className={classes["pointer-style"]}
+                c={"blue"}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/brand/employee/${row?.employee?.id}`);
+                }}
+              >
+                {row?.employee?.name}
+              </Text>
+            </Tooltip>
+          ) : (
+            <Text>None</Text>
+          )}
         </Table.Td>
 
-        <Table.Td>{renderIncidentStatusBadge(row?.status)}</Table.Td>
+        <Table.Td ta="center">
+          <StatusBadge statusName={row.status} size="sm" padding={10} />
+        </Table.Td>
       </Table.Tr>
     );
   });
@@ -283,7 +273,7 @@ const IncidentListPage = () => {
         <EditAndUpdateForm fields={fields} />
       </Collapse>
 
-      <Box pos={"relative"} mb={"lg"}>
+      <Box pos={"relative"} mb={"lg"} pl={20} pr={20}>
         <LoadingOverlay
           visible={isGetIncidentListLoading}
           zIndex={1000}
@@ -304,34 +294,45 @@ const IncidentListPage = () => {
             />
           </Center>
         ) : (
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            verticalSpacing={"md"}
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Incident type</Table.Th>
-                <Table.Th>Shop name</Table.Th>
-                <Table.Th>Time</Table.Th>
-                <Table.Th>Assigned to</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <Table.ScrollContainer minWidth={1000}>
+            <Table striped highlightOnHover verticalSpacing={"md"}>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Incident type</Table.Th>
+                  <Table.Th>Shop name</Table.Th>
+                  <Table.Th>Time</Table.Th>
+                  <Table.Th>Assigned to</Table.Th>
+                  <Table.Th ta="center">Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
       </Box>
-      <Group justify="flex-end">
+      <Group justify="space-between" align="end">
         <Pagination
           value={activePage}
           onChange={setPage}
           total={Math.ceil(
-            (incidentList?.totalCount ?? 0) / (form.values.size ?? 20)
+            (incidentList?.totalCount ?? 0) / (Number(pageSize) ?? 5)
           )}
         />
+        {!incidentList?.isValuesEmpty && (
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={PAGE_SIZE_SELECT}
+            defaultValue={DEFAULT_PAGE_SIZE}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value);
+              setPage(1);
+            }}
+          />
+        )}
       </Group>
     </Paper>
   );

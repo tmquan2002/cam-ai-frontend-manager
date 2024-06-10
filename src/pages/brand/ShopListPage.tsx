@@ -1,62 +1,39 @@
-import { useMemo, useState } from "react";
-import {
-  GetShopListHookParams,
-  useGetShopList,
-} from "../../hooks/useGetShopList";
-import { useForm } from "@mantine/form";
-import {
-  IconAlignBoxCenterStretch,
-  IconFilter,
-  IconPhoneCall,
-  IconPlus,
-  IconSearch,
-} from "@tabler/icons-react";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { ShopStatus } from "../../models/CamAIEnum";
 import {
   ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Center,
-  Collapse,
-  Flex,
-  Group,
-  Image,
-  LoadingOverlay,
-  Menu,
-  NumberInput,
-  Pagination,
-  Paper,
-  Table,
-  Text,
-  TextInput,
-  Tooltip,
-  rem,
+  Box, Button, Center, Collapse, Flex, Group, Image,
+  LoadingOverlay, Menu, NumberInput, Pagination, Paper, Select, Table, Text, TextInput, Tooltip, rem
 } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
-import classes from "./ShopListPage.module.scss";
+import { useForm } from "@mantine/form";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { IconAlignBoxCenterStretch, IconFilter, IconPhoneCall, IconPlus, IconSearch, } from "@tabler/icons-react";
 import _ from "lodash";
-import { IMAGE_CONSTANT } from "../../types/constant";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
+import EditAndUpdateForm, { FIELD_TYPES, } from "../../components/form/EditAndUpdateForm";
+import { GetShopListHookParams, useGetShopList, } from "../../hooks/useGetShopList";
+import { ShopStatus } from "../../models/CamAIEnum";
+import { DEFAULT_PAGE_SIZE, IMAGE_CONSTANT, PAGE_SIZE_SELECT } from "../../types/constant";
+import { formatTime, mapLookupToArray } from "../../utils/helperFunction";
+import classes from "./ShopListPage.module.scss";
+import { useTaskBrand } from "../../routes/BrandRoute";
 
 type SearchShopField = {
   status: string | null;
 };
 
 const SearchCategory = {
-  NAME: <IconAlignBoxCenterStretch size={"1.2rem"} stroke={1.5} />,
-  PHONE: <IconPhoneCall size={"1.2rem"} stroke={1.5} />,
+  NAME: <IconAlignBoxCenterStretch size={"1rem"} stroke={1.5} />,
+  PHONE: <IconPhoneCall size={"1rem"} stroke={1.5} />,
 };
 
 const ShopListPage = () => {
   const navigate = useNavigate();
   const [opened, { toggle }] = useDisclosure(false);
 
+  const { taskId } = useTaskBrand();
   const [activePage, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<string | null>(DEFAULT_PAGE_SIZE);
   const form = useForm<SearchShopField>({
     initialValues: {
       status: null,
@@ -66,12 +43,12 @@ const ShopListPage = () => {
   const [search, setSearch] = useState<string | number>("");
   const [debounced] = useDebouncedValue(search, 400);
   const [searchCategory, setSearchCategory] = useState<JSX.Element>(
-    SearchCategory.NAME
+    SearchCategory.NAME,
   );
 
   const searchParams: GetShopListHookParams = useMemo(() => {
     let sb: GetShopListHookParams = {
-      size: 12,
+      size: Number(pageSize) ?? DEFAULT_PAGE_SIZE,
       pageIndex: activePage - 1,
       status: form.values.status ?? null,
       enabled: true,
@@ -111,29 +88,22 @@ const ShopListPage = () => {
 
   const rows = shopList?.values.map((row, index) => {
     return (
-      <Table.Tr key={index} onClick={() => navigate(`/brand/shop/${row.id}`)}>
-        <Table.Td>
-          <Text className={classes["pointer-style"]} c={"blue"}>
-            {row.name}
-          </Text>
-        </Table.Td>
-        <Table.Td>{row.addressLine}</Table.Td>
-        <Table.Td>{row.openTime}</Table.Td>
-        <Table.Td>{row.closeTime}</Table.Td>
-        <Table.Td>{row.phone}</Table.Td>
-        <Table.Td>
-          {row?.shopManager ? row.shopManager?.name : "No manager"}
-        </Table.Td>
-        <Table.Td>
-          {_.isEqual(row.shopStatus, "Active") ? (
-            <Badge variant="light">Active</Badge>
-          ) : (
-            <Badge color="gray" variant="light">
-              Disabled
-            </Badge>
-          )}
-        </Table.Td>
-      </Table.Tr>
+      <Tooltip label="View shop detail" withArrow openDelay={300} key={index}>
+        <Table.Tr onClick={() => navigate(`/brand/shop/${row.id}`)}>
+          <Table.Td>{index + 1 + Number(pageSize) * (activePage - 1)}</Table.Td>
+          <Table.Td>{row.name}</Table.Td>
+          <Table.Td>{row.addressLine}</Table.Td>
+          <Table.Td>{formatTime(row.openTime, false, false)}</Table.Td>
+          <Table.Td>{formatTime(row.closeTime, false, false)}</Table.Td>
+          <Table.Td>{row.phone}</Table.Td>
+          <Table.Td>
+            {row?.shopManager ? row.shopManager?.name : "No manager"}
+          </Table.Td>
+          <Table.Td ta={"center"}>
+            <StatusBadge statusName={row.shopStatus} size="sm" padding={10} />
+          </Table.Td>
+        </Table.Tr>
+      </Tooltip>
     );
   });
 
@@ -142,7 +112,7 @@ const ShopListPage = () => {
       <Menu transitionProps={{ transition: "pop-top-right" }}>
         <Tooltip label="Search by">
           <Menu.Target>
-            <ActionIcon size={36} radius="xl" color={"blue"} variant="filled">
+            <ActionIcon size={25} color={"blue"} variant="filled">
               {searchCategory}
             </ActionIcon>
           </Menu.Target>
@@ -182,7 +152,7 @@ const ShopListPage = () => {
   };
 
   return (
-    <Paper p={rem(32)} shadow="xs">
+    <Paper m={rem(32)} mb={0} p={rem(32)} pb={rem(48)} shadow="xl">
       <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
         Shop list
       </Text>
@@ -191,7 +161,6 @@ const ShopListPage = () => {
           <TextInput
             style={{ flex: 1 }}
             placeholder="Search by any field"
-            classNames={{ input: classes.search_input }}
             rightSectionWidth={52}
             leftSectionWidth={52}
             leftSection={
@@ -208,7 +177,6 @@ const ShopListPage = () => {
           <NumberInput
             style={{ flex: 1 }}
             placeholder="Search by any field"
-            classNames={{ input: classes.search_input }}
             rightSectionWidth={52}
             leftSectionWidth={52}
             leftSection={
@@ -232,13 +200,10 @@ const ShopListPage = () => {
         </Button>
         <Button
           leftSection={<IconPlus size={14} />}
-          variant="outline"
-          h={rem(48)}
           onClick={() => {
             navigate("/brand/create/shop");
           }}
-          ml={rem(12)}
-          radius={"20%/50%"}
+          disabled={taskId !== undefined}
         >
           Add shop
         </Button>
@@ -252,7 +217,7 @@ const ShopListPage = () => {
         </Group>
       </Collapse>
 
-      <Box mt={"md"} pos={"relative"}>
+      <Box mt={"md"} pos={"relative"} pl={20} pr={20}>
         <LoadingOverlay
           visible={isShopListLoading}
           zIndex={1000}
@@ -272,34 +237,49 @@ const ShopListPage = () => {
             />
           </Center>
         ) : (
-          <Table
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-            verticalSpacing={"md"}
-          >
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Shop name</Table.Th>
-                <Table.Th>Address</Table.Th>
-                <Table.Th>Open time</Table.Th>
-                <Table.Th>Close time</Table.Th>
-                <Table.Th>Phone</Table.Th>
-                <Table.Th>Shop manager</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-          </Table>
+          <Table.ScrollContainer minWidth={1000}>
+            <Table
+              miw={1000}
+              highlightOnHover
+              verticalSpacing={"md"}
+              striped
+            >
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>#</Table.Th>
+                  <Table.Th>Shop name</Table.Th>
+                  <Table.Th>Address</Table.Th>
+                  <Table.Th>Open time</Table.Th>
+                  <Table.Th>Close time</Table.Th>
+                  <Table.Th>Phone</Table.Th>
+                  <Table.Th>Shop manager</Table.Th>
+                  <Table.Th ta={"center"}>Status</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
         )}
       </Box>
-      <Group justify="flex-end" mt="lg">
+      <Group justify="space-between" align="end">
         <Pagination
           value={activePage}
           onChange={setPage}
-          total={Math.ceil((shopList?.totalCount ?? 0) / 12)}
+          total={Math.ceil((shopList?.totalCount ?? 0) / Number(pageSize))}
         />
+        {!shopList?.isValuesEmpty &&
+          <Select
+            label="Page Size"
+            allowDeselect={false}
+            placeholder="0"
+            data={PAGE_SIZE_SELECT} defaultValue={DEFAULT_PAGE_SIZE}
+            value={pageSize}
+            onChange={(value) => {
+              setPageSize(value)
+              setPage(1)
+            }}
+          />
+        }
       </Group>
     </Paper>
   );

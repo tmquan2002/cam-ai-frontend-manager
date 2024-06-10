@@ -1,6 +1,7 @@
 import { getAccessToken } from "../context/AuthContext";
 import { ShopStatus } from "../models/CamAIEnum";
 import { CommonResponse } from "../models/Common";
+import { Progress } from "../models/Task";
 import { ShopDetail } from "../models/Shop";
 import http, { toQueryParams } from "../utils/http";
 
@@ -20,7 +21,7 @@ export type UpdateShopParams = {
   name?: string;
   phone?: string | null;
   wardId?: string;
-  shopManagerId?: string;
+  shopManagerId: string;
   addressLine?: string;
   openTime?: string;
   closeTime?: string;
@@ -99,6 +100,68 @@ export const ShopAPI = {
         },
       }
     );
+
+    return res?.data;
+  },
+  _deleteShopById: async (shopId: string) => {
+    const access_token = getAccessToken();
+
+    const res = await http.delete(`/api/shops/${shopId}`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _uploadShopFile: async (params: { file: File }) => {
+    const access_token = getAccessToken();
+    const form = new FormData();
+    form.append("file", params.file);
+
+    const res = await http.post<{ taskId: string, message: string }>(`/api/shops/upsert`, form, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getShopUpsertTask: async () => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<string[]>(`/api/shops/upsert/task`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getShopUpsertTaskResult: async (taskId: string | undefined) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/result`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    return res?.data;
+  },
+
+  _getShopProgress: async (taskId: string | undefined) => {
+    const access_token = getAccessToken();
+
+    const res = await http.get<Progress>(`/api/shops/upsert/task/${taskId}/progress`, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
 
     return res?.data;
   },

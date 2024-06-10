@@ -1,27 +1,35 @@
 import {
-  Badge,
   Box,
   Divider,
   Flex,
   Group,
-  Loader,
+  LoadingOverlay,
   Paper,
-  Select,
+  ScrollArea,
+  Stack,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
-import BackButton from "../../components/button/BackButton";
-import { useGetEmployeeList } from "../../hooks/useGetEmployeeList";
-import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
-import { useGetIncidentById } from "../../hooks/useGetIncidentById";
-import { useParams } from "react-router-dom";
-import dayjs from "dayjs";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
-import { EvidenceDetail } from "../../models/Evidence";
-import NoImage from "../../components/image/NoImage";
+import {
+  IconClock,
+  IconPictureInPicture,
+  IconReport,
+  IconRobot,
+  IconUserCircle,
+  IconUsers,
+} from "@tabler/icons-react";
+import dayjs from "dayjs";
 import _ from "lodash";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import StatusBadge from "../../components/badge/StatusBadge";
 import LoadingImage from "../../components/image/LoadingImage";
+import NoImage from "../../components/image/NoImage";
+import { useGetIncidentById } from "../../hooks/useGetIncidentById";
+import { EvidenceType, IncidentStatus } from "../../models/CamAIEnum";
+import { EvidenceDetail } from "../../models/Evidence";
 
 type IncidentFormField = {
   employeeId: string | null;
@@ -32,23 +40,21 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
     case EvidenceType.Image:
       return (
         <Box>
-          <Group align="center" mb={rem(12)}>
-            <Group gap={"xl"}>
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Created time
-                </Text>
-                <Text fw={500}>
-                  {dayjs(evidence?.createdDate).format("DD/MM/YYYY h:mm A")}
-                </Text>
-              </Box>
-              <Box>
-                <Text fw={500} c={"dimmed"}>
-                  Camera
-                </Text>
-                <Text fw={500}>{evidence?.cameraId}</Text>
-              </Box>
-            </Group>
+          <Group align="center" mb={rem(12)} gap={30}>
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Created time
+              </Text>
+              <Text fw={500}>
+                {dayjs(evidence?.createdDate).format("DD/MM/YYYY h:mm A")}
+              </Text>
+            </Box>
+            <Box>
+              <Text fw={500} c={"dimmed"}>
+                Camera
+              </Text>
+              <Text fw={500}>{evidence?.cameraId}</Text>
+            </Box>
           </Group>
 
           <LoadingImage
@@ -62,26 +68,12 @@ const renderIncidentFootage = (evidence: EvidenceDetail) => {
   }
 };
 
-const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-  switch (status) {
-    case IncidentStatus.New:
-      return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-    case IncidentStatus.Accepted:
-      return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-    case IncidentStatus.Rejected:
-      return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-    case undefined:
-      return <></>;
-  }
-};
-
 const ShopIncidentDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const form = useForm<IncidentFormField>();
-
-  const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({});
-
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const { data: incidentData, isLoading: isGetIncidentLoading } =
     useGetIncidentById(id ?? "");
 
@@ -93,23 +85,24 @@ const ShopIncidentDetailPage = () => {
     }
   }, [incidentData]);
 
-  if (isGetIncidentLoading) {
-    return <Loader />;
-  }
-
   return (
-    <Box>
-      <Group px={rem(64)} bg={"white"} justify="space-between" align="center">
-        <Group py={rem(32)} align="center">
-          <BackButton color="#000" w={rem(36)} h={rem(36)} />
-          <Text size={rem(20)} fw={500}>
-            {incidentData?.incidentType} Incident -{" "}
-            {dayjs(incidentData?.startTime).format("DD/MM/YYYY h:mm A")}
+    <Box pos="relative">
+      <LoadingOverlay visible={isGetIncidentLoading} />
+      <Paper px={rem(32)} shadow="sm">
+        <Box py={rem(32)}>
+          <Text
+            size={rem(18)}
+            fw={600}
+            c={computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"}
+            lh={rem(26)}
+          >
+            {incidentData?.incidentType} incident
           </Text>
-          {renderIncidentStatusBadge(incidentData?.status ?? undefined)}
-        </Group>
-      </Group>
-      <Divider />
+          <Text c={"dimmed"} size={rem(14)} fw={400} lh={rem(26)}>
+            {dayjs(incidentData?.startTime).format("MMMM DD, YYYY h:mm A")}
+          </Text>
+        </Box>
+      </Paper>
       <Flex>
         <Box
           style={{
@@ -118,7 +111,7 @@ const ShopIncidentDetailPage = () => {
         >
           <Paper
             shadow="xs"
-            mx={rem(64)}
+            mx={rem(32)}
             my={rem(40)}
             px={rem(32)}
             py={rem(28)}
@@ -127,61 +120,185 @@ const ShopIncidentDetailPage = () => {
               <Text fw={500} size={rem(20)}>
                 Evidence
               </Text>
-              <Group align="flex-end">
-                <Text fw={500} size={rem(16)}>
-                  Total evidence:{" "}
-                  <Text span c={"blue"} inherit>
-                    {incidentData?.evidences.length}
-                  </Text>
-                </Text>
-                <>|</>
-                <Text fw={500} size={rem(16)}>
-                  AI identity :{" "}
-                  <Text span c={"blue"} inherit>
-                    {incidentData?.aiId}
-                  </Text>
-                </Text>
-              </Group>
             </Group>
             <Divider color="#acacac" mb={rem(20)} />
-            {_.isEmpty(incidentData?.evidences) ? (
-              <NoImage />
-            ) : (
-              incidentData?.evidences?.map((item) => {
-                return (
-                  <Box key={item.id} mb={rem(20)}>
-                    {renderIncidentFootage(item)}
-                  </Box>
-                );
-              })
-            )}
+            <ScrollArea h={470}>
+              {_.isEmpty(incidentData?.evidences) ? (
+                <NoImage type="NO_DATA" />
+              ) : (
+                incidentData?.evidences?.map((item) => {
+                  return (
+                    <Box key={item.id} mb={rem(20)}>
+                      {renderIncidentFootage(item)}
+                    </Box>
+                  );
+                })
+              )}
+            </ScrollArea>
           </Paper>
         </Box>
         <Box w={rem(500)}>
-          <Paper shadow="xs" mt={rem(40)} mr={rem(20)} py={rem(4)}>
-            <Box px={rem(32)} pb={rem(32)}>
-              <Text fw={500} size={rem(20)} my={rem(20)}>
-                Assigned to
-              </Text>
-              <Divider color="#acacac" />
-              {isGetEmployeeListLoading ? (
-                <Loader mt={rem(30)} />
-              ) : (
-                <Select
-                  mt={rem(24)}
-                  {...form.getInputProps("employeeId")}
-                  placeholder="No employee assigned"
-                  data={employeeList?.values?.map((item) => {
-                    return {
-                      value: item?.id,
-                      label: item?.name,
-                    };
-                  })}
-                  readOnly
-                  nothingFoundMessage="Nothing found..."
+          <Paper shadow="xs" mt={rem(40)} mr={rem(32)} py={rem(4)}>
+            <Stack
+              p={rem(24)}
+              gap={4}
+              style={{
+                backgroundColor:
+                  computedColorScheme == "light" ? "#fff" : "#1f1f1f",
+              }}
+            >
+              <Group justify="space-between">
+                <Text
+                  fw={600}
+                  size={rem(17)}
+                  c={
+                    computedColorScheme == "light" ? "rgb(17, 24, 39)" : "white"
+                  }
+                  lh={rem(26)}
+                >
+                  {incidentData?.incidentType} incident
+                </Text>
+                <StatusBadge
+                  statusName={incidentData?.status || "None"}
+                  size="sm"
+                  padding={10}
                 />
+              </Group>
+            </Stack>
+            <Divider color="#ccc" />
+            <Stack p={rem(24)} gap={rem(18)}>
+              {incidentData?.employee && (
+                <Group>
+                  <IconUserCircle
+                    style={{
+                      width: rem(22),
+                      color: computedColorScheme == "light" ? "#000" : "white",
+                      aspectRatio: 1,
+                    }}
+                  />
+
+                  <Text
+                    size={rem(15)}
+                    fw={500}
+                    c={computedColorScheme == "light" ? "black" : "white"}
+                    lh={rem(24)}
+                  >
+                    <Text
+                      span
+                      size={rem(15)}
+                      lh={rem(24)}
+                      inherit
+                      fw={400}
+                      c={"dimmed"}
+                    >
+                      Assign to{" "}
+                    </Text>
+                    {incidentData?.employee?.name}
+                  </Text>
+                </Group>
               )}
-            </Box>
+
+              {incidentData?.assigningAccount && (
+                <Group>
+                  <IconUsers
+                    style={{
+                      width: rem(22),
+                      color: computedColorScheme == "light" ? "#000" : "white",
+                      aspectRatio: 1,
+                    }}
+                  />
+                  <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
+                    {incidentData?.status == IncidentStatus.Rejected
+                      ? "Rejected "
+                      : "Assigned "}
+                    by{" "}
+                    <Text
+                      inherit
+                      span
+                      fw={500}
+                      c={computedColorScheme == "light" ? "black" : "white"}
+                    >
+                      {incidentData?.assigningAccount?.name}
+                    </Text>
+                  </Text>
+                </Group>
+              )}
+              <Group>
+                <IconReport
+                  style={{
+                    width: rem(22),
+                    color: computedColorScheme == "light" ? "#000" : "white",
+                    aspectRatio: 1,
+                  }}
+                />
+                <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
+                  In charge :
+                  <Text
+                    inherit
+                    span
+                    fw={500}
+                    c={computedColorScheme == "light" ? "black" : "white"}
+                  >
+                    {" " + incidentData?.assignment?.inChargeAccount?.name}
+                  </Text>
+                </Text>
+              </Group>
+              <Group>
+                <IconPictureInPicture
+                  style={{
+                    width: rem(22),
+                    color: computedColorScheme == "light" ? "#000" : "white",
+                    aspectRatio: 1,
+                  }}
+                />
+                <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
+                  Evidences :
+                  <Text
+                    inherit
+                    span
+                    fw={500}
+                    c={computedColorScheme == "light" ? "black" : "white"}
+                  >
+                    {" " + incidentData?.evidences.length}
+                  </Text>
+                </Text>
+              </Group>
+              <Group>
+                <IconRobot
+                  style={{
+                    width: rem(22),
+                    color: computedColorScheme == "light" ? "#000" : "white",
+                    aspectRatio: 1,
+                  }}
+                />
+                <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
+                  AI identity :
+                  <Text
+                    span
+                    inherit
+                    fw={500}
+                    c={computedColorScheme == "light" ? "black" : "white"}
+                  >
+                    {" " + incidentData?.aiId}
+                  </Text>
+                </Text>
+              </Group>
+
+              <Group>
+                <IconClock
+                  style={{
+                    width: rem(22),
+                    color: computedColorScheme == "light" ? "#000" : "white",
+                    aspectRatio: 1,
+                  }}
+                />
+                <Text size={rem(15)} c={"dimmed"} lh={rem(24)}>
+                  {dayjs(incidentData?.startTime).format(
+                    "MMMM DD, YYYY h:mm A"
+                  )}
+                </Text>
+              </Group>
+            </Stack>
           </Paper>
         </Box>
       </Flex>

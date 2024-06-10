@@ -1,12 +1,13 @@
 import {
   Box,
-  Card,
+  Flex,
   Group,
   Loader,
   Select,
   Tabs,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { IconClock, IconUser } from "@tabler/icons-react";
 import EmployeeIncidentReportTab from "./EmployeeIncidentReportTab";
@@ -15,6 +16,9 @@ import { useGetShopList } from "../../../../hooks/useGetShopList";
 import { useState } from "react";
 
 const IncidentReportPageManager = () => {
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const [selectedShop, setSelectedShop] = useState<string | null>(null);
   const iconStyle = { width: rem(20), height: rem(20) };
   const { data: shopList, isLoading: isGetShopListLoading } = useGetShopList({
@@ -23,10 +27,16 @@ const IncidentReportPageManager = () => {
   });
 
   return (
-    <Box pb={rem(40)} mx={rem(28)} mt={rem(28)}>
-      <Group justify="space-between" my={rem(20)}>
-        <Text size="lg" fw={"bold"} fz={22} c={"light-blue.4"}>
-          INCIDENT REPORT
+    <Flex
+      px={rem(40)}
+      pt={rem(20)}
+      bg={computedColorScheme == "light" ? "#fff" : "#1a1a1a"}
+      flex={1}
+      direction={"column"}
+    >
+      <Group justify="space-between" align="center" my={rem(16)}>
+        <Text size={rem(22)} fw={"bold"} c={"light-blue.4"}>
+          Incident report
         </Text>
         {isGetShopListLoading ? (
           <Loader />
@@ -34,8 +44,18 @@ const IncidentReportPageManager = () => {
           <Select
             value={selectedShop}
             onChange={setSelectedShop}
-            size="md"
+            size="sm"
+            radius={rem(8)}
             w={rem(320)}
+            allowDeselect={false}
+            style={{
+              fontWeight: 500,
+            }}
+            styles={{
+              dropdown: {
+                fontWeight: 500,
+              },
+            }}
             data={
               shopList
                 ? shopList?.values.map((item) => {
@@ -51,30 +71,23 @@ const IncidentReportPageManager = () => {
         )}
       </Group>
 
-      <Card shadow="xs" pb={rem(40)}>
-        <Tabs
-          keepMounted={false}
-          variant="default"
-          defaultValue="ByEmployee"
-          c={"blue"}
-          color="blue"
-        >
+      <Box
+        py={rem(10)}
+        bg={computedColorScheme == "light" ? "white" : "#242424"}
+      >
+        <Tabs keepMounted={false} variant="default" defaultValue="ByEmployee">
           <Tabs.List>
             <Tabs.Tab
               value="ByEmployee"
               leftSection={<IconUser style={iconStyle} />}
             >
-              <Text size="md" fw={500}>
-                Employee report
-              </Text>
+              <Text fw={500}>Employee report</Text>
             </Tabs.Tab>
             <Tabs.Tab
               value="ByTime"
               leftSection={<IconClock style={iconStyle} />}
             >
-              <Text size="md" fw={500}>
-                Time report
-              </Text>
+              <Text fw={500}>Time report</Text>
             </Tabs.Tab>
           </Tabs.List>
 
@@ -82,8 +95,8 @@ const IncidentReportPageManager = () => {
             {selectedShop ? (
               <EmployeeIncidentReportTab shopId={selectedShop} />
             ) : (
-              <Text mt={rem(28)} size="xl" fw={700}>
-                Please select shop
+              <Text my={rem(20)} size="md" fw={500}>
+                No Shop Selected
               </Text>
             )}
           </Tabs.Panel>
@@ -92,14 +105,14 @@ const IncidentReportPageManager = () => {
             {selectedShop ? (
               <TimeIncidentReportTab shopId={selectedShop} />
             ) : (
-              <Text size="xl" mt={rem(20)} fw={700}>
-                Please select shop
+              <Text size="md" my={rem(20)} fw={500}>
+                No Shop Selected
               </Text>
             )}
           </Tabs.Panel>
         </Tabs>
-      </Card>
-    </Box>
+      </Box>
+    </Flex>
   );
 };
 

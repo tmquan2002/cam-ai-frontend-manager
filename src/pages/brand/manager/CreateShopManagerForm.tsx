@@ -1,5 +1,5 @@
 import { Button, Group } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
@@ -15,14 +15,15 @@ import { useGetProvinceList } from "../../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../../hooks/useGetWardList";
 import { Gender, Role } from "../../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../../models/Response";
-import { phoneRegex } from "../../../types/constant";
-import { getDateFromSetYear, mapLookupToArray } from "../../../utils/helperFunction";
+import { useTaskBrand } from "../../../routes/BrandRoute";
+import { EMAIL_REGEX, PHONE_REGEX } from "../../../types/constant";
+import { mapLookupToArray } from "../../../utils/helperFunction";
 
 export type CreateAccountField = {
     email: string;
     name: string;
-    gender: Gender;
-    phone: string;
+    gender: Gender | null;
+    phone: string | null;
     birthday: Date | null;
     wardId: string;
     addressLine: string;
@@ -32,6 +33,7 @@ export type CreateAccountField = {
 
 const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "shop"; close?: () => void; refetch?: () => {} }) => {
     const navigate = useNavigate();
+    const { taskId } = useTaskBrand();
     const { data: brandList, isLoading: isGetBrandListLoading } = useGetBrandList(
         { size: 1 }
     );
@@ -43,9 +45,9 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
         initialValues: {
             email: "",
             name: "",
-            gender: Gender.Male,
+            gender: null,
             phone: "",
-            birthday: new Date("01/01/2000"),
+            birthday: null,
             addressLine: "",
             province: "",
             district: "",
@@ -54,10 +56,11 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
 
         validate: {
             name: isNotEmpty("Name is required"),
-            email: isEmail("Invalid email - ex: name@gmail.com"),
+            email: (value: string) => isEmpty(value) ? "Email is required"
+                : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
             gender: isNotEmpty("Please select gender"),
-            phone: (value) => isEmpty(value) ? null :
-                phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+            phone: (value) => isEmpty(value) || value == null ? null :
+                PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
         },
     });
 
@@ -82,6 +85,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     placeholder: "Name",
                     label: "Name",
                     required: true,
+                    disabled: taskId != undefined,
                 },
                 spans: 6,
             },
@@ -93,6 +97,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     placeholder: "Email",
                     label: "Email",
                     required: true,
+                    disabled: taskId != undefined,
                 },
                 spans: 6,
             },
@@ -103,8 +108,9 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     name: "phone",
                     placeholder: "Phone",
                     label: "Phone",
+                    disabled: taskId != undefined,
                 },
-                spans: 6,
+                spans: 4,
             },
 
             {
@@ -116,19 +122,20 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     form: createAccountForm,
                     name: "gender",
                     required: true,
+                    disabled: taskId != undefined,
                 },
-                spans: 6,
+                spans: 4,
             },
             {
                 type: FIELD_TYPES.DATE,
                 fieldProps: {
                     form: createAccountForm,
-                    maxDate: getDateFromSetYear(18),
                     name: "birthday",
                     placeholder: "Birthday",
                     label: "Birthday",
+                    disabled: taskId != undefined,
                 },
-                spans: 6,
+                spans: 4,
             },
 
             {
@@ -141,7 +148,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     }),
                     form: createAccountForm,
                     name: "province",
-
+                    disabled: taskId != undefined,
                     loading: isProvicesLoading,
                 },
                 spans: 4,
@@ -157,7 +164,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     form: createAccountForm,
                     name: "district",
                     loading: isCreateAccountDistrictsLoading,
-
+                    disabled: taskId != undefined,
                     // disabled: true,
                 },
                 spans: 4,
@@ -173,6 +180,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     form: createAccountForm,
                     name: "wardId",
                     loading: isCreateAccountWardsLoading,
+                    disabled: taskId != undefined,
                 },
                 spans: 4,
             },
@@ -183,6 +191,7 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                     name: "addressLine",
                     placeholder: "Address",
                     label: "Address",
+                    disabled: taskId != undefined,
                 },
             },
         ];
@@ -204,12 +213,12 @@ const CreateShopManagerForm = ({ mode, close, refetch }: { mode: "manager" | "sh
                 ({ addressLine, birthday, email, gender, name, phone, wardId, }: CreateAccountField) => {
                     const params: CreateAccountParams = {
                         addressLine,
-                        birthday: dayjs(birthday).format("YYYY-MM-DD"),
+                        birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
                         brandId: brandList?.values[0].id ?? "",
-                        email,
+                        email: email ?? null,
                         gender: gender ?? null,
                         name,
-                        phone,
+                        phone: isEmpty(phone) ? null : phone,
                         role: Role.ShopManager,
                         wardId: isEmpty(wardId) ? null : +wardId,
                     };

@@ -27,7 +27,7 @@ const BrandShopDetailPage = () => {
     );
 
   return (
-    <Paper p={rem(32)} m={rem(32)} style={{ flex: 1 }}>
+    <Paper p={rem(32)} m={rem(32)} style={{ flex: 1 }} shadow="lg">
       <Flex align={"center"} mb={rem(32)}>
         <Tooltip label="Brand logo">
           <Avatar

@@ -5,6 +5,7 @@ import {
   Group,
   Indicator,
   Popover,
+  Text,
   Tooltip,
   rem,
 } from "@mantine/core";
@@ -12,15 +13,10 @@ import { IconUser } from "@tabler/icons-react";
 import { MdLogout, MdNotifications } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { useSession } from "../../context/AuthContext";
-import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
-import Notification from "../notification/Notification";
-import { useNotification } from "../../hooks/useNotification";
-import { ReadyState } from "react-use-websocket";
-import { useEffect } from "react";
-import { notifications } from "@mantine/notifications";
-import _ from "lodash";
 import { useGetNotificationList } from "../../hooks/useGetNotificationList";
 import { NotificationStatus } from "../../models/CamAIEnum";
+import LightDarkSwitch from "../lightdarkswitch/LightDarkSwitch";
+import Notification from "../notification/Notification";
 
 interface BurgerProps {
   mobileOpened: boolean;
@@ -32,40 +28,40 @@ interface BurgerProps {
 const ShopHeader = ({ toggleMobile, toggleDesktop }: BurgerProps) => {
   const session = useSession();
   const navigate = useNavigate();
-  const { lastJsonMessage, readyState } = useNotification();
+  // const { lastJsonMessage, readyState } = useNotification();
   const {
     data: notificationList,
     isLoading: isGetNotificationListLoading,
     refetch: refetchNotificationList,
-  } = useGetNotificationList();
+  } = useGetNotificationList({ size: 20 });
 
-  useEffect(() => {
-    if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
-      notifications.show({
-        title: lastJsonMessage?.title,
-        message: lastJsonMessage?.content,
-      });
-    }
-  }, [readyState, lastJsonMessage]);
+  // useEffect(() => {
+  //   if (readyState == ReadyState.OPEN && !_.isEmpty(lastJsonMessage)) {
+  //     notifications.show({
+  //       title: lastJsonMessage?.title,
+  //       message: lastJsonMessage?.content,
+  //     });
+  //   }
+  // }, [readyState, lastJsonMessage]);
 
   const isNotificationAllRead: boolean =
     notificationList?.isValuesEmpty ||
     notificationList?.values == undefined ||
     notificationList?.values?.filter(
       (n) => n.status == NotificationStatus.Unread
-    ).length > 0;
+    ).length <= 0;
 
   return (
     <Flex justify="space-between" px={rem(32)} align={"center"} h={"100%"}>
       <Group>
         <Burger onClick={toggleMobile} hiddenFrom="sm" size="sm" />
         <Burger onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-        <b>CAMAI</b>
+        <Text fw={600}>CAMAI</Text>
       </Group>
       <Group gap={5}>
         <LightDarkSwitch size="md" />
 
-        <Popover position="bottom-end" withArrow shadow="md">
+        <Popover position="bottom-end" withArrow shadow="md" onOpen={refetchNotificationList}>
           <Tooltip label="Notification" withArrow>
             <Popover.Target>
               <Indicator

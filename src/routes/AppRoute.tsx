@@ -1,42 +1,45 @@
 import { useRoutes } from "react-router-dom";
-import CommonRoute from "./CommonRoute";
-import LoginPage from "../pages/common/login/LoginPage";
-import ShopRoute from "./ShopRoute";
-import ShopHomePage from "../pages/shop/ShopHomePage";
-import ShopDetailPage from "../pages/shop/ShopDetailPage";
-import BrandDetailPage from "../pages/brand/BrandDetailPage";
-import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
-import BrandRoute from "./BrandRoute";
-import BrandShopDetailPage from "../pages/shop/BrandShopDetailPage";
-import CreateShop from "../pages/brand/CreateShop";
-import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
-import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
-import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
-import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
-import IncidentDetail from "../pages/shop/IncidentDetail";
-import EmployeeListPage from "../pages/shop/EmployeeListPage";
-import BrandAccountPage from "../pages/brand/BrandAccountPage";
-import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
 import AccountDetailPage from "../pages/brand/AccountDetailPage";
-import BrandEmployeePage from "../pages/brand/BrandEmployeePage";
-import ShopListPage from "../pages/brand/ShopListPage";
-import ShopIncidentListPage from "../pages/shop/ShopIncidentListPage";
-import IncidentListPage from "../pages/brand/IncidentListPage";
-import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
-import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
-import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
-import BranddReportPage from "../pages/brand/BrandReportPage";
-import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
+import BrandEmployeeListPage from "../pages/brand/BrandEmployeeListPage";
+import BrandInteractionList from "../pages/brand/BrandInteractionList";
+import BrandMainPage from "../pages/brand/BrandMainPage";
+import BrandManagerProfilePage from "../pages/brand/BrandManagerProfilePage";
+import BrandReportPage from "../pages/brand/BrandReportPage";
+import BrandShopManagerListPage from "../pages/brand/BrandShopManagerListPage";
 import CameraDetailPage from "../pages/brand/CameraDetailPage";
-import ShopStreamPage from "../pages/shop/ShopStreamPage";
-import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
-import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
+import CreateShop from "../pages/brand/CreateShop";
+import EdgeBoxListPage from "../pages/brand/EdgeBoxListPage";
+import IncidentListPage from "../pages/brand/IncidentListPage";
+import ShopDetailPageManager from "../pages/brand/ShopDetailPageManager";
+import ShopEmployeeDetailPage from "../pages/brand/ShopEmployeeDetailPage";
+import ShopImportResultPage from "../pages/brand/ShopImportResultPage";
+import ShopIncidentDetailPage from "../pages/brand/ShopIncidentDetailPage";
+import CreateManagerPage from "../pages/brand/manager/CreateManagerPage";
+import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
 import IncidentReportPageManager from "../pages/brand/report/incident/IncidentReportPageManager";
 import InteractionReportPageManager from "../pages/brand/report/interaction/InteractionReportPageManager";
-import CountEmployeeReportPage from "../pages/shop/report/employee/CountEmployeeReportTab";
-import CountEmployeeReportPageManager from "../pages/brand/report/employee/CountEmployeeReportPageManager";
+import { NothingFoundBackground } from "../pages/common/404/NothingFoundBackground";
+import LoginPage from "../pages/common/login/LoginPage";
+import HeadSupervisorMainPage from "../pages/headsupervisor/HeadSupervisorMainPage";
+import CreateEmployeePage from "../pages/shop/CreateEmployeePage";
+import EmployeeDetailPage from "../pages/shop/EmployeeDetailPage";
+import EmployeeImportResultPage from "../pages/shop/EmployeeImportResultPage";
+import EmployeeListPage from "../pages/shop/EmployeeListPage";
+import IncidentDetail from "../pages/shop/IncidentDetail";
+import ShopCalendar from "../pages/shop/ShopCalendar";
+import ShopCalendarSetting from "../pages/shop/ShopCalendarSetting";
+import ShopDetailPage from "../pages/shop/ShopDetailPage";
+import ShopHomePage from "../pages/shop/ShopHomePage";
+import ShopIncidentListPage from "../pages/shop/ShopIncidentListPage";
 import ShopInteractionPage from "../pages/shop/ShopInteractionPage";
-import BrandInteractionList from "../pages/brand/BrandInteractionList";
+import ShopManagerProfilePage from "../pages/shop/ShopManagerProfilePage";
+import IncidentReportPage from "../pages/shop/report/incident/IncidentReportTab";
+import { InteractionReportPage } from "../pages/shop/report/interaction/InteractionReportPage";
+import BrandRoute from "./BrandRoute";
+import CommonRoute from "./CommonRoute";
+import HeadSupervisorRoute from "./HeadSupervisorRoute";
+import ShopRoute from "./ShopRoute";
+import { IncidentProvider } from "../context/IncidentContext";
 
 const AppRoute = () => {
   return useRoutes([
@@ -52,7 +55,12 @@ const AppRoute = () => {
     },
     {
       path: "shop",
-      element: <ShopRoute />,
+
+      element: (
+        <IncidentProvider>
+          <ShopRoute />
+        </IncidentProvider>
+      ),
       children: [
         {
           path: "",
@@ -71,15 +79,11 @@ const AppRoute = () => {
           path: "detail",
           element: <ShopDetailPage />,
         },
-        {
-          path: "stream",
-          element: <ShopStreamPage />,
-        },
 
-        {
-          path: "brand/detail",
-          element: <BrandShopDetailPage />,
-        },
+        // {
+        //   path: "brand/detail",
+        //   element: <BrandShopDetailPage />,
+        // },
         {
           path: "profile",
           element: <ShopManagerProfilePage />,
@@ -102,10 +106,7 @@ const AppRoute = () => {
           path: "camera/:id",
           element: <CameraDetailPage />,
         },
-        {
-          path: "report/count/employee",
-          element: <CountEmployeeReportPage />,
-        },
+
         {
           path: "report/incident",
           element: <IncidentReportPage />,
@@ -113,6 +114,18 @@ const AppRoute = () => {
         {
           path: "report/interaction",
           element: <InteractionReportPage />,
+        },
+        {
+          path: "calendar",
+          element: <ShopCalendar events={[]} />,
+        },
+        {
+          path: "calendar/setting",
+          element: <ShopCalendarSetting />,
+        },
+        {
+          path: "import/:id",
+          element: <EmployeeImportResultPage />,
         },
       ],
     },
@@ -122,11 +135,11 @@ const AppRoute = () => {
       children: [
         {
           path: "",
-          element: <BrandDetailPage />,
+          element: <BrandMainPage />,
         },
         {
           path: "account",
-          element: <BrandAccountPage />,
+          element: <BrandShopManagerListPage />,
         },
         {
           path: "account/:id",
@@ -134,16 +147,16 @@ const AppRoute = () => {
         },
         {
           path: "employee",
-          element: <BrandEmployeePage />,
+          element: <BrandEmployeeListPage />,
         },
         {
           path: "employee/:id",
           element: <ShopEmployeeDetailPage />,
         },
-        {
-          path: "shop",
-          element: <ShopListPage />,
-        },
+        // {
+        //   path: "shop",
+        //   element: <ShopListPage />,
+        // },
         {
           path: "shop/:id",
           element: <ShopDetailPageManager />,
@@ -169,7 +182,7 @@ const AppRoute = () => {
         },
         {
           path: "report",
-          element: <BranddReportPage />,
+          element: <BrandReportPage />,
         },
         {
           path: "camera/:id",
@@ -187,8 +200,27 @@ const AppRoute = () => {
           path: "report/interaction",
           element: <InteractionReportPageManager />,
         },
+        {
+          path: "import/:id",
+          element: <ShopImportResultPage />,
+        },
       ],
     },
+    {
+      path: "supervisor",
+      element: (
+        <IncidentProvider>
+          <HeadSupervisorRoute />
+        </IncidentProvider>
+      ),
+      children: [
+        {
+          path: "",
+          element: <HeadSupervisorMainPage />,
+        },
+      ],
+    },
+
     {
       path: "*",
       element: <NothingFoundBackground />,

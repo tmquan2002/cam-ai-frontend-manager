@@ -1,34 +1,61 @@
 .edgeBox-button {
-    border-bottom: 1px solid #ccc;
-    
+  border: 1px solid #ccc;
+  border-radius: rem(8);
 }
 
-.edgeBox-button-active{
-    background-color: #d2e3fc ; 
-    border-top-left-radius: rem(8);
-    border-top-right-radius: rem(8);
+.edgeBox-button-active {
+  background-color: #f2f7ff;
+
+  @include light {
+    background-color: #f2f7ff;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
+  border-top-left-radius: rem(8);
+  border-top-right-radius: rem(8);
 }
 
-.edgeBox-collapse{
-    box-shadow: 0px 4px 5px -2px rgba(97,82,82,0.55);
-    // border-bottom: 1px solid #ccc;
-    background-color: #d2e3fc;
-    border-bottom-left-radius: rem(8);
-    border-bottom-right-radius: rem(8);
+.edgeBox-collapse {
+  box-shadow: 0px 4px 5px -2px rgba(97, 82, 82, 0.55);
+
+  // border-bottom: 1px solid #ccc;
+  @include light {
+    background-color: #f2f7ff;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
+  border-bottom-left-radius: rem(8);
+  border-bottom-right-radius: rem(8);
 }
 
-.edgeBox-button:hover, .edgeBox-collapse:hover, .edgeBox-button-active:hover{
-    background-color:  #d2e3fc ;
-    cursor: pointer;
+.edgeBox-button:hover,
+.edgeBox-collapse:hover,
+.edgeBox-button-active:hover {
+  @include light {
+    background-color: #f2f7ff;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
+  cursor: pointer;
 }
 
 .clickable-style {
-    cursor: pointer;
+  cursor: pointer;
 }
-.clickable-style:hover, .clickable-style:hover > p {
-    color: #339af0 !important;
+
+.clickable-style:hover,
+.clickable-style:hover > p {
+  color: #339af0 !important;
   cursor: pointer;
   font-weight: 500;
   text-decoration: underline;
-
 }

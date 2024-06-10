@@ -14,7 +14,6 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
   Grid,
   Group,
   Paper,
@@ -22,6 +21,7 @@ import {
   Stack,
   Text,
   rem,
+  useComputedColorScheme,
 } from "@mantine/core";
 import { IconCheck, IconEye, IconX } from "@tabler/icons-react";
 import { EmployeeIncidentCardManager } from "../../../../components/card/EmployeeIncidentCardManager";
@@ -46,14 +46,17 @@ type SearchIncidentField = {
 const EmployeeIncidentReportTab = ({
   shopId,
 }: EmployeeIncidentReportTabProps) => {
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
   const form = useForm<SearchIncidentField>({
     validateInputOnChange: true,
     initialValues: {
       employeeId: null,
-      fromTime: null,
+      fromTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       status: null,
-      toTime: null,
-      incidentType: null,
+      toTime: new Date(),
+      incidentType: IncidentType.Incident,
       size: 999,
       shopId: shopId ?? undefined,
     },
@@ -114,14 +117,8 @@ const EmployeeIncidentReportTab = ({
   const { data: incidentList, isLoading: isGetIncidentListLoading } =
     useGetIncidentList(searchParams);
 
-  console.log(
-    incidentList?.values?.filter(
-      (i) => i.incidentType != IncidentType.Interaction
-    ).length
-  );
-
   const { data: employeeList, isLoading: isGetEmployeeListLoading } =
-    useGetEmployeeList({ size: 999 });
+    useGetEmployeeList({ size: 999, shopId: shopId ?? "", enabled: !!shopId });
 
   const removedInteractionIncident = useMemo(() => {
     if (isGetEmployeeListLoading) {
@@ -141,6 +138,7 @@ const EmployeeIncidentReportTab = ({
     var incidentArray: EmployeeIncidentCardProps[] = employeeList?.values?.map(
       (e) => {
         return {
+          status: IncidentStatus.Accepted,
           employee: e,
           incidentList: [],
         };
@@ -148,33 +146,56 @@ const EmployeeIncidentReportTab = ({
     );
 
     incidentArray.push({
+      status: IncidentStatus.New,
       employee: null,
       incidentList: [],
     });
 
+    incidentArray.push({
+      status: IncidentStatus.Rejected,
+      employee: null,
+      incidentList: [],
+    });
+
+    const rejectedIndex = _.findIndex(incidentArray, function (value) {
+      return value?.status == IncidentStatus.Rejected;
+    });
     // Add incident to current array
 
-    if (removedInteractionIncident.length != 0) {
-      removedInteractionIncident.forEach((item) => {
-        const existingEmployeeIndex = _.findIndex(
-          incidentArray,
-          function (value) {
-            return value?.employee?.id == item?.employeeId;
-          }
-        );
-        if (existingEmployeeIndex != -1) {
-          incidentArray[existingEmployeeIndex].incidentList.push(item);
-        }
-      });
-    }
+    removedInteractionIncident.forEach((item) => {
+      if (item.status == IncidentStatus.Rejected) {
+        incidentArray[rejectedIndex].incidentList.push(item);
+        return;
+      }
 
-    // Push unassigned incident to last of array
-    const unAssignedIncidentIndex = _.findIndex(incidentArray, {
-      employee: null,
+      const existingEmployeeIndex = _.findIndex(
+        incidentArray,
+        function (value) {
+          return value?.employee?.id == item?.employeeId;
+        }
+      );
+      if (existingEmployeeIndex != -1) {
+        incidentArray[existingEmployeeIndex].incidentList.push(item);
+      }
     });
-    if (unAssignedIncidentIndex != -1) {
-      incidentArray.push(incidentArray.splice(unAssignedIncidentIndex, 1)[0]);
-    }
+
+    incidentArray = _.sortBy(
+      incidentArray,
+      function (item: EmployeeIncidentCardProps) {
+        return -item.incidentList.length;
+      }
+    );
+
+    //Push unassigned and rejected incident to last of array
+    const unAssignedIncidentIndex = _.findIndex(incidentArray, {
+      status: IncidentStatus.New,
+    });
+
+    incidentArray.push(incidentArray.splice(unAssignedIncidentIndex, 1)[0]);
+    const rejectedIncidentIndex = _.findIndex(incidentArray, {
+      status: IncidentStatus.Rejected,
+    });
+    incidentArray.push(incidentArray.splice(rejectedIncidentIndex, 1)[0]);
     return incidentArray;
   }, [removedInteractionIncident, employeeList]);
 
@@ -187,6 +208,8 @@ const EmployeeIncidentReportTab = ({
           name: "fromTime",
           placeholder: "Start date",
           type: "range",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -196,6 +219,8 @@ const EmployeeIncidentReportTab = ({
           form,
           name: "toTime",
           placeholder: "End date",
+          fontWeight: 500,
+          radius: rem(8),
         },
         spans: 4,
       },
@@ -205,6 +230,8 @@ const EmployeeIncidentReportTab = ({
           form,
           name: "incidentType",
           placeholder: "Incident type",
+          fontWeight: 500,
+          radius: rem(8),
           data: [
             {
               key: IncidentType.Phone,
@@ -214,6 +241,10 @@ const EmployeeIncidentReportTab = ({
               key: IncidentType.Uniform,
               value: IncidentType.Uniform,
             },
+            {
+              value: IncidentType.Incident,
+              label: "All incident",
+            },
           ],
         },
         spans: 4,
@@ -222,16 +253,25 @@ const EmployeeIncidentReportTab = ({
   }, [form]);
 
   return (
-    <Box>
-      <Card
+    <Box mt={rem(20)}>
+      <Box
         style={{
-          borderBottom: "1px solid #ccc",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
+          marginTop: rem(20),
+          overflow: "hidden",
+          paddingBottom: rem(40),
         }}
-        pb={rem(32)}
-        shadow="md"
       >
-        <Card.Section withBorder inheritPadding mb={rem(32)}>
-          <Group justify="flex-end" my={rem(20)}>
+        <Box
+          mb={rem(32)}
+          py={rem(20)}
+          bg={computedColorScheme == "light" ? "#fff" : "#242424"}
+          style={{
+            borderBottom: "1px solid #ccc",
+          }}
+        >
+          <Group justify="flex-end" mr={rem(12)}>
             <Group>
               {form.isDirty() ? (
                 <Button
@@ -244,9 +284,7 @@ const EmployeeIncidentReportTab = ({
                   Reset
                 </Button>
               ) : (
-                <Text size="md" fw={500}>
-                  Filter
-                </Text>
+                <Text size="md" fw={500}></Text>
               )}
 
               <Box miw={rem(360)}>
@@ -254,30 +292,42 @@ const EmployeeIncidentReportTab = ({
               </Box>
             </Group>
           </Group>
-        </Card.Section>
+        </Box>
 
-        {newArray?.map((item, index) => (
-          <Box key={index} pt={index == 0 ? 0 : rem(12)}>
-            <EmployeeIncidentCardManager
-              employee={item?.employee}
-              incidentList={item?.incidentList}
-            />
-          </Box>
-        ))}
-      </Card>
+        <Box mx={rem(20)}>
+          {newArray?.map((item, index) => (
+            <Box key={index} pt={index == 0 ? 0 : rem(12)}>
+              <EmployeeIncidentCardManager
+                status={item?.status}
+                employee={item?.employee}
+                incidentList={item?.incidentList}
+              />
+            </Box>
+          ))}
+        </Box>
+      </Box>
 
       <Grid mt={rem(28)} justify="space-between" gutter={rem(40)}>
         <Grid.Col span={4}>
           <Skeleton
             visible={isGetIncidentListLoading || isGetEmployeeListLoading}
           >
-            <Paper px={rem(20)} py={rem(20)} radius={"md"} shadow="lg">
+            <Paper
+              px={rem(20)}
+              py={rem(20)}
+              radius={"md"}
+              shadow="lg"
+              bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
+            >
               <Group>
                 <Avatar radius={"md"} color="green" size={rem(68)} mr={rem(12)}>
                   <IconCheck size={"2rem"} />
                 </Avatar>
                 <Stack justify="center" gap={rem(6)}>
-                  <Text c="#000" fw={500}>
+                  <Text
+                    c={computedColorScheme == "dark" ? "white" : "black"}
+                    fw={500}
+                  >
                     Assigned incident
                   </Text>
                   <Text size={rem(22)} fw={700} c={"green"}>
@@ -296,13 +346,22 @@ const EmployeeIncidentReportTab = ({
           <Skeleton
             visible={isGetIncidentListLoading || isGetEmployeeListLoading}
           >
-            <Paper px={rem(20)} py={rem(20)} shadow="lg" radius={"md"}>
+            <Paper
+              px={rem(20)}
+              py={rem(20)}
+              shadow="lg"
+              radius={"md"}
+              bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
+            >
               <Group>
                 <Avatar radius={"md"} color="blue" size={rem(68)}>
                   <IconEye size={"2rem"} />
                 </Avatar>
                 <Stack justify="center" gap={rem(8)}>
-                  <Text c="#000" fw={500}>
+                  <Text
+                    c={computedColorScheme == "dark" ? "white" : "black"}
+                    fw={500}
+                  >
                     Unassigned incident
                   </Text>
                   <Text size={rem(22)} fw={700} c={"blue"}>
@@ -322,13 +381,22 @@ const EmployeeIncidentReportTab = ({
           <Skeleton
             visible={isGetIncidentListLoading || isGetEmployeeListLoading}
           >
-            <Paper px={rem(20)} py={rem(20)} shadow="lg" radius={"md"}>
+            <Paper
+              px={rem(20)}
+              py={rem(20)}
+              shadow="lg"
+              radius={"md"}
+              bg={computedColorScheme == "light" ? "white" : "#1D1D1D"}
+            >
               <Group>
                 <Avatar radius={"md"} color="red" size={rem(68)}>
                   <IconX size={"2rem"} />
                 </Avatar>
                 <Stack justify="center" gap={rem(8)}>
-                  <Text c="#000" fw={500}>
+                  <Text
+                    c={computedColorScheme == "dark" ? "white" : "black"}
+                    fw={500}
+                  >
                     Rejected incident
                   </Text>
                   <Text size={rem(22)} fw={700} c={"red"}>

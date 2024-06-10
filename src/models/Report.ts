@@ -2,9 +2,9 @@ import { ReportInterval } from "./CamAIEnum";
 import { IncidentDetail } from "./Incident";
 
 export type ChartReportData = {
-  Time: string;
-  Total: number;
-  ShopId: string;
+  time: string;
+  total: number;
+  shopId: string;
 };
 
 export type InteractionReportDetail = {
@@ -35,14 +35,21 @@ export type HumanCountDetail = {
   startDate: string;
   endDate: string;
   interval: ReportInterval;
+  totalInteraction: number;
   data: HumanCountDataDetail[];
 };
 
 export type HumanCountDataDetail = {
   time: string;
-  low: number;
-  high: number;
-  open: number;
-  close: number;
-  median: number;
+  humanCount: {
+    low: number;
+    high: number;
+    open: number;
+    close: number;
+    median: number;
+  };
+  interaction: {
+    count: number;
+    averageDuration: number;
+  };
 };

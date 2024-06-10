@@ -1,9 +1,6 @@
-import {
-  EdgeBoxStatus,
-  EventType,
-  IncidentStatus,
-  IncidentType,
-} from "./CamAIEnum";
+import { AccountDetail } from "./Account";
+import { EventType, IncidentStatus, IncidentType, Role } from "./CamAIEnum";
+import { EdgeboxDetail } from "./Edgebox";
 import { EmployeeDetail } from "./Employee";
 import { EvidenceDetail } from "./Evidence";
 import { ShopDetail } from "./Shop";
@@ -15,17 +12,56 @@ export type IncidentDetail = {
   endTime: string;
   edgeBoxId: string;
   employeeId: string;
-  status: IncidentStatus;
   shopId: string;
-  shop: ShopDetail;
-  edgeBox: EdgeBoxStatus | null;
-  employee: EmployeeDetail | null;
+  status: IncidentStatus;
+  assigningAccountId: string | null;
+  assigningAccount: AccountDetail | null;
+  assignmentId: string | null;
+  assignment: AssignmentDetail | null;
   evidences: EvidenceDetail[];
   id: string;
-  createdDate: string;
+  shop: ShopDetail | null;
+  edgeBox: EdgeboxDetail | null;
+  employee: EmployeeDetail | null;
 };
 
 export type WebSocketIncident = {
   EventType: EventType;
   Incident: IncidentDetail;
+};
+
+export type IncidentPercentDetail = {
+  shopId: string;
+  startDate: string;
+  endDate: string;
+  total: number;
+  statuses: IncidentPercentStatusDetail[];
+  types: IncidentPercentTypeDetail[];
+};
+
+export type IncidentPercentStatusDetail = {
+  status: IncidentStatus;
+  total: number;
+  percent: number;
+};
+export type IncidentPercentTypeDetail = {
+  type: IncidentType;
+  total: number;
+  percent: number;
+  statuses: IncidentPercentStatusDetail[];
+};
+
+export type AssignmentDetail = {
+  id: string;
+  shopId: string;
+  supervisorId: string | null;
+  inChargeAccountId: string | null;
+  inChargeAccountRole: Role;
+  inChargeEmployeeId: string | null;
+  startTime: string;
+  endTime: string;
+  supervisor: AccountDetail | null;
+  inChargeAccount: AccountDetail | null;
+  incidents: IncidentDetail[];
+  interactions: IncidentDetail[];
 };

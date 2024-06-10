@@ -5,9 +5,9 @@ import http, { toQueryParams } from "../utils/http";
 export type UpdateAccountParams = {
   name: string;
   gender: Gender | null;
-  phone: string;
+  phone: string | null;
   birthday: string | null;
-  wardId: number;
+  wardId: number | string | null;
   addressLine: string;
   userId: string;
 };
@@ -15,8 +15,8 @@ export type CreateAccountParams = {
   email: string;
   name: string;
   gender: Gender | null;
-  phone: string;
-  birthday: string;
+  phone: string | null;
+  birthday: string | null;
   wardId: number | null;
   addressLine: string | null;
   brandId: string;

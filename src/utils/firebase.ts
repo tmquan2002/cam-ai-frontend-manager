@@ -31,9 +31,9 @@ export const getMessagingToken = async () => {
       vapidKey:
         "BBh_WhzBpHQ9KYycEmPO794ZGjRkSFFwHEk-p3P8Ee9W8sSnrRDxXa23ncVyQTSLgbi5tNW1H9J3Wn_YOn_Docw",
     });
-    console.log("FCM registration token", currentToken);
+    // console.log("FCM registration token", currentToken);
   } catch (error) {
-    console.log("An error occurred while retrieving token. ", error);
+    // console.log("An error occurred while retrieving token. ", error);
   }
   return currentToken;
 };

@@ -1,19 +1,21 @@
-import styled from "./login.module.scss";
-import AuthImage from "../../../assets/images/login_signup_main.png";
 import { Box, Button, Group, Modal, Text, TextInput, rem } from "@mantine/core";
-import { useState } from "react";
-import { ChangePasswordForm } from "./ChangePasswordForm";
-import { useLogin } from "../../../hooks/useLogin";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { LoginParams } from "../../../apis/LoginAPI";
-import { getStatusFromToken } from "../../../utils/jwt";
-import { MdEmail, MdLockOutline } from "react-icons/md";
-import { AuthToken } from "../../../models/Auth";
-import { useSession } from "../../../context/AuthContext";
-import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
-import { AccountStatus } from "../../../models/CamAIEnum";
-import axios from "axios";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import axios from "axios";
+import { isEmpty } from "lodash";
+import { useState } from "react";
+import { MdEmail, MdLockOutline } from "react-icons/md";
+import { LoginParams } from "../../../apis/LoginAPI";
+import AuthImage from "../../../assets/images/login_signup_main.png";
+import LightDarkSwitch from "../../../components/lightdarkswitch/LightDarkSwitch";
+import { useSession } from "../../../context/AuthContext";
+import { useLogin } from "../../../hooks/useLogin";
+import { AuthToken } from "../../../models/Auth";
+import { AccountStatus } from "../../../models/CamAIEnum";
+import { getStatusFromToken } from "../../../utils/jwt";
+import { ChangePasswordForm } from "./ChangePasswordForm";
+import styled from "./login.module.scss";
+import { EMAIL_REGEX } from "../../../types/constant";
 
 const LoginPage = () => {
   const { mutate: login, isLoading } = useLogin();
@@ -28,7 +30,8 @@ const LoginPage = () => {
     },
 
     validate: {
-      email: isEmail("Invalid email - ex: name@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       password: isNotEmpty("Password is required"),
     },
   });
@@ -101,8 +104,14 @@ const LoginPage = () => {
               withAsterisk
               label="Email"
               placeholder="your@email.com"
-              mt={10}
+              mt={20}
               leftSection={<MdEmail />}
+              styles={{
+                label: {
+                  marginBottom: rem(4),
+                },
+              }}
+              radius={rem(8)}
               size="md"
               {...form.getInputProps("email")}
             />
@@ -112,7 +121,13 @@ const LoginPage = () => {
               label="Password"
               type="password"
               placeholder="Password"
-              mt={20}
+              mt={16}
+              radius={rem(8)}
+              styles={{
+                label: {
+                  marginBottom: rem(4),
+                },
+              }}
               leftSection={<MdLockOutline />}
               size="md"
               {...form.getInputProps("password")}
@@ -124,7 +139,7 @@ const LoginPage = () => {
                 variant="gradient"
                 size="md"
                 loading={isLoading}
-                mt={20}
+                mt={12}
                 gradient={{ from: "light-blue.5", to: "light-blue.7", deg: 90 }}
               >
                 Login

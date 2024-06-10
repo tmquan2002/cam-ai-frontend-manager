@@ -1,54 +1,46 @@
 import { ScrollArea } from "@mantine/core";
-import { IconExclamationCircle, IconFileAnalytics, IconGauge, IconNotes, IconRouter, IconUser } from "@tabler/icons-react";
-import { AiFillShop } from "react-icons/ai";
+import {
+  IconBriefcase,
+  IconExclamationCircle,
+  IconFileAnalytics,
+  IconMan,
+  IconNotes,
+  IconRouter
+} from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import classes from "./Sidebar.module.scss";
 
 const mockdata = [
-  { label: "Dashboard", icon: IconGauge, path: "/brand" },
   {
-    label: "Brand",
+    label: "Your Brand",
     icon: IconNotes,
-    initiallyOpened: true,
-    links: [{ label: "Overview", link: "/" }],
+    path: "/brand",
   },
   {
-    label: "Account",
-    icon: IconUser,
-    links: [
-      { label: "Shop Manager ", link: "/brand/account" },
-      { label: "Employee ", link: "/brand/employee" },
-    ],
+    label: "Shop Manager",
+    icon: IconBriefcase,
+    path: "/brand/account",
   },
   {
-    label: "Shop",
-    icon: AiFillShop,
-    path: "/brand/shop",
+    label: "Employees",
+    icon: IconMan,
+    path: "/brand/employee",
   },
   {
-    label: "EdgeBox",
+    label: "Edge Boxes",
     icon: IconRouter,
     path: "/brand/edgeBox",
   },
   {
-    label: "Incident & Interaction",
+    label: "Incidents",
     icon: IconExclamationCircle,
-    links: [
-      {
-        label: "Incident list",
-        link: "/brand/incident",
-      },
-      {
-        label: "Interaction list",
-        link: "/brand/interaction",
-      },
-    ],
+
+    path: "/brand/incident",
   },
   {
-    label: "Report",
+    label: "Reports",
     icon: IconFileAnalytics,
     links: [
-      { label: "Customer", link: "/brand/report/customer" },
       { label: "Incident", link: "/brand/report/incident" },
       { label: "Interaction", link: "/brand/report/interaction" },
     ],

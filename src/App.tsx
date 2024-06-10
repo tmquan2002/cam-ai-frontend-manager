@@ -10,7 +10,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { SessionProvider } from "./context/AuthContext";
 import { Notifications } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
-import { MantineProvider, createTheme } from "@mantine/core";
+import { MantineProvider, createTheme, rem } from "@mantine/core";
 import { light_blue, light_yellow, pale_red, shading } from "./types/constant";
 
 const queryClient = new QueryClient({
@@ -18,12 +18,12 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 2,
+      cacheTime: 0,
     },
   },
 });
 
 const theme = createTheme({
-  // fontFamily: "DVN-Poppins",
   primaryColor: "light-blue",
   colors: {
     "light-yellow": light_yellow,
@@ -31,8 +31,10 @@ const theme = createTheme({
     "pale-red": pale_red,
     shading: shading,
   },
+  cursorType: "pointer",
 });
 
+//TODO: Add a new page to show import result for notification button and notification progress bar
 function App() {
   return (
     <MantineProvider theme={theme} defaultColorScheme="light">
@@ -40,7 +42,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <SessionProvider>
-              <Notifications position="top-right" />
+              <Notifications position="top-right" mt={rem(40)} />
               <AppRoute />
             </SessionProvider>
           </BrowserRouter>

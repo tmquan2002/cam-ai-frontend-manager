@@ -1,60 +1,59 @@
 trigger:
-- deploy/vps
+  - deploy/vps
 
 pool:
-  name: 'Azure Pipelines'
+  name: "Azure Pipelines"
 
 variables:
-- group: web-admin-group
-- group: docker
+  - group: web-admin-group
+  - group: docker
 
 steps:
-- task: Docker@2
-  displayName: 'Build image'
-  inputs:
-    containerRegistry: 'camai-hub'
-    repository: 'milease/camai-backend'
-    command: 'build'
-    tags: 'camai-web-manager'
-    arguments: '--build-arg REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK) --build-arg REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)'
+  - task: Docker@2
+    displayName: "Build image"
+    inputs:
+      containerRegistry: "camai-hub"
+      repository: "milease/camai-backend"
+      command: "build"
+      tags: "camai-web-manager"
+      arguments: "--build-arg REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK) --build-arg REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)"
 
-- task: Docker@2
-  displayName: 'Push image'
-  inputs:
-    containerRegistry: 'camai-hub'
-    repository: 'milease/camai-backend'
-    command: 'push'
-    tags: 'camai-web-manager'
+  - task: Docker@2
+    displayName: "Push image"
+    inputs:
+      containerRegistry: "camai-hub"
+      repository: "milease/camai-backend"
+      command: "push"
+      tags: "camai-web-manager"
 
-- script: |
-    echo "REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)" > .env
-    echo "REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)" >> .env
-  displayName: 'Write .env'
-  
-- task: CopyFilesOverSSH@0
-  displayName: 'Copy files'
-  inputs:
-    sshEndpoint: 'khanh-vps'
-    contents: |
-      .env
-      ./Deploy/docker-compose.yml
-    targetFolder: 'frontend/manager'
-    readyTimeout: '20000'
+  - script: |
+      echo "REACT_APP_VITE_SERVER_LINK=$(VITE_SERVER_LINK)" > .env
+      echo "REACT_APP_VITE_WEB_SOCKET_LINK=$(VITE_WEB_SOCKET_LINK)" >> .env
+    displayName: "Write .env"
 
-- task: SSH@0
-  displayName: 'Pull and run image'
-  inputs:
-    sshEndpoint: 'khanh-vps'
-    runOptions: 'inline'
-    inline: |
-      cd frontend/manager
-      mv Deploy/*yml .
-      rmdir Deploy
-      docker logout
-      echo $(docker.password) | docker login -u $(docker.username) --password-stdin 2>&1
-      docker compose down web 2>&1
-      docker rmi $(docker images | grep "milease/camai-backend.*camai-web-manager" | awk '{print $3}' )
-      docker rmi milease/camai-backend:camai-web-manager 2>&1
-      docker compose up -d --quiet-pull 2>&1
-      docker logout
-    readyTimeout: '20000'
+  - task: CopyFilesOverSSH@0
+    displayName: "Copy files"
+    inputs:
+      sshEndpoint: "khanh-vps"
+      contents: |
+        .env
+        ./Deploy/docker-compose.yml
+      targetFolder: "frontend/manager"
+      readyTimeout: "20000"
+
+  - task: SSH@0
+    displayName: "Pull and run image"
+    inputs:
+      sshEndpoint: "khanh-vps"
+      runOptions: "inline"
+      inline: |
+        cd frontend/manager
+        mv Deploy/*yml .
+        rmdir Deploy
+        docker logout
+        echo $(docker.password) | docker login -u $(docker.username) --password-stdin 2>&1
+        docker compose down web 2>&1
+        docker compose up -d --quiet-pull 2>&1
+        docker rmi $(docker images | grep "none" | awk '{print $3}' ) 2>&1
+        docker logout
+      readyTimeout: "20000"

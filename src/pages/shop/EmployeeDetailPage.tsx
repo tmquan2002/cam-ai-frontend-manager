@@ -1,15 +1,5 @@
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
-import { useGetDistrictList } from "../../hooks/useGetDistrictList";
-import { useGetWardList } from "../../hooks/useGetWardList";
-import { useEffect, useMemo, useState } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Center,
@@ -25,30 +15,54 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
-import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
-import dayjs from "dayjs";
-import { AxiosError } from "axios";
-import { ResponseErrorDetail } from "../../models/Response";
 import { notifications } from "@mantine/notifications";
 import { IconTrash } from "@tabler/icons-react";
-import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender, IncidentStatus } from "../../models/CamAIEnum";
-import BackButton from "../../components/button/BackButton";
-import { useGetIncidentList } from "../../hooks/useGetIncidentList";
-import classes from "./EmployeeDetailPage.module.scss";
-import { IMAGE_CONSTANT, phoneRegex } from "../../types/constant";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
 import { isEmpty } from "lodash";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { UpdateEmployeeParams } from "../../apis/EmployeeAPI";
+import StatusBadge from "../../components/badge/StatusBadge";
+import CustomBreadcrumb, {
+  BreadcrumbItem,
+} from "../../components/breadcrumbs/CustomBreadcrumb";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
+import { useDeleteEmployeeById } from "../../hooks/useDeleteEmployeeById";
+import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetEmployeeById } from "../../hooks/useGetEmployeeByid";
+import { useGetIncidentList } from "../../hooks/useGetIncidentList";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useGetWardList } from "../../hooks/useGetWardList";
+import { useUpdateEmployeeById } from "../../hooks/useUpdateEmployeeById";
+import { Gender } from "../../models/CamAIEnum";
+import { ResponseErrorDetail } from "../../models/Response";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { DEFAULT_PAGE_SIZE, EMAIL_REGEX, IMAGE_CONSTANT, PHONE_REGEX } from "../../types/constant";
+import {
+  mapLookupToArray
+} from "../../utils/helperFunction";
+import classes from "./EmployeeDetailPage.module.scss";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Employee",
+    link: "/shop/employee",
+  },
+  {
+    title: "Detail",
+  },
+];
 export type CreateEmployeeField = {
   name: string;
   email: string;
-  gender: Gender;
+  gender: Gender | null;
   phone: string;
-  birthday?: Date;
+  birthday?: Date | null;
   addressLine: string;
   wardId: string;
   province: string;
@@ -59,6 +73,7 @@ const EmployeeDetailPage = () => {
   const params = useParams();
   const navigate = useNavigate();
   const [activePage, setPage] = useState(1);
+  const { taskId } = useTaskShop();
 
   const [opened, { open, close }] = useDisclosure(false);
   const {
@@ -71,15 +86,27 @@ const EmployeeDetailPage = () => {
     useGetIncidentList({
       size: 12,
       pageIndex: activePage - 1,
-      employeeId: params?.id ?? undefined
+      employeeId: params?.id ?? undefined,
     });
   const updateEmployeeForm = useForm<CreateEmployeeField>({
+    initialValues: {
+      addressLine: "",
+      district: "",
+      email: "",
+      gender: null,
+      name: "",
+      phone: "",
+      province: "",
+      wardId: "",
+      birthday: null
+    },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: isEmail("Invalid email - ex: helloitsme@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) || value == null ? null : PHONE_REGEX.test(value)
+        ? null : "A phone number should have a length of 10-12 characters",
     },
   });
   const { mutate: deleteEmployee, isLoading: isDeleteEmployeeLoading } =
@@ -88,14 +115,14 @@ const EmployeeDetailPage = () => {
   useEffect(() => {
     if (employeeData) {
       updateEmployeeForm.setInitialValues({
-        name: employeeData?.name ?? undefined,
-        email: employeeData?.email ?? undefined,
-        gender: employeeData?.gender ?? undefined,
-        phone: employeeData?.phone ?? undefined,
+        name: employeeData?.name ?? "",
+        email: employeeData?.email ?? "",
+        gender: employeeData?.gender ?? null,
+        phone: employeeData?.phone ?? "",
         birthday: employeeData.birthday
           ? new Date(employeeData.birthday)
-          : undefined,
-        addressLine: employeeData?.addressLine ?? undefined,
+          : null,
+        addressLine: employeeData?.addressLine ?? "",
         wardId: `${employeeData?.wardId}`,
         province: `${employeeData?.ward?.district?.provinceId}`,
         district: `${employeeData?.ward?.districtId}`,
@@ -116,19 +143,6 @@ const EmployeeDetailPage = () => {
   const { mutate: updateEmployee, isLoading: isUpdateEmployeeLoading } =
     useUpdateEmployeeById();
 
-  const renderIncidentStatusBadge = (status: IncidentStatus | undefined) => {
-    switch (status) {
-      case IncidentStatus.New:
-        return <Badge color="yellow">{IncidentStatus.New}</Badge>;
-      case IncidentStatus.Accepted:
-        return <Badge color="green">{IncidentStatus.Accepted}</Badge>;
-      case IncidentStatus.Rejected:
-        return <Badge color="red">{IncidentStatus.Rejected}</Badge>;
-      case undefined:
-        <></>;
-    }
-  };
-
   const rows = incidentList?.values.map((row, index) => {
     return (
       <Table.Tr
@@ -136,24 +150,14 @@ const EmployeeDetailPage = () => {
         className={classes["clickable"]}
         onClick={() => navigate(`/shop/incident/${row.id}`)}
       >
+        <Table.Td>{index + 1 + Number(DEFAULT_PAGE_SIZE) * (activePage - 1)}</Table.Td>
         <Table.Td>
           <Text>{row.incidentType}</Text>
         </Table.Td>
         <Table.Td>{dayjs(row?.startTime).format("DD/MM/YYYY h:mm A")}</Table.Td>
-        <Table.Td>
-          <Text
-            className={classes["pointer-style"]}
-            c={"blue"}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/shop/employee/${row?.employee?.id}`);
-            }}
-          >
-            {row?.employee?.name}
-          </Text>
+        <Table.Td ta="center">
+          <StatusBadge statusName={row.status} size="sm" padding={10} />
         </Table.Td>
-
-        <Table.Td>{renderIncidentStatusBadge(row?.status)}</Table.Td>
       </Table.Tr>
     );
   });
@@ -168,6 +172,8 @@ const EmployeeDetailPage = () => {
           placeholder: "Name",
           label: "Name",
           required: true,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -178,6 +184,8 @@ const EmployeeDetailPage = () => {
           placeholder: "Email",
           label: "Email",
           required: true,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -189,6 +197,8 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "gender",
           required: true,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -201,6 +211,8 @@ const EmployeeDetailPage = () => {
           type: "number",
           placeholder: "Phone",
           label: "Phone",
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -211,6 +223,8 @@ const EmployeeDetailPage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -224,6 +238,8 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "province",
           loading: isProvicesLoading,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -238,6 +254,8 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "district",
           loading: isDistrictsLoading,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -251,6 +269,8 @@ const EmployeeDetailPage = () => {
           }),
           form: updateEmployeeForm,
           name: "wardId",
+          radius: "md",
+          disabled: taskId !== undefined,
           loading: isWardsLoading,
         },
         spans: 4,
@@ -261,6 +281,8 @@ const EmployeeDetailPage = () => {
           form: updateEmployeeForm,
           name: "addressLine",
           placeholder: "Employee address",
+          radius: "md",
+          disabled: taskId !== undefined,
           label: "Employee address",
         },
       },
@@ -277,34 +299,18 @@ const EmployeeDetailPage = () => {
 
   return (
     <Box pb={rem(40)}>
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        shadow="xs"
-      >
-        <Group
-          justify={"space-between"}
-          align="center"
-          pb={rem(28)}
-        >
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Group justify={"space-between"} align="center" pb={rem(28)}>
           <Group>
-            <BackButton />
-
-            <Text
-              size="lg"
-              fw={"bold"}
-              fz={25}
-              c={"light-blue.4"}
-            >
-              Employee - {employeeData?.name}
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+              General Information
             </Text>
           </Group>
 
-          <ActionIcon
-            color="red"
-            onClick={open}
-            size={"lg"}
-          >
+          <ActionIcon color="red" onClick={open} size={"lg"} disabled={taskId !== undefined}>
             <IconTrash style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>
         </Group>
@@ -325,12 +331,12 @@ const EmployeeDetailPage = () => {
                 const createEmployeeParams: UpdateEmployeeParams = {
                   email: email ?? "",
                   name: name ?? "",
-                  gender: gender ?? "",
+                  gender: gender ?? null,
                   addressLine,
                   birthday: birthday
                     ? dayjs(birthday).format("YYYY-MM-DD")
                     : null,
-                  phone,
+                  phone: isEmpty(phone) ? null : phone,
                   wardId: wardId ? +wardId : null,
                 };
                 updateEmployee(
@@ -358,10 +364,7 @@ const EmployeeDetailPage = () => {
             )}
           >
             <EditAndUpdateForm fields={fields} />
-            <Group
-              justify="flex-end"
-              mt="md"
-            >
+            <Group justify="flex-end" mt="md">
               <Button
                 type="submit"
                 disabled={!updateEmployeeForm.isDirty()}
@@ -374,24 +377,12 @@ const EmployeeDetailPage = () => {
         )}
       </Paper>
 
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        shadow="xs"
-      >
-        <Text
-          size="lg"
-          fw={"bold"}
-          fz={25}
-          c={"light-blue.4"}
-        >
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
           Incidents
         </Text>
 
-        <Box
-          mt={"xl"}
-          pos={"relative"}
-        >
+        <Box pl={20} pr={20} mt={"xl"} pos={"relative"}>
           <LoadingOverlay
             visible={isGetIncidentListLoading}
             zIndex={1000}
@@ -411,33 +402,26 @@ const EmployeeDetailPage = () => {
               />
             </Center>
           ) : (
-            <Table
-              striped
-              highlightOnHover
-              withTableBorder
-              withColumnBorders
-              verticalSpacing={"md"}
-            >
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>Incident type</Table.Th>
-                  <Table.Th>Time</Table.Th>
-                  <Table.Th>Assigned to</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>{rows}</Table.Tbody>
-            </Table>
+            <Table.ScrollContainer minWidth={1000}>
+              <Table striped highlightOnHover verticalSpacing={"md"}>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>#</Table.Th>
+                    <Table.Th>Incident type</Table.Th>
+                    <Table.Th>Time</Table.Th>
+                    <Table.Th ta="center">Status</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
           )}
         </Box>
-        <Group
-          justify="flex-end"
-          mt="lg"
-        >
+        <Group justify="flex-end" mt="lg">
           <Pagination
             value={activePage}
             onChange={setPage}
-            total={Math.ceil((incidentList?.totalCount ?? 0) / 12)}
+            total={Math.ceil((incidentList?.totalCount ?? 0) / Number(DEFAULT_PAGE_SIZE))}
           />
         </Group>
       </Paper>
@@ -447,15 +431,12 @@ const EmployeeDetailPage = () => {
         onClose={close}
         title={
           <Text>
-            Confirm delete <Mark>{employeeData?.name}</Mark> account ?
+            Confirm delete <Mark>{employeeData?.name}</Mark> employee?
           </Text>
         }
       // centered
       >
-        <Group
-          justify="flex-end"
-          mt="md"
-        >
+        <Group justify="flex-end" mt="md">
           <Button
             loading={isDeleteEmployeeLoading}
             onClick={() => {
@@ -465,7 +446,7 @@ const EmployeeDetailPage = () => {
                     title: "Successfully",
                     message: "Delete employee successfully!",
                   });
-                  navigate("/shop/detail");
+                  navigate("/shop/employee");
                 },
                 onError(data) {
                   const error = data as AxiosError<ResponseErrorDetail>;
@@ -482,12 +463,7 @@ const EmployeeDetailPage = () => {
           >
             Yes
           </Button>
-          <Button
-            onClick={close}
-            color={"red"}
-            variant="outline"
-            size="xs"
-          >
+          <Button onClick={close} color={"red"} variant="outline" size="xs">
             No
           </Button>
         </Group>

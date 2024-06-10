@@ -4,6 +4,7 @@ export enum CommonConstant {
   SESSION = "session",
   USER_ACCESS_TOKEN = "user_access_token",
   USER_REFRESH_TOKEN = "user_refresh_token",
+  TASK_ID = "task_id"
 }
 
 //Tips: Install "Colorize" extention and Add Typescript file in settings.json for easier to see color
@@ -67,6 +68,26 @@ export enum IMAGE_CONSTANT {
   NO_DATA = "https://cdn.dribbble.com/users/256646/screenshots/17751098/media/768417cc4f382d6171053ad620bc3c3b.png?resize=1000x750&vertical=center",
 }
 
-export const phoneRegex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g;
-export const emailRegex = /^\S+@(\S+\.)+\S{2,4}$/g;
-export const urlRegex = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+export enum NotificationColorPalette {
+  IN_PROGRESS = "#9B59B6",
+  DRAFT = "#34495E",
+  REPORT_EXPENSES = "#54A0FF",
+  UP_COMING = "#30CB83",
+  UNAPPROVED = "#F1C40F",
+  SEND_BACK = "#B33771",
+  ALERT_MESSAGE = "#E74C3C",
+  WARNING = "#F39C12",
+  DEVIATIONS = "#D35400",
+}
+
+type RGB = `rgb(${number}, ${number}, ${number})`;
+type RGBA = `rgba(${number}, ${number}, ${number}, ${number})`;
+type HEX = `#${string}`;
+
+export const DEFAULT_PAGE_SIZE = '20'
+export const PAGE_SIZE_SELECT = ['10', '15', '20']
+export type Color = RGB | RGBA | HEX;
+export const PHONE_REGEX = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
+export const EMAIL_REGEX = /^\S+@(\S+\.)+\S{2,4}$/;
+export const URL_REGEX = /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+export const POLLING_INTERVAL = 1000

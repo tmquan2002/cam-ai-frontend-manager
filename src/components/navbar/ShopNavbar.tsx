@@ -2,56 +2,39 @@ import {
   IconGauge,
   IconPresentationAnalytics,
   IconFileAnalytics,
-  IconLock,
   IconExclamationCircle,
+  IconMan,
+  IconCalendarTime,
 } from "@tabler/icons-react";
 import { SidebarLinksGroup } from "../linkgroup/SidebarLinkGroup";
 import { ScrollArea } from "@mantine/core";
 import classes from "./Sidebar.module.scss";
-import { IconVideo } from "@tabler/icons-react";
 
 const mockdata = [
   { label: "Dashboard", icon: IconGauge, path: "/shop" },
+  { label: "In charge", icon: IconCalendarTime, path: "/shop/calendar" },
 
   {
-    label: "Detail",
+    label: "Shop detail",
     icon: IconPresentationAnalytics,
     path: "/shop/detail",
   },
   {
-    label: "Incident & Interaction",
+    label: "Employees",
+    icon: IconMan,
+    path: "/shop/employee",
+  },
+  {
+    label: "Incidents",
     icon: IconExclamationCircle,
-    links: [
-      {
-        label: "Incident",
-        link: "/shop/incident",
-      },
-      {
-        label: "Interaction",
-        link: "/shop/interaction",
-      },
-    ],
+    path: "/shop/incident",
   },
   {
-    label: "Live",
-    icon: IconVideo,
-    path: "/shop/stream",
-  },
-  {
-    label: "Report",
+    label: "Reports",
     icon: IconFileAnalytics,
     links: [
-      { label: "Employee count", link: "/shop/report/count/employee" },
       { label: "Incident", link: "/shop/report/incident" },
       { label: "Interaction", link: "/shop/report/interaction" },
-    ],
-  },
-  {
-    label: "Employee",
-    icon: IconLock,
-    links: [
-      { label: "Create", link: "/shop/employee/create" },
-      { label: "Employee", link: "/shop/employee" },
     ],
   },
 ];

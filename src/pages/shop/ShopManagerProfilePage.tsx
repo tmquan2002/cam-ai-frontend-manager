@@ -8,40 +8,40 @@ import {
   Text,
   rem,
 } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { AxiosError } from "axios";
-import { useEffect, useMemo } from "react";
-import EditAndUpdateForm, {
-  FIELD_TYPES,
-} from "../../components/form/EditAndUpdateForm";
-import { ResponseErrorDetail } from "../../models/Response";
-import { useGetProfile } from "../../hooks/useGetProfile";
+import { isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useChangePassword } from "../../hooks/useChangePassword";
+import { notifications } from "@mantine/notifications";
+import { IconKey } from "@tabler/icons-react";
+import { AxiosError } from "axios";
+import dayjs from "dayjs";
+import { isEmpty } from "lodash";
+import { useEffect, useMemo } from "react";
 import {
   ChangePasswordParams,
   UpdateProfileParams,
 } from "../../apis/ProfileAPI";
-import { IconKey } from "@tabler/icons-react";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { Gender } from "../../models/CamAIEnum";
+import EditAndUpdateForm, {
+  FIELD_TYPES,
+} from "../../components/form/EditAndUpdateForm";
 import { getAccessToken } from "../../context/AuthContext";
-import { useGetProvinceList } from "../../hooks/useGetProvinceList";
+import { useChangePassword } from "../../hooks/useChangePassword";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
+import { useGetProfile } from "../../hooks/useGetProfile";
+import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { useUpdateProfile } from "../../hooks/useUpdateProfile";
-import dayjs from "dayjs";
-import { isEmpty } from "lodash";
-import { phoneRegex } from "../../types/constant";
+import { Gender } from "../../models/CamAIEnum";
+import { ResponseErrorDetail } from "../../models/Response";
+import { mapLookupToArray } from "../../utils/helperFunction";
+import { EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
 
 type ProfileFieldValue = {
   name: string;
   email: string;
   phone: string;
-  birthday?: Date;
+  birthday?: Date | null;
   address: string;
-  gender: Gender;
+  gender: Gender | null;
   shop: string;
   wardId: string;
   province: string;
@@ -63,9 +63,9 @@ const ShopManagerProfilePage = () => {
       name: "",
       email: "",
       phone: "",
-      birthday: new Date("01/01/2000"),
+      birthday: null,
       address: "",
-      gender: Gender.Male,
+      gender: null,
       shop: "",
       district: "",
       province: "",
@@ -74,10 +74,11 @@ const ShopManagerProfilePage = () => {
 
     validate: {
       name: isNotEmpty("Name is required"),
-      email: isEmail("Invalid email - ex: name@gmail.com"),
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
       gender: isNotEmpty("Please select gender"),
-      phone: (value) => isEmpty(value) ? null :
-        phoneRegex.test(value) ? null : "A phone number should have a length of 10-12 characters",
+      phone: (value) => isEmpty(value) || value == null ? null : PHONE_REGEX.test(value)
+        ? null : "A phone number should have a length of 10-12 characters",
     },
   });
 
@@ -147,16 +148,16 @@ const ShopManagerProfilePage = () => {
   useEffect(() => {
     if (account) {
       form.setInitialValues({
-        name: account?.name,
-        email: account?.email,
-        phone: account?.phone,
-        birthday: account?.birthday ? new Date(account?.birthday) : undefined,
-        address: account?.addressLine,
+        name: account?.name ?? "",
+        email: account?.email ?? "",
+        phone: account?.phone ?? "",
+        birthday: account?.birthday ? new Date(account?.birthday) : null,
+        address: account?.addressLine ?? "",
         gender: account?.gender,
         shop: account?.managingShop?.name,
         district: account?.ward?.districtId.toString(),
         province: account?.ward?.district?.provinceId.toString(),
-        wardId: account?.wardId.toString(),
+        wardId: account?.wardId?.toString(),
       });
       form.reset();
     }
@@ -337,10 +338,7 @@ const ShopManagerProfilePage = () => {
 
   if (isAccountLoading)
     return (
-      <Paper
-        style={{ flex: 1, height: "100vh" }}
-        pos={"relative"}
-      >
+      <Paper style={{ flex: 1, height: "100vh" }} pos={"relative"}>
         <LoadingOverlay
           visible={isAccountLoading}
           zIndex={1000}
@@ -362,10 +360,7 @@ const ShopManagerProfilePage = () => {
       >
         <form onSubmit={passwordForm.onSubmit(onSubmitNewPassword)}>
           <EditAndUpdateForm fields={changePasswordFields} />
-          <Group
-            justify="flex-end"
-            mt="md"
-          >
+          <Group justify="flex-end" mt="md">
             <Button
               disabled={!passwordForm.isDirty()}
               type="submit"
@@ -376,30 +371,13 @@ const ShopManagerProfilePage = () => {
           </Group>
         </form>
       </Modal>
-      <Paper
-        m={rem(32)}
-        p={rem(32)}
-        pb={rem(64)}
-        shadow={"xs"}
-        style={{ flex: 1 }}
-      >
-        <Group
-          mb={rem(20)}
-          justify="space-between"
-        >
-          <Text
-            size="lg"
-            fw={"bold"}
-            fz={25}
-            c={"light-blue.4"}
-          >
+      <Paper p={rem(40)} pb={rem(64)} shadow={"xs"} style={{ flex: 1 }}>
+        <Group mb={rem(20)} justify="space-between">
+          <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
             Your profile
           </Text>
 
-          <ActionIcon
-            onClick={open}
-            size={"lg"}
-          >
+          <ActionIcon onClick={open} size={"lg"}>
             <IconKey style={{ width: rem(20), height: rem(20) }} />
           </ActionIcon>
         </Group>
@@ -412,8 +390,8 @@ const ShopManagerProfilePage = () => {
                 ? dayjs(values.birthday).format("YYYY-MM-DD")
                 : null,
               gender: values.gender,
-              phone: values.phone,
-              wardId: +values?.wardId,
+              phone: isEmpty(values?.phone) ? null : values?.phone,
+              wardId: values?.wardId ?? "",
               email: values?.email,
             };
             updateProfile(params, {
@@ -435,11 +413,7 @@ const ShopManagerProfilePage = () => {
           })}
         >
           <EditAndUpdateForm fields={fields} />
-          <Group
-            justify="flex-end"
-            mt="md"
-            pb={rem(10)}
-          >
+          <Group justify="flex-end" mt="md" pb={rem(10)}>
             <Button
               loading={updateProfileLoading}
               type="submit"

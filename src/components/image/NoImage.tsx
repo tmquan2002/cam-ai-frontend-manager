@@ -1,17 +1,23 @@
-import { Center, Image, rem } from "@mantine/core";
+import { Center, Image, ImageProps, rem } from "@mantine/core";
 import { IMAGE_CONSTANT } from "../../types/constant";
 
-const NoImage = () => {
+export type NoImageProps = {
+  type: "NO_DATA" | "CANNOT_LOAD";
+} & ImageProps;
+
+const NoImage = ({ type, h }: NoImageProps) => {
   return (
     <Center>
       <Image
+        src={
+          type == "NO_DATA" ? IMAGE_CONSTANT.NO_DATA : IMAGE_CONSTANT.NO_IMAGE
+        }
         radius={"md"}
-        src={IMAGE_CONSTANT.NO_DATA}
         fit="contain"
-        h={rem(400)}
+        h={h ?? rem(400)}
         w={"auto"}
         style={{
-          borderBottom: "1px solid #dee2e6",
+          border: "1px solid #dee2e6",
         }}
       />
     </Center>

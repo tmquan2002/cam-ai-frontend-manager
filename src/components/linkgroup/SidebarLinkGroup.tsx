@@ -28,14 +28,13 @@ export function SidebarLinksGroup({
   links,
 }: LinksGroupProps) {
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
   const items = (hasLinks ? links : []).map((link) => (
     <Text<"a">
       component="a"
       className={classes["link"]}
-      // href={link.link}
       key={link.label}
       onClick={(event) => {
         navigate(link.link);
@@ -45,29 +44,41 @@ export function SidebarLinksGroup({
       {link.label}
     </Text>
   ));
-
+  // console.log(location.pathname)
   return (
     <Box>
       <UnstyledButton
-        onClick={() => setOpened((o) => !o)}
-        className={(hasLinks && links.some(e => location.pathname === e.link)) || location.pathname === path! ? `${classes["activeControl"]}` : `${classes["control"]}`}
+        onClick={() => {
+          setOpened((o) => !o)
+          if (path) {
+            navigate(path);
+          }
+        }}
+        className={
+          (hasLinks && links.some((e) => location.pathname === e.link)) ||
+            (location.pathname.includes(path!) && path !== "/brand" && path !== "/shop") || (location.pathname === path)
+            ? `${classes["activeControl"]}`
+            : `${classes["control"]}`
+        }
       >
         <Group
-          onClick={() => {
-            if (path) {
-              navigate(path);
-            }
-          }}
           justify="space-between"
           gap={0}
         >
           <Box style={{ display: "flex", alignItems: "center" }}>
             <ThemeIcon
               size={30}
+              variant="transparent"
+              className={
+                (hasLinks && links.some((e) => location.pathname === e.link)) ||
+                  (location.pathname.includes(path!) && path !== "/brand" && path !== "/shop") || (location.pathname === path)
+                  ? classes["activeIcon"]
+                  : classes["icon"]
+              }
             >
-              <Icon style={{ width: rem(18), height: rem(18) }} />
+              <Icon style={{ width: rem(22), height: rem(22) }} />
             </ThemeIcon>
-            <Box ml="md">{label}</Box>
+            <Box ml="sm">{label}</Box>
           </Box>
           {hasLinks && (
             <IconChevronRight
@@ -83,10 +94,7 @@ export function SidebarLinksGroup({
         </Group>
       </UnstyledButton>
       {hasLinks ? (
-        <Collapse
-          pl={"md"}
-          in={opened}
-        >
+        <Collapse pl={"md"} in={opened}>
           {items}
         </Collapse>
       ) : null}

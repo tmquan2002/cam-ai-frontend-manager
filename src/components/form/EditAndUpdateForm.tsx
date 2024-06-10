@@ -9,14 +9,25 @@ import {
   Radio,
   Select,
   TextInput,
+  rem,
 } from "@mantine/core";
 
 import { DateInput, DateTimePicker } from "@mantine/dates";
 import CustomTimeInput from "../input/CustomTimeInput";
 
 const renderTextField = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, type, readonly } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    type,
+    readonly,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <TextInput
       type={type}
@@ -25,13 +36,31 @@ const renderTextField = ({ fieldProps }: any) => {
       withAsterisk={required}
       label={label}
       placeholder={placeholder}
+      radius={radius ?? "sm"}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
+      styles={{
+        label: {
+          marginBottom: rem(8),
+        },
+      }}
       {...form.getInputProps(name)}
     />
   );
 };
 const renderPasswordInput = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    radius,
+    fontWeight,
+  } = fieldProps;
 
   return (
     <PasswordInput
@@ -39,6 +68,17 @@ const renderPasswordInput = ({ fieldProps }: any) => {
       readOnly={readonly}
       withAsterisk={required}
       label={label}
+      radius={radius ?? "sm"}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+      }}
       placeholder={placeholder}
       {...form.getInputProps(name)}
     />
@@ -59,6 +99,9 @@ const renderSelect = ({ fieldProps }: any) => {
     rightSection,
     readonly,
     rightSectionWidth,
+    fontWeight,
+    radius,
+    clearable,
   } = fieldProps;
   if (loading) return <Loader />;
 
@@ -71,8 +114,23 @@ const renderSelect = ({ fieldProps }: any) => {
       rightSectionWidth={rightSectionWidth}
       rightSectionPointerEvents="all"
       placeholder={placeholder}
+      clearable={clearable}
       data={data}
+      radius={radius ?? "sm"}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+        dropdown: {
+          fontWeight: fontWeight ?? 400,
+        },
+      }}
       rightSection={rightSection}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
       required={required}
       {...form.getInputProps(name)}
     />
@@ -80,7 +138,8 @@ const renderSelect = ({ fieldProps }: any) => {
 };
 
 const renderRadio = ({ fieldProps }: any) => {
-  const { name, label, description, form, data, required } = fieldProps;
+  const { name, label, description, form, data, required, radius, fontWeight } =
+    fieldProps;
 
   return (
     <Radio.Group
@@ -89,6 +148,17 @@ const renderRadio = ({ fieldProps }: any) => {
       required={required}
       description={description}
       {...form.getInputProps(name)}
+      radius={radius ?? "sm"}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+      }}
     >
       <Group mt={"xs"}>
         {data.map(({ key, value }: { key: string; value: string }) => (
@@ -100,8 +170,17 @@ const renderRadio = ({ fieldProps }: any) => {
 };
 
 const renderNumber = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <NumberInput
       required={required}
@@ -111,6 +190,17 @@ const renderNumber = ({ fieldProps }: any) => {
       rightSection={<></>}
       label={label}
       name={name}
+      radius={radius ?? "sm"}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+      }}
       placeholder={placeholder}
       {...form.getInputProps(name)}
     />
@@ -118,8 +208,18 @@ const renderNumber = ({ fieldProps }: any) => {
 };
 
 const renderDate = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, maxDate } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    maxDate,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <DateInput
       required={required}
@@ -128,15 +228,37 @@ const renderDate = ({ fieldProps }: any) => {
       label={label}
       maxDate={maxDate}
       readOnly={readonly}
+      radius={radius ?? "sm"}
       placeholder={placeholder}
+      defaultDate={new Date(2000, 0)}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+      }}
       {...form.getInputProps(name)}
     />
   );
 };
 
 const renderDateTime = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, withSeconds } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    withSeconds,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <DateTimePicker
       required={required}
@@ -144,6 +266,17 @@ const renderDateTime = ({ fieldProps }: any) => {
       withAsterisk={required}
       label={label}
       readOnly={readonly}
+      radius={radius ?? "sm"}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+      }}
       placeholder={placeholder}
       withSeconds={withSeconds}
       {...form.getInputProps(name)}
@@ -152,34 +285,68 @@ const renderDateTime = ({ fieldProps }: any) => {
 };
 
 const renderTime = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, withSeconds } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    readonly,
+    withSeconds,
+    radius,
+    fontWeight,
+  } = fieldProps;
   return (
     <CustomTimeInput
       // required={required}
       withSeconds={withSeconds}
       disabled={disabled}
       withAsterisk={required}
+      radius={radius ?? "sm"}
+      style={{
+        fontWeight: fontWeight ?? 400,
+      }}
       label={label}
       readOnly={readonly}
       placeholder={placeholder}
+      styles={{
+        label: {
+          fontWeight: 500,
+          fontSize: rem(14),
+          marginBottom: rem(8),
+        },
+      }}
       {...form.getInputProps(name)}
     />
   );
 };
 
 const renderFile = ({ fieldProps }: any) => {
-  const { form, name, placeholder, label, required, disabled, readonly, multiple } =
-    fieldProps;
+  const {
+    form,
+    name,
+    placeholder,
+    label,
+    required,
+    disabled,
+    accept,
+    multiple,
+    readOnly,
+    description,
+    width,
+  } = fieldProps;
   return (
     <FileInput
-      // required={required}
+      accept={accept}
       disabled={disabled}
+      readOnly={readOnly}
+      description={description}
       withAsterisk={required}
       label={label}
-      readOnly={readonly}
       placeholder={placeholder}
       multiple={multiple}
+      w={width}
       {...form.getInputProps(name)}
     />
   );
@@ -224,7 +391,7 @@ const FORM_MAPPING = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EditAndUpdateForm = ({ fields }: any) => {
   return (
-    <Grid>
+    <Grid gutter={rem(16)}>
       {fields.map(({ type, fieldProps, spans, margin }: any, index: number) => {
         return (
           <Grid.Col span={spans ?? 12} key={index} m={margin ?? 0}>

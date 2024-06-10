@@ -1,28 +1,47 @@
-import { Button, Group, Paper, Text, rem } from "@mantine/core";
+import { Box, Button, Group, Modal, Paper, Text, rem } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { AxiosError } from "axios";
 import dayjs from "dayjs";
 import _, { isEmpty } from "lodash";
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreateEmployeeParams } from "../../apis/EmployeeAPI";
+import CustomBreadcrumb, {
+  BreadcrumbItem,
+} from "../../components/breadcrumbs/CustomBreadcrumb";
+import DownloadButton from "../../components/button/DownloadButton";
 import EditAndUpdateForm, {
   FIELD_TYPES,
 } from "../../components/form/EditAndUpdateForm";
 import { useCreateEmployee } from "../../hooks/useCreateEmployee";
+import { useUploadEmployeeFile } from "../../hooks/useFiles";
 import { useGetDistrictList } from "../../hooks/useGetDistrictList";
 import { useGetProvinceList } from "../../hooks/useGetProvinceList";
 import { useGetWardList } from "../../hooks/useGetWardList";
 import { Gender } from "../../models/CamAIEnum";
 import { ResponseErrorDetail } from "../../models/Response";
-import { mapLookupToArray } from "../../utils/helperFunction";
-import { emailRegex } from "../../types/constant";
+import { useTaskShop } from "../../routes/ShopRoute";
+import { CommonConstant, EMAIL_REGEX, PHONE_REGEX } from "../../types/constant";
+import {
+  mapLookupToArray
+} from "../../utils/helperFunction";
 
+const breadcrumbs: BreadcrumbItem[] = [
+  {
+    title: "Employee",
+    link: "/shop/employee",
+  },
+  {
+    title: "Add",
+  },
+];
 export type CreateEmployeeField = {
   name: string | null;
   email: string;
-  gender: Gender;
+  gender: Gender | null;
   phone: string | null;
   birthday: Date | null;
   addressLine: string | null;
@@ -32,13 +51,17 @@ export type CreateEmployeeField = {
 };
 const CreateEmployeePage = () => {
   const navigate = useNavigate();
+  const [openedMassImport, { open: openMassImport, close: closeMassImport }] =
+    useDisclosure(false);
+  const { taskId, setTaskId } = useTaskShop();
+
   const createEmployeeForm = useForm<CreateEmployeeField>({
     initialValues: {
       name: "",
       email: "",
-      gender: Gender.Male,
+      gender: null,
       phone: "",
-      birthday: new Date("01/01/2000"),
+      birthday: null,
       addressLine: "",
       wardId: null,
       province: "",
@@ -46,11 +69,20 @@ const CreateEmployeePage = () => {
     },
     validate: {
       name: isNotEmpty("Employee name is required"),
-      email: (value) => isEmpty(value) ? null
-        : emailRegex.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      email: (value: string) => isEmpty(value) ? "Email is required"
+        : EMAIL_REGEX.test(value) ? null : "Invalid email - ex: name@gmail.com",
+      phone: (value) => isEmpty(value) || value == null ? null :
+        PHONE_REGEX.test(value) ? null : "A phone number should have a length of 10-12 characters",
       gender: isNotEmpty("Please select gender"),
     },
   });
+
+  const massImportForm = useForm<{ file: File }>({
+    validate: {
+      file: isNotEmpty("Please choose a file"),
+    },
+  });
+
   const { data: provinces, isLoading: isProvicesLoading } =
     useGetProvinceList();
   const { data: districts, isLoading: isDistrictsLoading } = useGetDistrictList(
@@ -61,8 +93,10 @@ const CreateEmployeePage = () => {
   );
   const { mutate: craeteEmployee, isLoading: isCreateEmployeeLoading } =
     useCreateEmployee();
+  const { mutate: uploadEmployee, isLoading: isUploadEmployeeLoading } =
+    useUploadEmployeeFile();
 
-  const fields = useMemo(() => {
+  const createEmployeeFields = useMemo(() => {
     return [
       {
         type: FIELD_TYPES.TEXT,
@@ -72,6 +106,8 @@ const CreateEmployeePage = () => {
           placeholder: "Name",
           label: "Name",
           required: true,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -81,6 +117,9 @@ const CreateEmployeePage = () => {
           name: "email",
           placeholder: "Email",
           label: "Email",
+          required: true,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -92,6 +131,8 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "gender",
           required: true,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -104,6 +145,8 @@ const CreateEmployeePage = () => {
           type: "number",
           placeholder: "Phone",
           label: "Phone",
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 6,
       },
@@ -114,6 +157,8 @@ const CreateEmployeePage = () => {
           name: "birthday",
           placeholder: "Birthday",
           label: "Birthday",
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
       {
@@ -126,6 +171,8 @@ const CreateEmployeePage = () => {
           }),
           form: createEmployeeForm,
           name: "province",
+          radius: "md",
+          disabled: taskId !== undefined,
           loading: isProvicesLoading,
         },
         spans: 4,
@@ -141,6 +188,8 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "district",
           loading: isDistrictsLoading,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -155,6 +204,8 @@ const CreateEmployeePage = () => {
           form: createEmployeeForm,
           name: "wardId",
           loading: isWardsLoading,
+          radius: "md",
+          disabled: taskId !== undefined,
         },
         spans: 4,
       },
@@ -165,6 +216,8 @@ const CreateEmployeePage = () => {
           name: "addressLine",
           placeholder: "Employee address",
           label: "Employee address",
+          radius: "md",
+          disabled: taskId !== undefined,
         },
       },
     ];
@@ -177,56 +230,175 @@ const CreateEmployeePage = () => {
     provinces,
     wards,
   ]);
-  return (
-    <Paper m={rem(32)} p={rem(32)} shadow="xs">
-      <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"} pb={rem(28)}>
-        Add employee
-      </Text>
-      <form
-        onSubmit={createEmployeeForm.onSubmit(
-          ({ name, addressLine, birthday, email, gender, phone, wardId }) => {
-            const createEmployeeParams: CreateEmployeeParams = {
-              email: email ?? null,
-              name: name ?? "",
-              gender: gender,
-              addressLine,
-              birthday: birthday ? dayjs(birthday).format("YYYY-MM-DD") : null,
-              phone,
-              wardId,
-            };
 
-            let sb: CreateEmployeeParams = _.omitBy(
-              createEmployeeParams,
-              _.isNil
-            ) as CreateEmployeeParams;
-            craeteEmployee(sb, {
-              onSuccess() {
-                navigate(`/shop/employee`);
+  const massImportFields = useMemo(() => {
+    return [
+      {
+        type: FIELD_TYPES.FILE,
+        fieldProps: {
+          description:
+            "Choose your file to import multiple employess for your shop at once, accept .csv file",
+          form: massImportForm,
+          name: "file",
+          placeholder: "Choose a file",
+          label: "Import Employees",
+          accept: ".csv",
+          width: 300,
+          required: true,
+          disabled: taskId !== undefined,
+        },
+      },
+    ];
+  }, [massImportForm]);
+
+  return (
+    <>
+      <Box pt={rem(20)} pl={rem(32)}>
+        <CustomBreadcrumb items={breadcrumbs} goBack />
+      </Box>
+      <Paper m={rem(32)} p={rem(32)} shadow="xs">
+        <Group pb={20} align="center" justify="space-between">
+          <Group>
+            <Text size="lg" fw={"bold"} fz={25} c={"light-blue.4"}>
+              New employee
+            </Text>
+          </Group>
+          <Button onClick={openMassImport} disabled={taskId !== undefined}>Import File</Button>
+        </Group>
+
+        <form
+          onSubmit={createEmployeeForm.onSubmit(
+            ({ name, addressLine, birthday, email, gender, phone, wardId }) => {
+              const createEmployeeParams: CreateEmployeeParams = {
+                email: email ?? null,
+                name: name ?? "",
+                gender: gender,
+                addressLine,
+                birthday: birthday
+                  ? dayjs(birthday).format("YYYY-MM-DD")
+                  : null,
+                phone: isEmpty(phone) ? null : phone,
+                wardId,
+              };
+
+              let sb: CreateEmployeeParams = _.omitBy(
+                createEmployeeParams,
+                _.isNil
+              ) as CreateEmployeeParams;
+              craeteEmployee(sb, {
+                onSuccess() {
+                  navigate(`/shop/employee`);
+                },
+                onError(data) {
+                  const error = data as AxiosError<ResponseErrorDetail>;
+                  notifications.show({
+                    color: "red",
+                    title: "Failed",
+                    message: error.response?.data?.message,
+                  });
+                },
+              });
+            }
+          )}
+        >
+          <EditAndUpdateForm fields={createEmployeeFields} />
+          <Group justify="flex-end" mt="md">
+            <Button
+              type="submit"
+              disabled={!createEmployeeForm.isDirty() || taskId !== undefined}
+              loading={isCreateEmployeeLoading}
+            >
+              Create
+            </Button>
+          </Group>
+        </form>
+      </Paper>
+
+      {/* Mass import modal section */}
+      <Modal
+        opened={openedMassImport}
+        onClose={closeMassImport}
+        size="lg"
+        title="Import Multiple Employees"
+        centered
+        closeOnClickOutside={false}
+      >
+        <form
+          autoComplete="off"
+          onSubmit={massImportForm.onSubmit(({ file }) => {
+            // console.log(file)
+            notifications.show({
+              id: "uploadEmployeeProgress",
+              title: "Notice",
+              color: "light-blue.4",
+              message: "Import in progress",
+              autoClose: false,
+              withCloseButton: false,
+              icon: (
+                <IconCheck style={{ width: rem(18), height: rem(18) }} />
+              ),
+              loading: true,
+            });
+            uploadEmployee(
+              { file }, {
+              onSuccess(data) {
+                closeMassImport();
+                massImportForm.reset();
+                // console.log(data.taskId)
+
+                setTaskId(data.taskId);
+                localStorage.setItem(CommonConstant.TASK_ID, data?.taskId)
+                notifications.show({
+                  id: "uploadEmployeeProgress",
+                  title: "Notice",
+                  color: "light-blue.4",
+                  message: "Import in progress",
+                  autoClose: false,
+                  withCloseButton: false,
+                  icon: (
+                    <IconCheck style={{ width: rem(18), height: rem(18) }} />
+                  ),
+                  loading: true,
+                });
               },
               onError(data) {
                 const error = data as AxiosError<ResponseErrorDetail>;
                 notifications.show({
+                  id: "uploadEmployeeProgress",
                   color: "red",
                   title: "Failed",
-                  message: error.response?.data?.message,
+                  message:
+                    error.response?.data?.message ||
+                    "Something wrong happen trying to upload the file",
+                  autoClose: 5000,
+                  icon: <IconX style={{ width: rem(18), height: rem(18) }} />,
+                  loading: false,
                 });
               },
-            });
-          }
-        )}
-      >
-        <EditAndUpdateForm fields={fields} />
-        <Group justify="flex-end" mt="md">
-          <Button
-            type="submit"
-            disabled={!createEmployeeForm.isDirty()}
-            loading={isCreateEmployeeLoading}
-          >
-            Create
-          </Button>
-        </Group>
-      </form>
-    </Paper>
+            }
+            );
+          })}
+        >
+          <Group align="end">
+            <EditAndUpdateForm fields={massImportFields} />
+            <DownloadButton type="employee" />
+          </Group>
+          <Group mt="md">
+            <Button type="submit" loading={isUploadEmployeeLoading} disabled={taskId !== undefined}>
+              Import
+            </Button>
+            <Button
+              type="submit"
+              variant="outline"
+              onClick={closeMassImport}
+              loading={isUploadEmployeeLoading}
+            >
+              Cancel
+            </Button>
+          </Group>
+        </form>
+      </Modal>
+    </>
   );
 };
 

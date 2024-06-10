@@ -3,7 +3,7 @@ import { ShopAPI, UpdateShopParams } from "../apis/ShopAPI";
 
 export const useUpdateShopById = () => {
   const { mutate, isLoading, error, data } = useMutation({
-    mutationKey: ["update", "shop"],
+    mutationKey: ["updateShop"],
     mutationFn: async (params: UpdateShopParams) => {
       return await ShopAPI._updateShopById(params);
     },

@@ -1,0 +1,159 @@
+.today {
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+
+  @include light {
+    background-color: #eff6ff;
+  }
+
+  @include dark {
+    background-color: #595959;
+  }
+}
+
+.selectedDay {
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+
+  @include light {
+    background-color: #d2e3fc;
+  }
+
+  @include dark {
+    background-color: #434343;
+  }
+}
+
+.activeCard {
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+
+  @include light {
+    background-color: white;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
+  cursor: pointer;
+}
+
+.activeCard:hover {
+  @include light {
+    background-color: #d2e3fc;
+  }
+
+  @include dark {
+    background-color: #434343;
+  }
+}
+
+.timelinePrimaryPoint {
+  border-radius: 999px;
+  border: 1px solid #228be6;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.innerTimelinePrimaryPoint {
+  width: rem(16);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  margin: rem(2);
+}
+
+.timelinePrimaryPoint:hover > .innerTimelinePrimaryPoint {
+  background-color: #228be6;
+  transition: background-color 400ms ease-in;
+}
+
+.divider {
+  border-color: #dbeafe !important;
+  border-width: rem(2) !important;
+}
+
+.timelineWrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  align-items: center;
+  cursor: pointer;
+}
+
+.timelineWrapper:hover > .divider {
+  border-color: #228be6 !important;
+  transition: border-color 400ms ease-in;
+}
+
+.timelineWrapper:hover .innerTimelinePrimaryPoint,
+.timelineWrapper:hover .timelineSecondaryPoint {
+  background-color: #228be6 !important;
+  transition: background-color 400ms ease-in;
+}
+
+.timelineSecondaryPoint {
+  width: rem(16);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 1px solid #228be6;
+  margin-left: rem(2);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.timelineSecondaryPoint:hover {
+  background-color: #228be6;
+  transition: background-color 400ms ease-in;
+}
+
+.timeLineNumber {
+  position: absolute;
+  top: -24px;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  background-color: var(--mantine-color-body);
+  transition: box-shadow 150ms ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-bottom: rem(1px) solid #ccc;
+  }
+}
+
+.scrolled {
+  box-shadow: var(--mantine-shadow-sm);
+}
+
+.selectedInteraction {
+  @include light {
+    background-color: #eaf8fe;
+  }
+
+  @include dark {
+    background-color: #3b3b3b;
+  }
+}
+
+.activeAccordion {
+  @include light {
+    background-color: white;
+  }
+
+  @include dark {
+    background-color: #1f1f1f;
+  }
+
+  border: 1px solid rgb(79, 70, 229) !important;
+}

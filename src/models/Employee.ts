@@ -1,5 +1,5 @@
 import { WardDetail } from "./Address";
-import { EmployeeStatus, Gender } from "./CamAIEnum";
+import { EmployeeRole, EmployeeStatus, Gender } from "./CamAIEnum";
 import { ShopDetail } from "./Shop";
 
 export type EmployeeDetail = {
@@ -18,4 +18,5 @@ export type EmployeeDetail = {
   id: string;
   createdDate: Date;
   modifiedDate: Date;
+  employeeRole: EmployeeRole;
 };
